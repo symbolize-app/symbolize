@@ -1,17 +1,26 @@
 /** @type {import("snowpack").SnowpackUserConfig } */
-module.exports = {
+const config = {
+  alias: {
+    '@fe/api': './api',
+    '@fe/core': './core',
+    '@fe/db': './db',
+    '@fe/ui': './ui',
+    '@tiny': './tiny',
+  },
+  buildOptions: {},
+  devOptions: {},
   mount: {
     public: { url: '/', static: true },
     ui: { url: '/js/ui' },
     tiny: { url: '/js/ui' },
   },
-  plugins: [],
-  packageOptions: {},
-  devOptions: {},
-  buildOptions: {},
   optimize: {
     bundle: false,
     minify: true,
     target: 'es2018',
   },
+  packageOptions: {},
+  plugins: [],
 }
+
+module.exports = config
