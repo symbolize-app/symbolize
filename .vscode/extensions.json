@@ -1,0 +1,12 @@
+{
+  "recommendations": [
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "ms-azuretools.vscode-docker",
+    "eg2.vscode-npm-script"
+  ],
+  "unwantedRecommendations": [
+    "hookyqr.beautify",
+    "christian-kohler.npm-intellisense"
+  ]
+}
