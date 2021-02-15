@@ -1,13 +1,13 @@
 export namespace styleConfig {
   export let styleSheet: CSSStyleSheet
   export let styleMap: Map<string, Map<Style, string[]>>
-  export let styleCount
+  export let styleCount: number
 }
 
 export function initStyles() {
   const styleElement = document.createElement('style')
   document.head.appendChild(styleElement)
-  styleConfig.styleSheet = styleElement.sheet
+  styleConfig.styleSheet = styleElement.sheet!
   styleConfig.styleMap = new Map()
   styleConfig.styleCount = 0
   console.log('STYLES', styleConfig)
@@ -78,7 +78,7 @@ function renderStyleMerge(
   styleValue: StyleMerge,
   pseudo: string
 ): string[] {
-  return [].concat(
+  return ([] as string[]).concat(
     ...styleValue.map((newStyle) =>
       renderStyleForPseudo(newStyle, pseudo)
     )
