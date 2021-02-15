@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "pnpm watch",
+      "type": "shell",
+      "command": "pnpm watch",
+      "isBackground": true,
+      "problemMatcher": ["$tsc-watch"],
+      "option": "watch",
+      "presentation": {
+        "reveal": "never",
+        "echo": false,
+        "focus": false,
+        "panel": "dedicated"
+      },
+      "runOptions": {
+        "runOn": "folderOpen"
+      }
+    }
+  ]
+}

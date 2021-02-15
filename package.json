@@ -3,7 +3,7 @@
   "scripts": {
     "start": "snowpack dev",
     "build": "snowpack build",
-    "fmt": "prettier --ignore-path .gitignore --write '**/*.js' '**/*.json' '**/*.ts' '**/*.html'",
+    "fmt": "prettier --ignore-path .gitignore --write '**/*.js' '**/*.json' '**/*.ts' '**/*.html' '**/*.md'",
     "watch": "tsc --watch"
   },
   "devDependencies": {
