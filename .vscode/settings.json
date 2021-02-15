@@ -1,0 +1,11 @@
+{
+  "editor.detectIndentation": false,
+  "editor.formatOnPaste": false,
+  "editor.formatOnSave": false,
+  "editor.insertSpaces": true,
+  "editor.rulers": [60],
+  "editor.minimap.maxColumn": 60,
+  "editor.tabSize": 2,
+  "files.autoSave": "onFocusChange",
+  "typescript.tsdk": "node_modules/typescript/lib"
+}
