@@ -1,0 +1,34 @@
+{
+  "include": [
+    "api/**/*.ts",
+    "core/**/*.ts",
+    "db/**/*.ts",
+    "snowpack.config.js",
+    "tiny/**/*.ts",
+    "ui/**/*.ts"
+  ],
+  "compilerOptions": {
+    "allowUnreachableCode": false,
+    "allowJs": true,
+    "alwaysStrict": true,
+    "checkJs": true,
+    "forceConsistentCasingInFileNames": true,
+    "incremental": true,
+    "lib": ["dom", "dom.iterable", "es2015", "scripthost"],
+    "noEmit": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "paths": {
+      "@fe/api/*": ["./api/*"],
+      "@fe/core/*": ["./core/*"],
+      "@fe/db/*": ["./db/*"],
+      "@fe/ui/*": ["./ui/*"],
+      "@tiny/*": ["./tiny/*"]
+    },
+    "skipLibCheck": true,
+    "strict": true,
+    "types": ["node"]
+  }
+}
