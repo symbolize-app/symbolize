@@ -3,6 +3,7 @@
     "api/**/*.ts",
     "core/**/*.ts",
     "db/**/*.ts",
+    "global.d.ts",
     "snowpack.config.js",
     "tiny/**/*.ts",
     "ui/**/*.ts"
@@ -29,6 +30,7 @@
     },
     "skipLibCheck": true,
     "strict": true,
+    "target": "ES2019",
     "types": ["node"]
   }
 }
