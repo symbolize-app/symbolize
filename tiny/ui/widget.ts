@@ -207,9 +207,9 @@ export const range = widget<{
 export function replaceHtml(widget: Widget) {
   const result = collect([widget])
   if (result.length !== 1) {
-    throw Error('Too many')
+    throw Error('Too many elements to replace HTML')
   } else if (!(result[0] instanceof HTMLHtmlElement)) {
-    throw Error('Too many')
+    throw Error('Only HTML element can replace HTML')
   }
   document.replaceChild(result[0], document.documentElement)
 }
