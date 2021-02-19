@@ -1,30 +1,45 @@
 import { MutableKeys } from 'utility-types'
-import { Overwrite } from 'utility-types'
 
 const listeners = Symbol('listeners')
 
 const listenerOptions = Symbol('listenerOptions')
 
-function advancedListener<T>(
+export function advancedListener<T>(
   body: T,
   options: AddEventListenerOptions
-) {
+): T & { [listenerOptions]: AddEventListenerOptions } {
   return Object.assign(body, {
     [listenerOptions]: options,
   })
 }
 
-type Listeners = any
+export type HtmlListeners<E extends Element = Element> = {
+  [K in keyof HTMLElementEventMap]?: ((
+    this: E,
+    ev: HTMLElementEventMap[K]
+  ) => any) & {
+    [listenerOptions]?: AddEventListenerOptions
+  }
+}
 
-type Widget =
-  | string
+export type Style = any
+
+type BodyWidget = {
+  body: Widget
+}
+
+type RangeWidget = {
+  content: Widget[]
+}
+
+export type Widget =
   | Node
+  | BodyWidget
+  | RangeWidget
+  | string
   | false
   | undefined
   | null
-  | { root: (string | Node)[] }
-
-type ElementWidget<T> = any
 
 function replaceChildren(
   parent: ParentNode,
@@ -35,18 +50,25 @@ function replaceChildren(
 }
 
 const elementProperties = {
-  classes: {
+  styles: {
     set(_value: never) {},
-  },
-  inner: {
-    set(this: Element, value: Widget[]) {
-      replaceChildren(this, collect(value))
-    },
   },
   listen: {
     set(
-      this: Element & { [listeners]: Listeners },
-      value: Listeners
+      this: Element & {
+        [listeners]: Record<
+          string,
+          EventListener & {
+            [listenerOptions]?: AddEventListenerOptions
+          }
+        >
+      },
+      value: Record<
+        string,
+        EventListener & {
+          [listenerOptions]?: AddEventListenerOptions
+        }
+      >
     ) {
       const oldListeners = this[listeners]
       for (const key in oldListeners) {
@@ -71,11 +93,17 @@ const elementProperties = {
     writable: true,
     value: {},
   },
+  content: {
+    set(this: Element, value: Widget[]) {
+      replaceChildren(this, collect(value))
+    },
+  },
 }
 
 function collect(items: Widget[]): (string | Node)[] {
-  const results = []
-  for (let item of items) {
+  const results: (string | Node)[] = []
+
+  function loop(item: Widget) {
     if (typeof item == 'string' || item instanceof Node) {
       results.push(item)
     } else if (
@@ -83,35 +111,56 @@ function collect(items: Widget[]): (string | Node)[] {
       item === undefined ||
       item === null
     ) {
+    } else if (item.hasOwnProperty('body')) {
+      loop((item as BodyWidget).body)
     } else {
-      for (const subitem of item.root) {
-        results.push(subitem)
+      for (const subitem of (item as RangeWidget).content) {
+        loop(subitem)
       }
     }
   }
+
+  for (let item of items) {
+    loop(item)
+  }
+
   return results
 }
 
-type WidgetInitializer<T extends object> = Simplify<
-  Partial<Pick<T, MutableKeys<T>>>
->
+export type WidgetInitializer<
+  T extends Widget & object
+> = Partial<Pick<T, MutableKeys<T>>>
 
-type WidgetBody<T extends object> = T extends Node
-  ? T
-  : Overwrite<T, { readonly root: Widget }>
+export type WidgetFunction<T extends Widget & object> = (
+  data: WidgetInitializer<T>
+) => T
 
-function widget<T extends object>(
-  body: () => WidgetBody<T>
-): (data: WidgetInitializer<T>) => WidgetBody<T> {
+export function widget<T extends Widget & object>(
+  body: () => T
+): WidgetFunction<T> {
   return (data) => {
     return Object.assign(body(), data)
   }
 }
 
-const html = new Proxy(
-  {},
+type HtmlWidgetMap = {
+  [K in keyof HTMLElementTagNameMap]: WidgetFunction<
+    HTMLElementTagNameMap[K] & {
+      styles: Style[]
+      listen: HtmlListeners<HTMLElementTagNameMap[K]>
+      content: Widget[]
+    }
+  >
+}
+
+export const html: HtmlWidgetMap = new Proxy(
+  {} as HtmlWidgetMap,
   {
-    get(target, property, _receiver) {
+    get(
+      target: HtmlWidgetMap,
+      property: keyof HtmlWidgetMap,
+      _receiver
+    ) {
       return (
         target[property] ||
         (target[property] = widget(() =>
@@ -125,119 +174,42 @@ const html = new Proxy(
   }
 )
 
-const range = widget(() => {
+export const range = widget<{
+  content: Widget[]
+}>(() => {
   const start = document.createComment('')
   const end = document.createComment('')
-  const root = [start, end]
+  const content: Widget[] = [start, end]
 
   return {
-    root,
-    set inner(value: Widget[]) {
+    get content() {
+      return content
+    },
+    set content(value: Widget[]) {
       const inner = collect(value)
       const parent = start.parentNode
       if (parent) {
-        const siblings = Array.from(parent.childNodes)
+        const siblings: (string | Node)[] = Array.from(
+          parent.childNodes
+        )
         siblings.splice(
           siblings.indexOf(start) + 1,
-          root.length - 2,
+          content.length - 2,
           ...inner
         )
         replaceChildren(parent, siblings)
       }
-      root.splice(1, root.length - 2, ...inner)
+      content.splice(1, content.length - 2, ...inner)
     },
   }
 })
 
-function replaceHtml(
-  widget: ElementWidget<HTMLHtmlElement>
-) {
-  document.replaceChild(
-    collect([widget])[0],
-    document.documentElement
-  )
+export function replaceHtml(widget: Widget) {
+  const result = collect([widget])
+  if (result.length !== 1) {
+    throw Error('Too many')
+  } else if (!(result[0] instanceof HTMLHtmlElement)) {
+    throw Error('Too many')
+  }
+  document.replaceChild(result[0], document.documentElement)
 }
-
-const myButton = widget<{
-  readonly root: Widget
-  listen: number
-}>(() => {
-  const root = html.button({
-    inner: ['OK'],
-  })
-  const body: {
-    readonly root: Widget
-    listen: number
-  } = {
-    root,
-    set listen(value: number) {
-      root.listen = value
-    },
-  }
-  return body
-})
-
-const myCounter = widget(() => {
-  let value
-  const root = html.span({})
-  const body = {
-    root: [root],
-    get value() {
-      return value
-    },
-    set value(_value) {
-      value = _value
-      root.inner = [value.toString()]
-    },
-  }
-  body.value = 0
-  return body
-})
-
-const counter = myCounter()
-
-const listContents = range()
-
-const div = html.div({
-  inner: [
-    'HI ',
-    myButton({
-      listen: {
-        click() {
-          counter.value += 1
-          listContents.inner = [
-            html.li({
-              inner: [counter.value.toString()],
-            }),
-            html.li({
-              inner: [(counter.value * 2).toString()],
-            }),
-          ]
-        },
-      },
-    }),
-    ' ',
-    counter,
-    html.ul({
-      inner: [
-        html.li({
-          inner: ['+'],
-        }),
-        listContents,
-        html.li({
-          inner: ['-'],
-        }),
-      ],
-    }),
-  ],
-})
-
-replaceHtml(
-  html.html({
-    inner: [
-      html.body({
-        inner: [div],
-      }),
-    ],
-  })
-)
