@@ -16,6 +16,7 @@
     "forceConsistentCasingInFileNames": true,
     "incremental": true,
     "lib": ["dom", "dom.iterable", "es2015", "scripthost"],
+    "moduleResolution": "node",
     "noEmit": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
