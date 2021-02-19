@@ -1,3 +1,6 @@
+import { MutableKeys } from 'utility-types'
+import { Overwrite } from 'utility-types'
+
 const listeners = Symbol('listeners')
 
 const listenerOptions = Symbol('listenerOptions')
@@ -89,14 +92,18 @@ function collect(items: Widget[]): (string | Node)[] {
   return results
 }
 
-function widget<
-  T extends Node | { root: (string | Node)[] }
->(body: () => T) {
-  return (data: Partial<T>) => {
-    const newWidget = body()
-    if (!(newWidget instanceof Node)) {
-      newWidget.root = collect(newWidget.root)
-    }
+type WidgetInitializer<T extends object> = Simplify<
+  Partial<Pick<T, MutableKeys<T>>>
+>
+
+type WidgetBody<T extends object> = T extends Node
+  ? T
+  : Overwrite<T, { readonly root: Widget }>
+
+function widget<T extends object>(
+  body: () => WidgetBody<T>
+): (data: WidgetInitializer<T>) => WidgetBody<T> {
+  return (data) => {
     return Object.assign(body(), data)
   }
 }
@@ -151,16 +158,23 @@ function replaceHtml(
   )
 }
 
-const myButton = widget(() => {
+const myButton = widget<{
+  readonly root: Widget
+  listen: number
+}>(() => {
   const root = html.button({
     inner: ['OK'],
   })
-  return {
-    root: [root],
-    set listen(value) {
+  const body: {
+    readonly root: Widget
+    listen: number
+  } = {
+    root,
+    set listen(value: number) {
       root.listen = value
     },
   }
+  return body
 })
 
 const myCounter = widget(() => {
