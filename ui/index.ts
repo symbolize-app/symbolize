@@ -1,23 +1,42 @@
-import { initStyles } from '@tiny/ui/style'
+import { styleConfig } from '@tiny/ui/style'
 import { style } from '@tiny/ui/style'
-import { renderStyle } from '@tiny/ui/style'
+import { selector } from '@tiny/ui/style'
 import { Widget } from '@tiny/ui/widget'
+import { widgetConfig } from '@tiny/ui/widget'
 import { html } from '@tiny/ui/widget'
 import { widget } from '@tiny/ui/widget'
 import { HtmlListeners } from '@tiny/ui/widget'
 import { range } from '@tiny/ui/widget'
-import { replaceHtml } from '@tiny/ui/widget'
+import { toHtmlWidget } from '@tiny/ui/widget'
 import { message } from '@fe/ui/message'
 
+widgetConfig.init(window.document)
+styleConfig.init(window.document)
+
 console.log(message)
-initStyles()
-const s = style([
+
+const green = style([
   {
-    color: 'red',
+    backgroundColor: 'green',
   },
 ])
-const r = renderStyle(s)
-console.log('CLASSES', r)
+const blue = style([
+  {
+    backgroundColor: 'blue',
+  },
+])
+const red = style([
+  {
+    backgroundColor: 'red',
+  },
+  blue,
+  selector('&:hover', [green]),
+])
+const bold = style([
+  {
+    fontWeight: 'bold',
+  },
+])
 
 const myButton = widget<{
   readonly body: Widget
@@ -59,6 +78,7 @@ const counter = myCounter({})
 const listContents = range({
   content: [
     html.li({
+      styles: [bold],
       content: ['init'],
     }),
   ],
@@ -74,6 +94,7 @@ const div = html.div({
           counter.value += 1
           listContents.content = [
             html.li({
+              styles: [red],
               content: [counter.value.toString()],
             }),
             html.li({
@@ -99,12 +120,8 @@ const div = html.div({
   ],
 })
 
-replaceHtml(
-  html.html({
-    content: [
-      html.body({
-        content: [div],
-      }),
-    ],
-  })
-)
+const head = toHtmlWidget(window.document.head)
+const body = toHtmlWidget(window.document.body)
+
+head.content = [html.title({ content: ['Fertile Earth'] })]
+body.content = [div]
