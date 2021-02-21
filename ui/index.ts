@@ -1,4 +1,5 @@
 import { initStyles } from '@tiny/ui/style'
+import { style } from '@tiny/ui/style'
 import { renderStyle } from '@tiny/ui/style'
 import { Widget } from '@tiny/ui/widget'
 import { html } from '@tiny/ui/widget'
@@ -10,10 +11,13 @@ import { message } from '@fe/ui/message'
 
 console.log(message)
 initStyles()
-const s = renderStyle({
-  color: 'red',
-})
-console.log('CLASSES', s)
+const s = style([
+  {
+    color: 'red',
+  },
+])
+const r = renderStyle(s)
+console.log('CLASSES', r)
 
 const myButton = widget<{
   readonly body: Widget
