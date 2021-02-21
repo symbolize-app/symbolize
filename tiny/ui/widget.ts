@@ -1,4 +1,17 @@
 import { MutableKeys } from 'utility-types'
+import {
+  renderStyle,
+  Style,
+  styleConfig,
+} from '@tiny/ui/style'
+
+export namespace widgetConfig {
+  export let document: Document
+
+  export function init(document: Document) {
+    widgetConfig.document = document
+  }
+}
 
 const listeners = Symbol('listeners')
 
@@ -22,8 +35,6 @@ export type HtmlListeners<E extends Element = Element> = {
   }
 }
 
-export type Style = any
-
 type BodyWidget = {
   body: Widget
 }
@@ -45,13 +56,42 @@ function replaceChildren(
   parent: ParentNode,
   children: (Node | string)[]
 ): void {
-  // TODO Check for replaceChilren
-  parent.replaceChildren(...children)
+  if (parent instanceof HTMLHeadElement) {
+    let styleElement: HTMLStyleElement | null = null
+    let node = parent.firstChild
+    while (node) {
+      const nextNode = node.nextSibling
+      if (node !== styleConfig.styleElement) {
+        node.remove()
+      } else if (!styleElement) {
+        styleElement = styleConfig.styleElement
+      }
+      node = nextNode
+    }
+    for (const child of children) {
+      parent.insertBefore(
+        child instanceof Node
+          ? child
+          : widgetConfig.document.createTextNode(child),
+        styleElement
+      )
+    }
+  } else {
+    // TODO Check for replaceChilren
+    parent.replaceChildren(...children)
+  }
 }
 
 const elementProperties = {
   styles: {
-    set(_value: never) {},
+    set(this: Element, value: Style[]) {
+      if (this.classList.length) {
+        this.classList.remove(...this.classList)
+      }
+      for (const styleValue of value) {
+        this.classList.add(...renderStyle(styleValue))
+      }
+    },
   },
   listen: {
     set(
@@ -149,6 +189,12 @@ type HtmlWidget<T extends HTMLElement> = T & {
   content: Widget[]
 }
 
+export function toHtmlWidget<T extends HTMLElement>(
+  element: T
+): HtmlWidget<T> {
+  return Object.defineProperties(element, elementProperties)
+}
+
 type HtmlWidgetMap = {
   [K in keyof HTMLElementTagNameMap]: WidgetFunction<
     HtmlWidget<HTMLElementTagNameMap[K]>
@@ -160,17 +206,16 @@ export const html: HtmlWidgetMap = new Proxy(
   {
     get(
       target: HtmlWidgetMap,
-      property: keyof HtmlWidgetMap,
-      _receiver
+      property: keyof HTMLElementTagNameMap,
+      _receiver: unknown
     ) {
       return (
         target[property] ||
         (target[property] = widget(() =>
-          Object.defineProperties(
-            document.createElement(property),
-            elementProperties
+          toHtmlWidget(
+            widgetConfig.document.createElement(property)
           )
-        ))
+        ) as any)
       )
     },
   }
@@ -179,8 +224,8 @@ export const html: HtmlWidgetMap = new Proxy(
 export const range = widget<{
   content: Widget[]
 }>(() => {
-  const start = document.createComment('')
-  const end = document.createComment('')
+  const start = widgetConfig.document.createComment('')
+  const end = widgetConfig.document.createComment('')
   const content: Widget[] = [start, end]
 
   return {
@@ -205,13 +250,3 @@ export const range = widget<{
     },
   }
 })
-
-export function replaceHtml(widget: Widget) {
-  const result = collect([widget])
-  if (result.length !== 1) {
-    throw Error('Too many elements to replace HTML')
-  } else if (!(result[0] instanceof HTMLHtmlElement)) {
-    throw Error('Only HTML element can replace HTML')
-  }
-  document.replaceChild(result[0], document.documentElement)
-}
