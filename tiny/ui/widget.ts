@@ -143,13 +143,15 @@ export function widget<T extends Widget & object>(
   }
 }
 
+type HtmlWidget<T extends HTMLElement> = T & {
+  styles: Style[]
+  listen: HtmlListeners<T>
+  content: Widget[]
+}
+
 type HtmlWidgetMap = {
   [K in keyof HTMLElementTagNameMap]: WidgetFunction<
-    HTMLElementTagNameMap[K] & {
-      styles: Style[]
-      listen: HtmlListeners<HTMLElementTagNameMap[K]>
-      content: Widget[]
-    }
+    HtmlWidget<HTMLElementTagNameMap[K]>
   >
 }
 
