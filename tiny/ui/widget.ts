@@ -1,16 +1,12 @@
+import { renderStyle } from '@tiny/ui/style'
+import { Style } from '@tiny/ui/style'
+import { configStyleElement } from '@tiny/ui/style'
 import { MutableKeys } from 'utility-types'
-import {
-  renderStyle,
-  Style,
-  styleConfig,
-} from '@tiny/ui/style'
 
-export namespace widgetConfig {
-  export let document: Document
+export let configDocument: Document
 
-  export function init(document: Document) {
-    widgetConfig.document = document
-  }
+export function initWidgetConfig(document: Document): void {
+  configDocument = document
 }
 
 const listeners = Symbol('listeners')
@@ -30,7 +26,7 @@ export type HtmlListeners<E extends Element = Element> = {
   [K in keyof HTMLElementEventMap]?: ((
     this: E,
     ev: HTMLElementEventMap[K]
-  ) => any) & {
+  ) => void) & {
     [listenerOptions]?: AddEventListenerOptions
   }
 }
@@ -61,10 +57,10 @@ function replaceChildren(
     let node = parent.firstChild
     while (node) {
       const nextNode = node.nextSibling
-      if (node !== styleConfig.styleElement) {
+      if (node !== configStyleElement) {
         node.remove()
       } else if (!styleElement) {
-        styleElement = styleConfig.styleElement
+        styleElement = configStyleElement
       }
       node = nextNode
     }
@@ -72,7 +68,7 @@ function replaceChildren(
       parent.insertBefore(
         child instanceof Node
           ? child
-          : widgetConfig.document.createTextNode(child),
+          : configDocument.createTextNode(child),
         styleElement
       )
     }
@@ -151,7 +147,8 @@ function collect(items: Widget[]): (string | Node)[] {
       item === undefined ||
       item === null
     ) {
-    } else if (item.hasOwnProperty('body')) {
+      // Skip
+    } else if (Reflect.has(item, 'body')) {
       loop((item as BodyWidget).body)
     } else {
       for (const subitem of (item as RangeWidget).content) {
@@ -160,7 +157,7 @@ function collect(items: Widget[]): (string | Node)[] {
     }
   }
 
-  for (let item of items) {
+  for (const item of items) {
     loop(item)
   }
 
@@ -168,16 +165,16 @@ function collect(items: Widget[]): (string | Node)[] {
 }
 
 export type WidgetInitializer<
-  T extends Widget & object
+  T extends Widget & { [K in keyof T]: T[K] }
 > = Partial<Pick<T, MutableKeys<T>>>
 
-export type WidgetFunction<T extends Widget & object> = (
-  data: WidgetInitializer<T>
-) => T
+export type WidgetFunction<
+  T extends Widget & { [K in keyof T]: T[K] }
+> = (data: WidgetInitializer<T>) => T
 
-export function widget<T extends Widget & object>(
-  body: () => T
-): WidgetFunction<T> {
+export function widget<
+  T extends Widget & { [K in keyof T]: T[K] }
+>(body: () => T): WidgetFunction<T> {
   return (data) => {
     return Object.assign(body(), data)
   }
@@ -192,7 +189,10 @@ type HtmlWidget<T extends HTMLElement> = T & {
 export function toHtmlWidget<T extends HTMLElement>(
   element: T
 ): HtmlWidget<T> {
-  return Object.defineProperties(element, elementProperties)
+  return Object.defineProperties(
+    element,
+    elementProperties
+  ) as HtmlWidget<T>
 }
 
 type HtmlWidgetMap = {
@@ -204,19 +204,16 @@ type HtmlWidgetMap = {
 export const html: HtmlWidgetMap = new Proxy(
   {} as HtmlWidgetMap,
   {
-    get(
-      target: HtmlWidgetMap,
-      property: keyof HTMLElementTagNameMap,
-      _receiver: unknown
+    get<K extends keyof HTMLElementTagNameMap>(
+      target: unknown,
+      property: K
     ) {
-      return (
-        target[property] ||
-        (target[property] = widget(() =>
-          toHtmlWidget(
-            widgetConfig.document.createElement(property)
-          )
-        ) as any)
-      )
+      return ((target as Record<
+        K,
+        WidgetFunction<HtmlWidget<HTMLElementTagNameMap[K]>>
+      >)[property] ??= widget(() =>
+        toHtmlWidget(configDocument.createElement(property))
+      ))
     },
   }
 )
@@ -224,8 +221,8 @@ export const html: HtmlWidgetMap = new Proxy(
 export const range = widget<{
   content: Widget[]
 }>(() => {
-  const start = widgetConfig.document.createComment('')
-  const end = widgetConfig.document.createComment('')
+  const start = configDocument.createComment('')
+  const end = configDocument.createComment('')
   const content: Widget[] = [start, end]
 
   return {

@@ -1,3 +1,5 @@
+/* eslint-env commonjs */
+
 /** @type {import("snowpack").SnowpackUserConfig } */
 const config = {
   alias: {
