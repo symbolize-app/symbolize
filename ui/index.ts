@@ -1,17 +1,17 @@
-import { styleConfig } from '@tiny/ui/style'
+import { message } from '@fe/ui/message'
+import { initStyleConfig } from '@tiny/ui/style'
 import { style } from '@tiny/ui/style'
 import { selector } from '@tiny/ui/style'
 import { Widget } from '@tiny/ui/widget'
-import { widgetConfig } from '@tiny/ui/widget'
+import { initWidgetConfig } from '@tiny/ui/widget'
 import { html } from '@tiny/ui/widget'
 import { widget } from '@tiny/ui/widget'
 import { HtmlListeners } from '@tiny/ui/widget'
 import { range } from '@tiny/ui/widget'
 import { toHtmlWidget } from '@tiny/ui/widget'
-import { message } from '@fe/ui/message'
 
-widgetConfig.init(window.document)
-styleConfig.init(window.document)
+initWidgetConfig(window.document)
+initStyleConfig(window.document)
 
 console.log(message)
 
