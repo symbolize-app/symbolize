@@ -1,4 +1,7 @@
 {
+  "engines": {
+    "node": "^12.17.0"
+  },
   "type": "module",
   "scripts": {
     "build": "snowpack build",
@@ -7,7 +10,7 @@
     "check-prettier": "prettier --ignore-path .gitignore --check '**/*.js' '**/*.json' '**/*.ts' '**/*.html' '**/*.md'",
     "fix": "eslint --ignore-path .gitignore --fix .",
     "fmt": "prettier --ignore-path .gitignore --write '**/*.js' '**/*.json' '**/*.ts' '**/*.html' '**/*.md'",
-    "start": "snowpack dev",
+    "dev": "node dev.js",
     "watch": "tsc --watch"
   },
   "devDependencies": {
@@ -42,6 +45,9 @@
       "tsconfigRootDir": ".",
       "project": [
         "./tsconfig.json"
+      ],
+      "extraFileExtensions": [
+        ".cjs"
       ]
     },
     "plugins": [
