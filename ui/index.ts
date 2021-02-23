@@ -1,71 +1,67 @@
-import { message } from '@fe/ui/message'
-import { initStyleConfig } from '@tiny/ui/style'
-import { style } from '@tiny/ui/style'
-import { selector } from '@tiny/ui/style'
-import { Widget } from '@tiny/ui/widget'
-import { initWidgetConfig } from '@tiny/ui/widget'
-import { html } from '@tiny/ui/widget'
-import { widget } from '@tiny/ui/widget'
-import { HtmlListeners } from '@tiny/ui/widget'
-import { range } from '@tiny/ui/widget'
-import { toHtmlWidget } from '@tiny/ui/widget'
+import * as message from '@fe/ui/message.ts'
+import * as style from '@tiny/ui/style.ts'
+import * as widget from '@tiny/ui/widget.ts'
 
-initWidgetConfig(window.document)
-initStyleConfig(window.document)
+console.log(message.hi)
 
-console.log(message)
-
-const green = style([
+const green = style.build([
   {
     backgroundColor: 'green',
   },
 ])
-const blue = style([
+const blue = style.build([
   {
     backgroundColor: 'blue',
   },
 ])
-const red = style([
+const red = style.build([
   {
     backgroundColor: 'red',
   },
   blue,
-  selector('&:hover', [green]),
+  style.useSelector('&:hover', [green]),
 ])
-const bold = style([
+const bold = style.build([
   {
     fontWeight: 'bold',
   },
 ])
 
-const myButton = widget<{
-  readonly body: Widget
-  listen: HtmlListeners
+const li = widget.html.li
+const div = widget.html.div
+const button = widget.html.button
+const ul = widget.html.ul
+const span = widget.html.span
+const title = widget.html.title
+
+const myButton = widget.define<{
+  readonly body: widget.Widget
+  listen: widget.HtmlListeners
 }>(() => {
-  const body = html.button({
+  const body = button({
     content: ['OK'],
   })
   return {
     body,
-    set listen(value: HtmlListeners) {
+    set listen(value: widget.HtmlListeners) {
       body.listen = value
     },
   }
 })
 
-const myCounter = widget<{
-  readonly body: Widget
+const myCounter = widget.define<{
+  readonly body: widget.Widget
   value: number
 }>(() => {
   let value: number
-  const body = html.span({})
+  const body = span({})
   const result = {
     body,
     get value() {
       return value
     },
-    set value(_value) {
-      value = _value
+    set value(newValue) {
+      value = newValue
       body.content = [value.toString()]
     },
   }
@@ -73,18 +69,21 @@ const myCounter = widget<{
   return result
 })
 
+widget.initConfig(window.document)
+style.initConfig(window.document)
+
 const counter = myCounter({})
 
-const listContents = range({
+const listContents = widget.range({
   content: [
-    html.li({
+    li({
       styles: [bold],
       content: ['init'],
     }),
   ],
 })
 
-const div = html.div({
+const rootDiv = div({
   content: [
     'HI ',
     myButton({
@@ -93,11 +92,11 @@ const div = html.div({
           console.log(event)
           counter.value += 1
           listContents.content = [
-            html.li({
+            li({
               styles: [red],
               content: [counter.value.toString()],
             }),
-            html.li({
+            li({
               content: [(counter.value * 2).toString()],
             }),
           ]
@@ -106,13 +105,13 @@ const div = html.div({
     }),
     ' ',
     counter,
-    html.ul({
+    ul({
       content: [
-        html.li({
+        li({
           content: ['+'],
         }),
         listContents,
-        html.li({
+        li({
           content: ['-'],
         }),
       ],
@@ -120,8 +119,8 @@ const div = html.div({
   ],
 })
 
-const head = toHtmlWidget(window.document.head)
-const body = toHtmlWidget(window.document.body)
+const head = widget.toHtmlWidget(window.document.head)
+const body = widget.toHtmlWidget(window.document.body)
 
-head.content = [html.title({ content: ['Fertile Earth'] })]
-body.content = [div]
+head.content = [title({ content: ['Fertile Earth'] })]
+body.content = [rootDiv]
