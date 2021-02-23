@@ -1,11 +1,9 @@
-import { renderStyle } from '@tiny/ui/style'
-import { Style } from '@tiny/ui/style'
-import { configStyleElement } from '@tiny/ui/style'
-import { MutableKeys } from 'utility-types'
+import * as style from '@tiny/ui/style.ts'
+import * as utilityTypes from 'utility-types'
 
 export let configDocument: Document
 
-export function initWidgetConfig(document: Document): void {
+export function initConfig(document: Document): void {
   configDocument = document
 }
 
@@ -57,10 +55,10 @@ function replaceChildren(
     let node = parent.firstChild
     while (node) {
       const nextNode = node.nextSibling
-      if (node !== configStyleElement) {
+      if (node !== style.configStyleElement) {
         node.remove()
       } else if (!styleElement) {
-        styleElement = configStyleElement
+        styleElement = style.configStyleElement
       }
       node = nextNode
     }
@@ -80,12 +78,12 @@ function replaceChildren(
 
 const elementProperties = {
   styles: {
-    set(this: Element, value: Style[]) {
+    set(this: Element, value: style.Style[]) {
       if (this.classList.length) {
         this.classList.remove(...this.classList)
       }
-      for (const styleValue of value) {
-        this.classList.add(...renderStyle(styleValue))
+      for (const styleItem of value) {
+        this.classList.add(...style.render(styleItem))
       }
     },
   },
@@ -166,13 +164,13 @@ function collect(items: Widget[]): (string | Node)[] {
 
 export type WidgetInitializer<
   T extends Widget & { [K in keyof T]: T[K] }
-> = Partial<Pick<T, MutableKeys<T>>>
+> = Partial<Pick<T, utilityTypes.MutableKeys<T>>>
 
 export type WidgetFunction<
   T extends Widget & { [K in keyof T]: T[K] }
 > = (data: WidgetInitializer<T>) => T
 
-export function widget<
+export function define<
   T extends Widget & { [K in keyof T]: T[K] }
 >(body: () => T): WidgetFunction<T> {
   return (data) => {
@@ -181,7 +179,7 @@ export function widget<
 }
 
 type HtmlWidget<T extends HTMLElement> = T & {
-  styles: Style[]
+  styles: style.Style[]
   listen: HtmlListeners<T>
   content: Widget[]
 }
@@ -211,14 +209,15 @@ export const html: HtmlWidgetMap = new Proxy(
       return ((target as Record<
         K,
         WidgetFunction<HtmlWidget<HTMLElementTagNameMap[K]>>
-      >)[property] ??= widget(() =>
-        toHtmlWidget(configDocument.createElement(property))
-      ))
+      >)[property] ??= define(() =>
+        toHtmlWidget(
+          configDocument.createElement(property)
+        )))
     },
   }
 )
 
-export const range = widget<{
+export const range = define<{
   content: Widget[]
 }>(() => {
   const start = configDocument.createComment('')
