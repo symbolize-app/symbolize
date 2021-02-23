@@ -2,7 +2,7 @@
   "type": "module",
   "scripts": {
     "build": "snowpack build",
-    "check-eslint": "eslint --ignore-path .gitignore .",
+    "check-eslint": "eslint --ignore-path .gitignore --max-warnings 0 .",
     "check-tsc": "tsc",
     "check-prettier": "prettier --ignore-path .gitignore --check '**/*.js' '**/*.json' '**/*.ts' '**/*.html' '**/*.md'",
     "fix": "eslint --ignore-path .gitignore --fix .",
@@ -57,10 +57,34 @@
       "prettier"
     ],
     "rules": {
-      "import/first": "error",
-      "import/newline-after-import": "error",
-      "simple-import-sort/imports": "error",
-      "@typescript-eslint/camelcase": "off",
+      "import/extensions": [
+        "warn",
+        "always"
+      ],
+      "import/first": "warn",
+      "import/newline-after-import": "warn",
+      "import/no-default-export": "error",
+      "import/no-duplicates": "warn",
+      "simple-import-sort/imports": "warn",
+      "@typescript-eslint/naming-convention": [
+        "warn",
+        {
+          "selector": "default",
+          "format": [
+            "strictCamelCase"
+          ],
+          "leadingUnderscore": "forbid",
+          "trailingUnderscore": "forbid"
+        },
+        {
+          "selector": "typeLike",
+          "format": [
+            "StrictPascalCase"
+          ],
+          "leadingUnderscore": "forbid",
+          "trailingUnderscore": "forbid"
+        }
+      ],
       "@typescript-eslint/member-delimiter-style": [
         "error",
         {
