@@ -3,12 +3,14 @@
     "api/**/*.ts",
     "core/**/*.ts",
     "db/**/*.ts",
+    "dev.js",
     "global.d.ts",
-    "snowpack.config.js",
+    "snowpack.config.cjs",
     "tiny/**/*.ts",
     "ui/**/*.ts"
   ],
   "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
     "allowUnreachableCode": false,
     "allowJs": true,
     "alwaysStrict": true,
