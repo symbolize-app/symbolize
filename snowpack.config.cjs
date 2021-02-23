@@ -14,7 +14,7 @@ const config = {
   mount: {
     public: { url: '/', static: true },
     ui: { url: '/js/ui' },
-    tiny: { url: '/js/ui' },
+    "tiny/ui": { url: '/js/tiny/ui' },
   },
   optimize: {
     bundle: false,
