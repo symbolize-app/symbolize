@@ -6,14 +6,6 @@ async function run() {
   /** @type {snowpack.SSRLoader} */
   let runtime
   const config = await snowpack.loadConfiguration({
-    mount: {
-      api: { url: '/js/api' },
-      db: { url: '/js/db' },
-      public: { url: '/', static: true },
-      ui: { url: '/js/ui' },
-      'tiny/api': { url: '/js/tiny/api' },
-      'tiny/ui': { url: '/js/tiny/ui' },
-    },
     routes: [
       {
         match: 'routes',
@@ -22,7 +14,7 @@ async function run() {
       },
       {
         match: 'routes',
-        src: '.*',
+        src: '/(?!_snowpack/).*',
         dest: async (req, res) => {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           const serve = (

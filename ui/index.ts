@@ -124,3 +124,13 @@ const body = widget.toHtmlWidget(window.document.body)
 
 head.content = [title({ content: ['Fertile Earth'] })]
 body.content = [rootDiv]
+
+if (import.meta.env.MODE === 'development') {
+  async function runAll() {
+    const test = await import('@tiny/test/index.ts')
+    const uiTest = await import('@fe/ui/test.ts')
+    test.runAll(...uiTest.all)
+  }
+
+  runAll().catch(console.error)
+}
