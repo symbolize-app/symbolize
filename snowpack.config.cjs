@@ -12,16 +12,20 @@ const config = {
   buildOptions: {},
   devOptions: {},
   mount: {
+    api: { url: '/js/api' },
+    db: { url: '/js/db' },
     public: { url: '/', static: true },
+    tiny: { url: '/js/tiny' },
     ui: { url: '/js/ui' },
-    "tiny/ui": { url: '/js/tiny/ui' },
   },
   optimize: {
     bundle: false,
     minify: true,
-    target: 'es2018',
+    target: 'es2020',
   },
-  packageOptions: {},
+  packageOptions: {
+    source: "remote"
+  },
   plugins: [],
 }
 
