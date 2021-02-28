@@ -1,4 +1,4 @@
-import * as message from '@fe/ui/message.ts'
+import * as message from '@fe/core/message.ts'
 import * as http from 'http'
 
 export function handleRequest(

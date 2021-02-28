@@ -1,5 +1,5 @@
 import * as style from '@tiny/ui/style.ts'
-import * as utilityTypes from 'utility-types'
+import type * as utilityTypes from 'utility-types'
 
 export let configDocument: Document
 
@@ -134,7 +134,9 @@ const elementProperties = {
   },
 }
 
-function collect(items: Widget[]): (string | Node)[] {
+export function collect(
+  items: Widget[]
+): (string | Node)[] {
   const results: (string | Node)[] = []
 
   function loop(item: Widget) {

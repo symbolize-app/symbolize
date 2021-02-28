@@ -1,4 +1,4 @@
-import * as message from '@fe/ui/message.ts'
+import * as message from '@fe/core/message.ts'
 import * as chai from 'chai'
 
 export const url = import.meta.url
