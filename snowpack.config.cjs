@@ -13,6 +13,7 @@ const config = {
   devOptions: {},
   mount: {
     api: { url: '/js/api' },
+    core: { url: '/js/core' },
     db: { url: '/js/db' },
     public: { url: '/', static: true },
     tiny: { url: '/js/tiny' },
