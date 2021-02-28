@@ -2,7 +2,7 @@ import * as chai from 'chai'
 import chaiDom from 'chai-dom'
 import prettyMs from 'pretty-ms'
 
-type Test = () => void | Promise<void>
+export type Test = () => void | Promise<void>
 
 type TestModule = {
   url: string
@@ -11,17 +11,26 @@ type TestModule = {
   }
 }
 
+export type TestCollection = () => Promise<TestModule>[]
+
+type TestCollectionModule = {
+  all: TestCollection
+}
+
 export async function runAll(
-  ...allTestModules: Promise<TestModule>[]
+  testCollectionModules: TestCollectionModule[]
 ): Promise<void> {
   console.group('Testing...')
   chai.use(chaiDom)
   const start = window.performance.now()
   let pass = 0
   let fail = 0
-  for (const testModule of await Promise.all(
-    allTestModules
-  )) {
+  const testModules = ([] as Promise<TestModule>[]).concat(
+    ...testCollectionModules.map((testCollectionModule) =>
+      testCollectionModule.all()
+    )
+  )
+  for (const testModule of await Promise.all(testModules)) {
     const { url, tests } = testModule
     let testUrlPrinted = false
     for (const testName in tests) {
@@ -30,7 +39,7 @@ export async function runAll(
         await test()
         pass += 1
       } catch (error: unknown) {
-        const info =
+        const basicInfo =
           error instanceof Error
             ? {
                 message: error.message,
@@ -43,7 +52,7 @@ export async function runAll(
                 stack: undefined,
               }
 
-        const assertion =
+        const assertionInfo =
           typeof error == 'object' &&
           error !== null &&
           'actual' in error &&
@@ -69,23 +78,29 @@ export async function runAll(
         } else {
           console.groupCollapsed(testName)
         }
-        console.log(`%c${info.message}`, 'color: crimson')
+        console.log(
+          `%c${basicInfo.message}`,
+          'color: crimson'
+        )
         console.groupCollapsed('Details')
-        if (assertion) {
+        if (assertionInfo) {
           console.log(
             '%cActual',
             'color: crimson',
-            assertion.actual
+            assertionInfo.actual
           )
           console.log(
             '%cExpected',
             'color: green',
-            assertion.expected
+            assertionInfo.expected
           )
-          info.stack = info.stack?.replace(/^Assertion/, '')
+          basicInfo.stack = basicInfo.stack?.replace(
+            /^Assertion/,
+            ''
+          )
         }
-        if (info.stack) {
-          console.log(info.stack, 'color: grey')
+        if (basicInfo.stack) {
+          console.log(basicInfo.stack, 'color: grey')
         }
         console.groupEnd()
         console.groupEnd()
@@ -96,8 +111,10 @@ export async function runAll(
       console.groupEnd()
     }
   }
+
   const end = window.performance.now()
   const elapsed = prettyMs(end - start)
+
   console.log(
     `%cPass: ${pass}`,
     'font-weight: bold; color: green'

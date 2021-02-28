@@ -3,7 +3,7 @@
 import snowpack from 'snowpack'
 
 async function run() {
-  /** @type {snowpack.SSRLoader} */
+  /** @type {snowpack.ServerRuntime} */
   let runtime
   const config = await snowpack.loadConfiguration({
     routes: [
