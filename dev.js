@@ -37,5 +37,5 @@ async function run() {
 
 run().catch((error) => {
   console.error(error)
-  process.abort()
+  process.exit(1)
 })
