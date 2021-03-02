@@ -114,15 +114,9 @@ async function main(): Promise<void> {
   body.content = [rootDiv]
 
   if (import.meta.env.MODE === 'development') {
-    await runAllUiTests()
+    const uiTest = await import('@fe/ui/index.t.ts')
+    await uiTest.run()
   }
-}
-
-async function runAllUiTests() {
-  const test = await import('@tiny/test/index.ts')
-  const coreTest = await import('@fe/core/index.t.ts')
-  const uiTest = await import('@fe/ui/index.t.ts')
-  await test.runAll([coreTest, uiTest])
 }
 
 main().catch(console.error)

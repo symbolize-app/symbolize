@@ -25,7 +25,8 @@ const config = {
     target: 'es2020',
   },
   packageOptions: {
-    source: "remote"
+    source: "local",
+    external: ["http", "url"]
   },
   plugins: [],
 }
