@@ -4,34 +4,37 @@
   },
   "type": "module",
   "scripts": {
-    "build": "snowpack build",
+    "build": "node --experimental-loader ./loader.js build.ts",
     "check-eslint": "eslint --ignore-path .gitignore --max-warnings 0 .",
     "check-tsc": "tsc",
     "check-prettier": "prettier --ignore-path .gitignore --check '**/*.js' '**/*.json' '**/*.ts' '**/*.html' '**/*.md'",
     "fix": "eslint --ignore-path .gitignore --fix .",
     "fmt": "prettier --ignore-path .gitignore --write '**/*.js' '**/*.json' '**/*.ts' '**/*.html' '**/*.md'",
-    "dev": "node dev.js",
+    "dev": "node --experimental-loader ./loader.js dev.ts",
     "watch": "tsc --watch"
   },
   "dependencies": {
     "chai": "^4.3.0",
     "chai-dom": "^1.8.2",
+    "jsdom": "^16.4.0",
+    "picomatch": "^2.2.2",
     "pretty-ms": "^7.0.1"
   },
   "devDependencies": {
     "@types/chai": "^4.2.15",
     "@types/chai-dom": "^0.0.10",
+    "@types/jsdom": "^16.2.6",
     "@types/node": "^14.14.31",
-    "@types/snowpack-env": "^2.3.3",
+    "@types/picomatch": "^2.2.1",
     "@typescript-eslint/eslint-plugin": "^4.15.2",
     "@typescript-eslint/parser": "^4.15.2",
+    "esbuild": "^0.8.54",
     "eslint": "^7.20.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-prettier": "^3.3.1",
     "eslint-plugin-simple-import-sort": "^7.0.0",
     "prettier": "^2.2.1",
-    "snowpack": "^3.0.13",
     "typescript": "^4.1.5 <4.2.0",
     "utility-types": "^3.10.0"
   },
@@ -111,6 +114,12 @@
         "warn",
         {
           "functions": false
+        }
+      ],
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          "argsIgnorePattern": "^_"
         }
       ]
     }
