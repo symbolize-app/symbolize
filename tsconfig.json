@@ -1,11 +1,12 @@
 {
   "include": [
     "api/**/*.ts",
+    "build.ts",
     "core/**/*.ts",
     "db/**/*.ts",
-    "dev.js",
+    "dev.ts",
     "global.d.ts",
-    "snowpack.config.cjs",
+    "loader.js",
     "tiny/**/*.ts",
     "ui/**/*.ts"
   ],
@@ -32,9 +33,10 @@
       "@fe/ui/*": ["./ui/*"],
       "@tiny/*": ["./tiny/*"]
     },
+    "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,
     "target": "ES2020",
-    "types": ["node", "snowpack-env"]
+    "types": ["node"]
   }
 }
