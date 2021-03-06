@@ -12,12 +12,13 @@ devDependencies:
   '@types/picomatch': 2.2.1
   '@typescript-eslint/eslint-plugin': 4.15.2_bd37cc6d9e4ef1f78f94a852ca0107ce
   '@typescript-eslint/parser': 4.15.2_eslint@7.20.0+typescript@4.1.5
-  esbuild: 0.8.54
+  esbuild: 0.8.56
   eslint: 7.20.0
   eslint-config-prettier: 8.1.0_eslint@7.20.0
   eslint-plugin-import: 2.22.1_eslint@7.20.0
   eslint-plugin-prettier: 3.3.1_991a7c46cc739487e9cb2e863aa32c6d
   eslint-plugin-simple-import-sort: 7.0.0_eslint@7.20.0
+  http-proxy: 1.18.1
   prettier: 2.2.1
   typescript: 4.1.5
   utility-types: 3.10.0
@@ -688,12 +689,12 @@ packages:
       node: '>= 0.4'
     resolution:
       integrity: sha512-QCOllgZJtaUo9miYBcLChTUaHNjJF3PYs1VidD7AwiEj1kYxKeQTctLAezAOH5ZKRH0g2IgPn6KwB4IT8iRpvA==
-  /esbuild/0.8.54:
+  /esbuild/0.8.56:
     dev: true
     hasBin: true
     requiresBuild: true
     resolution:
-      integrity: sha512-DJH38OiTgXJxFb/EhHrCrY8eGmtdkTtWymHpN9IYN9AF+4jykT0dQArr7wzFejpVbaB0TMIq2+vfNRWr3LXpvw==
+      integrity: sha512-PTMdAWK3JI2MNW811znGssGP5GR44tQPr++VQ1rPP0n8Z1cTKbCPD3S/kXPLr3ZZDIwAaVm08fuFym6Rp8l/0A==
   /escape-string-regexp/1.0.5:
     dev: true
     engines:
@@ -910,6 +911,10 @@ packages:
       node: '>=0.10.0'
     resolution:
       integrity: sha512-kVscqXk4OCp68SZ0dkgEKVi6/8ij300KBWTJq32P/dYeWTSwK41WyTxalN1eRmA5Z9UU/LX9D7FWSmV9SAYx6g==
+  /eventemitter3/4.0.7:
+    dev: true
+    resolution:
+      integrity: sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw==
   /extend/3.0.2:
     dev: false
     resolution:
@@ -989,6 +994,17 @@ packages:
     dev: true
     resolution:
       integrity: sha512-zAoAQiudy+r5SvnSw3KJy5os/oRJYHzrzja/tBDqrZtNhUw8bt6y8OBzMWcjWr+8liV8Eb6yOhw8WZ7VFZ5ZzA==
+  /follow-redirects/1.13.3:
+    dev: true
+    engines:
+      node: '>=4.0'
+    peerDependencies:
+      debug: '*'
+    peerDependenciesMeta:
+      debug:
+        optional: true
+    resolution:
+      integrity: sha512-DUgl6+HDzB0iEptNQEXLx/KhTmDb8tZUHSeLqpnjpknR70H0nC2t9N73BK6fN4hOvJ84pKlIQVQ4k5FFlBedKA==
   /forever-agent/0.6.1:
     dev: false
     resolution:
@@ -1131,6 +1147,16 @@ packages:
       node: '>=10'
     resolution:
       integrity: sha512-D5JbOMBIR/TVZkubHT+OyT2705QvogUW4IBn6nHd756OwieSF9aDYFj4dv6HHEVGYbHaLETa3WggZYWWMyy3ZQ==
+  /http-proxy/1.18.1:
+    dependencies:
+      eventemitter3: 4.0.7
+      follow-redirects: 1.13.3
+      requires-port: 1.0.0
+    dev: true
+    engines:
+      node: '>=8.0.0'
+    resolution:
+      integrity: sha512-7mz/721AbnJwIVbnaSv1Cz3Am0ZLT/UBwkC92VlxhXv/k/BBQfM2fXElQNC27BVGr0uwUpplYPQM9LnaBMR5NQ==
   /http-signature/1.2.0:
     dependencies:
       assert-plus: 1.0.0
@@ -1822,6 +1848,10 @@ packages:
       node: '>=0.10.0'
     resolution:
       integrity: sha512-Xf0nWe6RseziFMu+Ap9biiUbmplq6S9/p+7w7YXP/JBHhrUDDUhwa+vANyubuqfZWTveU//DYVGsDG7RKL/vEw==
+  /requires-port/1.0.0:
+    dev: true
+    resolution:
+      integrity: sha1-kl0mAdOaxIXgkc8NpcbmlNw9yv8=
   /resolve-from/4.0.0:
     dev: true
     engines:
@@ -2291,12 +2321,13 @@ specifiers:
   '@typescript-eslint/parser': ^4.15.2
   chai: ^4.3.0
   chai-dom: ^1.8.2
-  esbuild: ^0.8.54
+  esbuild: ^0.8.56
   eslint: ^7.20.0
   eslint-config-prettier: ^8.1.0
   eslint-plugin-import: ^2.22.1
   eslint-plugin-prettier: ^3.3.1
   eslint-plugin-simple-import-sort: ^7.0.0
+  http-proxy: ^1.18.1
   jsdom: ^16.4.0
   picomatch: ^2.2.2
   prettier: ^2.2.1
