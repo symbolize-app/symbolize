@@ -9,7 +9,7 @@ async function main(): Promise<void> {
   await fs.mkdir('build/browser', { recursive: true })
   await fs.copyFile(
     'public/index.html',
-    'build/browser/public.html'
+    'build/browser/index.html'
   )
   const completedSteps: Set<string> = new Set()
   const nextSteps: string[] = [
@@ -78,82 +78,47 @@ async function build(
   return { nextSteps }
 
   function plugin(build: esbuild.PluginBuild) {
-    build.onResolve(
-      { filter: /.*/, namespace: 'file' },
-      async (args) => {
-        if (args.kind === 'entry-point') {
-          return undefined
-        } else if (
-          args.kind === 'import-statement' ||
-          args.kind === 'dynamic-import'
-        ) {
-          const url = await import.meta.resolve(
-            args.path,
-            urlModule
-              .pathToFileURL(args.importer)
-              .toString()
-          )
-          if (url.startsWith('node:')) {
-            return { path: args.path, external: true }
-          }
-          const fullPath = urlModule.fileURLToPath(url)
-          const localPath = pathModule.relative(
-            localRootPath,
-            fullPath
-          )
-          if (localPath.startsWith(`..${pathModule.sep}`)) {
-            throw new Error(`Invalid path ${args.path}`)
-          } else {
-            const path = pathModule
-              .join('/js', localPath)
-              .replace(/\.[^.]+$/, '.js')
-            nextSteps.push(url)
-            return { path, external: true }
-          }
+    build.onResolve({ filter: /.*/ }, async (args) => {
+      if (args.kind === 'entry-point') {
+        return undefined
+      } else if (
+        args.kind === 'import-statement' ||
+        args.kind === 'dynamic-import'
+      ) {
+        const url = await import.meta.resolve(
+          args.path,
+          urlModule.pathToFileURL(args.importer).toString()
+        )
+        if (url.startsWith('node:')) {
+          return { path: args.path, external: true }
+        }
+        const fullPath = urlModule.fileURLToPath(url)
+        const localPath = pathModule.relative(
+          localRootPath,
+          fullPath
+        )
+        if (localPath.startsWith(`..${pathModule.sep}`)) {
+          throw new Error(`Invalid path ${args.path}`)
         } else {
-          const fullPath = module
-            .createRequire(args.importer)
-            .resolve(args.path)
-          if (!pathModule.isAbsolute(fullPath)) {
-            return {
-              path: args.path,
-              namespace: 'external',
-            }
-          }
-          const localPath = pathModule.relative(
-            localRootPath,
-            fullPath
-          )
-          if (localPath.startsWith(`..${pathModule.sep}`)) {
-            throw new Error(`Invalid path ${args.path}`)
-          } else {
-            const url = urlModule
-              .pathToFileURL(fullPath)
-              .toString()
-            const path = pathModule
-              .join('/js', localPath)
-              .replace(/\.[^.]+$/, '.js')
-            nextSteps.push(url)
-            return { path, namespace: 'external' }
+          const path = pathModule
+            .join('/js', localPath)
+            .replace(/\.[^.]+$/, '.js')
+          nextSteps.push(url)
+          return { path, external: true }
+        }
+      } else {
+        const fullPath = module
+          .createRequire(args.importer)
+          .resolve(args.path)
+        if (!pathModule.isAbsolute(fullPath)) {
+          return {
+            path: args.path,
+            namespace: 'external',
           }
         }
+        return { path: fullPath, namespace: 'file' }
       }
-    )
-    build.onResolve(
-      { filter: /.*/, namespace: 'external' },
-      (args) => ({
-        path: args.path,
-        external: true,
-      })
-    )
-    build.onLoad(
-      { filter: /.*/, namespace: 'external' },
-      (args) => ({
-        contents: `export * from ${JSON.stringify(
-          args.path
-        )}`,
-      })
-    )
+    })
   }
 }
 
