@@ -1,5 +1,5 @@
 import * as message from '@fe/core/message.ts'
-import * as chai from 'chai'
+import chai from 'chai'
 
 export const url = import.meta.url
 
