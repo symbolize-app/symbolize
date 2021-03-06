@@ -1,6 +1,6 @@
 import * as button from '@fe/ui/button.ts'
-import * as widgetTest from '@tiny/ui/widget.t'
-import * as chai from 'chai'
+import * as widgetTest from '@tiny/ui/widget.t.ts'
+import chai from 'chai'
 
 export const url = import.meta.url
 
