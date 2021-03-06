@@ -6,11 +6,12 @@
   "scripts": {
     "build": "node --experimental-loader ./loader.js build.ts",
     "check-eslint": "eslint --ignore-path .gitignore --max-warnings 0 .",
-    "check-tsc": "tsc",
     "check-prettier": "prettier --ignore-path .gitignore --check '**/*.js' '**/*.json' '**/*.ts' '**/*.html' '**/*.md'",
+    "check-tsc": "tsc",
+    "dev": "node --experimental-loader ./loader.js dev.ts",
     "fix": "eslint --ignore-path .gitignore --fix .",
     "fmt": "prettier --ignore-path .gitignore --write '**/*.js' '**/*.json' '**/*.ts' '**/*.html' '**/*.md'",
-    "dev": "node --experimental-loader ./loader.js dev.ts",
+    "test": "node --experimental-loader ./loader.js api/index.t.ts",
     "watch": "tsc --watch"
   },
   "dependencies": {
