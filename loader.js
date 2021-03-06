@@ -81,14 +81,19 @@ export async function transformSource(
   defaultTransformSource
 ) {
   // Defer to Node.js for all other sources.
-  if (
-    isLocalUrl(context.url) &&
-    typeof source === 'string'
-  ) {
+  if (isLocalUrl(context.url)) {
+    if (typeof source !== 'string') {
+      source = Buffer.from(source).toString('utf-8')
+    }
     return {
-      source: (await esbuild.transform(source)).code,
+      source: (
+        await esbuild.transform(source, {
+          loader: 'ts',
+        })
+      ).code,
     }
   } else {
+    console.log('D', context.url, typeof source)
     return defaultTransformSource(
       source,
       context,
