@@ -11,27 +11,39 @@ async function main(): Promise<void> {
     'public/index.html',
     'build/browser/index.html'
   )
-  const completedSteps: Set<string> = new Set()
-  const nextSteps: string[] = [
-    await import.meta.resolve('@fe/ui/index.ts'),
-  ]
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
-    const step = nextSteps.pop()
-    if (!step) {
-      break
-    } else if (completedSteps.has(step)) {
-      continue
-    }
-    const result = await build({ entryPoint: step })
-    completedSteps.add(step)
-    nextSteps.push(...result.nextSteps)
-  }
+  await buildAll({
+    entryPoints: [
+      await import.meta.resolve('@fe/ui/index.ts'),
+    ],
+    platform: 'browser',
+  })
+  await fs.mkdir('build/node', { recursive: true })
+  await fs.writeFile(
+    'build/node/package.json',
+    JSON.stringify({
+      type: 'module',
+    })
+  )
+  await buildAll({
+    entryPoints: [
+      await import.meta.resolve('@fe/api/serve.ts'),
+      await import.meta.resolve('@fe/api/index.t.ts'),
+    ],
+    platform: 'node',
+  })
   console.log('Done build')
+}
+
+type Platform = 'browser' | 'node'
+
+type BuildAllOptions = {
+  entryPoints: string[]
+  platform: Platform
 }
 
 type BuildOptions = {
   entryPoint: string
+  platform: Platform
 }
 
 type BuildResult = {
@@ -42,6 +54,28 @@ const localRootPath = pathModule.resolve(
   urlModule.fileURLToPath(import.meta.url),
   '..'
 )
+
+async function buildAll(
+  options: BuildAllOptions
+): Promise<void> {
+  const completedSteps: Set<string> = new Set()
+  const nextSteps: string[] = [...options.entryPoints]
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    const step = nextSteps.pop()
+    if (!step) {
+      break
+    } else if (completedSteps.has(step)) {
+      continue
+    }
+    const result = await build({
+      entryPoint: step,
+      platform: options.platform,
+    })
+    completedSteps.add(step)
+    nextSteps.push(...result.nextSteps)
+  }
+}
 
 async function build(
   options: BuildOptions
@@ -54,27 +88,36 @@ async function build(
     fullEntryPointPath
   )
   const outfile = pathModule
-    .join('build/browser/js', localEntryPointPath)
-    .replace(/\.[^.]+$/, '.js')
+    .join(
+      options.platform === 'browser'
+        ? 'build/browser/js'
+        : 'build/node',
+      localEntryPointPath
+    )
+    .replace(/\.[^.]+$/, '.mjs')
   const nextSteps: string[] = []
-  await esbuild.build({
-    bundle: true,
-    define: {
-      ['import.meta.env.MODE']: JSON.stringify(
-        'development'
-      ),
-    },
-    entryPoints: [fullEntryPointPath],
-    format: 'esm',
-    outfile,
-    platform: 'browser',
-    plugins: [
-      {
-        name: 'custom',
-        setup: plugin,
+  try {
+    await esbuild.build({
+      bundle: true,
+      define: {
+        ['import.meta.env.MODE']: JSON.stringify(
+          'development'
+        ),
       },
-    ],
-  })
+      entryPoints: [fullEntryPointPath],
+      format: 'esm',
+      outfile,
+      platform: options.platform,
+      plugins: [
+        {
+          name: 'custom',
+          setup: plugin,
+        },
+      ],
+    })
+  } catch {
+    process.exit(1)
+  }
   return { nextSteps }
 
   function plugin(build: esbuild.PluginBuild) {
@@ -99,13 +142,18 @@ async function build(
         )
         if (localPath.startsWith(`..${pathModule.sep}`)) {
           throw new Error(`Invalid path ${args.path}`)
-        } else {
-          const path = pathModule
-            .join('/js', localPath)
-            .replace(/\.[^.]+$/, '.js')
-          nextSteps.push(url)
-          return { path, external: true }
         }
+        let path = pathModule
+          .relative(
+            pathModule.join(args.importer, '..'),
+            fullPath
+          )
+          .replace(/\.[^.]+$/, '.mjs')
+        if (!path.startsWith(`.${pathModule.sep}`)) {
+          path = `.${pathModule.sep}${path}`
+        }
+        nextSteps.push(url)
+        return { path, external: true }
       } else {
         const fullPath = module
           .createRequire(args.importer)

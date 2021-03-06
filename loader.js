@@ -93,7 +93,6 @@ export async function transformSource(
       ).code,
     }
   } else {
-    console.log('D', context.url, typeof source)
     return defaultTransformSource(
       source,
       context,

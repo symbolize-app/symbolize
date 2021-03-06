@@ -18,11 +18,12 @@ type TestCollectionModule = {
 }
 
 export async function runAll(
+  ctx: { now: () => number },
   testCollectionModules: TestCollectionModule[]
-): Promise<void> {
+): Promise<boolean> {
   console.group('Testing...')
   chai.use(chaiDom)
-  const start = window.performance.now()
+  const start = ctx.now()
   let pass = 0
   let fail = 0
   const testModules = ([] as Promise<TestModule>[]).concat(
@@ -112,7 +113,7 @@ export async function runAll(
     }
   }
 
-  const end = window.performance.now()
+  const end = ctx.now()
   const elapsed = prettyMs(end - start)
 
   console.log(
@@ -127,4 +128,5 @@ export async function runAll(
   )
   console.log(`Elapsed: ${elapsed}`)
   console.groupEnd()
+  return fail == 0
 }
