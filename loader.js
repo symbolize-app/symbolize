@@ -1,9 +1,9 @@
 /* eslint-env node */
 /* eslint-disable @typescript-eslint/ban-ts-comment,@typescript-eslint/explicit-module-boundary-types,@typescript-eslint/no-unsafe-return */
 import esbuild from 'esbuild'
-import pathModule from 'path'
+import * as pathModule from 'path'
 import picomatch from 'picomatch'
-import urlModule from 'url'
+import * as urlModule from 'url'
 
 import tsconfig from './tsconfig.json'
 
@@ -12,14 +12,19 @@ const aliases = Object.entries(
 ).map(([from, to]) => {
   /** @type { RegExp } */
   // @ts-ignore
-  const re = picomatch.makeRe(from.replace('*', '**'), {
+  const re = picomatch.makeRe(from.replace('*.', '**/*.'), {
     // @ts-ignore
     capture: true,
   })
   return (/** @type {string} */ specifier) => {
     const match = re.exec(specifier)
     if (match) {
-      return to[0].replace('*', match[1])
+      return to[0].replace(
+        '*',
+        match[1] !== undefined
+          ? `${match[1]}/${match[2]}`
+          : match[2]
+      )
     } else {
       return undefined
     }

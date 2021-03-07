@@ -1,12 +1,14 @@
 dependencies:
   chai: 4.3.0
   chai-dom: 1.8.2
+  cookie: 0.4.1
   jsdom: 16.4.0
   picomatch: 2.2.2
   pretty-ms: 7.0.1
 devDependencies:
   '@types/chai': 4.2.15
   '@types/chai-dom': 0.0.10
+  '@types/cookie': 0.4.0
   '@types/jsdom': 16.2.6
   '@types/node': 14.14.31
   '@types/picomatch': 2.2.1
@@ -20,6 +22,7 @@ devDependencies:
   eslint-plugin-simple-import-sort: 7.0.0_eslint@7.20.0
   http-proxy: 1.18.1
   prettier: 2.2.1
+  type-fest: 0.21.2
   typescript: 4.1.5
   utility-types: 3.10.0
 lockfileVersion: 5.2
@@ -95,6 +98,10 @@ packages:
     dev: true
     resolution:
       integrity: sha512-rYff6FI+ZTKAPkJUoyz7Udq3GaoDZnxYDEvdEdFZASiA7PoErltHezDishqQiSDWrGxvxmplH304jyzQmjp0AQ==
+  /@types/cookie/0.4.0:
+    dev: true
+    resolution:
+      integrity: sha512-y7mImlc/rNkvCRmg8gC3/lj87S7pTUIJ6QGjwHR9WQJcFs+ZMTOaoPrkdFA/YdbuqVEmEbb5RdhVxMkAcgOnpg==
   /@types/jsdom/16.2.6:
     dependencies:
       '@types/node': 14.14.31
@@ -504,6 +511,12 @@ packages:
       node: '>=0.10.0'
     resolution:
       integrity: sha1-/ozxhP9mcLa67wGp1IYaXL7EEgo=
+  /cookie/0.4.1:
+    dev: false
+    engines:
+      node: '>= 0.6'
+    resolution:
+      integrity: sha512-ZwrFkGJxUR3EIoXtO+yVE69Eb7KlixbaeAWfBQB9vVsNn/o+Yw69gBWSSDK825hQNdN+wF8zELf3dFNl/kxkUA==
   /core-util-is/1.0.2:
     dev: false
     resolution:
@@ -2171,6 +2184,12 @@ packages:
       node: '>=4'
     resolution:
       integrity: sha512-0fr/mIH1dlO+x7TlcMy+bIDqKPsw/70tVyeHW787goQjhmqaZe10uwLujubK9q9Lg6Fiho1KUKDYz0Z7k7g5/g==
+  /type-fest/0.21.2:
+    dev: true
+    engines:
+      node: '>=10'
+    resolution:
+      integrity: sha512-pvQl0WNazvfQ0rq2XDdhpWv49sohh2t+buFbglaJ9N9+Xj4BhFRpuo+uJxemeARteRxRloJ1m+8gBR6Z2Nfktg==
   /type-fest/0.8.1:
     dev: true
     engines:
@@ -2314,6 +2333,7 @@ packages:
 specifiers:
   '@types/chai': ^4.2.15
   '@types/chai-dom': ^0.0.10
+  '@types/cookie': ^0.4.0
   '@types/jsdom': ^16.2.6
   '@types/node': ^14.14.31
   '@types/picomatch': ^2.2.1
@@ -2321,6 +2341,7 @@ specifiers:
   '@typescript-eslint/parser': ^4.15.2
   chai: ^4.3.0
   chai-dom: ^1.8.2
+  cookie: ^0.4.1
   esbuild: ^0.8.56
   eslint: ^7.20.0
   eslint-config-prettier: ^8.1.0
@@ -2332,5 +2353,6 @@ specifiers:
   picomatch: ^2.2.2
   prettier: ^2.2.1
   pretty-ms: ^7.0.1
+  type-fest: ^0.21.2
   typescript: ^4.1.5 <4.2.0
   utility-types: ^3.10.0
