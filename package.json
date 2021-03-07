@@ -4,19 +4,20 @@
   },
   "type": "module",
   "scripts": {
-    "build": "node --experimental-loader ./loader.js build.ts",
+    "build": "node --experimental-loader ./loader.js bin/build.ts",
     "check-eslint": "eslint --ignore-path .gitignore --max-warnings 0 .",
     "check-prettier": "prettier --ignore-path .gitignore --check '**/*.js' '**/*.json' '**/*.ts' '**/*.html' '**/*.md'",
     "check-tsc": "tsc",
-    "dev": "node --experimental-loader ./loader.js dev.ts",
+    "dev": "node --experimental-loader ./loader.js bin/dev.ts",
     "fix": "eslint --ignore-path .gitignore --fix .",
     "fmt": "prettier --ignore-path .gitignore --write '**/*.js' '**/*.json' '**/*.ts' '**/*.html' '**/*.md'",
-    "test": "node --experimental-loader ./loader.js api/index.t.ts",
+    "test": "node --experimental-loader ./loader.js bin/test.ts",
     "watch": "tsc --watch"
   },
   "dependencies": {
     "chai": "^4.3.0",
     "chai-dom": "^1.8.2",
+    "cookie": "^0.4.1",
     "jsdom": "^16.4.0",
     "picomatch": "^2.2.2",
     "pretty-ms": "^7.0.1"
@@ -24,6 +25,7 @@
   "devDependencies": {
     "@types/chai": "^4.2.15",
     "@types/chai-dom": "^0.0.10",
+    "@types/cookie": "^0.4.0",
     "@types/jsdom": "^16.2.6",
     "@types/node": "^14.14.31",
     "@types/picomatch": "^2.2.1",
@@ -37,6 +39,7 @@
     "eslint-plugin-simple-import-sort": "^7.0.0",
     "http-proxy": "^1.18.1",
     "prettier": "^2.2.1",
+    "type-fest": "^0.21.2",
     "typescript": "^4.1.5 <4.2.0",
     "utility-types": "^3.10.0"
   },
@@ -93,6 +96,17 @@
             "strictCamelCase"
           ],
           "leadingUnderscore": "forbid",
+          "trailingUnderscore": "forbid"
+        },
+        {
+          "selector": "parameter",
+          "modifiers": [
+            "unused"
+          ],
+          "format": [
+            "strictCamelCase"
+          ],
+          "leadingUnderscore": "require",
           "trailingUnderscore": "forbid"
         },
         {
