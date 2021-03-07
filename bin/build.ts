@@ -1,13 +1,18 @@
 import esbuild from 'esbuild'
-import fs from 'fs/promises'
+import * as fsPromises from 'fs/promises'
 import module from 'module'
-import pathModule from 'path'
-import urlModule from 'url'
+import * as pathModule from 'path'
+import * as urlModule from 'url'
 
 async function main(): Promise<void> {
-  await fs.rm('build', { recursive: true, force: true })
-  await fs.mkdir('build/browser', { recursive: true })
-  await fs.copyFile(
+  await fsPromises.rm('build', {
+    recursive: true,
+    force: true,
+  })
+  await fsPromises.mkdir('build/browser', {
+    recursive: true,
+  })
+  await fsPromises.copyFile(
     'public/index.html',
     'build/browser/index.html'
   )
@@ -17,8 +22,8 @@ async function main(): Promise<void> {
     ],
     platform: 'browser',
   })
-  await fs.mkdir('build/node', { recursive: true })
-  await fs.writeFile(
+  await fsPromises.mkdir('build/node', { recursive: true })
+  await fsPromises.writeFile(
     'build/node/package.json',
     JSON.stringify({
       type: 'module',
@@ -27,7 +32,6 @@ async function main(): Promise<void> {
   await buildAll({
     entryPoints: [
       await import.meta.resolve('@fe/api/serve.ts'),
-      await import.meta.resolve('@fe/api/index.t.ts'),
     ],
     platform: 'node',
   })
@@ -44,14 +48,21 @@ type BuildAllOptions = {
 type BuildOptions = {
   entryPoint: string
   platform: Platform
+  write?: boolean
 }
 
 type BuildResult = {
   nextSteps: string[]
 }
 
+type OutputFile = {
+  path: string
+  contents: Uint8Array
+}
+
 const localRootPath = pathModule.resolve(
   urlModule.fileURLToPath(import.meta.url),
+  '..',
   '..'
 )
 
@@ -78,8 +89,14 @@ async function buildAll(
 }
 
 async function build(
+  options: BuildOptions & { write: false }
+): Promise<BuildResult & { outputFiles: OutputFile[] }>
+async function build(
   options: BuildOptions
-): Promise<BuildResult> {
+): Promise<BuildResult>
+async function build(
+  options: BuildOptions
+): Promise<BuildResult & { outputFiles?: OutputFile[] }> {
   const fullEntryPointPath = urlModule.fileURLToPath(
     options.entryPoint
   )
@@ -97,7 +114,7 @@ async function build(
     .replace(/\.[^.]+$/, '.mjs')
   const nextSteps: string[] = []
   try {
-    await esbuild.build({
+    const result = await esbuild.build({
       bundle: true,
       define: {
         ['import.meta.env.MODE']: JSON.stringify(
@@ -114,11 +131,12 @@ async function build(
           setup: plugin,
         },
       ],
+      write: options.write,
     })
+    return { nextSteps, outputFiles: result.outputFiles }
   } catch {
     process.exit(1)
   }
-  return { nextSteps }
 
   function plugin(build: esbuild.PluginBuild) {
     build.onResolve({ filter: /.*/ }, async (args) => {
@@ -170,4 +188,9 @@ async function build(
   }
 }
 
-void main()
+if (
+  process.argv[1] ===
+  urlModule.fileURLToPath(import.meta.url)
+) {
+  void main()
+}

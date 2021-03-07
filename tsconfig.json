@@ -1,10 +1,10 @@
 {
   "include": [
     "api/**/*.ts",
-    "build.ts",
+    "bin/**/*.ts",
     "core/**/*.ts",
     "db/**/*.ts",
-    "dev.ts",
+    "bin/dev.ts",
     "global.d.ts",
     "loader.js",
     "tiny/**/*.ts",
@@ -28,11 +28,12 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "paths": {
-      "@fe/api/*": ["./api/*"],
-      "@fe/core/*": ["./core/*"],
-      "@fe/db/*": ["./db/*"],
-      "@fe/ui/*": ["./ui/*"],
-      "@tiny/*": ["./tiny/*"]
+      "@fe/api/*.ts": ["./api/*.ts"],
+      "@fe/bin/*.ts": ["./bin/*.ts"],
+      "@fe/core/*.ts": ["./core/*.ts"],
+      "@fe/db/*.ts": ["./db/*.ts"],
+      "@fe/ui/*.ts": ["./ui/*.ts"],
+      "@tiny/*.ts": ["./tiny/*.ts"]
     },
     "resolveJsonModule": true,
     "skipLibCheck": true,
