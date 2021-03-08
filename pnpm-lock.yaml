@@ -5,6 +5,7 @@ dependencies:
   jsdom: 16.4.0
   picomatch: 2.2.2
   pretty-ms: 7.0.1
+  sodium-native: 3.2.1
 devDependencies:
   '@types/chai': 4.2.15
   '@types/chai-dom': 0.0.10
@@ -12,6 +13,7 @@ devDependencies:
   '@types/jsdom': 16.2.6
   '@types/node': 14.14.31
   '@types/picomatch': 2.2.1
+  '@types/sodium-native': 2.3.5
   '@typescript-eslint/eslint-plugin': 4.15.2_bd37cc6d9e4ef1f78f94a852ca0107ce
   '@typescript-eslint/parser': 4.15.2_eslint@7.20.0+typescript@4.1.5
   esbuild: 0.8.56
@@ -122,6 +124,10 @@ packages:
     dev: true
     resolution:
       integrity: sha512-vFHy/ezP5qI0rFgJ7aQnjDXwAMrG0KqqIH7tQG5PPv3BWBayOPIQNBjVc/P6hhdZfMx51REc6tfDNXHUio893g==
+  /@types/node/14.14.32:
+    dev: true
+    resolution:
+      integrity: sha512-/Ctrftx/zp4m8JOujM5ZhwzlWLx22nbQJiVqz8/zE15gOeEW+uly3FSX4fGFpcfEvFzXcMCJwq9lGVWgyARXhg==
   /@types/parse5/6.0.0:
     dev: true
     resolution:
@@ -130,6 +136,12 @@ packages:
     dev: true
     resolution:
       integrity: sha512-26/tQcDmJXYHiaWAAIjnTVL5nwrT+IVaqFZIbBImAuKk/r/j1r/1hmZ7uaOzG6IknqP3QHcNNQ6QO8Vp28lUoA==
+  /@types/sodium-native/2.3.5:
+    dependencies:
+      '@types/node': 14.14.32
+    dev: true
+    resolution:
+      integrity: sha512-a3DAIpW8+36XAY8aIR36JBQQsfOabxHuJwx11DL/PTvnbwEWPAXW66b8QbMi0r2vUnkOfREsketxdvjBmQxqDQ==
   /@types/tough-cookie/4.0.0:
     dev: true
     resolution:
@@ -1227,6 +1239,10 @@ packages:
     dev: true
     resolution:
       integrity: sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==
+  /ini/1.3.8:
+    dev: false
+    resolution:
+      integrity: sha512-JV/yugV2uzW5iMRSiZAyDtQd+nxtUnjeLt0acNdw98kKLrvuRVyB80tsREOE7yvGVgalhZ6RNXCmEHkUKBKxew==
   /ip-regex/2.1.0:
     dev: false
     engines:
@@ -1525,6 +1541,11 @@ packages:
     dev: true
     resolution:
       integrity: sha1-Sr6/7tdUHywnrPspvbvRXI1bpPc=
+  /node-gyp-build/4.2.3:
+    dev: false
+    hasBin: true
+    resolution:
+      integrity: sha512-MN6ZpzmfNCRM+3t57PTJHgHyw/h4OWnZ6mR8P5j/uZtqQr46RRuDE/P+g3n0YR/AiYXeWixZZzaip77gdICfRg==
   /normalize-package-data/2.5.0:
     dependencies:
       hosted-git-info: 2.8.8
@@ -1958,6 +1979,14 @@ packages:
       node: '>=10'
     resolution:
       integrity: sha512-qMCMfhY040cVHT43K9BFygqYbUPFZKHOg7K73mtTWJRb8pyP3fzf4Ixd5SzdEJQ6MRUg/WBnOLxghZtKKurENQ==
+  /sodium-native/3.2.1:
+    dependencies:
+      ini: 1.3.8
+      node-gyp-build: 4.2.3
+    dev: false
+    requiresBuild: true
+    resolution:
+      integrity: sha512-EgDZ/Z7PxL2kCasKk7wnRkV8W9kvwuIlHuHXAxkQm3FF0MgVsjyLBXGjSRGhjE6u7rhSpk3KaMfFM23bfMysIQ==
   /source-map/0.6.1:
     dev: false
     engines:
@@ -2337,6 +2366,7 @@ specifiers:
   '@types/jsdom': ^16.2.6
   '@types/node': ^14.14.31
   '@types/picomatch': ^2.2.1
+  '@types/sodium-native': ^2.3.5
   '@typescript-eslint/eslint-plugin': ^4.15.2
   '@typescript-eslint/parser': ^4.15.2
   chai: ^4.3.0
@@ -2353,6 +2383,7 @@ specifiers:
   picomatch: ^2.2.2
   prettier: ^2.2.1
   pretty-ms: ^7.0.1
+  sodium-native: ^3.2.1
   type-fest: ^0.21.2
   typescript: ^4.1.5 <4.2.0
   utility-types: ^3.10.0

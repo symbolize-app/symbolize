@@ -2,6 +2,7 @@ import esbuild from 'esbuild'
 import * as fsPromises from 'fs/promises'
 import module from 'module'
 import * as pathModule from 'path'
+import sodium from 'sodium-native'
 import * as urlModule from 'url'
 
 async function main(): Promise<void> {
@@ -16,7 +17,7 @@ async function main(): Promise<void> {
     'public/index.html',
     'build/browser/index.html'
   )
-  await buildAll({
+  await all({
     entryPoints: [
       await import.meta.resolve('@fe/ui/index.ts'),
     ],
@@ -29,7 +30,7 @@ async function main(): Promise<void> {
       type: 'module',
     })
   )
-  await buildAll({
+  await all({
     entryPoints: [
       await import.meta.resolve('@fe/api/serve.ts'),
     ],
@@ -45,19 +46,29 @@ type BuildAllOptions = {
   platform: Platform
 }
 
-type BuildOptions = {
+export type BuildAllResult = {
+  tree: SourceTree
+}
+
+export type SourceTree = Record<string, SourceFile>
+
+export type SourceFile = SourceFileRef & {
+  contents: Buffer
+}
+
+export type SourceFileRef = {
+  path: string
+  hash: string
+}
+
+export type BuildOptions = {
   entryPoint: string
   platform: Platform
   write?: boolean
 }
 
-type BuildResult = {
+export type BuildResult = {
   nextSteps: string[]
-}
-
-type OutputFile = {
-  path: string
-  contents: Uint8Array
 }
 
 const localRootPath = pathModule.resolve(
@@ -66,7 +77,7 @@ const localRootPath = pathModule.resolve(
   '..'
 )
 
-async function buildAll(
+async function all(
   options: BuildAllOptions
 ): Promise<void> {
   const completedSteps: Set<string> = new Set()
@@ -79,7 +90,7 @@ async function buildAll(
     } else if (completedSteps.has(step)) {
       continue
     }
-    const result = await build({
+    const result = await oneStep({
       entryPoint: step,
       platform: options.platform,
     })
@@ -88,30 +99,18 @@ async function buildAll(
   }
 }
 
-async function build(
+export async function oneStep(
   options: BuildOptions & { write: false }
-): Promise<BuildResult & { outputFiles: OutputFile[] }>
-async function build(
+): Promise<BuildResult & { output: SourceFile }>
+export async function oneStep(
   options: BuildOptions
 ): Promise<BuildResult>
-async function build(
+export async function oneStep(
   options: BuildOptions
-): Promise<BuildResult & { outputFiles?: OutputFile[] }> {
-  const fullEntryPointPath = urlModule.fileURLToPath(
-    options.entryPoint
+): Promise<BuildResult & { output?: SourceFile }> {
+  const [fullEntryPointPath, outfile] = getBuildPaths(
+    options
   )
-  const localEntryPointPath = pathModule.relative(
-    localRootPath,
-    fullEntryPointPath
-  )
-  const outfile = pathModule
-    .join(
-      options.platform === 'browser'
-        ? 'build/browser/js'
-        : 'build/node',
-      localEntryPointPath
-    )
-    .replace(/\.[^.]+$/, '.mjs')
   const nextSteps: string[] = []
   try {
     const result = await esbuild.build({
@@ -133,7 +132,22 @@ async function build(
       ],
       write: options.write,
     })
-    return { nextSteps, outputFiles: result.outputFiles }
+    let output: SourceFile | undefined
+    if (result.outputFiles) {
+      const contents = Buffer.from(
+        result.outputFiles[0].contents
+      )
+      const hash = Buffer.alloc(
+        sodium.crypto_generichash_BYTES
+      )
+      sodium.crypto_generichash(hash, contents)
+      output = {
+        path: outfile,
+        contents,
+        hash: hash.toString('hex'),
+      }
+    }
+    return { nextSteps, output }
   } catch {
     process.exit(1)
   }
@@ -161,12 +175,10 @@ async function build(
         if (localPath.startsWith(`..${pathModule.sep}`)) {
           throw new Error(`Invalid path ${args.path}`)
         }
-        let path = pathModule
-          .relative(
-            pathModule.join(args.importer, '..'),
-            fullPath
-          )
-          .replace(/\.[^.]+$/, '.mjs')
+        let path = `${pathModule.relative(
+          pathModule.join(args.importer, '..'),
+          fullPath
+        )}.mjs`
         if (!path.startsWith(`.${pathModule.sep}`)) {
           path = `.${pathModule.sep}${path}`
         }
@@ -186,6 +198,33 @@ async function build(
       }
     })
   }
+}
+
+function getBuildPaths(
+  options: BuildOptions
+): [fullEntryPointPath: string, outfile: string] {
+  const fullEntryPointPath = urlModule.fileURLToPath(
+    options.entryPoint
+  )
+  const localEntryPointPath = pathModule.relative(
+    localRootPath,
+    fullEntryPointPath
+  )
+  return [
+    fullEntryPointPath,
+    `${pathModule.join(
+      options.platform === 'browser'
+        ? 'build/browser/js'
+        : 'build/node',
+      localEntryPointPath
+    )}.mjs`,
+  ]
+}
+
+export function getOutputPath(
+  options: BuildOptions
+): string {
+  return getBuildPaths(options)[1]
 }
 
 if (
