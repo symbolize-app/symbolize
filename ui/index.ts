@@ -28,11 +28,12 @@ const bold = style.build([
   },
 ])
 
-const li = widget.html.li
 const div = widget.html.div
-const ul = widget.html.ul
+const li = widget.html.li
+const link = widget.html.link
 const span = widget.html.span
 const title = widget.html.title
+const ul = widget.html.ul
 
 const myCounter = widget.define<{
   readonly body: widget.Widget
@@ -110,7 +111,13 @@ async function main(): Promise<void> {
   const head = widget.toHtmlWidget(window.document.head)
   const body = widget.toHtmlWidget(window.document.body)
 
-  head.content = [title({ content: ['Fertile Earth'] })]
+  head.content = [
+    title({ content: ['Fertile Earth'] }),
+    link({
+      rel: 'icon',
+      href: 'data:;base64,iVBORw0KGgo=',
+    }),
+  ]
   body.content = [rootDiv]
 
   if (import.meta.env.MODE === 'development') {
