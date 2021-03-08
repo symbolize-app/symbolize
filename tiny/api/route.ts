@@ -57,32 +57,37 @@ export type Response = typeFest.Promisable<{
   >
 }>
 
-export type Handler = (request: Request) => Response
+export type Handler<Context> = (
+  ctx: Context,
+  request: Request
+) => Response
 
-export type Route = {
+export type Route<Context> = {
   methods: string[] | undefined
   match: RegExp
-  handler: Handler
+  handler: Handler<Context>
 }
 
-export function define(
+export function define<Context = unknown>(
   methods: string[] | undefined,
   match: RegExp,
-  handler: Handler
-): Route {
+  handler: Handler<Context>
+): Route<Context> {
   return { methods, match, handler }
 }
 
-export function handle(
-  routes: Route[]
+export function handle<Context>(
+  ctx: Context,
+  routes: Route<Context>[]
 ): http.RequestListener {
   return (req, res) => {
-    void handleRequest(routes, req, res)
+    void handleRequest(ctx, routes, req, res)
   }
 }
 
-async function handleRequest(
-  routes: Route[],
+async function handleRequest<Context>(
+  ctx: Context,
+  routes: Route<Context>[],
   req: http.IncomingMessage,
   res: http.ServerResponse
 ): Promise<void> {
@@ -97,33 +102,21 @@ async function handleRequest(
   req.on('error', console.error)
   res.on('error', console.error)
   try {
-    let response: Response | undefined = undefined
-    for (const route of routes) {
-      const match =
-        (route.methods === undefined ||
-          route.methods.indexOf(req.method) >= 0) &&
-        route.match.exec(req.url)
-      if (match) {
-        response = route.handler({
-          url: new URL(
-            req.url,
-            `http://${req.headers.host || 'localhost'}`
-          ),
-          match: match.groups ?? {},
-          method: req.method,
-          headers: Object.fromEntries(
-            Object.entries(req.headers).filter(
-              ([_key, value]) => typeof value === 'string'
-            ) as [string, string][]
-          ),
-          stream: req,
-        })
-        break
-      }
+    const request = {
+      url: new URL(
+        req.url,
+        `http://${req.headers.host || 'localhost'}`
+      ),
+      match: {},
+      method: req.method,
+      headers: Object.fromEntries(
+        Object.entries(req.headers).filter(
+          ([_key, value]) => typeof value === 'string'
+        ) as [string, string][]
+      ),
+      stream: req,
     }
-    if (!response) {
-      throw new Error('No route found')
-    }
+    const response = match(ctx, request, routes)
     const headResponse = await Promise.resolve(response)
     res.writeHead(headResponse.status, headResponse.headers)
     const body = await Promise.resolve(headResponse.body)
@@ -148,4 +141,41 @@ async function handleRequest(
     }
   }
   res.end()
+}
+
+export function match<Context>(
+  ctx: Context,
+  request: Request,
+  routes: Route<Context>[]
+): Response {
+  let response: Response | undefined = undefined
+  for (const route of routes) {
+    const match =
+      (route.methods === undefined ||
+        route.methods.indexOf(request.method) >= 0) &&
+      route.match.exec(request.url.pathname)
+    if (match) {
+      response = route.handler(ctx, {
+        ...request,
+        match: match.groups ?? {},
+      })
+      break
+    }
+  }
+  if (!response) {
+    throw new Error('No route found')
+  }
+  return response
+}
+
+export function forward<Context>(
+  ctx: Context,
+  request: Request,
+  match: Record<string, string>,
+  route: Route<Context>
+): Response {
+  return route.handler(ctx, {
+    ...request,
+    match,
+  })
 }
