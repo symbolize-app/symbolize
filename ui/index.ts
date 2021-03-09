@@ -121,8 +121,8 @@ async function main(): Promise<void> {
   body.content = [rootDiv]
 
   if (import.meta.env.MODE === 'development') {
-    const uiTest = await import('@fe/ui/index.t.ts')
-    await uiTest.run()
+    const dev = await import('@fe/ui/dev.ts')
+    dev.main()
   }
 }
 
