@@ -1,6 +1,6 @@
 import chai from 'chai'
 import chaiDom from 'chai-dom'
-import prettyMs from 'pretty-ms'
+import ms from 'ms'
 
 export type Test = () => void | Promise<void>
 
@@ -114,7 +114,7 @@ export async function runAll(
   }
 
   const end = ctx.now()
-  const elapsed = prettyMs(end - start)
+  const elapsed = ms(Math.round(end - start))
 
   console.log(
     `%cPass: ${pass}`,

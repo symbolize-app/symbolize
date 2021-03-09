@@ -1,8 +1,13 @@
 import * as build from '@fe/bin/build.ts'
 import * as route from '@tiny/api/route.ts'
+import chokidar from 'chokidar'
 import * as fs from 'fs'
 import * as http from 'http'
+import debounce from 'lodash/debounce.js'
 import urlModule from 'url'
+import WebSocket from 'ws'
+
+import tsconfig from '../tsconfig.json'
 
 type Context = {
   sourceTree: SourceTree
@@ -82,18 +87,44 @@ function buildDev(
 }
 
 async function main(): Promise<void> {
-  const sourceTree: SourceTree = {}
-  buildDev(
-    sourceTree,
-    await import.meta.resolve('@fe/ui/index.ts')
+  const watcher = chokidar.watch(tsconfig.include, {
+    ignoreInitial: true,
+  })
+  watcher.on('all', debounce(reload))
+  const entryPoint = await import.meta.resolve(
+    '@fe/ui/index.ts'
   )
   const ctx: Context = {
-    sourceTree,
+    sourceTree: {},
   }
-  const server = http.createServer(
+  const httpServer = http.createServer(
     route.handle(ctx, [index, js, notFound])
   )
-  server.listen(process.env.DEV_PORT)
+  httpServer.on('error', console.error)
+  const wsServer = new WebSocket.Server({
+    server: httpServer,
+  })
+  wsServer.on('error', console.error)
+  wsServer.on('connection', (ws, req) => {
+    if (req.url !== '/api/dev') {
+      ws.close()
+      return
+    }
+    ws.on('error', console.error)
+  })
+  reload()
+  httpServer.listen(process.env.DEV_PORT)
+  return
+
+  function reload() {
+    ctx.sourceTree = {}
+    buildDev(ctx.sourceTree, entryPoint)
+    for (const ws of wsServer.clients) {
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.send('reload')
+      }
+    }
+  }
 }
 
 if (
