@@ -1,4 +1,4 @@
-import * as http from 'http'
+import type * as http from 'http'
 import * as stream from 'stream'
 import * as streamPromises from 'stream/promises'
 import type * as typeFest from 'type-fest'

@@ -1,27 +1,42 @@
 import chai from 'chai'
 import chaiDom from 'chai-dom'
 import ms from 'ms'
+import type * as typeFest from 'type-fest'
 
-export type Test = () => void | Promise<void>
+export type Test<
+  Context extends TestContext = TestContext
+> = (ctx: Context) => typeFest.Promisable<void>
 
-type TestModule = {
+export type TestContext = { now: () => number }
+
+type TestModule<
+  Context extends TestContext = TestContext
+> = {
   url: string
   tests: {
-    [testName: string]: Test
+    [testName: string]: Test<Context>
   }
 }
 
-export type TestCollection = () => Promise<TestModule>[]
+export type TestCollection<
+  Context extends TestContext = TestContext
+> = () => Promise<TestModule<Context>>[]
 
-type TestCollectionModule = {
-  all: TestCollection
+type TestCollectionModule<
+  Context extends TestContext = TestContext
+> = {
+  all: TestCollection<Context>
 }
 
-export async function runAll(
-  ctx: { now: () => number },
-  testCollectionModules: TestCollectionModule[]
+export async function runAll<
+  Context extends TestContext = TestContext
+>(
+  ctx: Context,
+  testCollectionModules: TestCollectionModule<Context>[]
 ): Promise<boolean> {
-  const testModules = ([] as Promise<TestModule>[]).concat(
+  const testModules = ([] as Promise<
+    TestModule<Context>
+  >[]).concat(
     ...testCollectionModules.map((testCollectionModule) =>
       testCollectionModule.all()
     )
@@ -38,7 +53,7 @@ export async function runAll(
     for (const testName in tests) {
       const test = tests[testName]
       try {
-        await test()
+        await test(ctx)
         pass += 1
       } catch (error: unknown) {
         const basicInfo =
