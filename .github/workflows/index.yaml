@@ -28,5 +28,14 @@ jobs:
       - name: Install NPM packages
         run: pnpm install
 
-      - name: Run eslint
+      - name: Check Prettier
+        run: pnpm check-prettier
+
+      - name: Run ESLint
         run: pnpm check-eslint
+
+      - name: Check TypeScript
+        run: pnpm check-tsc
+
+      - name: Build
+        run: pnpm build
