@@ -1,5 +1,5 @@
 import * as button from '@fe/ui/button.ts'
-import * as widgetTest from '@tiny/ui/widget.t.ts'
+import * as widgetTest from '@tiny/ui/widget.test.ts'
 import * as widget from '@tiny/ui/widget.ts'
 import chai from 'chai'
 
