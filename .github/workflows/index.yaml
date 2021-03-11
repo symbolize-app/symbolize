@@ -41,7 +41,7 @@ jobs:
         run: pnpm check-tsc
 
       - name: Test
-        run: direnv . pnpm test
+        run: direnv exec . pnpm test
 
       - name: Build
-        run: direnv . pnpm build
+        run: direnv exec . pnpm build
