@@ -45,17 +45,20 @@ export async function readRequestObject(
   }
 }
 
-export type Response = typeFest.Promisable<{
-  status: number
-  headers: Record<string, string>
-  body: typeFest.Promisable<
-    | string
-    | Buffer
-    | Uint8Array
-    | stream.Readable
-    | typeFest.JsonObject
-  >
-}>
+export type Response = typeFest.Promisable<
+  | {
+      status: number
+      headers: Record<string, string>
+      body: typeFest.Promisable<
+        | string
+        | Buffer
+        | Uint8Array
+        | stream.Readable
+        | typeFest.JsonObject
+      >
+    }
+  | http.RequestListener
+>
 
 export type Handler<Context> = (
   ctx: Context,
@@ -118,19 +121,27 @@ async function handleRequest<Context>(
     }
     const response = match(ctx, request, routes)
     const headResponse = await Promise.resolve(response)
-    res.writeHead(headResponse.status, headResponse.headers)
-    const body = await Promise.resolve(headResponse.body)
-    if (typeof body === 'string') {
-      res.write(body)
-    } else if (body instanceof Buffer) {
-      res.write(body)
-    } else if (body instanceof Uint8Array) {
-      res.write(body)
-    } else if (body instanceof stream.Readable) {
-      await streamPromises.pipeline(body, res)
+    if (typeof headResponse === 'function') {
+      headResponse(req, res)
     } else {
-      const result = JSON.stringify(body)
-      res.write(result)
+      res.writeHead(
+        headResponse.status,
+        headResponse.headers
+      )
+      const body = await Promise.resolve(headResponse.body)
+      if (typeof body === 'string') {
+        res.write(body)
+      } else if (body instanceof Buffer) {
+        res.write(body)
+      } else if (body instanceof Uint8Array) {
+        res.write(body)
+      } else if (body instanceof stream.Readable) {
+        await streamPromises.pipeline(body, res)
+      } else {
+        const result = JSON.stringify(body)
+        res.write(result)
+      }
+      res.end()
     }
   } catch (error) {
     console.error(error)
@@ -139,8 +150,8 @@ async function handleRequest<Context>(
     } else {
       res.writeHead(500)
     }
+    res.end()
   }
-  res.end()
 }
 
 export function match<Context>(
