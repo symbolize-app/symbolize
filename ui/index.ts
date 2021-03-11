@@ -120,7 +120,12 @@ async function main(): Promise<void> {
   ]
   body.content = [rootDiv]
 
-  if (import.meta.env.MODE === 'development') {
+  console.log(
+    'SERVER',
+    await (await fetch('/api/x')).text()
+  )
+
+  if (import.meta.env.NODE_ENV === 'development') {
     const dev = await import('@fe/ui/dev.ts')
     dev.main()
   }

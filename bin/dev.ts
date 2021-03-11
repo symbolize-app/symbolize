@@ -1,9 +1,14 @@
 import * as build from '@fe/bin/build.ts'
 import * as route from '@tiny/api/route.ts'
+import * as concurrency from '@tiny/util/concurrency.ts'
+import chalk from 'chalk'
+import childProcess from 'child_process'
 import chokidar from 'chokidar'
 import * as fs from 'fs'
 import * as http from 'http'
-import debounce from 'lodash/debounce.js'
+import HttpProxy from 'http-proxy'
+import debounce from 'lodash-es/debounce.js'
+import type * as net from 'net'
 import urlModule from 'url'
 import WebSocket from 'ws'
 
@@ -11,9 +16,16 @@ import tsconfig from '../tsconfig.json'
 
 type Context = {
   sourceTree: SourceTree
+  proxy: HttpProxy
+  server: Server
 }
 
 type SourceTree = Record<string, Promise<build.SourceFile>>
+
+type Server = {
+  ready: concurrency.EventSemaphore
+  kill: () => Promise<void>
+}
 
 const index = route.define(['GET'], /^\/$/, () => {
   return {
@@ -56,33 +68,84 @@ const js = route.define<Context>(
   }
 )
 
-function buildDev(
-  sourceTree: SourceTree,
-  entryPoint: string
-): void {
-  const options = {
-    entryPoint,
+const api = route.define<{
+  server: Server
+  proxy: HttpProxy
+}>(undefined, /^\/api\/.+/, async (ctx) => {
+  await ctx.server.ready.wait()
+  return (req, res) =>
+    ctx.proxy.web(req, res, {
+      target: `http://localhost:${
+        process.env.PORT as string
+      }`,
+    })
+})
+
+function buildDev(entryPoint: string): SourceTree {
+  const sourceTree: SourceTree = {}
+  const baseOptions = {
     platform: 'browser',
     write: false,
   } as const
-  sourceTree[build.getOutputPath(options)] = loop()
-  return
+  loop(entryPoint)
+  return sourceTree
 
-  async function loop(): Promise<build.SourceFile> {
-    const result = await build.oneStep(options)
+  function loop(step: string): void {
+    const options = {
+      ...baseOptions,
+      entryPoint: step,
+    } as const
+    sourceTree[build.getOutputPath(options)] = start(step)
+  }
+
+  async function start(
+    step: string
+  ): Promise<build.SourceFile> {
+    const result = await build.oneStep({
+      ...baseOptions,
+      entryPoint: step,
+    })
     for (const step of result.nextSteps) {
       if (
         !(
           build.getOutputPath({
-            ...options,
+            ...baseOptions,
             entryPoint: step,
           }) in sourceTree
         )
       ) {
-        buildDev(sourceTree, step)
+        loop(step)
       }
     }
     return result.output
+  }
+}
+
+function createServer(): Server {
+  const ready = new concurrency.EventSemaphore()
+  const exited = new concurrency.EventSemaphore()
+  const child = childProcess.fork('api/index.ts', {
+    env: {
+      ...process.env,
+      ['NODE_ENV']: 'development',
+    },
+  })
+  child.on('message', (message) => {
+    if (message === 'ready') {
+      console.log(chalk.blue('dev server ready'))
+      ready.set()
+    }
+  })
+  child.on('error', console.error)
+  child.on('exit', () => {
+    ready.clear()
+    exited.set()
+  })
+  return { ready, kill }
+
+  async function kill() {
+    child.kill()
+    await exited.wait()
   }
 }
 
@@ -90,15 +153,21 @@ async function main(): Promise<void> {
   const watcher = chokidar.watch(tsconfig.include, {
     ignoreInitial: true,
   })
-  watcher.on('all', debounce(reload))
+  watcher.on(
+    'all',
+    debounce(() => void reload())
+  )
   const entryPoint = await import.meta.resolve(
     '@fe/ui/index.ts'
   )
+  const proxy = new HttpProxy({})
   const ctx: Context = {
-    sourceTree: {},
+    sourceTree: buildDev(entryPoint),
+    proxy,
+    server: createServer(),
   }
   const httpServer = http.createServer(
-    route.handle(ctx, [index, js, notFound])
+    route.handle(ctx, [index, js, api, notFound])
   )
   httpServer.on('error', console.error)
   const wsServer = new WebSocket.Server({
@@ -112,13 +181,21 @@ async function main(): Promise<void> {
     }
     ws.on('error', console.error)
   })
-  reload()
+  await reload()
   httpServer.listen(process.env.DEV_PORT)
+  console.log(
+    chalk.bold(
+      `Ready at http://localhost:${
+        (httpServer.address() as net.AddressInfo).port
+      }/`
+    )
+  )
   return
 
-  function reload() {
-    ctx.sourceTree = {}
-    buildDev(ctx.sourceTree, entryPoint)
+  async function reload() {
+    ctx.sourceTree = buildDev(entryPoint)
+    await ctx.server.kill()
+    ctx.server = createServer()
     for (const ws of wsServer.clients) {
       if (ws.readyState === WebSocket.OPEN) {
         ws.send('reload')

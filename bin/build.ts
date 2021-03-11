@@ -32,7 +32,7 @@ async function main(): Promise<void> {
   )
   await all({
     entryPoints: [
-      await import.meta.resolve('@fe/api/serve.ts'),
+      await import.meta.resolve('@fe/api/index.ts'),
     ],
     platform: 'node',
   })
@@ -116,7 +116,7 @@ export async function oneStep(
     const result = await esbuild.build({
       bundle: true,
       define: {
-        ['import.meta.env.MODE']: JSON.stringify(
+        ['import.meta.env.NODE_ENV']: JSON.stringify(
           'development'
         ),
       },
