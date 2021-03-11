@@ -7,6 +7,7 @@
     "bin/dev.ts",
     "global.d.ts",
     "loader.js",
+    "suppress.cjs",
     "tiny/**/*.ts",
     "ui/**/*.ts"
   ],
