@@ -57,10 +57,13 @@ export type Widget =
 
 function replaceChildren(
   ctx: WidgetContext,
-  parent: ParentNode,
+  parent: Node & ParentNode,
   children: (Node | string)[]
 ): void {
-  if (parent instanceof HTMLHeadElement) {
+  if (
+    parent.nodeType === 1 &&
+    (parent as Element).tagName === 'HEAD'
+  ) {
     let styleElement: HTMLStyleElement | null = null
     let node = parent.firstChild
     while (node) {
@@ -74,15 +77,28 @@ function replaceChildren(
     }
     for (const child of children) {
       parent.insertBefore(
-        child instanceof Node
-          ? child
-          : ctx.document.createTextNode(child),
+        typeof child === 'string'
+          ? ctx.document.createTextNode(child)
+          : child,
         styleElement
       )
     }
-  } else {
-    // TODO Check for replaceChilren
+  } else if (parent.replaceChildren) {
     parent.replaceChildren(...children)
+  } else {
+    let node = parent.firstChild
+    while (node) {
+      const nextNode = node.nextSibling
+      node.remove()
+      node = nextNode
+    }
+    for (const child of children) {
+      parent.appendChild(
+        typeof child === 'string'
+          ? ctx.document.createTextNode(child)
+          : child
+      )
+    }
   }
 }
 
@@ -162,14 +178,17 @@ export function collect(
   const results: (string | Node)[] = []
 
   function loop(item: Widget) {
-    if (typeof item == 'string' || item instanceof Node) {
-      results.push(item)
-    } else if (
+    if (
       item === false ||
       item === undefined ||
       item === null
     ) {
       // Skip
+    } else if (
+      typeof item == 'string' ||
+      Reflect.has(item, 'nodeType')
+    ) {
+      results.push(item as string | Node)
     } else if (Reflect.has(item, 'body')) {
       loop((item as BodyWidget).body)
     } else {

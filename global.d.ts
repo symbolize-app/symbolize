@@ -16,7 +16,7 @@ interface ImportMeta {
 }
 
 declare module 'stream/promises' {
-  import { FinishedOptions } from 'stream'
+  import type { FinishedOptions } from 'stream'
 
   namespace promises {
     function finished(
