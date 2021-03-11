@@ -1,25 +1,32 @@
-export let configStyleElement: HTMLStyleElement
-export let configStyleSheet: CSSStyleSheet
-export let configStyleRenderMap: Map<
-  string,
-  Map<Style, string[]>
->
-export let configStyleNameCount = 0
-export let configStyleRenderCount: number
+export type StyleContext = {
+  styleElement: HTMLStyleElement
+  styleSheet: CSSStyleSheet
+  styleRenderMap: Map<string, Map<Style, string[]>>
+  styleRenderCount: number
+}
 
-export function initConfig(document: Document): void {
-  configStyleElement = document.createElement('style')
-  document.head.appendChild(configStyleElement)
-  const styleSheet = configStyleElement.sheet
+let globalStyleNameCount = 0
+
+export function initContext(
+  document: Document
+): StyleContext {
+  const styleElement = document.createElement('style')
+  document.head.appendChild(styleElement)
+  const styleSheet = styleElement.sheet
   if (!styleSheet) {
     throw Error('Problem adding style element')
   }
-  configStyleSheet = styleSheet
-  configStyleRenderMap = new Map<
+  const styleRenderMap = new Map<
     string,
     Map<Style, string[]>
   >()
-  configStyleRenderCount = 0
+  const styleRenderCount = 0
+  return {
+    styleElement,
+    styleSheet,
+    styleRenderMap,
+    styleRenderCount,
+  }
 }
 
 const styleBase = 36
@@ -64,10 +71,10 @@ export type Style = {
 }
 
 export function build(body: StyleBody): Style {
-  const styleNameClass = `s${configStyleNameCount.toString(
+  const styleNameClass = `s${globalStyleNameCount.toString(
     styleBase
   )}`
-  configStyleNameCount += 1
+  globalStyleNameCount += 1
   return {
     name: styleNameClass,
     body: body,
@@ -100,23 +107,27 @@ export function useCombinatorSelector(
   ]
 }
 
-export function render(style: Style): string[] {
-  return renderNestedStyle(style, '', '', false)
+export function render(
+  ctx: StyleContext,
+  style: Style
+): string[] {
+  return renderNestedStyle(ctx, style, '', '', false)
 }
 
 function renderNestedStyle(
+  ctx: StyleContext,
   style: Style,
   combinatorSelectorValue: string,
   selectorValue: string,
   newStyleName: boolean
 ): string[] {
   const fullSelectorValue = `${combinatorSelectorValue}${selectorValue}`
-  let fullSelectorStyleMap = configStyleRenderMap.get(
+  let fullSelectorStyleMap = ctx.styleRenderMap.get(
     fullSelectorValue
   )
   if (!fullSelectorStyleMap) {
     fullSelectorStyleMap = new Map<Style, string[]>()
-    configStyleRenderMap.set(
+    ctx.styleRenderMap.set(
       fullSelectorValue,
       fullSelectorStyleMap
     )
@@ -134,10 +145,10 @@ function renderNestedStyle(
     newStyleName &&
     (combinatorSelectorValue || selectorValue)
   ) {
-    styleName = `r${configStyleRenderCount.toString(
+    styleName = `r${ctx.styleRenderCount.toString(
       styleBase
     )}`
-    configStyleRenderCount += 1
+    ctx.styleRenderCount += 1
   } else {
     styleName = style.name
   }
@@ -151,6 +162,7 @@ function renderNestedStyle(
       if (nesting === StyleNesting.selector) {
         styleClasses.push(
           ...renderStyleSelector(
+            ctx,
             styleName,
             nestedStyleItem as StyleSelector,
             combinatorSelectorValue,
@@ -160,6 +172,7 @@ function renderNestedStyle(
       } else {
         styleClasses.push(
           ...renderStyleCombinatorSelector(
+            ctx,
             styleName,
             nestedStyleItem as StyleCombinatorSelector,
             combinatorSelectorValue,
@@ -172,6 +185,7 @@ function renderNestedStyle(
       if (Reflect.has(flatStyleItem, 'name')) {
         styleClasses.push(
           ...renderNestedStyle(
+            ctx,
             flatStyleItem as Style,
             combinatorSelectorValue,
             selectorValue,
@@ -180,6 +194,7 @@ function renderNestedStyle(
         )
       } else {
         renderStyleProps(
+          ctx,
           styleName,
           flatStyleItem as StyleProps,
           combinatorSelectorValue,
@@ -193,12 +208,14 @@ function renderNestedStyle(
 }
 
 function renderStyleSelector(
+  ctx: StyleContext,
   styleName: string,
   style: StyleSelector,
   combinatorSelectorValue: string,
   selectorValue: string
 ): string[] {
   return renderNestedStyle(
+    ctx,
     { name: styleName, body: style[1] },
     combinatorSelectorValue,
     selectorValue
@@ -209,6 +226,7 @@ function renderStyleSelector(
 }
 
 function renderStyleCombinatorSelector(
+  ctx: StyleContext,
   styleName: string,
   style: StyleCombinatorSelector,
   combinatorSelectorValue: string,
@@ -220,6 +238,7 @@ function renderStyleCombinatorSelector(
     )
   }
   return renderNestedStyle(
+    ctx,
     { name: styleName, body: style[1] },
     style[0].combinatorSelector,
     selectorValue,
@@ -228,14 +247,15 @@ function renderStyleCombinatorSelector(
 }
 
 function renderStyleProps(
+  ctx: StyleContext,
   styleName: string,
   style: StyleProps,
   combinatorSelectorValue: string,
   selectorValue: string
 ): void {
-  const styleRules = configStyleSheet.cssRules
+  const styleRules = ctx.styleSheet.cssRules
   const styleIndex = styleRules.length
-  configStyleSheet.insertRule(
+  ctx.styleSheet.insertRule(
     `${combinatorSelectorValue.substring(
       0,
       combinatorSelectorValue.length - 1

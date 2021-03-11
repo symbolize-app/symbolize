@@ -38,9 +38,9 @@ const ul = widget.html.ul
 const myCounter = widget.define<{
   readonly body: widget.Widget
   value: number
-}>(() => {
+}>((ctx) => {
   let value: number
-  const body = span({})
+  const body = span(ctx, {})
   const result = {
     body,
     get value() {
@@ -56,14 +56,13 @@ const myCounter = widget.define<{
 })
 
 async function main(): Promise<void> {
-  widget.initConfig(window.document)
-  style.initConfig(window.document)
+  const ctx = widget.initContext(window.document)
 
-  const counter = myCounter({})
+  const counter = myCounter(ctx, {})
 
-  const listContents = widget.range({
+  const listContents = widget.range(ctx, {
     content: [
-      li({
+      li(ctx, {
         styles: [bold],
         content: ['init'],
       }),
@@ -74,33 +73,33 @@ async function main(): Promise<void> {
     console.log(event)
     counter.value += 1
     listContents.content = [
-      li({
+      li(ctx, {
         styles: [red],
         content: [counter.value.toString()],
       }),
-      li({
+      li(ctx, {
         content: [(counter.value * 2).toString()],
       }),
     ]
   }
 
-  const rootDiv = div({
+  const rootDiv = div(ctx, {
     content: [
       'HI ',
-      button.custom({
+      button.custom(ctx, {
         listen: {
           click: onClick,
         },
       }),
       ' ',
       counter,
-      ul({
+      ul(ctx, {
         content: [
-          li({
+          li(ctx, {
             content: ['+'],
           }),
           listContents,
-          li({
+          li(ctx, {
             content: ['-'],
           }),
         ],
@@ -108,12 +107,18 @@ async function main(): Promise<void> {
     ],
   })
 
-  const head = widget.toHtmlWidget(window.document.head)
-  const body = widget.toHtmlWidget(window.document.body)
+  const head = widget.toHtmlWidget(
+    ctx,
+    window.document.head
+  )
+  const body = widget.toHtmlWidget(
+    ctx,
+    window.document.body
+  )
 
   head.content = [
-    title({ content: ['Fertile Earth'] }),
-    link({
+    title(ctx, { content: ['Fertile Earth'] }),
+    link(ctx, {
       rel: 'icon',
       href: 'data:;base64,iVBORw0KGgo=',
     }),
