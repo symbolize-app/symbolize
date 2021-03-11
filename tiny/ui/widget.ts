@@ -1,13 +1,9 @@
 import * as style from '@tiny/ui/style.ts'
 import type * as utilityTypes from 'utility-types'
 
-export let configDocument: Document
-
-export function initConfig(document: Document): void {
-  configDocument = document
-}
-
 const listeners = Symbol('listeners')
+
+const context = Symbol('context')
 
 const listenerOptions = Symbol('listenerOptions')
 
@@ -29,6 +25,19 @@ export type HtmlListeners<E extends Element = Element> = {
   }
 }
 
+export type WidgetContext = {
+  document: Document
+} & style.StyleContext
+
+export function initContext(
+  document: Document
+): WidgetContext {
+  return {
+    ...style.initContext(document),
+    document,
+  }
+}
+
 type BodyWidget = {
   body: Widget
 }
@@ -47,6 +56,7 @@ export type Widget =
   | null
 
 function replaceChildren(
+  ctx: WidgetContext,
   parent: ParentNode,
   children: (Node | string)[]
 ): void {
@@ -55,10 +65,10 @@ function replaceChildren(
     let node = parent.firstChild
     while (node) {
       const nextNode = node.nextSibling
-      if (node !== style.configStyleElement) {
+      if (node !== ctx.styleElement) {
         node.remove()
       } else if (!styleElement) {
-        styleElement = style.configStyleElement
+        styleElement = ctx.styleElement
       }
       node = nextNode
     }
@@ -66,7 +76,7 @@ function replaceChildren(
       parent.insertBefore(
         child instanceof Node
           ? child
-          : configDocument.createTextNode(child),
+          : ctx.document.createTextNode(child),
         styleElement
       )
     }
@@ -77,13 +87,22 @@ function replaceChildren(
 }
 
 const elementProperties = {
+  [context]: {
+    writable: true,
+    value: {},
+  },
   styles: {
-    set(this: Element, value: style.Style[]) {
+    set(
+      this: Element & { [context]: WidgetContext },
+      value: style.Style[]
+    ) {
       if (this.classList.length) {
         this.classList.remove(...this.classList)
       }
       for (const styleItem of value) {
-        this.classList.add(...style.render(styleItem))
+        this.classList.add(
+          ...style.render(this[context], styleItem)
+        )
       }
     },
   },
@@ -128,8 +147,11 @@ const elementProperties = {
     value: {},
   },
   content: {
-    set(this: Element, value: Widget[]) {
-      replaceChildren(this, collect(value))
+    set(
+      this: Element & { [context]: WidgetContext },
+      value: Widget[]
+    ) {
+      replaceChildren(this[context], this, collect(value))
     },
   },
 }
@@ -164,19 +186,23 @@ export function collect(
   return results
 }
 
-export type WidgetInitializer<
-  T extends Widget & { [K in keyof T]: T[K] }
-> = Partial<Pick<T, utilityTypes.MutableKeys<T>>>
+type WidgetInitializer<
+  Body extends Widget & { [Key in keyof Body]: Body[Key] }
+> = Partial<Pick<Body, utilityTypes.MutableKeys<Body>>>
 
-export type WidgetFunction<
-  T extends Widget & { [K in keyof T]: T[K] }
-> = (data: WidgetInitializer<T>) => T
+type WidgetFunction<
+  Body extends Widget & { [Key in keyof Body]: Body[Key] },
+  Context extends WidgetContext = WidgetContext
+> = (ctx: Context, data: WidgetInitializer<Body>) => Body
 
 export function define<
-  T extends Widget & { [K in keyof T]: T[K] }
->(body: () => T): WidgetFunction<T> {
-  return (data) => {
-    return Object.assign(body(), data)
+  Body extends Widget & { [Key in keyof Body]: Body[Key] },
+  Context extends WidgetContext = WidgetContext
+>(
+  body: (ctx: Context) => Body
+): WidgetFunction<Body, Context> {
+  return (ctx, data) => {
+    return Object.assign(body(ctx), data)
   }
 }
 
@@ -187,12 +213,17 @@ type HtmlWidget<T extends HTMLElement> = T & {
 }
 
 export function toHtmlWidget<T extends HTMLElement>(
+  ctx: WidgetContext,
   element: T
 ): HtmlWidget<T> {
-  return Object.defineProperties(
+  const widget = Object.defineProperties(
     element,
     elementProperties
   ) as HtmlWidget<T>
+  ;((widget as unknown) as { [context]: WidgetContext })[
+    context
+  ] = ctx
+  return widget
 }
 
 type HtmlWidgetMap = {
@@ -211,9 +242,10 @@ export const html: HtmlWidgetMap = new Proxy(
       return ((target as Record<
         K,
         WidgetFunction<HtmlWidget<HTMLElementTagNameMap[K]>>
-      >)[property] ??= define(() =>
+      >)[property] ??= define((ctx) =>
         toHtmlWidget(
-          configDocument.createElement(property)
+          ctx,
+          ctx.document.createElement(property)
         )))
     },
   }
@@ -221,9 +253,9 @@ export const html: HtmlWidgetMap = new Proxy(
 
 export const range = define<{
   content: Widget[]
-}>(() => {
-  const start = configDocument.createComment('')
-  const end = configDocument.createComment('')
+}>((ctx) => {
+  const start = ctx.document.createComment('')
+  const end = ctx.document.createComment('')
   const content: Widget[] = [start, end]
 
   return {
@@ -242,7 +274,7 @@ export const range = define<{
           content.length - 2,
           ...inner
         )
-        replaceChildren(parent, siblings)
+        replaceChildren(ctx, parent, siblings)
       }
       content.splice(1, content.length - 2, ...inner)
     },
