@@ -1,4 +1,4 @@
-import * as apiTest from '@fe/api/index.t.ts'
+import * as apiTest from '@fe/api/index.test.ts'
 import * as urlModule from 'url'
 
 if (

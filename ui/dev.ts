@@ -1,4 +1,4 @@
-import * as uiTest from '@fe/ui/index.t.ts'
+import * as uiTest from '@fe/ui/index.test.ts'
 
 export function main(): void {
   uiTest.run().catch(console.error)

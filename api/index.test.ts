@@ -7,7 +7,7 @@ export async function run(): Promise<boolean> {
   const ctx = {
     now: () => perfHooks.performance.now(),
   }
-  const coreTest = await import('@fe/core/index.t.ts')
-  const apiTest = await import('@fe/api/index.t.ts')
+  const coreTest = await import('@fe/core/index.test.ts')
+  const apiTest = await import('@fe/api/index.test.ts')
   return await test.runAll(ctx, [coreTest, apiTest])
 }
