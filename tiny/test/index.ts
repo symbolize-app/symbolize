@@ -21,17 +21,18 @@ export async function runAll(
   ctx: { now: () => number },
   testCollectionModules: TestCollectionModule[]
 ): Promise<boolean> {
-  console.group('Testing...')
-  chai.use(chaiDom)
-  const start = ctx.now()
-  let pass = 0
-  let fail = 0
   const testModules = ([] as Promise<TestModule>[]).concat(
     ...testCollectionModules.map((testCollectionModule) =>
       testCollectionModule.all()
     )
   )
-  for (const testModule of await Promise.all(testModules)) {
+  const resolvedTestModules = await Promise.all(testModules)
+  chai.use(chaiDom)
+  const start = ctx.now()
+  let pass = 0
+  let fail = 0
+  console.group('Testing...')
+  for (const testModule of resolvedTestModules) {
     const { url, tests } = testModule
     let testUrlPrinted = false
     for (const testName in tests) {
