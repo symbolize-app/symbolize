@@ -5,8 +5,8 @@ const button = widget.html.button
 export const custom = widget.define<{
   readonly body: widget.Widget
   listen: widget.HtmlListeners
-}>(() => {
-  const body = button({
+}>((ctx) => {
+  const body = button(ctx, {
     content: ['OK'],
   })
   return {
