@@ -174,6 +174,11 @@ export async function oneStep(
         )
         if (localPath.startsWith(`..${pathModule.sep}`)) {
           throw new Error(`Invalid path ${args.path}`)
+        } else if (
+          options.platform === 'node' &&
+          localPath.startsWith('node_modules/')
+        ) {
+          return { path: args.path, external: true }
         }
         let path = `${pathModule.relative(
           pathModule.join(args.importer, '..'),
@@ -184,15 +189,14 @@ export async function oneStep(
         }
         nextSteps.push(url)
         return { path, external: true }
+      } else if (options.platform === 'node') {
+        throw new Error(`Unsupported resolve ${args.kind}`)
       } else {
         const fullPath = module
           .createRequire(args.importer)
           .resolve(args.path)
         if (!pathModule.isAbsolute(fullPath)) {
-          return {
-            path: args.path,
-            namespace: 'external',
-          }
+          throw new Error(`Invalid path ${args.path}`)
         }
         return { path: fullPath, namespace: 'file' }
       }
