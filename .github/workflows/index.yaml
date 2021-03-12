@@ -11,11 +11,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Install direnv
-        run: sudo apt-get install direnv
-
-      - name: Allow direnv
-        run: direnv allow
+      - name: Set up direnv
+        run: |
+          sudo apt-get install direnv
+          echo > .env
+          direnv allow
 
       - name: Set up Node.js
         uses: actions/setup-node@v2
@@ -37,7 +37,7 @@ jobs:
       - name: Check Prettier
         run: pnpm check-prettier
 
-      - name: Run ESLint
+      - name: Check ESLint
         run: pnpm check-eslint
 
       - name: Check TypeScript
