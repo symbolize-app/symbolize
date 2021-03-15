@@ -6,7 +6,7 @@ import * as perfHooks from 'perf_hooks'
 export const all: test.TestCollection = () => []
 
 export async function run(): Promise<boolean> {
-  const dom = new jsdom.JSDOM()
+  const dom = new jsdom.JSDOM('<!DOCTYPE html>')
   const ctx = {
     ...widget.initContext(dom.window.document),
     now: () => perfHooks.performance.now(),

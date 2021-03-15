@@ -127,7 +127,7 @@ async function main(): Promise<void> {
 
   console.log(
     'SERVER',
-    await (await fetch('/api/x')).text()
+    await (await fetch('/api/message')).text()
   )
 
   if (import.meta.env.NODE_ENV === 'development') {
