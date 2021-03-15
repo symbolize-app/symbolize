@@ -15,9 +15,6 @@ jobs:
         if: github.ref == 'refs/heads/action'
         run: |
           curl -L https://fly.io/install.sh | sudo FLYCTL_INSTALL=/usr/local sh
-          flyctl auth login
-        env:
-          FLY_ACCESS_TOKEN: ${{ secrets.FLY_ACCESS_TOKEN }}
 
       - name: Set up direnv
         run: |
@@ -56,6 +53,12 @@ jobs:
       - name: Build
         run: direnv exec . pnpm build
 
+      - name: Prune
+        if: github.ref == 'refs/heads/action'
+        run: pnpm prune --prod
+
       - name: Deploy
         if: github.ref == 'refs/heads/action'
         run: direnv exec . flyctl deploy --build-arg NODE_OPTIONS="${NODE_OPTIONS_PRODUCTION}"
+        env:
+          FLY_ACCESS_TOKEN: ${{ secrets.FLY_ACCESS_TOKEN }}
