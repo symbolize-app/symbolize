@@ -15,7 +15,7 @@ jobs:
         if: github.ref == 'refs/heads/action'
         run: |
           curl -L https://fly.io/install.sh | FLYCTL_INSTALL=/usr/local sudo sh
-          fly auth login
+          flyctl auth login
         env:
           FLY_ACCESS_TOKEN: ${{ secrets.FLY_ACCESS_TOKEN }}
 
