@@ -47,7 +47,7 @@ const notFound = route.define(undefined, /.*/, () => {
 
 const js = route.define<Context>(
   ['GET'],
-  /^\/js\/(?<path>.+\.mjs)/,
+  /^\/js\/(?<path>.+\.mjs)$/,
   async (ctx, request) => {
     const sourceFile = await Promise.resolve(
       ctx.sourceTree[
@@ -85,6 +85,11 @@ function buildDev(entryPoint: string): SourceTree {
   const sourceTree: SourceTree = {}
   const baseOptions = {
     platform: 'browser',
+    define: {
+      ['import.meta.env.NODE_ENV']: JSON.stringify(
+        'development'
+      ),
+    },
     write: false,
   } as const
   loop(entryPoint)

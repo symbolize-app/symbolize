@@ -11,11 +11,11 @@
     "dev": "node --experimental-loader ./loader.js bin/dev.ts",
     "fix": "eslint --ignore-path .gitignore --fix .",
     "fmt": "prettier --ignore-path .gitignore --write '**/*.cjs' '**/*.js' '**/*.json' '**/*.ts' '**/*.html' '**/*.md' '**/*.yaml' '!pnpm-lock.yaml'",
+    "start": "pnpm build && NODE_ENV=production NODE_OPTIONS=\"${NODE_OPTIONS_RELEASE}\" PORT=\"${DEV_PORT}\" node build/node/api/index.ts.mjs",
     "test": "node --experimental-loader ./loader.js bin/test.ts",
     "watch": "tsc --watch"
   },
   "dependencies": {
-    "canvas": "^2.7.0",
     "chalk": "^4.1.0",
     "cookie": "^0.4.1",
     "jsdom": "^16.4.0",
