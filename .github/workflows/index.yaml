@@ -33,6 +33,16 @@ jobs:
           npm i -g pnpm
           pnpm install --frozen-lockfile
 
+      - name: Set up Fly
+        if: github.ref == 'refs/heads/action'
+        run: |
+          echo "FLYCTL_INSTALL=/opt/fly" >> $GITHUB_ENV
+          echo "$FLYCTL_INSTALL/bin" >> $GITHUB_PATH
+          curl -L https://fly.io/install.sh | /usr/local sh
+          fly auth login
+        env:
+          FLY_ACCESS_TOKEN: ${{ secrets.FLY_ACCESS_TOKEN }}
+
       - name: Check Prettier
         run: pnpm check-prettier
 
@@ -47,3 +57,7 @@ jobs:
 
       - name: Build
         run: direnv exec . pnpm build
+
+      - name: Deploy
+        if: github.ref == 'refs/heads/action'
+        run: direnv exec . flyctl deploy --build-arg NODE_OPTIONS="${NODE_OPTIONS_PRODUCTION}"
