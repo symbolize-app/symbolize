@@ -11,6 +11,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Set up Fly
+        if: github.ref == 'refs/heads/action'
+        run: |
+          curl -L https://fly.io/install.sh | FLYCTL_INSTALL=/usr/local sh
+          fly auth login
+        env:
+          FLY_ACCESS_TOKEN: ${{ secrets.FLY_ACCESS_TOKEN }}
+
       - name: Set up direnv
         run: |
           sudo apt-get install direnv
@@ -32,14 +40,6 @@ jobs:
         run: |
           npm i -g pnpm
           pnpm install --frozen-lockfile
-
-      - name: Set up Fly
-        if: github.ref == 'refs/heads/action'
-        run: |
-          curl -L https://fly.io/install.sh | FLYCTL_INSTALL=/usr/local /usr/local sh
-          fly auth login
-        env:
-          FLY_ACCESS_TOKEN: ${{ secrets.FLY_ACCESS_TOKEN }}
 
       - name: Check Prettier
         run: pnpm check-prettier
