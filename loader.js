@@ -94,6 +94,11 @@ export async function transformSource(
       source: (
         await esbuild.transform(source, {
           loader: 'ts',
+          define: {
+            ['import.meta.env.NODE_ENV']: JSON.stringify(
+              'development'
+            ),
+          },
         })
       ).code,
     }

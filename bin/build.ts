@@ -22,19 +22,23 @@ async function main(): Promise<void> {
       await import.meta.resolve('@fe/ui/index.ts'),
     ],
     platform: 'browser',
+    define: {
+      ['import.meta.env.NODE_ENV']: JSON.stringify(
+        'production'
+      ),
+    },
   })
   await fsPromises.mkdir('build/node', { recursive: true })
-  await fsPromises.writeFile(
-    'build/node/package.json',
-    JSON.stringify({
-      type: 'module',
-    })
-  )
   await all({
     entryPoints: [
       await import.meta.resolve('@fe/api/index.ts'),
     ],
     platform: 'node',
+    define: {
+      ['import.meta.env.NODE_ENV']: JSON.stringify(
+        'production'
+      ),
+    },
   })
   console.log('Done build')
 }
@@ -44,6 +48,7 @@ type Platform = 'browser' | 'node'
 type BuildAllOptions = {
   entryPoints: string[]
   platform: Platform
+  define: Record<string, string>
 }
 
 export type BuildAllResult = {
@@ -64,6 +69,7 @@ export type SourceFileRef = {
 export type BuildOptions = {
   entryPoint: string
   platform: Platform
+  define: Record<string, string>
   write?: boolean
 }
 
@@ -93,6 +99,7 @@ async function all(
     const result = await oneStep({
       entryPoint: step,
       platform: options.platform,
+      define: options.define,
     })
     completedSteps.add(step)
     nextSteps.push(...result.nextSteps)
@@ -115,11 +122,7 @@ export async function oneStep(
   try {
     const result = await esbuild.build({
       bundle: true,
-      define: {
-        ['import.meta.env.NODE_ENV']: JSON.stringify(
-          'development'
-        ),
-      },
+      define: options.define,
       entryPoints: [fullEntryPointPath],
       format: 'esm',
       outfile,
