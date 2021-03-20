@@ -8,7 +8,7 @@
       "command": "pnpm watch",
       "isBackground": true,
       "problemMatcher": ["$tsc-watch"],
-      "option": "watch",
+      "group": "build",
       "presentation": {
         "reveal": "never",
         "echo": false,

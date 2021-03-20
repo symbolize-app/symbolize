@@ -1,3 +1,4 @@
 *.tsbuildinfo
 build
 node_modules
+.crdb
