@@ -16,6 +16,11 @@ jobs:
         run: |
           curl -L https://fly.io/install.sh | sudo FLYCTL_INSTALL=/usr/local sh
 
+      - name: Set up Dbmate
+        run: |
+          curl -fsSL -o /usr/local/bin/dbmate https://github.com/amacneil/dbmate/releases/latest/download/dbmate-linux-amd64
+          chmod +x /usr/local/bin/dbmate
+
       - name: Set up direnv
         run: |
           sudo apt-get install direnv

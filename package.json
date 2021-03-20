@@ -8,10 +8,13 @@
     "check-eslint": "eslint --ignore-path .gitignore --max-warnings 0 .",
     "check-prettier": "prettier --ignore-path .gitignore --check '**/*.cjs' '**/*.js' '**/*.json' '**/*.ts' '**/*.html' '**/*.md' '**/*.yaml' '!pnpm-lock.yaml'",
     "check-tsc": "tsc",
+    "db": "dbmate --url ${DATABASE_URL_ADMIN}",
     "dev": "node --experimental-loader ./loader.js bin/dev.ts",
     "fix": "eslint --ignore-path .gitignore --fix .",
     "fmt": "prettier --ignore-path .gitignore --write '**/*.cjs' '**/*.js' '**/*.json' '**/*.ts' '**/*.html' '**/*.md' '**/*.yaml' '!pnpm-lock.yaml'",
+    "sql": "cockroach sql --url ${DATABASE_URL_ADMIN}",
     "start": "pnpm build && NODE_ENV=production NODE_OPTIONS=\"${NODE_OPTIONS_RELEASE}\" PORT=\"${DEV_PORT}\" node build/node/api/index.ts.mjs",
+    "start-db": "cockroach start-single-node --certs-dir=.crdb/certs --store=.crdb/node --listen-addr=localhost:${DB_PORT} --http-addr=localhost:8257 --background",
     "test": "node --experimental-loader ./loader.js bin/test.ts",
     "watch": "tsc --watch"
   },
