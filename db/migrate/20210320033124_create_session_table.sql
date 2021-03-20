@@ -6,17 +6,17 @@ CREATE TABLE session (
                 TIMESTAMPTZ(3) NOT NULL DEFAULT current_timestamp(3),
         deleted
                 TIMESTAMPTZ(3) NULL,
+        member_id
+                UUID NOT NULL REFERENCES member (id),
         browser
                 TEXT NOT NULL,
         os
                 TEXT NOT NULL,
-        member_id
-                UUID NOT NULL REFERENCES member (id),
+        countries
+                JSONB NOT NULL,
+        languages
+                JSONB NOT NULL,
         last_activity
-                TIMESTAMPTZ NOT NULL,
-        last_country
-                TIMESTAMPTZ NOT NULL,
-        last_language
                 TIMESTAMPTZ NOT NULL
 );
 
