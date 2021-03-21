@@ -1,11 +1,11 @@
 -- migrate:up
 CREATE TABLE taxon_slug (
         slug
-                TEXT PRIMARY KEY,
+                STRING PRIMARY KEY,
         created
-                TIMESTAMPTZ(3) NOT NULL DEFAULT current_timestamp(3),
+                TIMESTAMPTZ(0) NOT NULL DEFAULT current_timestamp(0),
         taxon_id
-                UUID NOT NULL REFERENCES taxon (id)
+                BYTES NOT NULL REFERENCES taxon (id)
 );
 
 -- migrate:down

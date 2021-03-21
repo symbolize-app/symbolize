@@ -1,19 +1,21 @@
 -- migrate:up
 CREATE TABLE taxon_history (
         taxon_id
-                UUID NOT NULL REFERENCES taxon (id),
+                BYTES NOT NULL REFERENCES taxon (id),
         updated
-                TIMESTAMPTZ(3) NOT NULL,
+                TIMESTAMPTZ(0) NOT NULL,
         member_id
-                UUID NOT NULL REFERENCES member (id),
+                BYTES NOT NULL REFERENCES member (id),
         parent_taxon_id
-                UUID NULL REFERENCES taxon (id),
+                BYTES NULL REFERENCES taxon (id),
+        rank
+                rank NOT NULL,
         names
                 JSONB NOT NULL,
         slug
-                TEXT NOT NULL,
+                STRING NOT NULL,
         intro
-                TEXT NOT NULL,
+                STRING NOT NULL,
         PRIMARY KEY (taxon_id, updated)
 );
 
