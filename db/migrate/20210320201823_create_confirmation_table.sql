@@ -1,13 +1,13 @@
 -- migrate:up
 CREATE TABLE confirmation (
-        token_hash
+        id
                 BYTES PRIMARY KEY,
         created
-                TIMESTAMPTZ(3) NOT NULL DEFAULT current_timestamp(3),
+                TIMESTAMPTZ(0) NOT NULL DEFAULT current_timestamp(0),
         deleted
-                TIMESTAMPTZ(3) NULL,
+                TIMESTAMPTZ(0) NULL,
         member_id
-                UUID NOT NULL REFERENCES member (id)
+                BYTES NOT NULL REFERENCES member (id)
 );
 
 -- migrate:down

@@ -1,15 +1,15 @@
 -- migrate:up
 CREATE TABLE topic_history (
         topic_id
-                UUID NOT NULL REFERENCES topic (id),
+                BYTES NOT NULL REFERENCES topic (id),
         updated
-                TIMESTAMPTZ(3) NOT NULL,
+                TIMESTAMPTZ(0) NOT NULL,
         title
-                TEXT NOT NULL,
+                STRING NOT NULL,
         slug
-                TEXT NOT NULL,
+                STRING NOT NULL,
         content
-                TEXT NOT NULL,
+                STRING NOT NULL,
         PRIMARY KEY (topic_id, updated)
 );
 
