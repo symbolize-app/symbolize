@@ -1,11 +1,11 @@
 -- migrate:up
 CREATE TABLE topic_slug (
         slug
-                TEXT PRIMARY KEY,
+                STRING PRIMARY KEY,
         created
-                TIMESTAMPTZ(3) NOT NULL DEFAULT current_timestamp(3),
+                TIMESTAMPTZ(0) NOT NULL DEFAULT current_timestamp(0),
         topic_id
-                UUID NOT NULL REFERENCES topic (id)
+                BYTES NOT NULL REFERENCES topic (id)
 );
 
 -- migrate:down

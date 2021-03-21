@@ -1,23 +1,25 @@
 -- migrate:up
 CREATE TABLE taxon (
         id
-                UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+                BYTES PRIMARY KEY,
         created
-                TIMESTAMPTZ(3) NOT NULL DEFAULT current_timestamp(3),
+                TIMESTAMPTZ(0) NOT NULL DEFAULT current_timestamp(0),
         updated
-                TIMESTAMPTZ(3) NOT NULL DEFAULT current_timestamp(3),
+                TIMESTAMPTZ(0) NOT NULL DEFAULT current_timestamp(0),
         deleted
-                TIMESTAMPTZ(3) NULL,
+                TIMESTAMPTZ(0) NULL,
         member_id
-                UUID NOT NULL REFERENCES member (id),
+                BYTES NOT NULL REFERENCES member (id),
         parent_taxon_id
-                UUID NULL REFERENCES taxon (id),
+                BYTES NULL REFERENCES taxon (id),
+        rank
+                rank NOT NULL,
         names
                 JSONB NOT NULL,
         slug
-                TEXT NOT NULL,
+                STRING NOT NULL,
         intro
-                TEXT NOT NULL
+                STRING NOT NULL
 );
 
 -- migrate:down

@@ -1,18 +1,23 @@
 -- migrate:up
 CREATE TABLE reply (
         topic_id
-                UUID NOT NULL REFERENCES topic (id),
+                BYTES NOT NULL REFERENCES topic (id),
+        id
+                BYTES,
         created
-                TIMESTAMPTZ(3) NOT NULL DEFAULT current_timestamp(3),
+                TIMESTAMPTZ(0) NOT NULL DEFAULT current_timestamp(0),
         updated
-                TIMESTAMPTZ(3) NOT NULL DEFAULT current_timestamp(3),
+                TIMESTAMPTZ(0) NOT NULL DEFAULT current_timestamp(0),
         deleted
-                TIMESTAMPTZ(3) NULL,
+                TIMESTAMPTZ(0) NULL,
         member_id
-                UUID NOT NULL REFERENCES member (id),
+                BYTES NOT NULL REFERENCES member (id),
+        parent_reply_id
+                BYTES NULL,
         content
-                TEXT NOT NULL,
-        PRIMARY KEY (topic_id, created)
+                STRING NOT NULL,
+        PRIMARY KEY (topic_id, id),
+        FOREIGN KEY (topic_id, parent_reply_id) REFERENCES reply (topic_id, id)
 );
 
 -- migrate:down

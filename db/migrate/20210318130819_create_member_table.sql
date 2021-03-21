@@ -1,15 +1,15 @@
 -- migrate:up
 CREATE TABLE member (
         id
-                UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+                BYTES PRIMARY KEY,
         created
-                TIMESTAMPTZ(3) NOT NULL DEFAULT current_timestamp(3),
+                TIMESTAMPTZ(0) NOT NULL DEFAULT current_timestamp(0),
         deleted
-                TIMESTAMPTZ(3) NULL,
+                TIMESTAMPTZ(0) NULL,
         email
-                TEXT NOT NULL UNIQUE,
+                STRING NOT NULL UNIQUE,
         handle
-                TEXT NOT NULL UNIQUE
+                STRING NOT NULL UNIQUE
 );
 
 -- migrate:down

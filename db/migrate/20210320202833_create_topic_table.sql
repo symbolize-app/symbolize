@@ -1,21 +1,21 @@
 -- migrate:up
 CREATE TABLE topic (
         id
-                UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+                BYTES PRIMARY KEY,
         created
-                TIMESTAMPTZ(3) NOT NULL DEFAULT current_timestamp(3),
+                TIMESTAMPTZ(0) NOT NULL DEFAULT current_timestamp(0),
         updated
-                TIMESTAMPTZ(3) NOT NULL DEFAULT current_timestamp(3),
+                TIMESTAMPTZ(0) NOT NULL DEFAULT current_timestamp(0),
         deleted
-                TIMESTAMPTZ(3) NULL,
+                TIMESTAMPTZ(0) NULL,
         member_id
-                UUID NOT NULL REFERENCES member (id),
+                BYTES NOT NULL REFERENCES member (id),
         title
-                TEXT NOT NULL,
+                STRING NOT NULL,
         slug
-                TEXT NOT NULL,
+                STRING NOT NULL,
         content
-                TEXT NOT NULL
+                STRING NOT NULL
 );
 
 -- migrate:down
