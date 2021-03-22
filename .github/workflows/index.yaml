@@ -12,7 +12,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Set up Fly
-        if: github.ref == 'refs/heads/ref'
+        if: github.ref == 'refs/heads/main'
         run: |
           curl -fsSL https://fly.io/install.sh | sudo FLYCTL_INSTALL=/usr/local sh
 
