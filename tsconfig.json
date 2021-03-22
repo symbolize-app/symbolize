@@ -9,6 +9,7 @@
     "loader.js",
     "suppress.cjs",
     "tiny/**/*.ts",
+    "tiny/util/prettier-plugin-cockroach.cjs",
     "ui/**/*.ts"
   ],
   "compilerOptions": {
@@ -20,7 +21,7 @@
     "forceConsistentCasingInFileNames": true,
     "incremental": true,
     "isolatedModules": true,
-    "lib": ["dom", "dom.iterable", "es2015", "scripthost"],
+    "lib": ["dom", "dom.iterable", "es2019", "scripthost"],
     "module": "es2020",
     "moduleResolution": "node",
     "noEmit": true,
