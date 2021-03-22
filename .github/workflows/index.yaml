@@ -14,16 +14,22 @@ jobs:
       - name: Set up Fly
         if: github.ref == 'refs/heads/action'
         run: |
-          curl -L https://fly.io/install.sh | sudo FLYCTL_INSTALL=/usr/local sh
+          curl -fsSL https://fly.io/install.sh | sudo FLYCTL_INSTALL=/usr/local sh
 
       - name: Set up Dbmate
         run: |
-          curl -L https://github.com/amacneil/dbmate/releases/latest/download/dbmate-linux-amd64 | sudo tee /usr/local/bin/dbmate > /dev/null
+          curl -fsSL https://github.com/amacneil/dbmate/releases/latest/download/dbmate-linux-amd64 | sudo tee /usr/local/bin/dbmate > /dev/null
           sudo chmod +x /usr/local/bin/dbmate
+
+      - name: Cache /tmp/cockroach
+        uses: actions/cache@v1
+        with:
+          path: /tmp/cockroach-v20.2.6.linux-amd64
+          key: cockroach-v20.2.6.linux-amd64
 
       - name: Set up CockroachDB
         run: |
-          curl -L https://binaries.cockroachdb.com/cockroach-v20.2.6.linux-amd64.tgz | tar xvzC /tmp
+          curl -fsSL https://binaries.cockroachdb.com/cockroach-v20.2.6.linux-amd64.tgz | tar xvzC /tmp
           sudo cp /tmp/cockroach-v20.2.6.linux-amd64/cockroach /usr/local/bin
           sudo mkdir /usr/local/lib/cockroach
           sudo cp /tmp/cockroach-v20.2.6.linux-amd64/lib/libgeos.so /usr/local/lib/cockroach/
@@ -31,7 +37,8 @@ jobs:
 
       - name: Set up direnv
         run: |
-          sudo apt-get install direnv
+          curl -fsSL https://github.com/direnv/direnv/releases/latest/download/direnv.linux-amd64 | sudo tee /usr/local/bin/direnv > /dev/null
+          sudo chmod +x /usr/local/bin/direnv
           echo > .env
           direnv allow
 
@@ -48,7 +55,7 @@ jobs:
 
       - name: Set up pnpm
         run: |
-          npm i -g pnpm
+          curl -fsSL https://pnpm.js.org/pnpm.js | node - add --global pnpm
           pnpm install --frozen-lockfile
 
       - name: Check Prettier
