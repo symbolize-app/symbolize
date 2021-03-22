@@ -18,8 +18,16 @@ jobs:
 
       - name: Set up Dbmate
         run: |
-          sudo curl -fsSL -o /usr/local/bin/dbmate https://github.com/amacneil/dbmate/releases/latest/download/dbmate-linux-amd64
+          curl -fsSL https://github.com/amacneil/dbmate/releases/latest/download/dbmate-linux-amd64 | sudo tee /usr/local/bin/dbmate > /dev/null
           sudo chmod +x /usr/local/bin/dbmate
+
+      - name: Set up CockroachDB
+        run: |
+          wget -qO- https://binaries.cockroachdb.com/cockroach-v20.2.6.linux-amd64.tgz | tar -C /tmp xvz
+          sudo cp /tmp/cockroach-v20.2.6.linux-amd64/cockroach /usr/local/bin
+          sudo mkdir /usr/local/lib/cockroach
+          sudo cp /tmp/cockroach-v20.2.6.linux-amd64/lib/libgeos.so /usr/local/lib/cockroach/
+          sudo cp /tmp/cockroach-v20.2.6.linux-amd64/lib/libgeos_c.so /usr/local/lib/cockroach/
 
       - name: Set up direnv
         run: |
