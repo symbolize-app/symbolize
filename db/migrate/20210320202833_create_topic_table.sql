@@ -17,6 +17,7 @@ CREATE TABLE topic (
   content
     STRING NOT NULL
 );
+GRANT SELECT, INSERT, UPDATE ON TABLE topic TO api;
 
 -- migrate:down
 DROP TABLE topic;

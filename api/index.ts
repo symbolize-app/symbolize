@@ -7,6 +7,7 @@ import * as fs from 'fs'
 import * as http from 'http'
 import jsdom from 'jsdom'
 import type * as net from 'net'
+import pg from 'pg'
 import urlModule from 'url'
 
 type Context = unknown
@@ -65,13 +66,19 @@ const js = route.define(
 const apiMessage = route.define(
   undefined,
   /^\/api\/message$/,
-  () => {
+  async () => {
+    const pool = new pg.Pool({
+      connectionString: process.env.DATABASE_URL_API,
+    })
+
+    const result = await pool.query('SELECT * FROM member')
+
     return {
       status: 200,
       headers: {
         'content-type': 'text/plain',
       },
-      body: message.hi,
+      body: `${message.hi} ${JSON.stringify(result.rows)}`,
     }
   }
 )

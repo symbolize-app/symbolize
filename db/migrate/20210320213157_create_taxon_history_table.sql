@@ -18,6 +18,7 @@ CREATE TABLE taxon_history (
     STRING NOT NULL,
   PRIMARY KEY (taxon_id, updated)
 );
+GRANT SELECT, INSERT ON TABLE taxon_history TO api;
 
 -- migrate:down
 DROP TABLE taxon_history;

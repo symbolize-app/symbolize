@@ -12,6 +12,7 @@ CREATE TABLE reply_history (
   FOREIGN KEY (reply_topic_id, reply_id)
     REFERENCES reply (topic_id, id)
 );
+GRANT SELECT, INSERT ON TABLE reply_history TO api;
 
 -- migrate:down
 DROP TABLE reply_history;

@@ -7,6 +7,7 @@ CREATE TABLE topic_slug (
   topic_id
     BYTES NOT NULL REFERENCES topic (id)
 );
+GRANT SELECT, INSERT ON TABLE topic_slug TO api;
 
 -- migrate:down
 DROP TABLE topic_slug;
