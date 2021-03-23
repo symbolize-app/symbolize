@@ -12,16 +12,19 @@
     "dev": "node --experimental-loader ./loader.js bin/dev.ts",
     "fix": "eslint --ignore-path .gitignore --fix .",
     "fmt": "prettier --ignore-path .gitignore --plugin ./tiny/util/prettier-plugin-cockroach.cjs --write '**/*.cjs' '**/*.js' '**/*.json' '**/*.ts' '**/*.html' '**/*.md' '**/*.yaml' '!pnpm-lock.yaml' '**/*.sql'",
-    "sql": "cockroach sql --url ${DATABASE_URL_ADMIN}",
+    "sql": "cockroach sql --url ${DATABASE_URL_API}",
+    "sql-admin": "cockroach sql --url ${DATABASE_URL_ADMIN}",
     "start": "pnpm build && NODE_ENV=production NODE_OPTIONS=\"${NODE_OPTIONS_RELEASE}\" PORT=\"${DEV_PORT}\" node build/node/api/index.ts.mjs",
     "start-db": "cockroach start-single-node --certs-dir=.crdb/certs --store=.crdb/node --listen-addr=localhost:${DB_PORT} --http-addr=localhost:8257 --background",
     "test": "node --experimental-loader ./loader.js bin/test.ts",
     "watch": "tsc --watch"
   },
   "dependencies": {
+    "@types/pg": "^7.14.11",
     "chalk": "^4.1.0",
     "cookie": "^0.4.1",
     "jsdom": "^16.5.1",
+    "pg": "^8.5.1",
     "sodium-native": "^3.2.1"
   },
   "devDependencies": {

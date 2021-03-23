@@ -19,6 +19,7 @@ CREATE TABLE session (
   last_activity
     TIMESTAMPTZ NOT NULL
 );
+GRANT SELECT, INSERT, UPDATE ON TABLE session TO api;
 
 -- migrate:down
 DROP TABLE session;

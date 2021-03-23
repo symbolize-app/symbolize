@@ -21,6 +21,7 @@ CREATE TABLE taxon (
   intro
     STRING NOT NULL
 );
+GRANT SELECT, INSERT, UPDATE ON TABLE taxon TO api;
 
 -- migrate:down
 DROP TABLE taxon;
