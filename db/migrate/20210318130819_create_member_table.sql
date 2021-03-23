@@ -11,6 +11,7 @@ CREATE TABLE member (
   handle
     STRING NOT NULL UNIQUE
 );
+GRANT SELECT, INSERT, UPDATE ON TABLE member TO api;
 
 -- migrate:down
 DROP TABLE member;

@@ -20,6 +20,7 @@ CREATE TABLE reply (
   FOREIGN KEY (topic_id, parent_reply_id)
     REFERENCES reply (topic_id, id)
 );
+GRANT SELECT, INSERT, UPDATE ON TABLE reply TO api;
 
 -- migrate:down
 DROP TABLE reply;

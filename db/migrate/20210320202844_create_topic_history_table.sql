@@ -12,6 +12,7 @@ CREATE TABLE topic_history (
     STRING NOT NULL,
   PRIMARY KEY (topic_id, updated)
 );
+GRANT SELECT, INSERT ON TABLE topic_history TO api;
 
 -- migrate:down
 DROP TABLE topic_history;
