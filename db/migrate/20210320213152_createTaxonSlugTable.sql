@@ -7,7 +7,8 @@ CREATE TABLE taxon_slug (
   taxon_id
     BYTES NOT NULL REFERENCES taxon (id)
 );
-GRANT SELECT, INSERT ON TABLE taxon_slug TO api;
+GRANT SELECT ON TABLE taxon_slug TO apiread;
+GRANT SELECT, INSERT ON TABLE taxon_slug TO apiwrite;
 
 -- migrate:down
 DROP TABLE taxon_slug;

@@ -19,7 +19,8 @@ CREATE TABLE session (
   last_activity
     TIMESTAMPTZ NOT NULL
 );
-GRANT SELECT, INSERT, UPDATE ON TABLE session TO api;
+GRANT SELECT ON TABLE session TO api_read;
+GRANT SELECT, INSERT, UPDATE ON TABLE session TO api_write;
 
 -- migrate:down
 DROP TABLE session;

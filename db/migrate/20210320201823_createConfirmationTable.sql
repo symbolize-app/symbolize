@@ -9,7 +9,8 @@ CREATE TABLE confirmation (
   member_id
     BYTES NOT NULL REFERENCES member (id)
 );
-GRANT SELECT, INSERT, UPDATE ON TABLE confirmation TO api;
+GRANT SELECT ON TABLE confirmation TO api_read;
+GRANT SELECT, INSERT, UPDATE ON TABLE confirmation TO api_write;
 
 -- migrate:down
 DROP TABLE confirmation;

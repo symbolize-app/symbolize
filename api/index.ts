@@ -1,4 +1,6 @@
 import * as message from '@fe/core/message.ts'
+import type * as db from '@fe/db/index.ts'
+import * as memberQuery from '@fe/db/query/member.ts'
 import * as button from '@fe/ui/button.ts'
 import * as route from '@tiny/api/route.ts'
 import * as widget from '@tiny/ui/widget.ts'
@@ -67,18 +69,23 @@ const apiMessage = route.define(
   undefined,
   /^\/api\/message$/,
   async () => {
-    const pool = new pg.Pool({
-      connectionString: process.env.DATABASE_URL_API,
-    })
+    const databaseApiRead = {
+      pool: new pg.Pool({
+        connectionString: process.env.DATABASE_URL_API_READ,
+      }),
+    } as db.DatabaseApiRead
 
-    const result = await pool.query('SELECT * FROM member')
+    const rows = await memberQuery.find(
+      databaseApiRead,
+      Buffer.from('ABCD', 'hex')
+    )
 
     return {
       status: 200,
       headers: {
         'content-type': 'text/plain',
       },
-      body: `${message.hi} ${JSON.stringify(result.rows)}`,
+      body: `${message.hi} ${JSON.stringify(rows)}`,
     }
   }
 )
