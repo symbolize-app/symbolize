@@ -12,7 +12,8 @@ CREATE TABLE topic_history (
     STRING NOT NULL,
   PRIMARY KEY (topic_id, updated)
 );
-GRANT SELECT, INSERT ON TABLE topic_history TO api;
+GRANT SELECT ON TABLE topic_history TO api_read;
+GRANT SELECT, INSERT ON TABLE topic_history TO api_write;
 
 -- migrate:down
 DROP TABLE topic_history;

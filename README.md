@@ -17,7 +17,8 @@
 1. Run `cockroach cert create-ca --certs-dir=.crdb/certs --ca-key=.crdb/ca/ca.key`
 1. Run `cockroach cert create-node localhost --certs-dir=.crdb/certs --ca-key=.crdb/ca/ca.key`
 1. Run `cockroach cert create-client root --certs-dir=.crdb/certs --ca-key=.crdb/ca/ca.key`
-1. Run `cockroach cert create-client api --certs-dir=.crdb/certs --ca-key=.crdb/ca/ca.key`
+1. Run `cockroach cert create-client api_read --certs-dir=.crdb/certs --ca-key=.crdb/ca/ca.key`
+1. Run `cockroach cert create-client api_write --certs-dir=.crdb/certs --ca-key=.crdb/ca/ca.key`
 
 # Development
 
