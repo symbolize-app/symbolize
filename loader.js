@@ -90,17 +90,26 @@ export async function transformSource(
     if (typeof source !== 'string') {
       source = Buffer.from(source).toString('utf-8')
     }
-    return {
-      source: (
-        await esbuild.transform(source, {
-          loader: 'ts',
-          define: {
-            ['import.meta.env.NODE_ENV']: JSON.stringify(
-              'development'
-            ),
-          },
-        })
-      ).code,
+    const ext = pathModule.extname(context.url)
+    if (ext === '.sql') {
+      return {
+        source: `const text = ${JSON.stringify(
+          source
+        )}\nexport default text`,
+      }
+    } else {
+      return {
+        source: (
+          await esbuild.transform(source, {
+            loader: 'ts',
+            define: {
+              ['import.meta.env.NODE_ENV']: JSON.stringify(
+                'development'
+              ),
+            },
+          })
+        ).code,
+      }
     }
   } else {
     return defaultTransformSource(
@@ -111,11 +120,6 @@ export async function transformSource(
   }
 }
 
-const localRootPath = pathModule.resolve(
-  urlModule.fileURLToPath(import.meta.url),
-  '..'
-)
-
 /**
  * @param {string} url
  * @returns {string | undefined}
@@ -124,7 +128,7 @@ function toLocalPath(url) {
   const urlObject = new urlModule.URL(url)
   if (urlObject.protocol === 'file:') {
     const otherPath = urlModule.fileURLToPath(urlObject)
-    return pathModule.relative(localRootPath, otherPath)
+    return pathModule.relative('.', otherPath)
   } else {
     return undefined
   }
@@ -136,7 +140,7 @@ function toLocalPath(url) {
  */
 function fromLocalPath(path) {
   return urlModule
-    .pathToFileURL(pathModule.resolve(localRootPath, path))
+    .pathToFileURL(pathModule.resolve('.', path))
     .toString()
 }
 
