@@ -77,12 +77,6 @@ export type BuildResult = {
   nextSteps: string[]
 }
 
-const localRootPath = pathModule.resolve(
-  urlModule.fileURLToPath(import.meta.url),
-  '..',
-  '..'
-)
-
 async function all(
   options: BuildAllOptions
 ): Promise<void> {
@@ -125,6 +119,9 @@ export async function oneStep(
       define: options.define,
       entryPoints: [fullEntryPointPath],
       format: 'esm',
+      loader: {
+        '.sql': 'text',
+      },
       outfile,
       platform: options.platform,
       plugins: [
@@ -171,10 +168,7 @@ export async function oneStep(
           return { path: args.path, external: true }
         }
         const fullPath = urlModule.fileURLToPath(url)
-        const localPath = pathModule.relative(
-          localRootPath,
-          fullPath
-        )
+        const localPath = pathModule.relative('.', fullPath)
         if (localPath.startsWith(`..${pathModule.sep}`)) {
           throw new Error(`Invalid path ${args.path}`)
         } else if (
@@ -214,7 +208,7 @@ function getBuildPaths(
     options.entryPoint
   )
   const localEntryPointPath = pathModule.relative(
-    localRootPath,
+    '.',
     fullEntryPointPath
   )
   return [

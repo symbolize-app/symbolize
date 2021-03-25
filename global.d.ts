@@ -1,3 +1,9 @@
+declare module '*.sql' {
+  const text: string
+  // eslint-disable-next-line import/no-default-export
+  export default text
+}
+
 interface ParentNode {
   replaceChildren(
     ...nodesOrDOMStrings: (Node | string)[]
