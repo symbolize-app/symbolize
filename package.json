@@ -25,6 +25,7 @@
     "cookie": "^0.4.1",
     "jsdom": "^16.5.1",
     "pg": "^8.5.1",
+    "pg-connection-string": "^2.4.0",
     "sodium-native": "^3.2.1"
   },
   "devDependencies": {
