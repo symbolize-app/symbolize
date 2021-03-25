@@ -1,5 +1,5 @@
 -- migrate:up
-CREATE TABLE taxon (
+CREATE TABLE topic (
   id
     BYTES PRIMARY KEY,
   created
@@ -10,18 +10,15 @@ CREATE TABLE taxon (
     TIMESTAMPTZ(0) NULL,
   member_id
     BYTES NOT NULL REFERENCES member (id),
-  parent_taxon_id
-    BYTES NULL REFERENCES taxon (id),
-  rank
-    rank NOT NULL,
-  names
-    JSONB NOT NULL,
+  title
+    STRING NOT NULL,
   slug
     STRING NOT NULL,
-  intro
+  content
     STRING NOT NULL
 );
-GRANT SELECT, INSERT, UPDATE ON TABLE taxon TO api;
+GRANT SELECT ON TABLE topic TO api_read;
+GRANT SELECT, INSERT, UPDATE ON TABLE topic TO api_write;
 
 -- migrate:down
-DROP TABLE taxon;
+DROP TABLE topic;

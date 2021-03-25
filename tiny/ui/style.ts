@@ -29,7 +29,7 @@ export function initContext(
   }
 }
 
-const styleBase = 36
+const styleNameBase = 36
 
 type StyleProps = {
   readonly [TStyleName in keyof CSSStyleDeclaration]?: NonNullable<
@@ -72,7 +72,7 @@ export type Style = {
 
 export function build(body: StyleBody): Style {
   const styleNameClass = `s${globalStyleNameCount.toString(
-    styleBase
+    styleNameBase
   )}`
   globalStyleNameCount += 1
   return {
@@ -146,7 +146,7 @@ function renderNestedStyle(
     (combinatorSelectorValue || selectorValue)
   ) {
     styleName = `r${ctx.styleRenderCount.toString(
-      styleBase
+      styleNameBase
     )}`
     ctx.styleRenderCount += 1
   } else {
