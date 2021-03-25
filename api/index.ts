@@ -10,9 +10,12 @@ import * as http from 'http'
 import jsdom from 'jsdom'
 import type * as net from 'net'
 import pg from 'pg'
+import pgConnectionString from 'pg-connection-string'
 import urlModule from 'url'
 
-type Context = unknown
+type Context = {
+  databaseApiRead: db.DatabaseApiRead
+}
 
 const index = route.define(['GET'], /^\/$/, () => {
   return {
@@ -65,33 +68,31 @@ const js = route.define(
   }
 )
 
-const apiMessage = route.define(
-  undefined,
-  /^\/api\/message$/,
-  async () => {
-    const databaseApiRead = {
-      pool: new pg.Pool({
-        connectionString: process.env.DATABASE_URL_API_READ,
-      }),
-    } as db.DatabaseApiRead
+const apiMessage = route.define<{
+  databaseApiRead: db.DatabaseApiRead
+}>(['GET'], /^\/api\/message$/, async (ctx) => {
+  const rows = await memberQuery.find(
+    ctx.databaseApiRead,
+    Buffer.from('ABCD', 'hex')
+  )
 
-    const rows = await memberQuery.find(
-      databaseApiRead,
-      Buffer.from('ABCD', 'hex')
-    )
-
-    return {
-      status: 200,
-      headers: {
-        'content-type': 'text/plain',
-      },
-      body: `${message.hi} ${JSON.stringify(rows)}`,
-    }
+  return {
+    status: 200,
+    headers: {
+      'content-type': 'text/plain',
+    },
+    body: `${message.hi} ${JSON.stringify(rows)}`,
   }
-)
+})
 
 async function main(): Promise<void> {
-  const ctx: Context = {}
+  const ctx: Context = {
+    databaseApiRead: {
+      pool: openPool(
+        process.env.DATABASE_URL_API_READ as string
+      ),
+    } as db.DatabaseApiRead,
+  }
   const httpServer = http.createServer(
     route.handle(ctx, [
       index,
@@ -116,6 +117,38 @@ async function main(): Promise<void> {
       )
     )
   }
+}
+
+function openPool(connectionString: string): pg.Pool {
+  const max = 10
+  const user = pgConnectionString.parse(connectionString)
+    .user
+  if (!user) {
+    throw new Error('No DB user')
+  }
+
+  const pool = new pg.Pool({
+    connectionString,
+    connectionTimeoutMillis: 1_000,
+    idleTimeoutMillis: 10_000,
+    max,
+  })
+  pool.on('error', console.error)
+  pool.on('connect', () => {
+    console.log(
+      chalk.magenta(
+        `[${user}] DB client connected (${pool.totalCount} / ${max})`
+      )
+    )
+  })
+  pool.on('remove', () => {
+    console.log(
+      chalk.magenta(
+        `[${user}] DB client removed (${pool.totalCount} / ${max})`
+      )
+    )
+  })
+  return pool
 }
 
 if (
