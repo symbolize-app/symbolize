@@ -4,16 +4,23 @@ import * as memberQuery from '@fe/db/query/member.ts'
 import * as button from '@fe/ui/button.ts'
 import * as route from '@tiny/api/route.ts'
 import * as widget from '@tiny/ui/widget.ts'
+import * as errorModule from '@tiny/util/error.ts'
+import * as time from '@tiny/util/time.ts'
 import chalk from 'chalk'
 import * as fs from 'fs'
 import * as http from 'http'
 import jsdom from 'jsdom'
+import ms from 'ms'
 import type * as net from 'net'
+import * as perfHooks from 'perf_hooks'
 import pg from 'pg'
 import pgConnectionString from 'pg-connection-string'
 import urlModule from 'url'
 
-type Context = {
+type Context = errorModule.RetryContext &
+  DatabaseReadContext
+
+type DatabaseReadContext = {
   databaseApiRead: db.DatabaseApiRead
 }
 
@@ -68,12 +75,30 @@ const js = route.define(
   }
 )
 
-const apiMessage = route.define<{
-  databaseApiRead: db.DatabaseApiRead
-}>(['GET'], /^\/api\/message$/, async (ctx) => {
-  const rows = await memberQuery.find(
-    ctx.databaseApiRead,
-    Buffer.from('ABCD', 'hex')
+const apiMessage = route.define<
+  errorModule.RetryContext & DatabaseReadContext
+>(['GET'], /^\/api\/message$/, async (ctx) => {
+  const row = await errorModule.retry(
+    ctx,
+    () =>
+      memberQuery.find(
+        ctx.databaseApiRead,
+        Buffer.from('ABCD', 'hex')
+      ),
+    {
+      maxAttempts: 15,
+      minDelayMs: time.interval({ milliseconds: 10 }),
+      windowMs: time.interval({ seconds: 30 }),
+      onError(error, attempt, nextDelayMs) {
+        console.error(
+          `Retrying member find (attempt ${attempt}, delay ${ms(
+            nextDelayMs
+          )})`,
+          error
+        )
+        return errorModule.NextRetryAction.retry
+      },
+    }
   )
 
   return {
@@ -81,12 +106,13 @@ const apiMessage = route.define<{
     headers: {
       'content-type': 'text/plain',
     },
-    body: `${message.hi} ${JSON.stringify(rows)}`,
+    body: `${message.hi} ${JSON.stringify(row)}`,
   }
 })
 
 async function main(): Promise<void> {
   const ctx: Context = {
+    now: () => perfHooks.performance.now(),
     databaseApiRead: {
       pool: openPool(
         process.env.DATABASE_URL_API_READ as string
@@ -129,9 +155,14 @@ function openPool(connectionString: string): pg.Pool {
 
   const pool = new pg.Pool({
     connectionString,
-    connectionTimeoutMillis: 1_000,
-    idleTimeoutMillis: 10_000,
+    connectionTimeoutMillis: time.interval({ seconds: 1 }),
+    idleTimeoutMillis: time.interval({ seconds: 10 }),
+    ['idle_in_transaction_session_timeout']: time.interval({
+      seconds: 1,
+    }),
     max,
+    ['query_timeout']: time.interval({ seconds: 1 }),
+    ['statement_timeout']: time.interval({ seconds: 1 }),
   })
   pool.on('error', console.error)
   pool.on('connect', () => {
