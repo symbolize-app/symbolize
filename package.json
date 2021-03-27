@@ -15,7 +15,8 @@
     "sql": "cockroach sql --url ${DATABASE_URL_API_WRITE}",
     "sql-admin": "cockroach sql --url ${DATABASE_URL_ADMIN}",
     "start": "pnpm build && NODE_ENV=production NODE_OPTIONS=\"${NODE_OPTIONS_RELEASE}\" PORT=\"${DEV_PORT}\" node build/node/api/index.ts.mjs",
-    "start-db": "cockroach start-single-node --certs-dir=.crdb/certs --store=.crdb/node --listen-addr=localhost:${DB_PORT} --http-addr=localhost:8257 --background",
+    "start-db": "cockroach start-single-node --certs-dir=.crdb/certs --store=.crdb/node --listen-addr=localhost:${DB_PORT} --http-addr=localhost:8257 --background --pid-file .crdb/node.pid",
+    "stop-db": "kill $(cat .crdb/node.pid)",
     "test": "node --experimental-loader ./loader.js bin/test.ts",
     "watch": "tsc --watch"
   },
