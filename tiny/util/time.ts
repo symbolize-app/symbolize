@@ -12,23 +12,25 @@ export async function delay(
   })
 }
 
+const conversionTable = {
+  hours: 60 * 60 * 1000,
+  minutes: 60 * 1000,
+  seconds: 1000,
+} as const
+
 export function interval(parts: {
   hours?: number
   minutes?: number
   seconds?: number
   milliseconds?: number
 }): number {
-  const hours = parts.hours ?? 0
-  const minutes = hours * 60 + (parts.minutes ?? 0)
-  const seconds = minutes * 60 + (parts.seconds ?? 0)
-  return seconds * 1000 + (parts.milliseconds ?? 0)
+  return (
+    (parts.hours ?? 0) * conversionTable.hours +
+    (parts.minutes ?? 0) * conversionTable.minutes +
+    (parts.seconds ?? 0) * conversionTable.seconds +
+    (parts.milliseconds ?? 0)
+  )
 }
-
-const conversionTable = {
-  hours: 60 * 60 * 1000,
-  minutes: 60 * 1000,
-  seconds: 1000,
-} as const
 
 export function convert(
   ms: number,
@@ -42,7 +44,5 @@ export function subtract(to: Date, from: Date): number {
 }
 
 export function add(initial: Date, ms: number): Date {
-  const result = new Date()
-  result.setTime(initial.getTime() + ms)
-  return result
+  return new Date(initial.getTime() + ms)
 }

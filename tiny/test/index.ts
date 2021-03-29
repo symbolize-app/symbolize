@@ -213,14 +213,14 @@ export const mockHistory = Symbol('mockHistory')
 export function mock<
   Mock extends (...args: unknown[]) => unknown
 >(
-  returnValues: ReturnType<Mock>[]
+  returnValues: (() => ReturnType<Mock>)[]
 ): Mock & { [mockHistory]: Parameters<Mock>[] } {
   let i = 0
   const callback = ((...args: Parameters<Mock>) => {
     if (i === returnValues.length) {
       throw new Error('called too many times')
     } else {
-      const result = returnValues[i]
+      const result = returnValues[i]()
       callback[mockHistory].push(args)
       i += 1
       return result
