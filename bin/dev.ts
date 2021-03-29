@@ -166,6 +166,9 @@ async function main(): Promise<void> {
     '@fe/ui/index.ts'
   )
   const proxy = new HttpProxy({})
+  proxy.on('error', () => {
+    console.error('proxy error')
+  })
   const ctx: Context = {
     sourceTree: buildDev(entryPoint),
     proxy,

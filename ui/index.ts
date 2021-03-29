@@ -1,5 +1,7 @@
 import * as message from '@fe/core/message.ts'
 import * as button from '@fe/ui/button.ts'
+import type * as uiContext from '@fe/ui/context.ts'
+import * as uiMember from '@fe/ui/member.ts'
 import * as style from '@tiny/ui/style.ts'
 import * as widget from '@tiny/ui/widget.ts'
 
@@ -36,7 +38,7 @@ const title = widget.html.title
 const ul = widget.html.ul
 
 const myCounter = widget.define<{
-  readonly body: widget.Widget
+  body: widget.Widget
   value: number
 }>((ctx) => {
   let value: number
@@ -56,7 +58,13 @@ const myCounter = widget.define<{
 })
 
 async function main(): Promise<void> {
-  const ctx = widget.initContext(window.document)
+  const ctx: uiContext.Context = {
+    ...widget.initContext(window.document),
+    fetch: (...args) => window.fetch(...args),
+    performanceNow: () => window.performance.now(),
+    setTimeout: (...args) => window.setTimeout(...args),
+    random: () => Math.random(),
+  }
 
   const counter = myCounter(ctx, {})
 
@@ -104,6 +112,7 @@ async function main(): Promise<void> {
           }),
         ],
       }),
+      uiMember.custom(ctx, {}),
     ],
   })
 
@@ -125,10 +134,12 @@ async function main(): Promise<void> {
   ]
   body.content = [rootDiv]
 
-  console.log(
-    'SERVER',
-    await (await fetch('/api/message')).text()
-  )
+  ctx
+    .fetch('/api/message')
+    .then(async (response) => {
+      console.log('SERVER', await response.text())
+    })
+    .catch(console.error)
 
   if (import.meta.env.NODE_ENV === 'development') {
     const dev = await import('@fe/ui/dev.ts')

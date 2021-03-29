@@ -9,27 +9,34 @@ import tsconfig from './tsconfig.json'
 
 const aliases = Object.entries(
   tsconfig.compilerOptions.paths
-).map(([from, to]) => {
-  /** @type { RegExp } */
-  // @ts-ignore
-  const re = picomatch.makeRe(from.replace('*.', '**/*.'), {
+)
+  .filter(
+    ([_from, to]) => !to[0].startsWith('./node_modules/')
+  )
+  .map(([from, to]) => {
+    /** @type { RegExp } */
     // @ts-ignore
-    capture: true,
-  })
-  return (/** @type {string} */ specifier) => {
-    const match = re.exec(specifier)
-    if (match) {
-      return to[0].replace(
-        '*',
-        match[1] !== undefined
-          ? `${match[1]}/${match[2]}`
-          : match[2]
-      )
-    } else {
-      return undefined
+    const re = picomatch.makeRe(
+      from.replace('*.', '**/*.'),
+      {
+        // @ts-ignore
+        capture: true,
+      }
+    )
+    return (/** @type {string} */ specifier) => {
+      const match = re.exec(specifier)
+      if (match) {
+        return to[0].replace(
+          '*',
+          match[1] !== undefined
+            ? `${match[1]}/${match[2]}`
+            : match[2]
+        )
+      } else {
+        return undefined
+      }
     }
-  }
-})
+  })
 
 /**
  * @param {string} specifier
