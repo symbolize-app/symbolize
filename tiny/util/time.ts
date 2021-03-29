@@ -1,6 +1,14 @@
-export async function delay(ms: number): Promise<void> {
+export type TimeContext = {
+  performanceNow(): number
+  setTimeout(callback: () => void, ms: number): unknown
+}
+
+export async function delay(
+  ctx: TimeContext,
+  ms: number
+): Promise<void> {
   return new Promise((resolve) => {
-    globalThis.setTimeout(resolve, ms)
+    ctx.setTimeout(() => resolve(), ms)
   })
 }
 

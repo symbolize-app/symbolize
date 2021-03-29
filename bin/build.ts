@@ -1,8 +1,8 @@
+import * as crypto from '@tiny/util/crypto.ts'
 import esbuild from 'esbuild'
 import * as fsPromises from 'fs/promises'
 import module from 'module'
 import * as pathModule from 'path'
-import sodium from 'sodium-native'
 import * as urlModule from 'url'
 
 async function main(): Promise<void> {
@@ -137,10 +137,7 @@ export async function oneStep(
       const contents = Buffer.from(
         result.outputFiles[0].contents
       )
-      const hash = Buffer.alloc(
-        sodium.crypto_generichash_BYTES
-      )
-      sodium.crypto_generichash(hash, contents)
+      const hash = crypto.hash(contents)
       output = {
         path: outfile,
         contents,
@@ -160,10 +157,21 @@ export async function oneStep(
         args.kind === 'import-statement' ||
         args.kind === 'dynamic-import'
       ) {
-        const url = await import.meta.resolve(
+        let url = await import.meta.resolve(
           args.path,
           urlModule.pathToFileURL(args.importer).toString()
         )
+        if (
+          options.platform === 'browser' &&
+          url.endsWith('/lodash-es/isBuffer.js')
+        ) {
+          url = await import.meta.resolve(
+            'lodash-es/stubFalse.js',
+            urlModule
+              .pathToFileURL(args.importer)
+              .toString()
+          )
+        }
         if (url.startsWith('node:')) {
           return { path: args.path, external: true }
         }
@@ -193,7 +201,7 @@ export async function oneStep(
           .createRequire(args.importer)
           .resolve(args.path)
         if (!pathModule.isAbsolute(fullPath)) {
-          throw new Error(`Invalid path ${args.path}`)
+          return { path: args.path, external: true }
         }
         return { path: fullPath, namespace: 'file' }
       }

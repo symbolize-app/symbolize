@@ -22,7 +22,7 @@
     "forceConsistentCasingInFileNames": true,
     "incremental": true,
     "isolatedModules": true,
-    "lib": ["dom", "dom.iterable", "es2019", "scripthost"],
+    "lib": ["dom", "dom.iterable", "es2020", "scripthost"],
     "module": "es2020",
     "moduleResolution": "node",
     "noEmit": true,
@@ -37,7 +37,11 @@
       "@fe/db/*.ts": ["./db/*.ts"],
       "@fe/db/*.sql": ["./db/*.sql"],
       "@fe/ui/*.ts": ["./ui/*.ts"],
-      "@tiny/*.ts": ["./tiny/*.ts"]
+      "@tiny/*.ts": ["./tiny/*.ts"],
+      "@sinonjs/fake-timers": [
+        "./node_modules/@types/sinonjs__fake-timers"
+      ],
+      "sinonx": ["./node_modules/@types/sinon"]
     },
     "resolveJsonModule": true,
     "skipLibCheck": true,

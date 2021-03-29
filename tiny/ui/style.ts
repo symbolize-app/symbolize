@@ -32,7 +32,7 @@ export function initContext(
 const styleNameBase = 36
 
 type StyleProps = {
-  readonly [TStyleName in keyof CSSStyleDeclaration]?: NonNullable<
+  [TStyleName in keyof CSSStyleDeclaration]?: NonNullable<
     CSSStyleDeclaration[TStyleName]
   >
 }
@@ -42,23 +42,23 @@ enum StyleNesting {
   combinatorSelector,
 }
 
-type StyleSelector = readonly [
+type StyleSelector = [
   {
-    readonly nesting: StyleNesting.selector
-    readonly selector: string
+    nesting: StyleNesting.selector
+    selector: string
   },
   StyleBody
 ]
 
-type StyleCombinatorSelector = readonly [
+type StyleCombinatorSelector = [
   {
-    readonly nesting: StyleNesting.combinatorSelector
-    readonly combinatorSelector: string
+    nesting: StyleNesting.combinatorSelector
+    combinatorSelector: string
   },
   StyleBody
 ]
 
-type StyleBody = readonly (
+type StyleBody = (
   | StyleProps
   | StyleSelector
   | StyleCombinatorSelector
@@ -66,8 +66,8 @@ type StyleBody = readonly (
 )[]
 
 export type Style = {
-  readonly name: string
-  readonly body: StyleBody
+  name: string
+  body: StyleBody
 }
 
 export function build(body: StyleBody): Style {
@@ -155,9 +155,7 @@ function renderNestedStyle(
   const styleClasses = [styleName]
   for (const styleItem of style.body) {
     if (Array.isArray(styleItem)) {
-      const nestedStyleItem = styleItem as
-        | StyleSelector
-        | StyleCombinatorSelector
+      const nestedStyleItem = styleItem
       const nesting = nestedStyleItem[0].nesting
       if (nesting === StyleNesting.selector) {
         styleClasses.push(
@@ -181,7 +179,7 @@ function renderNestedStyle(
         )
       }
     } else {
-      const flatStyleItem = styleItem as StyleProps | Style
+      const flatStyleItem = styleItem
       if (Reflect.has(flatStyleItem, 'name')) {
         styleClasses.push(
           ...renderNestedStyle(

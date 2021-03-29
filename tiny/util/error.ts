@@ -1,7 +1,11 @@
 import * as time from '@tiny/util/time.ts'
 import type * as typeFest from 'type-fest'
 
-export type RetryContext = { now: () => number }
+export type RetryContext = time.TimeContext & RandomContext
+
+export type RandomContext = {
+  random(): number
+}
 
 export type RetryConfig = {
   minDelayMs: number
@@ -11,12 +15,7 @@ export type RetryConfig = {
     error: unknown,
     attempt: number,
     nextDelayMs: number
-  ) => NextRetryAction
-}
-
-export enum NextRetryAction {
-  retry,
-  stop,
+  ) => void
 }
 
 export async function retry<Result>(
@@ -24,7 +23,7 @@ export async function retry<Result>(
   callback: () => typeFest.Promisable<Result>,
   config: RetryConfig
 ): Promise<Result> {
-  const startMs = ctx.now()
+  const startMs = ctx.performanceNow()
   let attempt = 0
 
   while (true) {
@@ -35,10 +34,10 @@ export async function retry<Result>(
         throw error
       }
 
-      const nowMs = ctx.now()
+      const nowMs = ctx.performanceNow()
       const delayMs = Math.max(
         config.minDelayMs,
-        Math.random() *
+        ctx.random() *
           config.minDelayMs *
           Math.pow(2, attempt)
       )
@@ -46,16 +45,8 @@ export async function retry<Result>(
         throw error
       }
 
-      const nextAction = config.onError(
-        error,
-        attempt,
-        delayMs
-      )
-      if (nextAction === NextRetryAction.stop) {
-        throw error
-      }
-
-      await time.delay(delayMs)
+      config.onError(error, attempt, delayMs)
+      await time.delay(ctx, delayMs)
       attempt += 1
     }
   }

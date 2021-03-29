@@ -1,17 +1,21 @@
-import chai from 'chai'
-import chaiDom from 'chai-dom'
+import fakeTimers from '@sinonjs/fake-timers'
+import type * as timeTest from '@tiny/util/time.test.ts'
+import type * as time from '@tiny/util/time.ts'
+import * as diff from 'diff'
+import eq from 'lodash-es/eq.js'
+import isEqual from 'lodash-es/isEqual.js'
 import ms from 'ms'
 import type * as typeFest from 'type-fest'
 
-export type Test<
-  Context extends TestContext = TestContext
-> = (ctx: Context) => typeFest.Promisable<void>
+export type Test<Context extends unknown = unknown> = (
+  ctx: Context & TestContext
+) => typeFest.Promisable<void>
 
-export type TestContext = { now: () => number }
+export type TestContext = timeTest.TimeTestContext
 
-type TestModule<
-  Context extends TestContext = TestContext
-> = {
+export type TestRunContext = time.TimeContext
+
+type TestModule<Context extends unknown = unknown> = {
   url: string
   tests: {
     [testName: string]: Test<Context>
@@ -19,19 +23,40 @@ type TestModule<
 }
 
 export type TestCollection<
-  Context extends TestContext = TestContext
+  Context extends unknown = unknown
 > = () => Promise<TestModule<Context>>[]
 
 type TestCollectionModule<
-  Context extends TestContext = TestContext
+  Context extends unknown = unknown
 > = {
   all: TestCollection<Context>
 }
 
+class AssertionError extends Error {
+  actual: unknown
+  expected: unknown
+  diff: boolean
+
+  constructor(
+    message: string,
+    actual: unknown,
+    expected: unknown,
+    enableDiff?: 'diff' | undefined
+  ) {
+    super(message)
+    this.actual = actual
+    this.expected = expected
+    this.diff = !!enableDiff
+  }
+}
+
 export async function runAll<
-  Context extends TestContext = TestContext
+  Context extends Record<string, unknown> = Record<
+    string,
+    unknown
+  >
 >(
-  ctx: Context,
+  ctx: Context & TestRunContext,
   testCollectionModules: TestCollectionModule<Context>[]
 ): Promise<boolean> {
   const testModules = ([] as Promise<
@@ -42,8 +67,7 @@ export async function runAll<
     )
   )
   const resolvedTestModules = await Promise.all(testModules)
-  chai.use(chaiDom)
-  const start = ctx.now()
+  const start = ctx.performanceNow()
   let pass = 0
   let fail = 0
   console.group('Testing...')
@@ -53,7 +77,15 @@ export async function runAll<
     for (const testName in tests) {
       const test = tests[testName]
       try {
-        await test(ctx)
+        const clock = fakeTimers.createClock(1616952581493)
+        const testContext: Context & TestContext = {
+          ...ctx,
+          performanceNow: () => clock.now,
+          setTimeout: (...args) =>
+            clock.setTimeout(...args),
+          clock,
+        }
+        await test(testContext)
         pass += 1
       } catch (error: unknown) {
         const basicInfo =
@@ -73,12 +105,14 @@ export async function runAll<
           typeof error == 'object' &&
           error !== null &&
           'actual' in error &&
-          'expected' in error
+          'expected' in error &&
+          'diff' in error
             ? {
                 actual: (error as { actual: unknown })
                   .actual,
                 expected: (error as { expected: unknown })
                   .expected,
+                diff: (error as { diff: unknown }).diff,
               }
             : undefined
 
@@ -111,6 +145,33 @@ export async function runAll<
             'color: green',
             assertionInfo.expected
           )
+          if (assertionInfo.diff) {
+            const diffSections = diff.diffJson(
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              assertionInfo.expected as any,
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              assertionInfo.actual as any
+            )
+            const outputLines = []
+            for (const diffSection of diffSections) {
+              let prefix: string
+              if (diffSection.added) {
+                prefix = '+'
+              } else if (diffSection.removed) {
+                prefix = '-'
+              } else {
+                prefix = ' '
+              }
+              for (const diffLine of diffSection.value.split(
+                '\n'
+              )) {
+                if (diffLine) {
+                  outputLines.push(`${prefix} ${diffLine}`)
+                }
+              }
+            }
+            console.log(outputLines.join('\n'))
+          }
           basicInfo.stack = basicInfo.stack?.replace(
             /^Assertion/,
             ''
@@ -129,7 +190,7 @@ export async function runAll<
     }
   }
 
-  const end = ctx.now()
+  const end = ctx.performanceNow()
   const elapsed = ms(Math.round(end - start))
 
   console.log(
@@ -145,4 +206,117 @@ export async function runAll<
   console.log(`Elapsed: ${elapsed}`)
   console.groupEnd()
   return fail == 0
+}
+
+export const mockHistory = Symbol('mockHistory')
+
+export function mock<
+  Mock extends (...args: unknown[]) => unknown
+>(
+  returnValues: ReturnType<Mock>[]
+): Mock & { [mockHistory]: Parameters<Mock>[] } {
+  let i = 0
+  const callback = ((...args: Parameters<Mock>) => {
+    if (i === returnValues.length) {
+      throw new Error('called too many times')
+    } else {
+      const result = returnValues[i]
+      callback[mockHistory].push(args)
+      i += 1
+      return result
+    }
+  }) as Mock & { [mockHistory]: Parameters<Mock>[] }
+  callback[mockHistory] = []
+  return callback
+}
+
+export type SyncPromise<Value> = {
+  isSettled: boolean
+  resolvedValue: Value
+  rejectedValue: unknown
+}
+
+export function sync<Value>(
+  promise: Promise<Value>
+): SyncPromise<Value> {
+  let isResolved = false
+  let resolvedValue: Value | undefined = undefined
+  let isRejected = false
+  let rejectedValue: unknown = undefined
+  const result = {
+    get isSettled() {
+      return isResolved || isRejected
+    },
+    get resolvedValue() {
+      if (isRejected) {
+        throw rejectedValue
+      } else if (!isResolved) {
+        throw new Error('Promise not resolved yet')
+      } else {
+        return resolvedValue as Value
+      }
+    },
+    get rejectedValue() {
+      if (isResolved) {
+        throw new AssertionError(
+          'Promise resolved',
+          result,
+          '<rejected>'
+        )
+      } else if (!isRejected) {
+        throw new Error('Promise not rejected yet')
+      } else {
+        return rejectedValue
+      }
+    },
+  }
+  promise
+    .then((value) => {
+      isResolved = true
+      resolvedValue = value
+    })
+    .catch((value) => {
+      isRejected = true
+      rejectedValue = value
+    })
+  return result
+}
+
+export function assertEquals<Value>(
+  actual: Value,
+  expected: Value
+): void {
+  if (!eq(actual, expected)) {
+    throw new AssertionError('Not equal', actual, expected)
+  }
+}
+
+export function assertDeepEquals<Value>(
+  actual: Value,
+  expected: Value
+): void {
+  if (!isEqual(actual, expected)) {
+    throw new AssertionError(
+      'Not deep equal',
+      actual,
+      expected,
+      'diff'
+    )
+  }
+}
+
+export function assertThrows(
+  callback: () => unknown
+): unknown {
+  let result: unknown
+  try {
+    result = callback()
+  } catch (error: unknown) {
+    return error
+  }
+  throw new AssertionError(
+    'No error thrown',
+    result,
+    '<error>'
+  )
 }

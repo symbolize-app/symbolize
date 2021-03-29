@@ -1,5 +1,4 @@
 import * as style from '@tiny/ui/style.ts'
-import type * as utilityTypes from 'utility-types'
 
 const listeners = Symbol('listeners')
 
@@ -205,20 +204,19 @@ export function collect(
   return results
 }
 
-type WidgetInitializer<
-  Body extends Widget & { [Key in keyof Body]: Body[Key] }
-> = Partial<Pick<Body, utilityTypes.MutableKeys<Body>>>
-
 type WidgetFunction<
   Body extends Widget & { [Key in keyof Body]: Body[Key] },
-  Context extends WidgetContext = WidgetContext
-> = (ctx: Context, data: WidgetInitializer<Body>) => Body
+  Context extends unknown = unknown
+> = (
+  ctx: WidgetContext & Context,
+  data: Partial<Body>
+) => Body
 
 export function define<
   Body extends Widget & { [Key in keyof Body]: Body[Key] },
-  Context extends WidgetContext = WidgetContext
+  Context extends unknown = unknown
 >(
-  body: (ctx: Context) => Body
+  body: (ctx: WidgetContext & Context) => Body
 ): WidgetFunction<Body, Context> {
   return (ctx, data) => {
     return Object.assign(body(ctx), data)

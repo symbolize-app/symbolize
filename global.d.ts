@@ -11,8 +11,8 @@ interface ParentNode {
 }
 
 interface ImportMeta {
-  readonly env: {
-    readonly [key: string]: string
+  env: {
+    [key: string]: string
   }
 
   resolve(

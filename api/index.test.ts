@@ -7,12 +7,21 @@ export const all: test.TestCollection = () => []
 
 export async function run(): Promise<boolean> {
   const dom = new jsdom.JSDOM('<!DOCTYPE html>')
-  const ctx = {
+  const ctx: widget.WidgetContext & test.TestRunContext = {
     ...widget.initContext(dom.window.document),
-    now: () => perfHooks.performance.now(),
+    performanceNow: () => perfHooks.performance.now(),
+    setTimeout: (...args) => global.setTimeout(...args),
   }
   const coreTest = await import('@fe/core/index.test.ts')
   const apiTest = await import('@fe/api/index.test.ts')
   const uiTest = await import('@fe/ui/index.test.ts')
-  return await test.runAll(ctx, [coreTest, apiTest, uiTest])
+  const tinyUtilTest = await import(
+    '@tiny/util/index.test.ts'
+  )
+  return await test.runAll(ctx, [
+    coreTest,
+    apiTest,
+    uiTest,
+    tinyUtilTest,
+  ])
 }
