@@ -15,12 +15,12 @@ export async function readRequestBuffer(
   request: Request
 ): Promise<Buffer> {
   return new Promise((resolve, reject) => {
-    const buffer = Buffer.alloc(0)
+    const chunks: Buffer[] = []
     request.stream.on('data', (chunk) => {
-      buffer.write(chunk)
+      chunks.push(chunk)
     })
     request.stream.on('end', () => {
-      resolve(buffer)
+      resolve(Buffer.concat(chunks))
     })
     request.stream.on('error', reject)
   })
@@ -143,7 +143,7 @@ async function handleRequest<Context>(
       }
       res.end()
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error(error)
     if (res.headersSent) {
       console.error('Headers already sent')

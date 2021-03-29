@@ -1,10 +1,10 @@
 import * as message from '@fe/core/message.ts'
-import chai from 'chai'
+import * as test from '@tiny/test/index.ts'
 
 export const url = import.meta.url
 
 export const tests = {
   ['hi message'](): void {
-    chai.expect(message.hi).to.equal('Hello')
+    test.assertEquals(message.hi, 'Hello')
   },
 }

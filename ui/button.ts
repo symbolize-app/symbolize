@@ -3,7 +3,7 @@ import * as widget from '@tiny/ui/widget.ts'
 const button = widget.html.button
 
 export const custom = widget.define<{
-  readonly body: widget.Widget
+  body: widget.Widget
   listen: widget.HtmlListeners
 }>((ctx) => {
   const body = button(ctx, {

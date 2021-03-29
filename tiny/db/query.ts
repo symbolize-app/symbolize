@@ -28,10 +28,7 @@ export function defineMulti<
     queryNameBase
   )}`
   globalQueryNameCount += 1
-  return async (
-    database: SpecificDatabase,
-    ...values: Values
-  ) => {
+  return async (database, ...values) => {
     const result = await database.pool.query<Row, Values>(
       {
         name,
@@ -56,10 +53,7 @@ export function defineOptional<
   const base = defineMulti<SpecificDatabase, Values, Row>(
     text
   )
-  return async (
-    database: SpecificDatabase,
-    ...values: Values
-  ) => {
+  return async (database, ...values) => {
     const result = await base(database, ...values)
     if (result.length === 0) {
       return undefined
@@ -88,10 +82,7 @@ export function defineSingle<
     Values,
     Row
   >(text)
-  return async (
-    database: SpecificDatabase,
-    ...values: Values
-  ) => {
+  return async (database, ...values) => {
     const result = await base(database, ...values)
     if (result === undefined) {
       throw new Error('No rows returned')
@@ -99,4 +90,56 @@ export function defineSingle<
       return result
     }
   }
+}
+
+export function defineVoid<
+  SpecificDatabase extends db.Database,
+  Values extends SupportedType[]
+>(
+  text: string
+): (
+  database: SpecificDatabase,
+  ...values: Values
+) => Promise<void> {
+  const base = defineMulti<
+    SpecificDatabase,
+    Values,
+    Record<string, never>
+  >(text)
+  return async (database, ...values) => {
+    const result = await base(database, ...values)
+    if (result.length === 0) {
+      return
+    } else {
+      throw new Error(
+        `Too many rows returned (${result.length})`
+      )
+    }
+  }
+}
+
+export type QueryError = Error & { code: string }
+
+export function isQueryError(
+  error: unknown
+): error is QueryError {
+  return (
+    error instanceof Error &&
+    typeof (error as QueryError).code === 'string'
+  )
+}
+
+// https://www.postgresql.org/docs/13/errcodes-appendix.html
+export const errorCode = {
+  uniqueViolation: '23505',
+} as const
+
+const uniqueViolationConstraintNamePattern = / unique constraint "([^"]*)"$/
+
+export function getUniqueViolationConstraintName(
+  error: QueryError
+): string | undefined {
+  return uniqueViolationConstraintNamePattern.exec(
+    error.message
+  )?.[1]
 }

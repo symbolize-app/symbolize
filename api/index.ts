@@ -1,28 +1,19 @@
-import * as message from '@fe/core/message.ts'
+import type * as apiContext from '@fe/api/context.ts'
+import * as apiQuery from '@fe/api/query.ts'
 import type * as db from '@fe/db/index.ts'
-import * as memberQuery from '@fe/db/query/member.ts'
 import * as button from '@fe/ui/button.ts'
 import * as route from '@tiny/api/route.ts'
 import * as widget from '@tiny/ui/widget.ts'
-import * as errorModule from '@tiny/util/error.ts'
 import * as time from '@tiny/util/time.ts'
 import chalk from 'chalk'
 import * as fs from 'fs'
 import * as http from 'http'
 import jsdom from 'jsdom'
-import ms from 'ms'
 import type * as net from 'net'
 import * as perfHooks from 'perf_hooks'
 import pg from 'pg'
 import pgConnectionString from 'pg-connection-string'
 import urlModule from 'url'
-
-type Context = errorModule.RetryContext &
-  DatabaseReadContext
-
-type DatabaseReadContext = {
-  databaseApiRead: db.DatabaseApiRead
-}
 
 const index = route.define(['GET'], /^\/$/, () => {
   return {
@@ -75,56 +66,28 @@ const js = route.define(
   }
 )
 
-const apiMessage = route.define<
-  errorModule.RetryContext & DatabaseReadContext
->(['GET'], /^\/api\/message$/, async (ctx) => {
-  const row = await errorModule.retry(
-    ctx,
-    () =>
-      memberQuery.find(
-        ctx.databaseApiRead,
-        Buffer.from('ABCD', 'hex')
-      ),
-    {
-      maxAttempts: 15,
-      minDelayMs: time.interval({ milliseconds: 10 }),
-      windowMs: time.interval({ seconds: 30 }),
-      onError(error, attempt, nextDelayMs) {
-        console.error(
-          `Retrying member find (attempt ${attempt}, delay ${ms(
-            nextDelayMs
-          )})`,
-          error
-        )
-        return errorModule.NextRetryAction.retry
-      },
-    }
-  )
-
-  return {
-    status: 200,
-    headers: {
-      'content-type': 'text/plain',
-    },
-    body: `${message.hi} ${JSON.stringify(row)}`,
-  }
-})
-
 async function main(): Promise<void> {
-  const ctx: Context = {
-    now: () => perfHooks.performance.now(),
+  const ctx: apiContext.Context = {
+    performanceNow: () => perfHooks.performance.now(),
+    setTimeout: (...args) => global.setTimeout(...args),
+    random: () => Math.random(),
     databaseApiRead: {
       pool: openPool(
         process.env.DATABASE_URL_API_READ as string
       ),
     } as db.DatabaseApiRead,
+    databaseApiWrite: {
+      pool: openPool(
+        process.env.DATABASE_URL_API_WRITE as string
+      ),
+    } as db.DatabaseApiWrite,
   }
   const httpServer = http.createServer(
     route.handle(ctx, [
       index,
       ssr,
       js,
-      apiMessage,
+      ...apiQuery.routes,
       notFound,
     ])
   )
