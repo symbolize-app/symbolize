@@ -41,7 +41,7 @@ export async function retry<Result>(
           config.minDelayMs *
           Math.pow(2, attempt)
       )
-      if (nowMs + delayMs > startMs + config.windowMs) {
+      if (nowMs + delayMs >= startMs + config.windowMs) {
         throw error
       }
 

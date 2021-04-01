@@ -5,7 +5,7 @@ import * as time from '@tiny/util/time.ts'
 export const url = import.meta.url
 
 export const tests = {
-  async ['no retries'](
+  async ['one attempt, pass'](
     baseContext: test.TestContext
   ): Promise<void> {
     const ctx: test.TestContext &
@@ -33,7 +33,7 @@ export const tests = {
       expectedResult
     )
   },
-  async ['one retry'](
+  async ['two attempts, count limit'](
     baseContext: test.TestContext
   ): Promise<void> {
     const ctx: test.TestContext &
@@ -66,7 +66,7 @@ export const tests = {
       expectedResult
     )
   },
-  async ['two retries'](
+  async ['three attempts, count limit'](
     baseContext: test.TestContext
   ): Promise<void> {
     const ctx: test.TestContext &
@@ -108,7 +108,88 @@ export const tests = {
       expectedResult
     )
   },
-  async ['two retries, then pass'](
+  async ['one attempt, window limit'](
+    baseContext: test.TestContext
+  ): Promise<void> {
+    const ctx: test.TestContext &
+      errorModule.RetryContext = {
+      ...baseContext,
+      random: test.mock([() => 0]),
+    }
+    const expectedResult = new Error('TEST')
+    const onError = test.mock([])
+    const actualResult = test.sync(
+      errorModule.retry(
+        ctx,
+        async () => {
+          await time.delay(
+            ctx,
+            time.interval({ seconds: 9 })
+          )
+          throw expectedResult
+        },
+        {
+          minDelayMs: time.interval({ seconds: 1 }),
+          windowMs: time.interval({ seconds: 10 }),
+          maxAttempts: 10,
+          onError,
+        }
+      )
+    )
+    await ctx.clock.tickAsync(0)
+    test.assertEquals(actualResult.isSettled, false)
+    await ctx.clock.tickAsync(9_000)
+    test.assertEquals(
+      actualResult.rejectedValue,
+      expectedResult
+    )
+  },
+  async ['three attempts, window limit'](
+    baseContext: test.TestContext
+  ): Promise<void> {
+    const ctx: test.TestContext &
+      errorModule.RetryContext = {
+      ...baseContext,
+      random: test.mock([() => 0.6, () => 0.6, () => 0]),
+    }
+    const expectedResult = new Error('TEST')
+    const onError = test.mock([
+      () => undefined,
+      () => undefined,
+    ])
+    const actualResult = test.sync(
+      errorModule.retry(
+        ctx,
+        () => Promise.reject(expectedResult),
+        {
+          minDelayMs: time.interval({ seconds: 1 }),
+          windowMs: time.interval({
+            seconds: 2,
+            milliseconds: 201,
+          }),
+          maxAttempts: 10,
+          onError,
+        }
+      )
+    )
+    await ctx.clock.tickAsync(0)
+    test.assertDeepEquals(onError[test.mockHistory], [
+      [expectedResult, 0, 1000],
+    ])
+    test.assertEquals(actualResult.isSettled, false)
+    await ctx.clock.tickAsync(1000)
+    test.assertDeepEquals(onError[test.mockHistory], [
+      [expectedResult, 0, 1000],
+      [expectedResult, 1, 1200],
+    ])
+    test.assertEquals(actualResult.isSettled, false)
+    await ctx.clock.tickAsync(1200)
+    test.assertEquals(
+      actualResult.rejectedValue,
+      expectedResult
+    )
+  },
+  async ['three attempts, pass'](
     baseContext: test.TestContext
   ): Promise<void> {
     const ctx: test.TestContext &
