@@ -213,7 +213,7 @@ export const mockHistory = Symbol('mockHistory')
 export function mock<
   Mock extends (...args: unknown[]) => unknown
 >(
-  returnValues: (() => ReturnType<Mock>)[]
+  returnValues: Mock[]
 ): Mock & { [mockHistory]: Parameters<Mock>[] } {
   let i = 0
   const callback = ((...args: Parameters<Mock>) => {

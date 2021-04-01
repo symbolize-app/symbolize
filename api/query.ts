@@ -56,18 +56,13 @@ const apiMemberCreate = route.define<
   ['POST'],
   /^\/api\/member\/create$/,
   async (ctx, request) => {
-    const requestObject = await route.readRequestObject(
-      request
-    )
+    const requestJson = await request.json()
     const validatedRequestObject = {
       id: crypto.hash(
-        Buffer.from(
-          requestObject.requestId as string,
-          'hex'
-        )
+        Buffer.from(requestJson.requestId as string, 'hex')
       ),
-      email: requestObject.email as string,
-      handle: requestObject.handle as string,
+      email: requestJson.email as string,
+      handle: requestJson.handle as string,
     }
     try {
       await errorModule.retry(
