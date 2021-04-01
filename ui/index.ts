@@ -2,6 +2,7 @@ import * as message from '@fe/core/message.ts'
 import * as button from '@fe/ui/button.ts'
 import type * as uiContext from '@fe/ui/context.ts'
 import * as uiMember from '@fe/ui/member.ts'
+import * as submit from '@tiny/api/submit.ts'
 import * as style from '@tiny/ui/style.ts'
 import * as widget from '@tiny/ui/widget.ts'
 
@@ -60,7 +61,7 @@ const myCounter = widget.define<{
 async function main(): Promise<void> {
   const ctx: uiContext.Context = {
     ...widget.initContext(window.document),
-    fetch: (...args) => window.fetch(...args),
+    ...submit.initContext(window),
     performanceNow: () => window.performance.now(),
     setTimeout: (...args) => window.setTimeout(...args),
     random: () => Math.random(),
@@ -135,7 +136,7 @@ async function main(): Promise<void> {
   body.content = [rootDiv]
 
   ctx
-    .fetch('/api/message')
+    .submit({ url: '/api/message', method: 'GET' })
     .then(async (response) => {
       console.log('SERVER', await response.text())
     })

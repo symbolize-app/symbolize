@@ -9,47 +9,17 @@ export type Request = {
   method: string
   headers: Record<string, string>
   stream: stream.Readable
-}
-
-export async function readRequestBuffer(
-  request: Request
-): Promise<Buffer> {
-  return new Promise((resolve, reject) => {
-    const chunks: Buffer[] = []
-    request.stream.on('data', (chunk) => {
-      chunks.push(chunk)
-    })
-    request.stream.on('end', () => {
-      resolve(Buffer.concat(chunks))
-    })
-    request.stream.on('error', reject)
-  })
-}
-
-export async function readRequestText(
-  request: Request
-): Promise<string> {
-  return (await readRequestBuffer(request)).toString()
-}
-
-export async function readRequestObject(
-  request: Request
-): Promise<typeFest.JsonObject> {
-  const result: unknown = JSON.parse(
-    await readRequestText(request)
-  )
-  if (typeof result === 'object' && result !== null) {
-    return result
-  } else {
-    throw Error('Invalid type')
-  }
+  buffer(): Promise<Buffer>
+  text(): Promise<string>
+  json(): Promise<typeFest.JsonObject>
 }
 
 export type Response = typeFest.Promisable<
   | {
       status: number
       headers: Record<string, string>
-      body: typeFest.Promisable<
+      body?: typeFest.Promisable<
+        | undefined
         | string
         | Buffer
         | Uint8Array
@@ -105,7 +75,7 @@ async function handleRequest<Context>(
   req.on('error', console.error)
   res.on('error', console.error)
   try {
-    const request = {
+    const request: Request = {
       url: new URL(
         req.url,
         `http://${req.headers.host || 'localhost'}`
@@ -118,6 +88,31 @@ async function handleRequest<Context>(
         ) as [string, string][]
       ),
       stream: req,
+      async buffer(): Promise<Buffer> {
+        return new Promise((resolve, reject) => {
+          const chunks: Buffer[] = []
+          request.stream.on('data', (chunk) => {
+            chunks.push(chunk)
+          })
+          request.stream.on('end', () => {
+            resolve(Buffer.concat(chunks))
+          })
+          request.stream.on('error', reject)
+        })
+      },
+      async text(): Promise<string> {
+        return (await request.buffer()).toString()
+      },
+      async json(): Promise<typeFest.JsonObject> {
+        const result: unknown = JSON.parse(
+          await request.text()
+        )
+        if (typeof result === 'object' && result !== null) {
+          return result
+        } else {
+          throw Error('Invalid type')
+        }
+      },
     }
     const response = match(ctx, request, routes)
     const headResponse = await Promise.resolve(response)
@@ -129,7 +124,9 @@ async function handleRequest<Context>(
         headResponse.headers
       )
       const body = await Promise.resolve(headResponse.body)
-      if (typeof body === 'string') {
+      if (typeof body === undefined) {
+        // No body
+      } else if (typeof body === 'string') {
         res.write(body)
       } else if (body instanceof Buffer) {
         res.write(body)

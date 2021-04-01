@@ -1,4 +1,4 @@
-import type * as uiContext from '@fe/ui/context.ts'
+import type * as submit from '@tiny/api/submit.ts'
 import * as widget from '@tiny/ui/widget.ts'
 import * as errorModule from '@tiny/util/error.ts'
 import * as requestId from '@tiny/util/requestId.ts'
@@ -21,7 +21,7 @@ export const custom = widget.define<
   {
     body: widget.Widget
   },
-  uiContext.FetchContext & errorModule.RetryContext
+  submit.SubmitContext & errorModule.RetryContext
 >((ctx) => {
   const requestIdInput = input(ctx, {
     name: 'requestId',
@@ -64,7 +64,8 @@ export const custom = widget.define<
       const responseJson = await errorModule.retry(
         ctx,
         async () => {
-          const response = await ctx.fetch(url, {
+          const response = await ctx.submit({
+            url,
             method,
             body,
           })
