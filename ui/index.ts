@@ -136,7 +136,7 @@ async function main(): Promise<void> {
   body.content = [rootDiv]
 
   ctx
-    .submit({ url: '/api/message', method: 'GET' })
+    .submit({ path: '/api/message', method: 'GET' })
     .then(async (response) => {
       console.log('SERVER', await response.text())
     })

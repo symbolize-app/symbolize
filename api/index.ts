@@ -108,7 +108,9 @@ async function main(): Promise<void> {
   }
 }
 
-function openPool(connectionString: string): pg.Pool {
+function openPool(
+  connectionString: string
+): Pick<pg.Pool, 'query'> {
   const max = 10
   const user = pgConnectionString.parse(connectionString)
     .user

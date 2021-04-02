@@ -3,7 +3,9 @@ import * as widget from '@tiny/ui/widget.ts'
 import jsdom from 'jsdom'
 import * as perfHooks from 'perf_hooks'
 
-export const all: test.TestCollection = () => []
+export const all: test.TestCollection = () => [
+  import('@fe/api/query.test.ts'),
+]
 
 export async function run(): Promise<boolean> {
   const dom = new jsdom.JSDOM('<!DOCTYPE html>')

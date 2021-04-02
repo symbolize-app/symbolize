@@ -7,6 +7,7 @@ export function mockResponse(
   return {
     status: 200,
     headers: {},
+    stream: test.mock([]),
     buffer: test.mock([]),
     text: test.mock([]),
     json: test.mock([]),

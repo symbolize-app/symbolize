@@ -53,7 +53,7 @@ export const custom = widget.define<
 
   async function submit(event: Event) {
     event.preventDefault()
-    const url = '/api/member/create'
+    const path = '/api/member/create'
     const method = 'POST'
     const body = JSON.stringify({
       requestId: requestIdInput.value,
@@ -65,7 +65,7 @@ export const custom = widget.define<
         ctx,
         async () => {
           const response = await ctx.submit({
-            url,
+            path,
             method,
             body,
           })
@@ -82,7 +82,7 @@ export const custom = widget.define<
             }
           } else {
             throw new Error(
-              `status ${response.status} response for ${method} ${url}`
+              `status ${response.status} response for ${method} ${path}`
             )
           }
         },
