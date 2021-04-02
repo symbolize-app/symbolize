@@ -213,7 +213,7 @@ export const mockHistory = Symbol('mockHistory')
 export function mock<
   Mock extends (...args: unknown[]) => unknown
 >(
-  returnValues: Mock[]
+  returnValues: (() => ReturnType<Mock>)[]
 ): Mock & { [mockHistory]: Parameters<Mock>[] } {
   let i = 0
   const callback = ((...args: Parameters<Mock>) => {
@@ -237,7 +237,7 @@ export type SyncPromise<Value> = {
 }
 
 export function sync<Value>(
-  promise: Promise<Value>
+  promise: typeFest.Promisable<Value>
 ): SyncPromise<Value> {
   let isResolved = false
   let resolvedValue: Value | undefined = undefined
@@ -270,15 +270,16 @@ export function sync<Value>(
       }
     },
   }
-  promise
-    .then((value) => {
+  Promise.resolve(promise).then(
+    (value) => {
       isResolved = true
       resolvedValue = value
-    })
-    .catch((value) => {
+    },
+    (value) => {
       isRejected = true
       rejectedValue = value
-    })
+    }
+  )
   return result
 }
 

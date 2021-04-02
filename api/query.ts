@@ -50,7 +50,7 @@ class MemberCreateUniqueConstraintError extends Error {
   }
 }
 
-const apiMemberCreate = route.define<
+export const apiMemberCreate = route.define<
   errorModule.RetryContext & apiContext.DatabaseWriteContext
 >(
   ['POST'],
