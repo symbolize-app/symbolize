@@ -4,11 +4,13 @@ import * as streamPromises from 'stream/promises'
 import type * as typeFest from 'type-fest'
 
 export type Request = {
-  url: URL
+  origin: string
+  path: string
   match: Record<string, string>
+  params: Record<string, string>
   method: string
   headers: Record<string, string>
-  stream: stream.Readable
+  stream(): stream.Readable
   buffer(): Promise<Buffer>
   text(): Promise<string>
   json(): Promise<typeFest.JsonObject>
@@ -75,10 +77,15 @@ async function handleRequest<Context>(
   req.on('error', console.error)
   res.on('error', console.error)
   try {
+    const url = new URL(
+      req.url,
+      `http://${req.headers.host || 'localhost'}`
+    )
     const request: Request = {
-      url: new URL(
-        req.url,
-        `http://${req.headers.host || 'localhost'}`
+      origin: url.origin,
+      path: url.pathname,
+      params: Object.fromEntries(
+        url.searchParams.entries()
       ),
       match: {},
       method: req.method,
@@ -87,23 +94,25 @@ async function handleRequest<Context>(
           ([_key, value]) => typeof value === 'string'
         ) as [string, string][]
       ),
-      stream: req,
-      async buffer(): Promise<Buffer> {
+      stream() {
+        return req
+      },
+      async buffer() {
         return new Promise((resolve, reject) => {
           const chunks: Buffer[] = []
-          request.stream.on('data', (chunk) => {
+          request.stream().on('data', (chunk) => {
             chunks.push(chunk)
           })
-          request.stream.on('end', () => {
+          request.stream().on('end', () => {
             resolve(Buffer.concat(chunks))
           })
-          request.stream.on('error', reject)
+          request.stream().on('error', reject)
         })
       },
-      async text(): Promise<string> {
+      async text() {
         return (await request.buffer()).toString()
       },
-      async json(): Promise<typeFest.JsonObject> {
+      async json() {
         const result: unknown = JSON.parse(
           await request.text()
         )
@@ -161,7 +170,7 @@ export function match<Context>(
     const match =
       (route.methods === undefined ||
         route.methods.indexOf(request.method) >= 0) &&
-      route.match.exec(request.url.pathname)
+      route.match.exec(request.path)
     if (match) {
       response = route.handler(ctx, {
         ...request,

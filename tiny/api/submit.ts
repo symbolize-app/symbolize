@@ -1,7 +1,9 @@
 import type * as typeFest from 'type-fest'
 
 export type Request = {
-  url: string
+  origin?: string
+  path: string
+  params?: Record<string, string>
   method: string
   headers?: Record<string, string>
   body?:
@@ -16,6 +18,7 @@ export type Request = {
 export type Response = {
   status: number
   headers: Record<string, string>
+  stream(): ReadableStream
   buffer(): Promise<ArrayBuffer>
   text(): Promise<string>
   json(): Promise<typeFest.JsonObject>
@@ -42,19 +45,35 @@ export function initContext(
       } else {
         windowBody = JSON.stringify(request.body)
       }
-      const windowResponse = await window.fetch(
-        request.url,
-        {
-          method: request.method,
-          headers: request.headers,
-          body: windowBody,
+      // TODO Use URL origin & params
+      let url = request.path
+      if (request.origin) {
+        url = new URL(url, request.origin).toString()
+      }
+      if (request.params) {
+        const params = new URLSearchParams(
+          request.params
+        ).toString()
+        if (params) {
+          url = `${url}?${params}`
         }
-      )
+      }
+      const windowResponse = await window.fetch(url, {
+        method: request.method,
+        headers: request.headers,
+        body: windowBody,
+      })
       return {
         status: windowResponse.status,
         headers: Object.fromEntries(
           windowResponse.headers.entries()
         ),
+        stream() {
+          if (!windowResponse.body) {
+            throw new Error('No response stream')
+          }
+          return windowResponse.body
+        },
         buffer() {
           return windowResponse.arrayBuffer()
         },
