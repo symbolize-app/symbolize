@@ -1,10 +1,12 @@
 import * as message from '@fe/core/message.ts'
 import * as button from '@fe/ui/button.ts'
-import type * as uiContext from '@fe/ui/context.ts'
 import * as uiMember from '@fe/ui/member.ts'
 import * as submit from '@tiny/api/submit.ts'
 import * as style from '@tiny/ui/style.ts'
 import * as widget from '@tiny/ui/widget.ts'
+import type * as errorModule from '@tiny/util/error.ts'
+import * as random from '@tiny/util/random.ts'
+import * as timeBrowser from '@tiny/util/time.browser.ts'
 
 console.log(message.hi)
 
@@ -59,12 +61,13 @@ const myCounter = widget.define<{
 })
 
 async function main(): Promise<void> {
-  const ctx: uiContext.Context = {
+  const ctx: widget.Context &
+    errorModule.Context &
+    submit.Context = {
+    ...random.initContext(),
+    ...timeBrowser.initContext(),
     ...widget.initContext(window.document),
     ...submit.initContext(window),
-    performanceNow: () => window.performance.now(),
-    setTimeout: (...args) => window.setTimeout(...args),
-    random: () => Math.random(),
   }
 
   const counter = myCounter(ctx, {})
@@ -117,14 +120,8 @@ async function main(): Promise<void> {
     ],
   })
 
-  const head = widget.toHtmlWidget(
-    ctx,
-    window.document.head
-  )
-  const body = widget.toHtmlWidget(
-    ctx,
-    window.document.body
-  )
+  const head = ctx.document.head
+  const body = ctx.document.body
 
   head.content = [
     title(ctx, { content: ['Fertile Earth'] }),
@@ -144,7 +141,7 @@ async function main(): Promise<void> {
 
   if (import.meta.env.NODE_ENV === 'development') {
     const dev = await import('@fe/ui/dev.ts')
-    dev.main()
+    dev.main(ctx)
   }
 }
 

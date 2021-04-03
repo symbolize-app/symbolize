@@ -1,4 +1,4 @@
-export type StyleContext = {
+export type Context = {
   styleElement: HTMLStyleElement
   styleSheet: CSSStyleSheet
   styleRenderMap: Map<string, Map<Style, string[]>>
@@ -7,9 +7,7 @@ export type StyleContext = {
 
 let globalStyleNameCount = 0
 
-export function initContext(
-  document: Document
-): StyleContext {
+export function initContext(document: Document): Context {
   const styleElement = document.createElement('style')
   document.head.appendChild(styleElement)
   const styleSheet = styleElement.sheet
@@ -108,14 +106,14 @@ export function useCombinatorSelector(
 }
 
 export function render(
-  ctx: StyleContext,
+  ctx: Context,
   style: Style
 ): string[] {
   return renderNestedStyle(ctx, style, '', '', false)
 }
 
 function renderNestedStyle(
-  ctx: StyleContext,
+  ctx: Context,
   style: Style,
   combinatorSelectorValue: string,
   selectorValue: string,
@@ -206,7 +204,7 @@ function renderNestedStyle(
 }
 
 function renderStyleSelector(
-  ctx: StyleContext,
+  ctx: Context,
   styleName: string,
   style: StyleSelector,
   combinatorSelectorValue: string,
@@ -224,7 +222,7 @@ function renderStyleSelector(
 }
 
 function renderStyleCombinatorSelector(
-  ctx: StyleContext,
+  ctx: Context,
   styleName: string,
   style: StyleCombinatorSelector,
   combinatorSelectorValue: string,
@@ -245,7 +243,7 @@ function renderStyleCombinatorSelector(
 }
 
 function renderStyleProps(
-  ctx: StyleContext,
+  ctx: Context,
   styleName: string,
   style: StyleProps,
   combinatorSelectorValue: string,

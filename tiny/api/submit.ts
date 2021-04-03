@@ -24,13 +24,13 @@ export type Response = {
   json(): Promise<typeFest.JsonObject>
 }
 
-export type SubmitContext = {
+export type Context = {
   submit(request: Request): Promise<Response>
 }
 
 export function initContext(
   window: Window & typeof globalThis
-): SubmitContext {
+): Context {
   return {
     async submit(request) {
       let windowBody
