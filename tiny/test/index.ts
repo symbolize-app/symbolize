@@ -1,5 +1,6 @@
-import fakeTimers from '@sinonjs/fake-timers'
-import type * as timeTest from '@tiny/util/time.test.ts'
+import * as randomTest from '@tiny/util/random.test.ts'
+import type * as random from '@tiny/util/random.ts'
+import * as timeTest from '@tiny/util/time.test.ts'
 import type * as time from '@tiny/util/time.ts'
 import * as diff from 'diff'
 import eq from 'lodash-es/eq.js'
@@ -7,29 +8,31 @@ import isEqual from 'lodash-es/isEqual.js'
 import ms from 'ms'
 import type * as typeFest from 'type-fest'
 
-export type Test<Context extends unknown = unknown> = (
-  ctx: Context & TestContext
+export type Test<
+  CustomContext extends unknown = unknown
+> = (
+  ctx: CustomContext & Context
 ) => typeFest.Promisable<void>
 
-export type TestContext = timeTest.TimeTestContext
+export type Context = timeTest.Context & random.Context
 
-export type TestRunContext = time.TimeContext
+export type RunContext = time.Context
 
-type TestModule<Context extends unknown = unknown> = {
+type TestModule<CustomContext extends unknown = unknown> = {
   url: string
   tests: {
-    [testName: string]: Test<Context>
+    [testName: string]: Test<CustomContext>
   }
 }
 
 export type TestCollection<
-  Context extends unknown = unknown
-> = () => Promise<TestModule<Context>>[]
+  CustomContext extends unknown = unknown
+> = () => Promise<TestModule<CustomContext>>[]
 
 type TestCollectionModule<
-  Context extends unknown = unknown
+  CustomContext extends unknown = unknown
 > = {
-  all: TestCollection<Context>
+  all: TestCollection<CustomContext>
 }
 
 class AssertionError extends Error {
@@ -51,16 +54,16 @@ class AssertionError extends Error {
 }
 
 export async function runAll<
-  Context extends Record<string, unknown> = Record<
+  CustomContext extends Record<string, unknown> = Record<
     string,
     unknown
   >
 >(
-  ctx: Context & TestRunContext,
-  testCollectionModules: TestCollectionModule<Context>[]
+  ctx: CustomContext & RunContext,
+  testCollectionModules: TestCollectionModule<CustomContext>[]
 ): Promise<boolean> {
   const testModules = ([] as Promise<
-    TestModule<Context>
+    TestModule<CustomContext>
   >[]).concat(
     ...testCollectionModules.map((testCollectionModule) =>
       testCollectionModule.all()
@@ -77,13 +80,10 @@ export async function runAll<
     for (const testName in tests) {
       const test = tests[testName]
       try {
-        const clock = fakeTimers.createClock(1616952581493)
-        const testContext: Context & TestContext = {
+        const testContext: CustomContext & Context = {
           ...ctx,
-          performanceNow: () => clock.now,
-          setTimeout: (...args) =>
-            clock.setTimeout(...args),
-          clock,
+          ...timeTest.initContext(),
+          ...randomTest.initContext(),
         }
         await test(testContext)
         pass += 1
@@ -136,14 +136,14 @@ export async function runAll<
         console.groupCollapsed('Details')
         if (assertionInfo) {
           console.log(
-            '%cActual',
-            'color: crimson',
-            assertionInfo.actual
-          )
-          console.log(
             '%cExpected',
             'color: green',
             assertionInfo.expected
+          )
+          console.log(
+            '%cActual',
+            'color: crimson',
+            assertionInfo.actual
           )
           if (assertionInfo.diff) {
             const diffSections = diff.diffJson(
@@ -211,7 +211,8 @@ export async function runAll<
 export const mockHistory = Symbol('mockHistory')
 
 export function mock<
-  Mock extends (...args: unknown[]) => unknown
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  Mock extends (...args: any[]) => unknown
 >(
   returnValues: (() => ReturnType<Mock>)[]
 ): Mock & { [mockHistory]: Parameters<Mock>[] } {

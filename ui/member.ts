@@ -1,11 +1,12 @@
 import type * as submit from '@tiny/api/submit.ts'
 import * as widget from '@tiny/ui/widget.ts'
 import * as errorModule from '@tiny/util/error.ts'
-import * as requestId from '@tiny/util/requestId.ts'
+import * as random from '@tiny/util/random.ts'
 import * as time from '@tiny/util/time.ts'
 import ms from 'ms'
 
 const button = widget.html.button
+const div = widget.html.div
 const form = widget.html.form
 const input = widget.html.input
 
@@ -21,12 +22,12 @@ export const custom = widget.define<
   {
     body: widget.Widget
   },
-  submit.SubmitContext & errorModule.RetryContext
+  submit.Context & errorModule.Context & random.Context
 >((ctx) => {
   const requestIdInput = input(ctx, {
     name: 'requestId',
     type: 'hidden',
-    value: requestId.generate(),
+    value: random.requestIdHex(ctx),
   })
   const emailInput = input(ctx, {
     name: 'email',
@@ -36,12 +37,13 @@ export const custom = widget.define<
     name: 'handle',
     value: 'aaa',
   })
-
+  const status = div(ctx, {})
   const body = form(ctx, {
     content: [
       emailInput,
       handleInput,
       button(ctx, { content: ['Submit'] }),
+      status,
     ],
     listen: {
       submit,
@@ -108,14 +110,16 @@ export const custom = widget.define<
           },
         }
       )
-      console.log('Member created', responseJson)
+      status.content = [
+        `Member created ${JSON.stringify(responseJson)}`,
+      ]
     } catch (error: unknown) {
       if (
         error instanceof MemberCreateUniqueConstraintError
       ) {
-        console.error(
-          `Unique constraint error ${error.field}`
-        )
+        status.content = [
+          `Unique constraint error ${error.field}`,
+        ]
         return
       }
       throw error

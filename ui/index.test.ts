@@ -1,17 +1,15 @@
 import * as test from '@tiny/test/index.ts'
-import * as widget from '@tiny/ui/widget.ts'
+import type * as widget from '@tiny/ui/widget.ts'
+import type * as time from '@tiny/util/time.ts'
 
-export const all: test.TestCollection<widget.WidgetContext> = () => [
+export const all: test.TestCollection<widget.Context> = () => [
   import('@fe/ui/button.test.ts'),
+  import('@fe/ui/member.test.ts'),
 ]
 
-export async function run(): Promise<boolean> {
-  const document = window.document.implementation.createHTMLDocument()
-  const ctx: widget.WidgetContext & test.TestRunContext = {
-    ...widget.initContext(document),
-    performanceNow: () => window.performance.now(),
-    setTimeout: (...args) => window.setTimeout(...args),
-  }
+export async function run(
+  ctx: widget.Context & time.Context
+): Promise<boolean> {
   const coreTest = await import('@fe/core/index.test.ts')
   const uiTest = await import('@fe/ui/index.test.ts')
   const tinyUtilTest = await import(

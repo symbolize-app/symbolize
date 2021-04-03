@@ -1,18 +1,20 @@
 import * as test from '@tiny/test/index.ts'
 import * as widget from '@tiny/ui/widget.ts'
+import type * as time from '@tiny/util/time.ts'
 import jsdom from 'jsdom'
-import * as perfHooks from 'perf_hooks'
 
 export const all: test.TestCollection = () => [
   import('@fe/api/query.test.ts'),
 ]
 
-export async function run(): Promise<boolean> {
+export async function run(
+  baseContext: time.Context
+): Promise<boolean> {
   const dom = new jsdom.JSDOM('<!DOCTYPE html>')
-  const ctx: widget.WidgetContext & test.TestRunContext = {
-    ...widget.initContext(dom.window.document),
-    performanceNow: () => perfHooks.performance.now(),
-    setTimeout: (...args) => global.setTimeout(...args),
+  const document = dom.window.document
+  const ctx = {
+    ...baseContext,
+    ...widget.initContext(document),
   }
   const coreTest = await import('@fe/core/index.test.ts')
   const apiTest = await import('@fe/api/index.test.ts')
