@@ -1,10 +1,10 @@
-export type TimeContext = {
+export type Context = {
   performanceNow(): number
   setTimeout(callback: () => void, ms: number): unknown
 }
 
 export async function delay(
-  ctx: TimeContext,
+  ctx: Context,
   ms: number
 ): Promise<void> {
   return new Promise((resolve) => {

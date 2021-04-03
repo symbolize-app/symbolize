@@ -24,17 +24,21 @@ export type HtmlListeners<E extends Element = Element> = {
   }
 }
 
-export type WidgetContext = {
-  document: Document
-} & style.StyleContext
+export type Context = {
+  document: Document & {
+    head: HtmlWidget<HTMLHeadElement>
+    body: HtmlWidget<HTMLBodyElement>
+  }
+} & style.Context
 
-export function initContext(
-  document: Document
-): WidgetContext {
-  return {
+export function initContext(document: Document): Context {
+  const ctx = {
     ...style.initContext(document),
     document,
-  }
+  } as Context
+  toHtmlWidget(ctx, document.body)
+  toHtmlWidget(ctx, document.head)
+  return ctx
 }
 
 type BodyWidget = {
@@ -55,7 +59,7 @@ export type Widget =
   | null
 
 function replaceChildren(
-  ctx: WidgetContext,
+  ctx: Context,
   parent: Node & ParentNode,
   children: (Node | string)[]
 ): void {
@@ -108,7 +112,7 @@ const elementProperties = {
   },
   styles: {
     set(
-      this: Element & { [context]: WidgetContext },
+      this: Element & { [context]: Context },
       value: style.Style[]
     ) {
       if (this.classList.length) {
@@ -163,7 +167,7 @@ const elementProperties = {
   },
   content: {
     set(
-      this: Element & { [context]: WidgetContext },
+      this: Element & { [context]: Context },
       value: Widget[]
     ) {
       replaceChildren(this[context], this, collect(value))
@@ -206,38 +210,38 @@ export function collect(
 
 type WidgetFunction<
   Body extends Widget & { [Key in keyof Body]: Body[Key] },
-  Context extends unknown = unknown
+  CustomContext extends unknown = unknown
 > = (
-  ctx: WidgetContext & Context,
+  ctx: CustomContext & Context,
   data: Partial<Body>
 ) => Body
 
 export function define<
   Body extends Widget & { [Key in keyof Body]: Body[Key] },
-  Context extends unknown = unknown
+  CustomContext extends unknown = unknown
 >(
-  body: (ctx: WidgetContext & Context) => Body
-): WidgetFunction<Body, Context> {
+  body: (ctx: CustomContext & Context) => Body
+): WidgetFunction<Body, CustomContext> {
   return (ctx, data) => {
     return Object.assign(body(ctx), data)
   }
 }
 
-type HtmlWidget<T extends HTMLElement> = T & {
+export type HtmlWidget<T extends HTMLElement> = T & {
   styles: style.Style[]
   listen: HtmlListeners<T>
   content: Widget[]
 }
 
 export function toHtmlWidget<T extends HTMLElement>(
-  ctx: WidgetContext,
+  ctx: Context,
   element: T
 ): HtmlWidget<T> {
   const widget = Object.defineProperties(
     element,
     elementProperties
   ) as HtmlWidget<T>
-  ;((widget as unknown) as { [context]: WidgetContext })[
+  ;((widget as unknown) as { [context]: Context })[
     context
   ] = ctx
   return widget

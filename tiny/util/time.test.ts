@@ -1,22 +1,31 @@
-import type fakeTimers from '@sinonjs/fake-timers'
+import fakeTimers from '@sinonjs/fake-timers'
 import * as test from '@tiny/test/index.ts'
 import * as time from '@tiny/util/time.ts'
 
-export type TimeTestContext = time.TimeContext & {
+export type Context = time.Context & {
   clock: fakeTimers.Clock
+}
+
+export function initContext(): Context {
+  const clock = fakeTimers.createClock(1616952581493)
+  return {
+    performanceNow: () => clock.now,
+    setTimeout: (...args) => clock.setTimeout(...args),
+    clock,
+  }
 }
 
 export const url = import.meta.url
 
 export const tests = {
-  async ['delay'](ctx: test.TestContext): Promise<void> {
+  ['delay']: async (ctx: test.Context): Promise<void> => {
     const result = test.sync(time.delay(ctx, 20))
     await ctx.clock.tickAsync(0)
     test.assertEquals(result.isSettled, false)
     await ctx.clock.tickAsync(20)
     test.assertEquals(result.resolvedValue, undefined)
   },
-  ['interval'](): void {
+  ['interval']: (): void => {
     test.assertEquals(
       time.interval({
         hours: 2,
@@ -27,7 +36,7 @@ export const tests = {
       2 * 60 * 60 * 1000 + 2 * 60 * 1000 + 2 * 1000 + 2
     )
   },
-  ['convert'](): void {
+  ['convert']: (): void => {
     test.assertEquals(
       time.convert(2 * 60 * 60 * 1000, 'hours'),
       2
@@ -41,7 +50,7 @@ export const tests = {
       2 * 60 * 60
     )
   },
-  ['subtract'](): void {
+  ['subtract']: (): void => {
     test.assertDeepEquals(
       time.subtract(
         new Date('2021-03-29T05:12:27.331Z'),
@@ -50,7 +59,7 @@ export const tests = {
       12055
     )
   },
-  ['add'](): void {
+  ['add']: (): void => {
     test.assertDeepEquals(
       time.add(new Date('2021-03-29T05:12:15.276Z'), 12055),
       new Date('2021-03-29T05:12:27.331Z')

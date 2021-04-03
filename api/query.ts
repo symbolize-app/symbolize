@@ -1,5 +1,5 @@
-import type * as apiContext from '@fe/api/context.ts'
 import * as message from '@fe/core/message.ts'
+import type * as db from '@fe/db/index.ts'
 import * as memberQuery from '@fe/db/query/member.ts'
 import * as route from '@tiny/api/route.ts'
 import * as query from '@tiny/db/query.ts'
@@ -9,7 +9,7 @@ import * as time from '@tiny/util/time.ts'
 import ms from 'ms'
 
 const apiMessage = route.define<
-  errorModule.RetryContext & apiContext.DatabaseReadContext
+  errorModule.Context & db.ReadContext
 >(['GET'], /^\/api\/message$/, async (ctx) => {
   const row = await errorModule.retry(
     ctx,
@@ -51,7 +51,7 @@ class MemberCreateUniqueConstraintError extends Error {
 }
 
 export const apiMemberCreate = route.define<
-  errorModule.RetryContext & apiContext.DatabaseWriteContext
+  errorModule.Context & db.WriteContext
 >(
   ['POST'],
   /^\/api\/member\/create$/,
@@ -137,7 +137,4 @@ export const apiMemberCreate = route.define<
   }
 )
 
-export const routes: route.Route<apiContext.Context>[] = [
-  apiMessage,
-  apiMemberCreate,
-]
+export const routes = [apiMessage, apiMemberCreate]

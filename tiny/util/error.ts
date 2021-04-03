@@ -1,11 +1,8 @@
+import type * as random from '@tiny/util/random.ts'
 import * as time from '@tiny/util/time.ts'
 import type * as typeFest from 'type-fest'
 
-export type RetryContext = time.TimeContext & RandomContext
-
-export type RandomContext = {
-  random(): number
-}
+export type Context = time.Context & random.Context
 
 export type RetryConfig = {
   minDelayMs: number
@@ -19,7 +16,7 @@ export type RetryConfig = {
 }
 
 export async function retry<Result>(
-  ctx: RetryContext,
+  ctx: Context,
   callback: () => typeFest.Promisable<Result>,
   config: RetryConfig
 ): Promise<Result> {
@@ -37,7 +34,7 @@ export async function retry<Result>(
       const nowMs = ctx.performanceNow()
       const delayMs = Math.max(
         config.minDelayMs,
-        ctx.random() *
+        ctx.randomNumber() *
           config.minDelayMs *
           Math.pow(2, attempt)
       )

@@ -5,13 +5,12 @@ import * as time from '@tiny/util/time.ts'
 export const url = import.meta.url
 
 export const tests = {
-  async ['one attempt, pass'](
-    baseContext: test.TestContext
-  ): Promise<void> {
-    const ctx: test.TestContext &
-      errorModule.RetryContext = {
+  ['one attempt, pass']: async (
+    baseContext: test.Context
+  ): Promise<void> => {
+    const ctx: test.Context & errorModule.Context = {
       ...baseContext,
-      random: test.mock([]),
+      randomNumber: test.mock([]),
     }
     const expectedResult = {}
     const onError = test.mock([])
@@ -33,13 +32,12 @@ export const tests = {
       expectedResult
     )
   },
-  async ['two attempts, count limit'](
-    baseContext: test.TestContext
-  ): Promise<void> {
-    const ctx: test.TestContext &
-      errorModule.RetryContext = {
+  ['two attempts, count limit']: async (
+    baseContext: test.Context
+  ): Promise<void> => {
+    const ctx: test.Context & errorModule.Context = {
       ...baseContext,
-      random: test.mock([() => 0.5]),
+      randomNumber: test.mock([() => 0.5]),
     }
     const expectedResult = new Error('TEST')
     const onError = test.mock([() => undefined])
@@ -66,13 +64,12 @@ export const tests = {
       expectedResult
     )
   },
-  async ['three attempts, count limit'](
-    baseContext: test.TestContext
-  ): Promise<void> {
-    const ctx: test.TestContext &
-      errorModule.RetryContext = {
+  ['three attempts, count limit']: async (
+    baseContext: test.Context
+  ): Promise<void> => {
+    const ctx: test.Context & errorModule.Context = {
       ...baseContext,
-      random: test.mock([() => 0.8, () => 0.8]),
+      randomNumber: test.mock([() => 0.8, () => 0.8]),
     }
     const expectedResult = new Error('TEST')
     const onError = test.mock([
@@ -108,13 +105,12 @@ export const tests = {
       expectedResult
     )
   },
-  async ['one attempt, window limit'](
-    baseContext: test.TestContext
-  ): Promise<void> {
-    const ctx: test.TestContext &
-      errorModule.RetryContext = {
+  ['one attempt, window limit']: async (
+    baseContext: test.Context
+  ): Promise<void> => {
+    const ctx: test.Context & errorModule.Context = {
       ...baseContext,
-      random: test.mock([() => 0]),
+      randomNumber: test.mock([() => 0]),
     }
     const expectedResult = new Error('TEST')
     const onError = test.mock([])
@@ -144,13 +140,16 @@ export const tests = {
       expectedResult
     )
   },
-  async ['three attempts, window limit'](
-    baseContext: test.TestContext
-  ): Promise<void> {
-    const ctx: test.TestContext &
-      errorModule.RetryContext = {
+  ['three attempts, window limit']: async (
+    baseContext: test.Context
+  ): Promise<void> => {
+    const ctx: test.Context & errorModule.Context = {
       ...baseContext,
-      random: test.mock([() => 0.6, () => 0.6, () => 0]),
+      randomNumber: test.mock([
+        () => 0.6,
+        () => 0.6,
+        () => 0,
+      ]),
     }
     const expectedResult = new Error('TEST')
     const onError = test.mock([
@@ -189,13 +188,12 @@ export const tests = {
       expectedResult
     )
   },
-  async ['three attempts, pass'](
-    baseContext: test.TestContext
-  ): Promise<void> {
-    const ctx: test.TestContext &
-      errorModule.RetryContext = {
+  ['three attempts, pass']: async (
+    baseContext: test.Context
+  ): Promise<void> => {
+    const ctx: test.Context & errorModule.Context = {
       ...baseContext,
-      random: test.mock([() => 0.8, () => 0.8]),
+      randomNumber: test.mock([() => 0.8, () => 0.8]),
     }
     const expectedResult = {}
     const expectedError = new Error('TEST')
