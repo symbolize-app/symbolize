@@ -121,4 +121,40 @@ export const tests = {
       ],
     ])
   },
+  ['member create, bad request']: async (
+    baseContext: test.Context
+  ): Promise<void> => {
+    const ctx: test.Context &
+      errorModule.Context &
+      db.WriteContext = {
+      ...baseContext,
+      databaseApiWrite: {
+        pool: {
+          query: test.mock([]),
+        } as unknown,
+      } as db.DatabaseApiWrite,
+    }
+    const response = test.sync(
+      apiQuery.apiMemberCreate.handler(
+        ctx,
+        requestTest.mockReqeuest({
+          json: () =>
+            Promise.resolve({
+              requestId: random.requestIdHex(ctx),
+              email: 'test@example.org',
+              handle: 't',
+            }),
+        })
+      )
+    )
+    await ctx.clock.tickAsync(0)
+    test.assertDeepEquals(response.resolvedValue, {
+      status: 400,
+      headers: { 'content-type': 'application/json' },
+      body: {
+        error:
+          'Invalid string (too short, min 3) at (root).handle',
+      },
+    })
+  },
 }

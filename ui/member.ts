@@ -1,3 +1,4 @@
+import * as apiPayload from '@fe/api/payload.ts'
 import type * as submit from '@tiny/api/submit.ts'
 import * as widget from '@tiny/ui/widget.ts'
 import * as errorModule from '@tiny/util/error.ts'
@@ -9,14 +10,6 @@ const button = widget.html.button
 const div = widget.html.div
 const form = widget.html.form
 const input = widget.html.input
-
-class MemberCreateUniqueConstraintError extends Error {
-  field: 'email' | 'handle'
-  constructor(field: 'email' | 'handle') {
-    super(`${field} conflict`)
-    this.field = field
-  }
-}
 
 export const custom = widget.define<
   {
@@ -57,13 +50,16 @@ export const custom = widget.define<
     event.preventDefault()
     const path = '/api/member/create'
     const method = 'POST'
-    const body = JSON.stringify({
+    const payload: apiPayload.MemberCreateRequest = {
       requestId: requestIdInput.value,
       email: emailInput.value,
       handle: handleInput.value,
-    })
+    }
+    const body = JSON.stringify(
+      apiPayload.checkMemberCreateRequest(payload)
+    )
     try {
-      const responseJson = await errorModule.retry(
+      const responseObject = await errorModule.retry(
         ctx,
         async () => {
           const response = await ctx.submit({
@@ -72,16 +68,16 @@ export const custom = widget.define<
             body,
           })
           if (response.status === 409) {
-            const responseJson = (await response.json()) as {
-              conflict: 'email' | 'handle'
-            }
-            throw new MemberCreateUniqueConstraintError(
-              responseJson.conflict
+            const conflictResponseObject = apiPayload.checkMemberCreateConflictResponse(
+              await response.json()
+            )
+            throw new apiPayload.MemberCreateConflictError(
+              conflictResponseObject.conflict
             )
           } else if (response.status === 200) {
-            return (await response.json()) as {
-              id: string
-            }
+            return apiPayload.checkMemberCreateResponse(
+              await response.json()
+            )
           } else {
             throw new Error(
               `status ${response.status} response for ${method} ${path}`
@@ -97,7 +93,7 @@ export const custom = widget.define<
           onError(error, attempt, nextDelayMs) {
             if (
               error instanceof
-              MemberCreateUniqueConstraintError
+              apiPayload.MemberCreateConflictError
             ) {
               throw error
             }
@@ -111,11 +107,12 @@ export const custom = widget.define<
         }
       )
       status.content = [
-        `Member created ${JSON.stringify(responseJson)}`,
+        `Member created ${JSON.stringify(responseObject)}`,
       ]
     } catch (error: unknown) {
       if (
-        error instanceof MemberCreateUniqueConstraintError
+        error instanceof
+        apiPayload.MemberCreateConflictError
       ) {
         status.content = [
           `Unique constraint error ${error.field}`,

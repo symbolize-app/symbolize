@@ -1,4 +1,4 @@
-import * as uiTest from '@fe/ui/index.test.ts'
+import * as uiTest from '@fe/ui/index.test.browser.ts'
 import type * as widget from '@tiny/ui/widget.ts'
 import type * as time from '@tiny/util/time.ts'
 

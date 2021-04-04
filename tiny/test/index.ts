@@ -60,12 +60,16 @@ export async function runAll<
   >
 >(
   ctx: CustomContext & RunContext,
-  testCollectionModules: TestCollectionModule<CustomContext>[]
+  testCollectionModules: Promise<
+    TestCollectionModule<CustomContext>
+  >[]
 ): Promise<boolean> {
   const testModules = ([] as Promise<
     TestModule<CustomContext>
   >[]).concat(
-    ...testCollectionModules.map((testCollectionModule) =>
+    ...(
+      await Promise.all(testCollectionModules)
+    ).map((testCollectionModule) =>
       testCollectionModule.all()
     )
   )
@@ -284,12 +288,36 @@ export function sync<Value>(
   return result
 }
 
+export function assert(actual: unknown): asserts actual {
+  if (!actual) {
+    throw new AssertionError('Not true', actual, '(truthy)')
+  }
+}
+
 export function assertEquals<Value>(
   actual: Value,
   expected: Value
 ): void {
   if (!eq(actual, expected)) {
     throw new AssertionError('Not equal', actual, expected)
+  }
+}
+
+export function assertInstanceOf<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  Constructor extends new (...args: any) => any
+>(
+  actual: unknown,
+  expectedType: Constructor
+): asserts actual is InstanceType<Constructor> {
+  if (!(actual instanceof expectedType)) {
+    throw new AssertionError(
+      'Not instance of',
+      (typeof actual === 'object'
+        ? actual?.constructor?.name
+        : undefined) ?? typeof actual,
+      expectedType.name
+    )
   }
 }
 
