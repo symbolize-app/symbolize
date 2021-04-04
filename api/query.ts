@@ -1,6 +1,8 @@
+import * as apiPayload from '@fe/api/payload.ts'
 import * as message from '@fe/core/message.ts'
 import type * as db from '@fe/db/index.ts'
 import * as memberQuery from '@fe/db/query/member.ts'
+import * as payload from '@tiny/api/payload.ts'
 import * as route from '@tiny/api/route.ts'
 import * as query from '@tiny/db/query.ts'
 import * as crypto from '@tiny/util/crypto.ts'
@@ -42,37 +44,44 @@ const apiMessage = route.define<
   }
 })
 
-class MemberCreateUniqueConstraintError extends Error {
-  field: 'email' | 'handle'
-  constructor(cause: Error, field: 'email' | 'handle') {
-    super(cause.message)
-    this.field = field
-  }
-}
-
 export const apiMemberCreate = route.define<
   errorModule.Context & db.WriteContext
 >(
   ['POST'],
   /^\/api\/member\/create$/,
   async (ctx, request) => {
-    const requestJson = await request.json()
-    const validatedRequestObject = {
-      id: crypto.hash(
-        Buffer.from(requestJson.requestId as string, 'hex')
-      ),
-      email: requestJson.email as string,
-      handle: requestJson.handle as string,
+    let requestObject: apiPayload.MemberCreateRequest
+    try {
+      requestObject = apiPayload.checkMemberCreateRequest(
+        await request.json()
+      )
+    } catch (error: unknown) {
+      if (error instanceof payload.PayloadError) {
+        return {
+          status: 400,
+          headers: {
+            'content-type': 'application/json',
+          },
+          body: {
+            error: error.message,
+          },
+        }
+      } else {
+        throw error
+      }
     }
+    const id = crypto.hash(
+      Buffer.from(requestObject.requestId, 'hex')
+    )
     try {
       await errorModule.retry(
         ctx,
         () =>
           memberQuery.create(
             ctx.databaseApiWrite,
-            validatedRequestObject.id,
-            validatedRequestObject.email,
-            validatedRequestObject.handle
+            id,
+            requestObject.email,
+            requestObject.handle
           ),
         {
           maxAttempts: 15,
@@ -87,15 +96,13 @@ export const apiMemberCreate = route.define<
                 error
               )
               if (constraintName === 'member_email_key') {
-                throw new MemberCreateUniqueConstraintError(
-                  error,
+                throw new apiPayload.MemberCreateConflictError(
                   'email'
                 )
               } else if (
                 constraintName === 'member_handle_key'
               ) {
-                throw new MemberCreateUniqueConstraintError(
-                  error,
+                throw new apiPayload.MemberCreateConflictError(
                   'handle'
                 )
               }
@@ -111,28 +118,35 @@ export const apiMemberCreate = route.define<
       )
     } catch (error: unknown) {
       if (
-        error instanceof MemberCreateUniqueConstraintError
+        error instanceof
+        apiPayload.MemberCreateConflictError
       ) {
+        const conflictResponseObject: apiPayload.MemberCreateConflictResponse = {
+          conflict: error.field,
+        }
         return {
           status: 409,
           headers: {
             'content-type': 'application/json',
           },
-          body: {
-            conflict: error.field,
-          },
+          body: apiPayload.checkMemberCreateConflictResponse(
+            conflictResponseObject
+          ),
         }
       }
       throw error
+    }
+    const responseObject: apiPayload.MemberCreateResponse = {
+      id: id.toString('hex'),
     }
     return {
       status: 200,
       headers: {
         'content-type': 'application/json',
       },
-      body: {
-        id: validatedRequestObject.id.toString('hex'),
-      },
+      body: apiPayload.checkMemberCreateResponse(
+        responseObject
+      ),
     }
   }
 )
