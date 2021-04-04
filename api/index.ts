@@ -25,7 +25,8 @@ const index = route.define(['GET'], /^\/$/, () => {
 
 const ssr = route.define(['GET'], /^\/ssr$/, () => {
   const dom = new jsdom.JSDOM('<!DOCTYPE html>')
-  const document = dom.window.document
+  const window = dom.window
+  const document = window.document
   const ctx = {
     ...widget.initContext(document),
   }

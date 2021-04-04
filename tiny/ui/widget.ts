@@ -25,16 +25,22 @@ export type HtmlListeners<E extends Element = Element> = {
 }
 
 export type Context = {
+  window: NonNullable<Document['defaultView']>
   document: Document & {
     head: HtmlWidget<HTMLHeadElement>
     body: HtmlWidget<HTMLBodyElement>
+    defaultView: NonNullable<Document['defaultView']>
   }
 } & style.Context
 
 export function initContext(document: Document): Context {
+  if (!document.defaultView) {
+    throw new Error('No document default view')
+  }
   const ctx = {
     ...style.initContext(document),
     document,
+    window: document.defaultView,
   } as Context
   toHtmlWidget(ctx, document.body)
   toHtmlWidget(ctx, document.head)
@@ -63,10 +69,7 @@ function replaceChildren(
   parent: Node & ParentNode,
   children: (Node | string)[]
 ): void {
-  if (
-    parent.nodeType === 1 &&
-    (parent as Element).tagName === 'HEAD'
-  ) {
+  if (parent instanceof ctx.window.HTMLHeadElement) {
     let styleElement: HTMLStyleElement | null = null
     let node = parent.firstChild
     while (node) {

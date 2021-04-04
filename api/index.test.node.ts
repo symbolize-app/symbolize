@@ -4,6 +4,7 @@ import type * as time from '@tiny/util/time.ts'
 import jsdom from 'jsdom'
 
 export const all: test.TestCollection = () => [
+  import('@fe/api/payload.test.ts'),
   import('@fe/api/query.test.ts'),
 ]
 
@@ -11,21 +12,17 @@ export async function run(
   baseContext: time.Context
 ): Promise<boolean> {
   const dom = new jsdom.JSDOM('<!DOCTYPE html>')
-  const document = dom.window.document
+  const window = dom.window
+  const document = window.document
   const ctx = {
     ...baseContext,
     ...widget.initContext(document),
   }
-  const coreTest = await import('@fe/core/index.test.ts')
-  const apiTest = await import('@fe/api/index.test.ts')
-  const uiTest = await import('@fe/ui/index.test.ts')
-  const tinyUtilTest = await import(
-    '@tiny/util/index.test.ts'
-  )
   return await test.runAll(ctx, [
-    coreTest,
-    apiTest,
-    uiTest,
-    tinyUtilTest,
+    import('@fe/core/index.test.ts'),
+    import('@fe/api/index.test.node.ts'),
+    import('@fe/ui/index.test.node.ts'),
+    import('@tiny/api/index.test.ts'),
+    import('@tiny/util/index.test.ts'),
   ])
 }

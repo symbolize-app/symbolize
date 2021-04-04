@@ -11,13 +11,15 @@ export const url = import.meta.url
 export const tests = {
   ['member create, no error']: widgetTest.withTempDocument(
     async (baseContext: test.Context & widget.Context) => {
+      const id =
+        'd2f17ea3a0e36a7c79442855ca7d0a71a4eb616e10704121b4d169b6486f3bdc'
       const submit = test.mock<
         () => Promise<submit.Response>
       >([
         () =>
           Promise.resolve(
             submitTest.mockResponse({
-              json: () => Promise.resolve({ id: 'ABCDEF' }),
+              json: () => Promise.resolve({ id }),
             })
           ),
       ])
@@ -29,23 +31,32 @@ export const tests = {
         submit,
       }
       ctx.document.body.content = [uiMember.custom(ctx, {})]
-      const form = ctx.document.body.querySelector<HTMLFormElement>(
+      const form = ctx.document.body.querySelector(
         ':scope > form'
       )
-      const submitButton = form?.querySelector<HTMLButtonElement>(
+      test.assertInstanceOf(
+        form,
+        ctx.window.HTMLFormElement
+      )
+      const submitButton = form.querySelector(
         ':scope > button'
       )
-      const status = form?.querySelector<HTMLDivElement>(
-        ':scope > div'
+      test.assertInstanceOf(
+        submitButton,
+        ctx.window.HTMLButtonElement
       )
-      test.assertEquals(submitButton?.textContent, 'Submit')
-      test.assertEquals(submitButton?.type, 'submit')
-      submitButton?.click()
+      const status = form.querySelector(':scope > div')
+      test.assertInstanceOf(
+        status,
+        ctx.window.HTMLDivElement
+      )
+      test.assertEquals(submitButton.textContent, 'Submit')
+      test.assertEquals(submitButton.type, 'submit')
+      submitButton.click()
       await ctx.clock.tickAsync(0)
-      test.assertEquals(submit[test.mockHistory].length, 1)
       test.assertEquals(
         status?.textContent,
-        'Member created {"id":"ABCDEF"}'
+        `Member created {"id":"${id}"}`
       )
       test.assertDeepEquals(submit[test.mockHistory], [
         [
@@ -81,22 +92,31 @@ export const tests = {
         submit,
       }
       ctx.document.body.content = [uiMember.custom(ctx, {})]
-      const form = ctx.document.body.querySelector<HTMLFormElement>(
+      const form = ctx.document.body.querySelector(
         ':scope > form'
       )
-      const submitButton = form?.querySelector<HTMLButtonElement>(
+      test.assertInstanceOf(
+        form,
+        ctx.window.HTMLFormElement
+      )
+      const submitButton = form.querySelector(
         ':scope > button'
       )
-      const status = form?.querySelector<HTMLDivElement>(
-        ':scope > div'
+      test.assertInstanceOf(
+        submitButton,
+        ctx.window.HTMLButtonElement
       )
-      test.assertEquals(submitButton?.textContent, 'Submit')
-      test.assertEquals(submitButton?.type, 'submit')
-      submitButton?.click()
+      const status = form.querySelector(':scope > div')
+      test.assertInstanceOf(
+        status,
+        ctx.window.HTMLDivElement
+      )
+      test.assertEquals(submitButton.textContent, 'Submit')
+      test.assertEquals(submitButton.type, 'submit')
+      submitButton.click()
       await ctx.clock.tickAsync(0)
-      test.assertEquals(submit[test.mockHistory].length, 1)
       test.assertEquals(
-        status?.textContent,
+        status.textContent,
         'Unique constraint error email'
       )
       test.assertDeepEquals(submit[test.mockHistory], [

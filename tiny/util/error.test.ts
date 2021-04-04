@@ -57,7 +57,7 @@ export const tests = {
     test.assertDeepEquals(onError[test.mockHistory], [
       [expectedResult, 0, 10],
     ])
-    test.assertEquals(actualResult.isSettled, false)
+    test.assert(!actualResult.isSettled)
     await ctx.clock.tickAsync(10)
     test.assertEquals(
       actualResult.rejectedValue,
@@ -92,13 +92,13 @@ export const tests = {
     test.assertDeepEquals(onError[test.mockHistory], [
       [expectedResult, 0, 10],
     ])
-    test.assertEquals(actualResult.isSettled, false)
+    test.assert(!actualResult.isSettled)
     await ctx.clock.tickAsync(10)
     test.assertDeepEquals(onError[test.mockHistory], [
       [expectedResult, 0, 10],
       [expectedResult, 1, 16],
     ])
-    test.assertEquals(actualResult.isSettled, false)
+    test.assert(!actualResult.isSettled)
     await ctx.clock.tickAsync(16)
     test.assertEquals(
       actualResult.rejectedValue,
@@ -133,7 +133,7 @@ export const tests = {
       )
     )
     await ctx.clock.tickAsync(0)
-    test.assertEquals(actualResult.isSettled, false)
+    test.assert(!actualResult.isSettled)
     await ctx.clock.tickAsync(9_000)
     test.assertEquals(
       actualResult.rejectedValue,
@@ -175,13 +175,13 @@ export const tests = {
     test.assertDeepEquals(onError[test.mockHistory], [
       [expectedResult, 0, 1000],
     ])
-    test.assertEquals(actualResult.isSettled, false)
+    test.assert(!actualResult.isSettled)
     await ctx.clock.tickAsync(1000)
     test.assertDeepEquals(onError[test.mockHistory], [
       [expectedResult, 0, 1000],
       [expectedResult, 1, 1200],
     ])
-    test.assertEquals(actualResult.isSettled, false)
+    test.assert(!actualResult.isSettled)
     await ctx.clock.tickAsync(1200)
     test.assertEquals(
       actualResult.rejectedValue,
@@ -218,13 +218,13 @@ export const tests = {
     test.assertDeepEquals(onError[test.mockHistory], [
       [expectedError, 0, 10],
     ])
-    test.assertEquals(actualResult.isSettled, false)
+    test.assert(!actualResult.isSettled)
     await ctx.clock.tickAsync(10)
     test.assertDeepEquals(onError[test.mockHistory], [
       [expectedError, 0, 10],
       [expectedError, 1, 16],
     ])
-    test.assertEquals(actualResult.isSettled, false)
+    test.assert(!actualResult.isSettled)
     await ctx.clock.tickAsync(16)
     test.assertEquals(
       actualResult.resolvedValue,

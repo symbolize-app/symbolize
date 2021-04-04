@@ -10,14 +10,11 @@ export const all: test.TestCollection<widget.Context> = () => [
 export async function run(
   ctx: widget.Context & time.Context
 ): Promise<boolean> {
-  const coreTest = await import('@fe/core/index.test.ts')
-  const uiTest = await import('@fe/ui/index.test.ts')
-  const tinyUtilTest = await import(
-    '@tiny/util/index.test.ts'
-  )
   return await test.runAll(ctx, [
-    coreTest,
-    uiTest,
-    tinyUtilTest,
+    import('@fe/core/index.test.ts'),
+    import('@fe/api/index.test.browser.ts'),
+    import('@fe/ui/index.test.browser.ts'),
+    import('@tiny/api/index.test.ts'),
+    import('@tiny/util/index.test.ts'),
   ])
 }

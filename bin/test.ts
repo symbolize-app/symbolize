@@ -1,4 +1,4 @@
-import * as apiTest from '@fe/api/index.test.ts'
+import * as apiTest from '@fe/api/index.test.node.ts'
 import * as timeNode from '@tiny/util/time.node.ts'
 import * as urlModule from 'url'
 
