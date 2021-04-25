@@ -1,5 +1,5 @@
+import * as time from '@tiny/core/time.ts'
 import type * as query from '@tiny/db/index.ts'
-import * as time from '@tiny/util/time.ts'
 import chalk from 'chalk'
 import pg from 'pg'
 import pgConnectionString from 'pg-connection-string'

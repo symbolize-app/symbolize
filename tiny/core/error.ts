@@ -1,5 +1,5 @@
-import type * as random from '@tiny/util/random.ts'
-import * as time from '@tiny/util/time.ts'
+import type * as random from '@tiny/core/random.ts'
+import * as time from '@tiny/core/time.ts'
 import type * as typeFest from 'type-fest'
 
 export type Context = time.Context & random.Context

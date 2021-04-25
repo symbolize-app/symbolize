@@ -1,6 +1,6 @@
+import type * as time from '@tiny/core/time.ts'
 import * as test from '@tiny/test/index.ts'
 import * as widget from '@tiny/ui/widget.ts'
-import type * as time from '@tiny/util/time.ts'
 import jsdom from 'jsdom'
 
 export const all: test.TestCollection = () => [
@@ -23,6 +23,6 @@ export async function run(
     import('@fe/api/index.test.node.ts'),
     import('@fe/ui/index.test.node.ts'),
     import('@tiny/api/index.test.ts'),
-    import('@tiny/util/index.test.ts'),
+    import('@tiny/core/index.test.ts'),
   ])
 }
