@@ -1,7 +1,5 @@
 import type * as typeFest from 'type-fest'
 
-// TODO Move to ui
-
 export type Request = {
   origin?: string
   path: string

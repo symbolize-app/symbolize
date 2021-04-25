@@ -1,4 +1,4 @@
-import * as apiPayload from '@fe/api/payload.ts'
+import * as apiPayload from '@fe/core/payload.ts'
 import * as random from '@tiny/core/random.ts'
 import * as test from '@tiny/test/index.ts'
 

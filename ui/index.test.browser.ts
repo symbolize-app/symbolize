@@ -12,9 +12,7 @@ export async function run(
 ): Promise<boolean> {
   return await test.runAll(ctx, [
     import('@fe/core/index.test.ts'),
-    import('@fe/api/index.test.browser.ts'),
     import('@fe/ui/index.test.browser.ts'),
-    import('@tiny/api/index.test.ts'),
     import('@tiny/core/index.test.ts'),
   ])
 }

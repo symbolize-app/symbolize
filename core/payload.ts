@@ -1,6 +1,5 @@
-import * as payload from '@tiny/api/payload.ts'
+import * as payload from '@tiny/core/payload.ts'
 
-// TODO Move to core
 // TODO Create endpoints
 
 const checkId = payload.checkString({ min: 64, max: 64 })
