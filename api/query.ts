@@ -15,8 +15,8 @@ const apiMessage = route.define<
   errorModule.Context & db.ReadContext
 >(['GET'], /^\/api\/message$/, async (ctx) => {
   const row = await retryQuery(ctx, 'member find', () =>
-    memberQuery.find(
-      ctx.databaseApiRead,
+    ctx.databaseApiRead.query(
+      memberQuery.find,
       Buffer.from('ABCD', 'hex')
     )
   )
@@ -52,8 +52,8 @@ export const apiMemberCreate = route.define<
         ['member_handle_key']: 'handle',
       },
       () =>
-        memberQuery.create(
-          ctx.databaseApiWrite,
+        ctx.databaseApiWrite.query(
+          memberQuery.create,
           id,
           requestObject.email,
           requestObject.handle
