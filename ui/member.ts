@@ -1,9 +1,9 @@
-import * as apiPayload from '@fe/api/payload.ts'
-import type * as payload from '@tiny/api/payload.ts'
-import type * as submit from '@tiny/api/submit.ts'
+import * as apiPayload from '@fe/core/payload.ts'
 import * as errorModule from '@tiny/core/error.ts'
+import type * as payload from '@tiny/core/payload.ts'
 import * as random from '@tiny/core/random.ts'
 import * as time from '@tiny/core/time.ts'
+import type * as submit from '@tiny/ui/submit.ts'
 import * as widget from '@tiny/ui/widget.ts'
 import ms from 'ms'
 

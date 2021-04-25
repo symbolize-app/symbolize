@@ -1,7 +1,5 @@
 import type * as typeFest from 'type-fest'
 
-// TODO Move to core
-
 export type Payload<
   CustomValidator extends Validator<typeFest.JsonValue>
 > = CustomValidator extends Validator<infer Value>
