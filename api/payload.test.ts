@@ -17,7 +17,7 @@ export const tests = {
     test.assertDeepEquals(check(input), input)
   },
   ['checkMemberCreateResponse, ok']: (): void => {
-    const check = apiPayload.checkMemberCreateResponse
+    const check = apiPayload.checkMemberCreateOkResponse
     const input = {
       id:
         'd2f17ea3a0e36a7c79442855ca7d0a71a4eb616e10704121b4d169b6486f3bdc',

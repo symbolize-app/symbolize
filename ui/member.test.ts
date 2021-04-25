@@ -63,8 +63,15 @@ export const tests = {
           {
             path: '/api/member/create',
             method: 'POST',
-            body:
-              '{"requestId":"94194353ecc2a1448503e12775b8a20dc956a9ca26ef10f2fa930be7931bfa74","email":"a@b.com","handle":"aaa"}',
+            headers: {
+              'content-type': 'application/json',
+            },
+            body: {
+              requestId:
+                '94194353ecc2a1448503e12775b8a20dc956a9ca26ef10f2fa930be7931bfa74',
+              email: 'a@b.com',
+              handle: 'aaa',
+            },
           },
         ],
       ])
@@ -124,8 +131,15 @@ export const tests = {
           {
             path: '/api/member/create',
             method: 'POST',
-            body:
-              '{"requestId":"94194353ecc2a1448503e12775b8a20dc956a9ca26ef10f2fa930be7931bfa74","email":"a@b.com","handle":"aaa"}',
+            headers: {
+              'content-type': 'application/json',
+            },
+            body: {
+              requestId:
+                '94194353ecc2a1448503e12775b8a20dc956a9ca26ef10f2fa930be7931bfa74',
+              email: 'a@b.com',
+              handle: 'aaa',
+            },
           },
         ],
       ])

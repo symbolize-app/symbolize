@@ -33,7 +33,7 @@ const parsers = {
   },
 }
 
-const lineParser = /^(?<comment>--.*$\n)|(?<blank>\s*$\n)|(?<query>[^;]*;\n)/gm
+const lineParser = /^(?<comment>--.*$\n)|(?<blank>\s*$\n)|(?<query>[^;]*;?\n)/gm
 
 const printers = {
   'cockroach-ast': {
@@ -45,28 +45,37 @@ const printers = {
     print(path, options) {
       const lines = []
       const node = path.getValue()
+      let matchLength = 0
       for (const match of node.text.matchAll(lineParser)) {
         const { comment, blank, query } = match.groups
         if (comment) {
           lines.push(comment)
+          matchLength += comment.length
         } else if (blank !== undefined) {
           lines.push('\n')
+          matchLength += blank.length
         } else if (query) {
-          const output = childProcess.execFileSync(
-            'cockroach',
-            [
-              'sqlfmt',
-              '--print-width',
-              `${options.printWidth}`,
-              '--tab-width',
-              `${options.tabWidth}`,
-              '--use-spaces',
-            ],
-            { encoding: 'utf-8', input: query }
-          )
-          lines.push(output.trimEnd())
+          const output = childProcess
+            .execFileSync(
+              'cockroach',
+              [
+                'sqlfmt',
+                '--print-width',
+                `${options.printWidth}`,
+                '--tab-width',
+                `${options.tabWidth}`,
+                '--use-spaces',
+              ],
+              { encoding: 'utf-8', input: query }
+            )
+            .trimEnd()
+          lines.push(output)
           lines.push(';\n')
+          matchLength += query.length
         }
+      }
+      if (matchLength !== node.text.length) {
+        throw new Error('Invalid match length')
       }
       return lines.join('')
     },

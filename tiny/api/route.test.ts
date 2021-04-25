@@ -10,7 +10,9 @@ export function mockReqeuest(
     match: {},
     params: {},
     method: 'GET',
-    headers: {},
+    headers: {
+      'content-type': 'application/json',
+    },
     stream: test.mock([]),
     buffer: test.mock([]),
     text: test.mock([]),

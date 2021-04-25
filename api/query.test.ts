@@ -1,7 +1,8 @@
 import * as apiQuery from '@fe/api/query.ts'
 import type * as db from '@fe/db/index.ts'
+import * as route from '@tiny/api/route.ts'
 import * as memberQuery from '@fe/db/query/member.ts'
-import * as requestTest from '@tiny/api/route.test.ts'
+import * as routeTest from '@tiny/api/route.test.ts'
 import * as queryTest from '@tiny/db/query.test.ts'
 import * as test from '@tiny/test/index.ts'
 import type * as errorModule from '@tiny/util/error.ts'
@@ -31,7 +32,7 @@ export const tests = {
     const response = test.sync(
       apiQuery.apiMemberCreate.handler(
         ctx,
-        requestTest.mockReqeuest({
+        routeTest.mockReqeuest({
           json: () =>
             Promise.resolve({
               requestId: random.requestIdHex(ctx),
@@ -89,7 +90,7 @@ export const tests = {
     const response = test.sync(
       apiQuery.apiMemberCreate.handler(
         ctx,
-        requestTest.mockReqeuest({
+        routeTest.mockReqeuest({
           json: () =>
             Promise.resolve({
               requestId: random.requestIdHex(ctx),
@@ -100,7 +101,10 @@ export const tests = {
       )
     )
     await ctx.clock.tickAsync(0)
-    test.assertDeepEquals(response.resolvedValue, {
+    test.assert(
+      response.rejectedValue instanceof route.ResponseError
+    )
+    test.assertDeepEquals(response.rejectedValue.response, {
       status: 409,
       headers: { 'content-type': 'application/json' },
       body: {
@@ -137,7 +141,7 @@ export const tests = {
     const response = test.sync(
       apiQuery.apiMemberCreate.handler(
         ctx,
-        requestTest.mockReqeuest({
+        routeTest.mockReqeuest({
           json: () =>
             Promise.resolve({
               requestId: random.requestIdHex(ctx),
@@ -148,7 +152,10 @@ export const tests = {
       )
     )
     await ctx.clock.tickAsync(0)
-    test.assertDeepEquals(response.resolvedValue, {
+    test.assert(
+      response.rejectedValue instanceof route.ResponseError
+    )
+    test.assertDeepEquals(response.rejectedValue.response, {
       status: 400,
       headers: { 'content-type': 'application/json' },
       body: {

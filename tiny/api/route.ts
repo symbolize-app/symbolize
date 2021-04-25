@@ -32,6 +32,25 @@ export type Response = typeFest.Promisable<
   | http.RequestListener
 >
 
+export class ResponseError extends Error {
+  response: {
+    status: number
+    headers: Record<string, string>
+    body?:
+      | undefined
+      | string
+      | Buffer
+      | Uint8Array
+      | stream.Readable
+      | typeFest.JsonObject
+  }
+
+  constructor(response: ResponseError['response']) {
+    super(`Response ${response.status} error`)
+    this.response = response
+  }
+}
+
 export type Handler<Context> = (
   ctx: Context,
   request: Request
@@ -124,7 +143,16 @@ async function handleRequest<Context>(
       },
     }
     const response = match(ctx, request, routes)
-    const headResponse = await Promise.resolve(response)
+    let headResponse: typeFest.PromiseValue<Response>
+    try {
+      headResponse = await Promise.resolve(response)
+    } catch (error: unknown) {
+      if (error instanceof ResponseError) {
+        headResponse = error.response
+      } else {
+        throw error
+      }
+    }
     if (typeof headResponse === 'function') {
       headResponse(req, res)
     } else {
