@@ -1,6 +1,6 @@
-import * as apiQuery from '@fe/api/query.ts'
-import type * as db from '@fe/db/index.ts'
-import * as memberQuery from '@fe/db/query/member.ts'
+import * as appRoute from '@fe/api/route.ts'
+import type * as appQuery from '@fe/db/query/index.ts'
+import * as appQueryMember from '@fe/db/query/member.ts'
 import * as routeTest from '@tiny/api/route.test.ts'
 import * as route from '@tiny/api/route.ts'
 import type * as errorModule from '@tiny/core/error.ts'
@@ -16,11 +16,11 @@ export const tests = {
     baseContext: test.Context
   ): Promise<void> => {
     const queryMethod = test.mock<
-      query.Database<db.Write>['query']
+      query.Database<appQuery.Write>['query']
     >([() => Promise.resolve()])
     const ctx: test.Context &
       errorModule.Context &
-      db.WriteContext = {
+      appQuery.WriteContext = {
       ...baseContext,
       databaseApiWrite: query.createDatabase({
         query: queryMethod,
@@ -29,7 +29,7 @@ export const tests = {
     const expectedId =
       'd2f17ea3a0e36a7c79442855ca7d0a71a4eb616e10704121b4d169b6486f3bdc'
     const response = test.sync(
-      apiQuery.apiMemberCreate.handler(
+      appRoute.apiMemberCreate.handler(
         ctx,
         routeTest.mockReqeuest({
           json: () =>
@@ -51,7 +51,7 @@ export const tests = {
     })
     test.assertDeepEquals(queryMethod[test.mockHistory], [
       [
-        memberQuery.create,
+        appQueryMember.create,
         Buffer.from(expectedId, 'hex'),
         'test@example.org',
         'test',
@@ -62,7 +62,7 @@ export const tests = {
     baseContext: test.Context
   ): Promise<void> => {
     const queryMethod = test.mock<
-      query.Database<db.Write>['query']
+      query.Database<appQuery.Write>['query']
     >([
       () =>
         Promise.reject(
@@ -73,7 +73,7 @@ export const tests = {
     ])
     const ctx: test.Context &
       errorModule.Context &
-      db.WriteContext = {
+      appQuery.WriteContext = {
       ...baseContext,
       databaseApiWrite: query.createDatabase({
         query: queryMethod,
@@ -82,7 +82,7 @@ export const tests = {
     const expectedId =
       'd2f17ea3a0e36a7c79442855ca7d0a71a4eb616e10704121b4d169b6486f3bdc'
     const response = test.sync(
-      apiQuery.apiMemberCreate.handler(
+      appRoute.apiMemberCreate.handler(
         ctx,
         routeTest.mockReqeuest({
           json: () =>
@@ -107,7 +107,7 @@ export const tests = {
     })
     test.assertDeepEquals(queryMethod[test.mockHistory], [
       [
-        memberQuery.create,
+        appQueryMember.create,
         Buffer.from(expectedId, 'hex'),
         'test@example.org',
         'test',
@@ -119,16 +119,16 @@ export const tests = {
   ): Promise<void> => {
     const ctx: test.Context &
       errorModule.Context &
-      db.WriteContext = {
+      appQuery.WriteContext = {
       ...baseContext,
       databaseApiWrite: query.createDatabase({
-        query: test.mock<query.Database<db.Write>['query']>(
-          []
-        ),
+        query: test.mock<
+          query.Database<appQuery.Write>['query']
+        >([]),
       }),
     }
     const response = test.sync(
-      apiQuery.apiMemberCreate.handler(
+      appRoute.apiMemberCreate.handler(
         ctx,
         routeTest.mockReqeuest({
           json: () =>

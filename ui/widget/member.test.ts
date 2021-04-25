@@ -1,4 +1,4 @@
-import * as uiMember from '@fe/ui/member.ts'
+import * as appWidgetMember from '@fe/ui/widget/member.ts'
 import type * as errorModule from '@tiny/core/error.ts'
 import * as test from '@tiny/test/index.ts'
 import * as submitTest from '@tiny/ui/submit.test.ts'
@@ -30,7 +30,9 @@ export const tests = {
         ...baseContext,
         submit,
       }
-      ctx.document.body.content = [uiMember.custom(ctx, {})]
+      ctx.document.body.content = [
+        appWidgetMember.custom(ctx, {}),
+      ]
       const form = ctx.document.body.querySelector(
         ':scope > form'
       )
@@ -98,7 +100,9 @@ export const tests = {
         ...baseContext,
         submit,
       }
-      ctx.document.body.content = [uiMember.custom(ctx, {})]
+      ctx.document.body.content = [
+        appWidgetMember.custom(ctx, {}),
+      ]
       const form = ctx.document.body.querySelector(
         ':scope > form'
       )

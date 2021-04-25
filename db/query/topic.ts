@@ -1,11 +1,11 @@
-import type * as db from '@fe/db/index.ts'
-import topicCreate from '@fe/db/query/topicCreate.sql'
-import topicList from '@fe/db/query/topicList.sql'
-import topicUpdate from '@fe/db/query/topicUpdate.sql'
+import type * as appQuery from '@fe/db/query/index.ts'
+import appQueryTopicCreate from '@fe/db/query/topicCreate.sql'
+import appQueryTopicList from '@fe/db/query/topicList.sql'
+import appQueryTopicUpdate from '@fe/db/query/topicUpdate.sql'
 import * as query from '@tiny/db/query.ts'
 
 export const create = query.defineVoid<
-  db.Write,
+  appQuery.Write,
   [
     id: Buffer,
     memberId: Buffer,
@@ -13,10 +13,10 @@ export const create = query.defineVoid<
     slug: string,
     content: string
   ]
->(topicCreate)
+>(appQueryTopicCreate)
 
 export const list = query.defineMulti<
-  db.Read,
+  appQuery.Read,
   [],
   {
     id: Buffer
@@ -24,10 +24,10 @@ export const list = query.defineMulti<
     slug: string
     content: string
   }
->(topicList)
+>(appQueryTopicList)
 
 export const update = query.defineOptional<
-  db.Write,
+  appQuery.Write,
   [
     id: Buffer,
     updatedOld: Date,
@@ -36,4 +36,4 @@ export const update = query.defineOptional<
     content: string
   ],
   { updated: Date }
->(topicUpdate)
+>(appQueryTopicUpdate)
