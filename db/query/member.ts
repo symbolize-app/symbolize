@@ -4,12 +4,12 @@ import memberFind from '@fe/db/query/memberFind.sql'
 import * as query from '@tiny/db/query.ts'
 
 export const find = query.defineOptional<
-  db.DatabaseApiRead,
+  db.Read,
   [id: Buffer],
   { email: string }
 >(memberFind)
 
 export const create = query.defineVoid<
-  db.DatabaseApiWrite,
+  db.Write,
   [id: Buffer, email: string, handle: string]
 >(memberCreate)

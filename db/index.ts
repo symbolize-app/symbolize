@@ -1,54 +1,39 @@
 import * as time from '@tiny/core/time.ts'
-import type * as query from '@tiny/db/index.ts'
+import * as query from '@tiny/db/query.ts'
 import chalk from 'chalk'
 import pg from 'pg'
 import pgConnectionString from 'pg-connection-string'
-import type * as typeFest from 'type-fest'
 
-declare const databaseApiReadSymbol: unique symbol
+declare const readSymbol: unique symbol
 
-export type DatabaseApiRead = typeFest.Opaque<
-  query.Database,
-  typeof databaseApiReadSymbol
->
+export type Read = typeof readSymbol
 
 export type ReadContext = {
-  databaseApiRead: DatabaseApiRead
+  databaseApiRead: query.Database<Read>
 }
 
-declare const databaseApiWriteSymbol: unique symbol
+declare const writeSymbol: unique symbol
 
-export type DatabaseApiWrite = typeFest.Opaque<
-  query.Database,
-  typeof databaseApiWriteSymbol
->
+export type Write = typeof writeSymbol
 
 export type WriteContext = {
-  databaseApiWrite: DatabaseApiWrite
+  databaseApiWrite: query.Database<Write>
 }
 
 export function initContext(): ReadContext & WriteContext {
   return {
-    databaseApiRead: initDatabase<DatabaseApiRead>(
+    databaseApiRead: initDatabase<Read>(
       process.env.DATABASE_URL_API_READ as string
     ),
-    databaseApiWrite: initDatabase<DatabaseApiWrite>(
+    databaseApiWrite: initDatabase<Write>(
       process.env.DATABASE_URL_API_WRITE as string
     ),
   }
 }
 
-function initDatabase<Database extends query.Database>(
+function initDatabase<Id extends unknown>(
   connectionString: string
-): Database {
-  return {
-    pool: openPool(connectionString),
-  } as Database
-}
-
-function openPool(
-  connectionString: string
-): Pick<pg.Pool, 'query'> {
+): query.Database<Id> {
   const max = 10
   const user = pgConnectionString.parse(connectionString)
     .user
@@ -82,5 +67,23 @@ function openPool(
       )
     )
   })
-  return pool
+  return query.createDatabase({
+    async query<
+      Values extends query.SupportedType[],
+      Row extends Record<string, query.SupportedType>,
+      Transform extends unknown
+    >(
+      query: query.Query<Id, Values, Row, Transform>,
+      ...values: Values
+    ): Promise<Transform> {
+      const result = await pool.query<Row, Values>(
+        {
+          name: query.name,
+          text: query.text,
+        },
+        values
+      )
+      return query.transform(result.rows)
+    },
+  })
 }

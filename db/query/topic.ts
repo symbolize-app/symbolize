@@ -5,7 +5,7 @@ import topicUpdate from '@fe/db/query/topicUpdate.sql'
 import * as query from '@tiny/db/query.ts'
 
 export const create = query.defineVoid<
-  db.DatabaseApiWrite,
+  db.Write,
   [
     id: Buffer,
     memberId: Buffer,
@@ -16,7 +16,7 @@ export const create = query.defineVoid<
 >(topicCreate)
 
 export const list = query.defineMulti<
-  db.DatabaseApiRead,
+  db.Read,
   [],
   {
     id: Buffer
@@ -27,7 +27,7 @@ export const list = query.defineMulti<
 >(topicList)
 
 export const update = query.defineOptional<
-  db.DatabaseApiWrite,
+  db.Write,
   [
     id: Buffer,
     updatedOld: Date,

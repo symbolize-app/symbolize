@@ -6,6 +6,7 @@ import * as route from '@tiny/api/route.ts'
 import type * as errorModule from '@tiny/core/error.ts'
 import * as random from '@tiny/core/random.ts'
 import * as queryTest from '@tiny/db/query.test.ts'
+import * as query from '@tiny/db/query.ts'
 import * as test from '@tiny/test/index.ts'
 
 export const url = import.meta.url
@@ -14,18 +15,16 @@ export const tests = {
   ['member create, no error']: async (
     baseContext: test.Context
   ): Promise<void> => {
-    const query = test.mock([
-      () => Promise.resolve({ rows: [] }),
-    ])
+    const queryMethod = test.mock<
+      query.Database<db.Write>['query']
+    >([() => Promise.resolve()])
     const ctx: test.Context &
       errorModule.Context &
       db.WriteContext = {
       ...baseContext,
-      databaseApiWrite: {
-        pool: {
-          query,
-        } as unknown,
-      } as db.DatabaseApiWrite,
+      databaseApiWrite: query.createDatabase({
+        query: queryMethod,
+      }),
     }
     const expectedId =
       'd2f17ea3a0e36a7c79442855ca7d0a71a4eb616e10704121b4d169b6486f3bdc'
@@ -50,24 +49,21 @@ export const tests = {
         id: expectedId,
       },
     })
-    test.assertDeepEquals(query[test.mockHistory], [
+    test.assertDeepEquals(queryMethod[test.mockHistory], [
       [
-        {
-          name: memberQuery.create.queryName,
-          text: memberQuery.create.queryText,
-        },
-        [
-          Buffer.from(expectedId, 'hex'),
-          'test@example.org',
-          'test',
-        ],
+        memberQuery.create,
+        Buffer.from(expectedId, 'hex'),
+        'test@example.org',
+        'test',
       ],
     ])
   },
   ['member create, uniqueness error']: async (
     baseContext: test.Context
   ): Promise<void> => {
-    const query = test.mock([
+    const queryMethod = test.mock<
+      query.Database<db.Write>['query']
+    >([
       () =>
         Promise.reject(
           new queryTest.MockUniqueViolationConstraintError(
@@ -79,11 +75,9 @@ export const tests = {
       errorModule.Context &
       db.WriteContext = {
       ...baseContext,
-      databaseApiWrite: {
-        pool: {
-          query,
-        } as unknown,
-      } as db.DatabaseApiWrite,
+      databaseApiWrite: query.createDatabase({
+        query: queryMethod,
+      }),
     }
     const expectedId =
       'd2f17ea3a0e36a7c79442855ca7d0a71a4eb616e10704121b4d169b6486f3bdc'
@@ -111,17 +105,12 @@ export const tests = {
         conflict: 'email',
       },
     })
-    test.assertDeepEquals(query[test.mockHistory], [
+    test.assertDeepEquals(queryMethod[test.mockHistory], [
       [
-        {
-          name: memberQuery.create.queryName,
-          text: memberQuery.create.queryText,
-        },
-        [
-          Buffer.from(expectedId, 'hex'),
-          'test@example.org',
-          'test',
-        ],
+        memberQuery.create,
+        Buffer.from(expectedId, 'hex'),
+        'test@example.org',
+        'test',
       ],
     ])
   },
@@ -132,11 +121,11 @@ export const tests = {
       errorModule.Context &
       db.WriteContext = {
       ...baseContext,
-      databaseApiWrite: {
-        pool: {
-          query: test.mock([]),
-        } as unknown,
-      } as db.DatabaseApiWrite,
+      databaseApiWrite: query.createDatabase({
+        query: test.mock<query.Database<db.Write>['query']>(
+          []
+        ),
+      }),
     }
     const response = test.sync(
       apiQuery.apiMemberCreate.handler(
