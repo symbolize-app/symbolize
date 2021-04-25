@@ -146,7 +146,7 @@ function retryConflictSubmit<
   ctx: errorModule.Context & submit.Context,
   description: string,
   checkOkResponse: payload.Validator<OkResponse>,
-  ConflictError: new (
+  conflictError: new (
     field: ConflictResponse['conflict']
   ) => payload.ConflictError<ConflictResponse>,
   checkConflictResponse: payload.Validator<ConflictResponse>,
@@ -162,7 +162,7 @@ function retryConflictSubmit<
         const conflictResponseObject = checkConflictResponse(
           await response.json()
         )
-        throw new ConflictError(
+        throw new conflictError(
           conflictResponseObject.conflict
         )
       } else {
@@ -170,7 +170,7 @@ function retryConflictSubmit<
       }
     },
     (error: unknown) => {
-      if (error instanceof ConflictError) {
+      if (error instanceof conflictError) {
         throw error
       }
     }
@@ -186,7 +186,7 @@ function retryConflictPostSubmit<
   description: string,
   checkRequest: payload.Validator<Request>,
   checkOkResponse: payload.Validator<OkResponse>,
-  ConflictError: new (
+  conflictError: new (
     field: ConflictResponse['conflict']
   ) => payload.ConflictError<ConflictResponse>,
   checkConflictResponse: payload.Validator<ConflictResponse>,
@@ -197,7 +197,7 @@ function retryConflictPostSubmit<
     ctx,
     description,
     checkOkResponse,
-    ConflictError,
+    conflictError,
     checkConflictResponse,
     postSubmit(ctx, checkRequest, path, requestObject)
   )

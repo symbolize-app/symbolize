@@ -114,8 +114,19 @@ async function checkRequestJson<Value>(
   try {
     input = await request.json()
   } catch (error: unknown) {
-    // TODO Handle read & deserialization errors
-    throw error
+    if (error instanceof SyntaxError) {
+      throw new route.ResponseError({
+        status: 400,
+        headers: {
+          'content-type': 'application/json',
+        },
+        body: {
+          error: 'JSON syntax error',
+        },
+      })
+    } else {
+      throw error
+    }
   }
   return checkRequest(check, input)
 }
@@ -124,7 +135,7 @@ async function checkConflictQuery<
   Value,
   ConflictResponse extends { conflict: string }
 >(
-  ConflictError: new (
+  conflictError: new (
     field: ConflictResponse['conflict']
   ) => payload.ConflictError<ConflictResponse>,
   check: payload.Validator<ConflictResponse>,
@@ -133,7 +144,7 @@ async function checkConflictQuery<
   try {
     return await query()
   } catch (error: unknown) {
-    if (error instanceof ConflictError) {
+    if (error instanceof conflictError) {
       throw checkConflictResponse(check, error.field)
     } else {
       throw error
@@ -188,7 +199,7 @@ async function retryConflictQuery<
 >(
   ctx: errorModule.Context,
   description: string,
-  ConflictError: new (
+  conflictError: new (
     field: ConflictResponse['conflict']
   ) => payload.ConflictError<ConflictResponse>,
   checkConflictResponse: payload.Validator<ConflictResponse>,
@@ -199,7 +210,7 @@ async function retryConflictQuery<
   queryCallback: () => Promise<Value>
 ): Promise<Value> {
   return await checkConflictQuery(
-    ConflictError,
+    conflictError,
     checkConflictResponse,
     () =>
       retryQuery(
@@ -217,7 +228,7 @@ async function retryConflictQuery<
             const conflictField =
               constraintName && conflictMap[constraintName]
             if (conflictField) {
-              throw new ConflictError(conflictField)
+              throw new conflictError(conflictField)
             }
           }
         }
