@@ -1,4 +1,4 @@
-import * as build from '@fe/bin/build.ts'
+import * as appBuild from '@fe/bin/build.ts'
 import * as route from '@tiny/api/route.ts'
 import * as concurrency from '@tiny/core/concurrency.ts'
 import chalk from 'chalk'
@@ -20,7 +20,10 @@ type Context = {
   server: Server
 }
 
-type SourceTree = Record<string, Promise<build.SourceFile>>
+type SourceTree = Record<
+  string,
+  Promise<appBuild.SourceFile>
+>
 
 type Server = {
   ready: concurrency.EventSemaphore
@@ -100,20 +103,22 @@ function buildDev(entryPoint: string): SourceTree {
       ...baseOptions,
       entryPoint: step,
     } as const
-    sourceTree[build.getOutputPath(options)] = start(step)
+    sourceTree[appBuild.getOutputPath(options)] = start(
+      step
+    )
   }
 
   async function start(
     step: string
-  ): Promise<build.SourceFile> {
-    const result = await build.oneStep({
+  ): Promise<appBuild.SourceFile> {
+    const result = await appBuild.oneStep({
       ...baseOptions,
       entryPoint: step,
     })
     for (const step of result.nextSteps) {
       if (
         !(
-          build.getOutputPath({
+          appBuild.getOutputPath({
             ...baseOptions,
             entryPoint: step,
           }) in sourceTree

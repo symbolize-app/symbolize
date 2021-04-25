@@ -1,4 +1,4 @@
-import * as apiTest from '@fe/api/index.test.node.ts'
+import * as appApiTest from '@fe/api/index.test.node.ts'
 import * as timeNode from '@tiny/core/time.node.ts'
 import * as urlModule from 'url'
 
@@ -6,7 +6,7 @@ if (
   process.argv[1] ===
   urlModule.fileURLToPath(import.meta.url)
 ) {
-  void apiTest
+  void appApiTest
     .run({
       ...timeNode.initContext(),
     })

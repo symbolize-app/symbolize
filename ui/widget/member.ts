@@ -1,4 +1,4 @@
-import * as apiPayload from '@fe/core/payload.ts'
+import * as appPayload from '@fe/core/payload.ts'
 import * as errorModule from '@tiny/core/error.ts'
 import type * as payload from '@tiny/core/payload.ts'
 import * as random from '@tiny/core/random.ts'
@@ -53,10 +53,10 @@ export const custom = widget.define<
       const responseObject = await retryConflictPostSubmit(
         ctx,
         'create member',
-        apiPayload.checkMemberCreateRequest,
-        apiPayload.checkMemberCreateOkResponse,
-        apiPayload.MemberCreateConflictError,
-        apiPayload.checkMemberCreateConflictResponse,
+        appPayload.checkMemberCreateRequest,
+        appPayload.checkMemberCreateOkResponse,
+        appPayload.MemberCreateConflictError,
+        appPayload.checkMemberCreateConflictResponse,
         '/api/member/create',
         {
           requestId: requestIdInput.value,
@@ -70,7 +70,7 @@ export const custom = widget.define<
     } catch (error: unknown) {
       if (
         error instanceof
-        apiPayload.MemberCreateConflictError
+        appPayload.MemberCreateConflictError
       ) {
         status.content = [
           `Unique constraint error ${error.field}`,

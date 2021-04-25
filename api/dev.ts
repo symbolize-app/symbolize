@@ -1,4 +1,4 @@
-import * as apiTest from '@fe/api/index.test.node.ts'
+import * as appApiTest from '@fe/api/index.test.node.ts'
 import type * as time from '@tiny/core/time.ts'
 
 export function main(ctx: time.Context): void {
@@ -6,5 +6,5 @@ export function main(ctx: time.Context): void {
     process.send('ready')
   }
 
-  void apiTest.run(ctx)
+  void appApiTest.run(ctx)
 }

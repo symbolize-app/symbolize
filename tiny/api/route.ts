@@ -58,13 +58,13 @@ export type Handler<Context> = (
 
 export type Route<Context> = {
   methods: string[] | undefined
-  match: RegExp
+  match: string | RegExp
   handler: Handler<Context>
 }
 
 export function define<Context = unknown>(
   methods: string[] | undefined,
-  match: RegExp,
+  match: string | RegExp,
   handler: Handler<Context>
 ): Route<Context> {
   return { methods, match, handler }
@@ -198,7 +198,11 @@ export function match<Context>(
     const match =
       (route.methods === undefined ||
         route.methods.indexOf(request.method) >= 0) &&
-      route.match.exec(request.path)
+      (typeof route.match === 'string'
+        ? route.match === request.path && {
+            groups: undefined,
+          }
+        : route.match.exec(request.path))
     if (match) {
       response = route.handler(ctx, {
         ...request,
