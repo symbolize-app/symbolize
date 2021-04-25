@@ -19,17 +19,20 @@ export type QueryMetadata = {
   queryText: string
 }
 
-export function defineMulti<
+export function defineMultiTransform<
   SpecificDatabase extends db.Database,
   Values extends SupportedType[],
-  Row extends Record<string, SupportedType>
+  Row extends Record<string, SupportedType>,
+  Transform extends unknown
 >(
-  queryText: string
+  queryText: string,
+  transform: (rows: Row[]) => Transform
 ): ((
   database: SpecificDatabase,
   ...values: Values
-) => Promise<Row[]>) &
+) => Promise<Transform>) &
   QueryMetadata {
+  // TODO Switch from function to value
   const queryName = `q${globalQueryNameCount.toString(
     queryNameBase
   )}`
@@ -42,15 +45,34 @@ export function defineMulti<
       },
       values
     )
-    return result.rows
+    return transform(result.rows)
   }) as ((
     database: SpecificDatabase,
     ...values: Values
-  ) => Promise<Row[]>) &
+  ) => Promise<Transform>) &
     QueryMetadata
   query.queryName = queryName
   query.queryText = queryText
   return query
+}
+
+export function defineMulti<
+  SpecificDatabase extends db.Database,
+  Values extends SupportedType[],
+  Row extends Record<string, SupportedType>
+>(
+  queryText: string
+): ((
+  database: SpecificDatabase,
+  ...values: Values
+) => Promise<Row[]>) &
+  QueryMetadata {
+  return defineMultiTransform<
+    SpecificDatabase,
+    Values,
+    Row,
+    Row[]
+  >(queryText, (rows) => rows)
 }
 
 export function defineOptional<
@@ -58,34 +80,28 @@ export function defineOptional<
   Values extends SupportedType[],
   Row extends Record<string, SupportedType>
 >(
-  text: string
+  queryText: string
 ): ((
   database: SpecificDatabase,
   ...values: Values
 ) => Promise<Row | undefined>) &
   QueryMetadata {
-  const base = defineMulti<SpecificDatabase, Values, Row>(
-    text
-  )
-  const query = (async (database, ...values) => {
-    const result = await base(database, ...values)
-    if (result.length === 0) {
+  return defineMultiTransform<
+    SpecificDatabase,
+    Values,
+    Row,
+    Row | undefined
+  >(queryText, (rows) => {
+    if (rows.length === 0) {
       return undefined
-    } else if (result.length === 1) {
-      return result[0]
+    } else if (rows.length === 1) {
+      return rows[0]
     } else {
       throw new Error(
-        `Too many rows returned (${result.length})`
+        `Too many rows returned (${rows.length})`
       )
     }
-  }) as ((
-    database: SpecificDatabase,
-    ...values: Values
-  ) => Promise<Row | undefined>) &
-    QueryMetadata
-  query.queryName = base.queryName
-  query.queryText = base.queryText
-  return query
+  })
 }
 
 export function defineSingle<
@@ -93,66 +109,54 @@ export function defineSingle<
   Values extends SupportedType[],
   Row extends Record<string, SupportedType>
 >(
-  text: string
+  queryText: string
 ): ((
   database: SpecificDatabase,
   ...values: Values
 ) => Promise<Row>) &
   QueryMetadata {
-  const base = defineOptional<
+  return defineMultiTransform<
     SpecificDatabase,
     Values,
+    Row,
     Row
-  >(text)
-  const query = (async (database, ...values) => {
-    const result = await base(database, ...values)
-    if (result === undefined) {
+  >(queryText, (rows) => {
+    if (rows.length === 0) {
       throw new Error('No rows returned')
+    } else if (rows.length === 1) {
+      return rows[0]
     } else {
-      return result
+      throw new Error(
+        `Too many rows returned (${rows.length})`
+      )
     }
-  }) as ((
-    database: SpecificDatabase,
-    ...values: Values
-  ) => Promise<Row>) &
-    QueryMetadata
-  query.queryName = base.queryName
-  query.queryText = base.queryText
-  return query
+  })
 }
 
 export function defineVoid<
   SpecificDatabase extends db.Database,
   Values extends SupportedType[]
 >(
-  text: string
+  queryText: string
 ): ((
   database: SpecificDatabase,
   ...values: Values
 ) => Promise<void>) &
   QueryMetadata {
-  const base = defineMulti<
+  return defineMultiTransform<
     SpecificDatabase,
     Values,
-    Record<string, never>
-  >(text)
-  const query = (async (database, ...values) => {
-    const result = await base(database, ...values)
-    if (result.length === 0) {
+    Record<string, never>,
+    void
+  >(queryText, (rows) => {
+    if (rows.length === 0) {
       return
     } else {
       throw new Error(
-        `Too many rows returned (${result.length})`
+        `Too many rows returned (${rows.length})`
       )
     }
-  }) as ((
-    database: SpecificDatabase,
-    ...values: Values
-  ) => Promise<void>) &
-    QueryMetadata
-  query.queryName = base.queryName
-  query.queryText = base.queryText
-  return query
+  })
 }
 
 export type QueryError = Error & { code: string }

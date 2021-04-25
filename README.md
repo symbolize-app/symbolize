@@ -33,3 +33,10 @@ Formats all source code
 ## `pnpm build`
 
 Compiles all source code
+
+## `pnpm sql`
+
+Open a CockroachDB SQL prompt
+
+- Use `select id::string from member` to view hex
+- Use `'\xabc123'` to write hex

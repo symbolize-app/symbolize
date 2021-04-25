@@ -1,5 +1,7 @@
 import type * as typeFest from 'type-fest'
 
+// TODO Move to core
+
 export type Payload<
   CustomValidator extends Validator<typeFest.JsonValue>
 > = CustomValidator extends Validator<infer Value>
@@ -125,6 +127,90 @@ export function checkStringOption<Options extends string>(
         path
       )
     }
+  }
+}
+
+export function checkStringMatch(config: {
+  min: number
+  max: number
+  match: RegExp
+}): Validator<string> {
+  const base = checkString(config)
+  return (baseInput, path) => {
+    const input = base(baseInput, path)
+    if (!config.match.exec(input)) {
+      throw new PayloadError(
+        `Invalid string match (for ${JSON.stringify(
+          config.match.toString()
+        )})`,
+        path
+      )
+    } else {
+      return input
+    }
+  }
+}
+
+export function checkNumber(config: {
+  min: number
+  max: number
+}): Validator<number> {
+  return (input, path) => {
+    if (typeof input !== 'number') {
+      throw new PayloadError(
+        `Invalid number (wrong type ${getTypeName(input)})`,
+        path
+      )
+    } else if (input < config.min) {
+      throw new PayloadError(
+        `Invalid number (too small, min ${config.min})`,
+        path
+      )
+    } else if (input > config.max) {
+      throw new PayloadError(
+        `Invalid number (too large, max ${config.max})`,
+        path
+      )
+    } else {
+      return input
+    }
+  }
+}
+
+export function checkInteger(config: {
+  min: number
+  max: number
+}): Validator<number> {
+  const base = checkNumber(config)
+  return (baseInput, path) => {
+    const input = base(baseInput, path)
+    if ((input | 0) !== input) {
+      throw new PayloadError(
+        'Invalid integer (includes fractional component)',
+        path
+      )
+    } else {
+      return input
+    }
+  }
+}
+
+const checkTimestampBase = checkNumber({
+  min: Date.UTC(1000, 1, 1),
+  max: Date.UTC(10000, 1, 1),
+})
+export const checkTimestamp: Validator<number> = (
+  baseInput,
+  path
+) => {
+  const input = checkTimestampBase(baseInput, path)
+  if (input % 1000 !== 0) {
+    throw new PayloadError(
+      'Invalid timestamp (includes fractional seconds)',
+      path
+    )
+  } else {
+    return input
   }
 }
 

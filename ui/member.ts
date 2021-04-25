@@ -1,4 +1,5 @@
 import * as apiPayload from '@fe/api/payload.ts'
+import * as payload from '@tiny/api/payload.ts'
 import type * as submit from '@tiny/api/submit.ts'
 import * as widget from '@tiny/ui/widget.ts'
 import * as errorModule from '@tiny/util/error.ts'
@@ -48,62 +49,19 @@ export const custom = widget.define<
 
   async function submit(event: Event) {
     event.preventDefault()
-    const path = '/api/member/create'
-    const method = 'POST'
-    const payload: apiPayload.MemberCreateRequest = {
-      requestId: requestIdInput.value,
-      email: emailInput.value,
-      handle: handleInput.value,
-    }
-    const body = JSON.stringify(
-      apiPayload.checkMemberCreateRequest(payload)
-    )
     try {
-      const responseObject = await errorModule.retry(
+      const responseObject = await retryConflictPostSubmit(
         ctx,
-        async () => {
-          const response = await ctx.submit({
-            path,
-            method,
-            body,
-          })
-          if (response.status === 409) {
-            const conflictResponseObject = apiPayload.checkMemberCreateConflictResponse(
-              await response.json()
-            )
-            throw new apiPayload.MemberCreateConflictError(
-              conflictResponseObject.conflict
-            )
-          } else if (response.status === 200) {
-            return apiPayload.checkMemberCreateResponse(
-              await response.json()
-            )
-          } else {
-            throw new Error(
-              `status ${response.status} response for ${method} ${path}`
-            )
-          }
-        },
+        'create member',
+        apiPayload.checkMemberCreateRequest,
+        apiPayload.checkMemberCreateOkResponse,
+        apiPayload.MemberCreateConflictError,
+        apiPayload.checkMemberCreateConflictResponse,
+        '/api/member/create',
         {
-          maxAttempts: 15,
-          minDelayMs: time.interval({
-            milliseconds: 10,
-          }),
-          windowMs: time.interval({ seconds: 30 }),
-          onError(error, attempt, nextDelayMs) {
-            if (
-              error instanceof
-              apiPayload.MemberCreateConflictError
-            ) {
-              throw error
-            }
-            console.error(
-              `Retrying member create (attempt ${attempt}, delay ${ms(
-                nextDelayMs
-              )})`,
-              error
-            )
-          },
+          requestId: requestIdInput.value,
+          email: emailInput.value,
+          handle: handleInput.value,
         }
       )
       status.content = [
@@ -123,3 +81,124 @@ export const custom = widget.define<
     }
   }
 })
+function postSubmit<Request>(
+  ctx: errorModule.Context & submit.Context,
+  checkRequest: payload.Validator<Request>,
+  path: string,
+  requestObject: Request
+): () => Promise<submit.Response> {
+  const method = 'POST'
+  const headers = { 'content-type': 'application/json' }
+  const body = checkRequest(requestObject)
+  return () =>
+    ctx.submit({
+      path,
+      method,
+      headers,
+      body,
+    })
+}
+
+async function retrySubmit<OkResponse>(
+  ctx: errorModule.Context & submit.Context,
+  description: string,
+  checkOkResponse: payload.Validator<OkResponse>,
+  submit: () => Promise<submit.Response>,
+  onError?: (error: unknown) => void
+): Promise<OkResponse> {
+  return await errorModule.retry(
+    ctx,
+    async () => {
+      const response = await submit()
+      if (response.status === 200) {
+        return checkOkResponse(await response.json())
+      } else {
+        throw new Error(
+          `Unexpected status ${response.status} response during ${description}`
+        )
+      }
+    },
+    {
+      maxAttempts: 15,
+      minDelayMs: time.interval({
+        milliseconds: 10,
+      }),
+      windowMs: time.interval({ seconds: 30 }),
+      onError(error, attempt, nextDelayMs) {
+        if (onError) {
+          onError(error)
+        }
+        console.error(
+          `Retrying ${description} submit (attempt ${attempt}, delay ${ms(
+            nextDelayMs
+          )})`,
+          error
+        )
+      },
+    }
+  )
+}
+
+function retryConflictSubmit<
+  OkResponse,
+  ConflictResponse extends { conflict: string }
+>(
+  ctx: errorModule.Context & submit.Context,
+  description: string,
+  checkOkResponse: payload.Validator<OkResponse>,
+  ConflictError: new (
+    field: ConflictResponse['conflict']
+  ) => payload.ConflictError<ConflictResponse>,
+  checkConflictResponse: payload.Validator<ConflictResponse>,
+  submit: () => Promise<submit.Response>
+): Promise<OkResponse> {
+  return retrySubmit(
+    ctx,
+    description,
+    checkOkResponse,
+    async () => {
+      const response = await submit()
+      if (response.status === 409) {
+        const conflictResponseObject = checkConflictResponse(
+          await response.json()
+        )
+        throw new ConflictError(
+          conflictResponseObject.conflict
+        )
+      } else {
+        return response
+      }
+    },
+    (error: unknown) => {
+      if (error instanceof ConflictError) {
+        throw error
+      }
+    }
+  )
+}
+
+function retryConflictPostSubmit<
+  Request,
+  OkResponse,
+  ConflictResponse extends { conflict: string }
+>(
+  ctx: errorModule.Context & submit.Context,
+  description: string,
+  checkRequest: payload.Validator<Request>,
+  checkOkResponse: payload.Validator<OkResponse>,
+  ConflictError: new (
+    field: ConflictResponse['conflict']
+  ) => payload.ConflictError<ConflictResponse>,
+  checkConflictResponse: payload.Validator<ConflictResponse>,
+  path: string,
+  requestObject: Request
+): Promise<OkResponse> {
+  return retryConflictSubmit(
+    ctx,
+    description,
+    checkOkResponse,
+    ConflictError,
+    checkConflictResponse,
+    postSubmit(ctx, checkRequest, path, requestObject)
+  )
+}
