@@ -1,4 +1,4 @@
-import * as payload from '@tiny/api/payload.ts'
+import * as payload from '@tiny/core/payload.ts'
 import * as test from '@tiny/test/index.ts'
 
 export const url = import.meta.url

@@ -4,7 +4,6 @@ import * as widget from '@tiny/ui/widget.ts'
 import jsdom from 'jsdom'
 
 export const all: test.TestCollection = () => [
-  import('@fe/api/payload.test.ts'),
   import('@fe/api/query.test.ts'),
 ]
 
@@ -22,7 +21,6 @@ export async function run(
     import('@fe/core/index.test.ts'),
     import('@fe/api/index.test.node.ts'),
     import('@fe/ui/index.test.node.ts'),
-    import('@tiny/api/index.test.ts'),
     import('@tiny/core/index.test.ts'),
   ])
 }

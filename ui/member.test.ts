@@ -1,8 +1,8 @@
 import * as uiMember from '@fe/ui/member.ts'
-import * as submitTest from '@tiny/api/submit.test.ts'
-import type * as submit from '@tiny/api/submit.ts'
 import type * as errorModule from '@tiny/core/error.ts'
 import * as test from '@tiny/test/index.ts'
+import * as submitTest from '@tiny/ui/submit.test.ts'
+import type * as submit from '@tiny/ui/submit.ts'
 import * as widgetTest from '@tiny/ui/widget.test.ts'
 import type * as widget from '@tiny/ui/widget.ts'
 
