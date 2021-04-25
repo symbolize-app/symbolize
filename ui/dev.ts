@@ -1,6 +1,6 @@
 import * as uiTest from '@fe/ui/index.test.browser.ts'
+import type * as time from '@tiny/core/time.ts'
 import type * as widget from '@tiny/ui/widget.ts'
-import type * as time from '@tiny/util/time.ts'
 
 export function main(
   ctx: widget.Context & time.Context

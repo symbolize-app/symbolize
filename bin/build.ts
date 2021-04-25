@@ -1,4 +1,4 @@
-import * as crypto from '@tiny/util/crypto.ts'
+import * as crypto from '@tiny/core/crypto.ts'
 import esbuild from 'esbuild'
 import * as fsPromises from 'fs/promises'
 import module from 'module'

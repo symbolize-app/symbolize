@@ -1,5 +1,5 @@
+import * as hex from '@tiny/core/hex.ts'
 import * as test from '@tiny/test/index.ts'
-import * as hex from '@tiny/util/hex.ts'
 
 export const url = import.meta.url
 

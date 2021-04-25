@@ -1,6 +1,6 @@
+import * as errorModule from '@tiny/core/error.ts'
+import * as time from '@tiny/core/time.ts'
 import * as test from '@tiny/test/index.ts'
-import * as errorModule from '@tiny/util/error.ts'
-import * as time from '@tiny/util/time.ts'
 
 export const url = import.meta.url
 

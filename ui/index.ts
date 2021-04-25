@@ -2,11 +2,11 @@ import * as message from '@fe/core/message.ts'
 import * as button from '@fe/ui/button.ts'
 import * as uiMember from '@fe/ui/member.ts'
 import * as submit from '@tiny/api/submit.ts'
+import type * as errorModule from '@tiny/core/error.ts'
+import * as random from '@tiny/core/random.ts'
+import * as timeBrowser from '@tiny/core/time.browser.ts'
 import * as style from '@tiny/ui/style.ts'
 import * as widget from '@tiny/ui/widget.ts'
-import type * as errorModule from '@tiny/util/error.ts'
-import * as random from '@tiny/util/random.ts'
-import * as timeBrowser from '@tiny/util/time.browser.ts'
 
 console.log(message.hi)
 

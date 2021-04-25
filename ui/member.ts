@@ -1,10 +1,10 @@
 import * as apiPayload from '@fe/api/payload.ts'
-import * as payload from '@tiny/api/payload.ts'
+import type * as payload from '@tiny/api/payload.ts'
 import type * as submit from '@tiny/api/submit.ts'
+import * as errorModule from '@tiny/core/error.ts'
+import * as random from '@tiny/core/random.ts'
+import * as time from '@tiny/core/time.ts'
 import * as widget from '@tiny/ui/widget.ts'
-import * as errorModule from '@tiny/util/error.ts'
-import * as random from '@tiny/util/random.ts'
-import * as time from '@tiny/util/time.ts'
 import ms from 'ms'
 
 const button = widget.html.button
