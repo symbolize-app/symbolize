@@ -45,7 +45,6 @@ export function initContext(
       } else {
         windowBody = JSON.stringify(request.body)
       }
-      // TODO Use URL origin & params
       let url = request.path
       if (request.origin) {
         url = new URL(url, request.origin).toString()

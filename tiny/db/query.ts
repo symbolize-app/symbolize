@@ -1,4 +1,3 @@
-import type * as db from '@tiny/db/index.ts'
 import type * as typeFest from 'type-fest'
 
 const queryNameBase = 36
@@ -14,61 +13,100 @@ export type SupportedType =
   | typeFest.JsonArray
   | typeFest.JsonObject
 
-export type QueryMetadata = {
-  queryName: string
-  queryText: string
+export type BaseDatabase<
+  Id extends unknown
+> = Database<Id> extends typeFest.Opaque<infer Type, Id>
+  ? Type
+  : never
+
+export type Database<Id extends unknown> = typeFest.Opaque<
+  {
+    query<
+      Values extends SupportedType[],
+      Row extends Record<string, SupportedType>,
+      Transform extends unknown
+    >(
+      query: Query<Id, Values, Row, Transform>,
+      ...values: Values
+    ): Promise<Transform>
+  },
+  Id
+>
+
+export type BaseQuery<
+  DatabaseId extends unknown,
+  Values extends SupportedType[],
+  Row extends Record<string, SupportedType>,
+  Transform extends unknown
+> = Query<
+  DatabaseId,
+  Values,
+  Row,
+  Transform
+> extends typeFest.Opaque<infer Type, [DatabaseId, Values]>
+  ? Type
+  : never
+
+export type Query<
+  DatabaseId extends unknown,
+  Values extends SupportedType[],
+  Row extends Record<string, SupportedType>,
+  Transform extends unknown
+> = typeFest.Opaque<
+  {
+    name: string
+    text: string
+    transform: (rows: Row[]) => Transform
+  },
+  [DatabaseId, Values]
+>
+
+export function createDatabase<Id extends unknown>(
+  database: BaseDatabase<Id>
+): Database<Id> {
+  return database as Database<Id>
 }
 
-export function defineMultiTransform<
-  SpecificDatabase extends db.Database,
+export function createQuery<
+  DatabaseId extends unknown,
   Values extends SupportedType[],
   Row extends Record<string, SupportedType>,
   Transform extends unknown
 >(
-  queryText: string,
+  query: BaseQuery<DatabaseId, Values, Row, Transform>
+): Query<DatabaseId, Values, Row, Transform> {
+  return query as Query<DatabaseId, Values, Row, Transform>
+}
+
+export function defineMultiTransform<
+  DatabaseId extends unknown,
+  Values extends SupportedType[],
+  Row extends Record<string, SupportedType>,
+  Transform extends unknown
+>(
+  text: string,
   transform: (rows: Row[]) => Transform
-): ((
-  database: SpecificDatabase,
-  ...values: Values
-) => Promise<Transform>) &
-  QueryMetadata {
-  // TODO Switch from function to value
-  const queryName = `q${globalQueryNameCount.toString(
+): Query<DatabaseId, Values, Row, Transform> {
+  const name = `q${globalQueryNameCount.toString(
     queryNameBase
   )}`
   globalQueryNameCount += 1
-  const query = (async (database, ...values) => {
-    const result = await database.pool.query<Row, Values>(
-      {
-        name: queryName,
-        text: queryText,
-      },
-      values
-    )
-    return transform(result.rows)
-  }) as ((
-    database: SpecificDatabase,
-    ...values: Values
-  ) => Promise<Transform>) &
-    QueryMetadata
-  query.queryName = queryName
-  query.queryText = queryText
-  return query
+  return createQuery({
+    name,
+    text,
+    transform,
+  })
 }
 
 export function defineMulti<
-  SpecificDatabase extends db.Database,
+  DatabaseId extends unknown,
   Values extends SupportedType[],
   Row extends Record<string, SupportedType>
 >(
   queryText: string
-): ((
-  database: SpecificDatabase,
-  ...values: Values
-) => Promise<Row[]>) &
-  QueryMetadata {
+): Query<DatabaseId, Values, Row, Row[]> {
   return defineMultiTransform<
-    SpecificDatabase,
+    DatabaseId,
     Values,
     Row,
     Row[]
@@ -76,18 +114,14 @@ export function defineMulti<
 }
 
 export function defineOptional<
-  SpecificDatabase extends db.Database,
+  DatabaseId extends unknown,
   Values extends SupportedType[],
   Row extends Record<string, SupportedType>
 >(
   queryText: string
-): ((
-  database: SpecificDatabase,
-  ...values: Values
-) => Promise<Row | undefined>) &
-  QueryMetadata {
+): Query<DatabaseId, Values, Row, Row | undefined> {
   return defineMultiTransform<
-    SpecificDatabase,
+    DatabaseId,
     Values,
     Row,
     Row | undefined
@@ -105,48 +139,41 @@ export function defineOptional<
 }
 
 export function defineSingle<
-  SpecificDatabase extends db.Database,
+  DatabaseId extends unknown,
   Values extends SupportedType[],
   Row extends Record<string, SupportedType>
->(
-  queryText: string
-): ((
-  database: SpecificDatabase,
-  ...values: Values
-) => Promise<Row>) &
-  QueryMetadata {
-  return defineMultiTransform<
-    SpecificDatabase,
-    Values,
-    Row,
-    Row
-  >(queryText, (rows) => {
-    if (rows.length === 0) {
-      throw new Error('No rows returned')
-    } else if (rows.length === 1) {
-      return rows[0]
-    } else {
-      throw new Error(
-        `Too many rows returned (${rows.length})`
-      )
+>(queryText: string): Query<DatabaseId, Values, Row, Row> {
+  return defineMultiTransform<DatabaseId, Values, Row, Row>(
+    queryText,
+    (rows) => {
+      if (rows.length === 0) {
+        throw new Error('No rows returned')
+      } else if (rows.length === 1) {
+        return rows[0]
+      } else {
+        throw new Error(
+          `Too many rows returned (${rows.length})`
+        )
+      }
     }
-  })
+  )
 }
 
 export function defineVoid<
-  SpecificDatabase extends db.Database,
+  DatabaseId extends unknown,
   Values extends SupportedType[]
 >(
   queryText: string
-): ((
-  database: SpecificDatabase,
-  ...values: Values
-) => Promise<void>) &
-  QueryMetadata {
+): Query<
+  DatabaseId,
+  Values,
+  Record<string, SupportedType>,
+  void
+> {
   return defineMultiTransform<
-    SpecificDatabase,
+    DatabaseId,
     Values,
-    Record<string, never>,
+    Record<string, SupportedType>,
     void
   >(queryText, (rows) => {
     if (rows.length === 0) {
