@@ -1,4 +1,4 @@
-import type * as time from '@tiny/util/time.ts'
+import type * as time from '@tiny/core/time.ts'
 import * as perfHooks from 'perf_hooks'
 
 export function initContext(): time.Context {

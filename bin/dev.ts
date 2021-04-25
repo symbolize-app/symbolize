@@ -1,6 +1,6 @@
 import * as build from '@fe/bin/build.ts'
 import * as route from '@tiny/api/route.ts'
-import * as concurrency from '@tiny/util/concurrency.ts'
+import * as concurrency from '@tiny/core/concurrency.ts'
 import chalk from 'chalk'
 import childProcess from 'child_process'
 import chokidar from 'chokidar'

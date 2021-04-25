@@ -10,7 +10,7 @@
     "loader.js",
     "suppress.cjs",
     "tiny/**/*.ts",
-    "tiny/util/prettier-plugin-cockroach.cjs",
+    "tiny/core/prettier-plugin-cockroach.cjs",
     "ui/**/*.ts"
   ],
   "compilerOptions": {

@@ -1,4 +1,4 @@
-import * as hex from '@tiny/util/hex.ts'
+import * as hex from '@tiny/core/hex.ts'
 
 export type Context = {
   randomNumber(): number
