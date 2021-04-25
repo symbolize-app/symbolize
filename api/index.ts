@@ -1,6 +1,6 @@
-import * as apiQuery from '@fe/api/query.ts'
-import * as db from '@fe/db/index.ts'
-import * as button from '@fe/ui/button.ts'
+import * as appRoute from '@fe/api/route.ts'
+import * as appQuery from '@fe/db/query/index.ts'
+import * as appWidgetButton from '@fe/ui/widget/button.ts'
 import * as route from '@tiny/api/route.ts'
 import type * as errorModule from '@tiny/core/error.ts'
 import * as random from '@tiny/core/random.ts'
@@ -31,7 +31,7 @@ const ssr = route.define(['GET'], /^\/ssr$/, () => {
     ...widget.initContext(document),
   }
   const body = widget.toHtmlWidget(ctx, document.body)
-  body.content = [button.custom(ctx, {})]
+  body.content = [appWidgetButton.custom(ctx, {})]
   return {
     status: 200,
     headers: {
@@ -67,18 +67,18 @@ const js = route.define(
 
 async function main(): Promise<void> {
   const ctx: errorModule.Context &
-    db.ReadContext &
-    db.WriteContext = {
+    appQuery.ReadContext &
+    appQuery.WriteContext = {
     ...random.initContext(),
     ...timeNode.initContext(),
-    ...db.initContext(),
+    ...appQuery.initContext(),
   }
   const httpServer = http.createServer(
     route.handle(ctx, [
       index,
       ssr,
       js,
-      ...apiQuery.routes,
+      ...appRoute.routes,
       notFound,
     ])
   )

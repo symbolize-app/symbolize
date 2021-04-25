@@ -1,15 +1,15 @@
-import type * as db from '@fe/db/index.ts'
-import memberCreate from '@fe/db/query/memberCreate.sql'
-import memberFind from '@fe/db/query/memberFind.sql'
+import type * as appQuery from '@fe/db/query/index.ts'
+import appQueryMemberCreate from '@fe/db/query/memberCreate.sql'
+import appQueryMemberFind from '@fe/db/query/memberFind.sql'
 import * as query from '@tiny/db/query.ts'
 
 export const find = query.defineOptional<
-  db.Read,
+  appQuery.Read,
   [id: Buffer],
   { email: string }
->(memberFind)
+>(appQueryMemberFind)
 
 export const create = query.defineVoid<
-  db.Write,
+  appQuery.Write,
   [id: Buffer, email: string, handle: string]
->(memberCreate)
+>(appQueryMemberCreate)

@@ -1,6 +1,6 @@
-import * as message from '@fe/core/message.ts'
-import * as button from '@fe/ui/button.ts'
-import * as uiMember from '@fe/ui/member.ts'
+import * as appMessage from '@fe/core/message.ts'
+import * as appWidgetButton from '@fe/ui/widget/button.ts'
+import * as appWidgetMember from '@fe/ui/widget/member.ts'
 import type * as errorModule from '@tiny/core/error.ts'
 import * as random from '@tiny/core/random.ts'
 import * as timeBrowser from '@tiny/core/time.browser.ts'
@@ -8,7 +8,7 @@ import * as style from '@tiny/ui/style.ts'
 import * as submit from '@tiny/ui/submit.ts'
 import * as widget from '@tiny/ui/widget.ts'
 
-console.log(message.hi)
+console.log(appMessage.hi)
 
 const green = style.build([
   {
@@ -98,7 +98,7 @@ async function main(): Promise<void> {
   const rootDiv = div(ctx, {
     content: [
       'HI ',
-      button.custom(ctx, {
+      appWidgetButton.custom(ctx, {
         listen: {
           click: onClick,
         },
@@ -116,7 +116,7 @@ async function main(): Promise<void> {
           }),
         ],
       }),
-      uiMember.custom(ctx, {}),
+      appWidgetMember.custom(ctx, {}),
     ],
   })
 

@@ -1,11 +1,11 @@
-import * as uiTest from '@fe/ui/index.test.browser.ts'
+import * as appUiTest from '@fe/ui/index.test.browser.ts'
 import type * as time from '@tiny/core/time.ts'
 import type * as widget from '@tiny/ui/widget.ts'
 
 export function main(
   ctx: widget.Context & time.Context
 ): void {
-  uiTest.run(ctx).catch(console.error)
+  appUiTest.run(ctx).catch(console.error)
 
   const socket = new WebSocket(
     `${window.location.origin.replace(

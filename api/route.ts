@@ -1,7 +1,7 @@
-import * as message from '@fe/core/message.ts'
-import * as apiPayload from '@fe/core/payload.ts'
-import type * as db from '@fe/db/index.ts'
-import * as memberQuery from '@fe/db/query/member.ts'
+import * as appMessage from '@fe/core/message.ts'
+import * as appPayload from '@fe/core/payload.ts'
+import type * as appQuery from '@fe/db/query/index.ts'
+import * as appQueryMember from '@fe/db/query/member.ts'
 import * as route from '@tiny/api/route.ts'
 import * as crypto from '@tiny/core/crypto.node.ts'
 import * as errorModule from '@tiny/core/error.ts'
@@ -12,11 +12,11 @@ import ms from 'ms'
 import type * as typeFest from 'type-fest'
 
 const apiMessage = route.define<
-  errorModule.Context & db.ReadContext
+  errorModule.Context & appQuery.ReadContext
 >(['GET'], /^\/api\/message$/, async (ctx) => {
   const row = await retryQuery(ctx, 'member find', () =>
     ctx.databaseApiRead.query(
-      memberQuery.find,
+      appQueryMember.find,
       Buffer.from('ABCD', 'hex')
     )
   )
@@ -25,18 +25,18 @@ const apiMessage = route.define<
     headers: {
       'content-type': 'text/plain',
     },
-    body: `${message.hi} ${JSON.stringify(row)}`,
+    body: `${appMessage.hi} ${JSON.stringify(row)}`,
   }
 })
 
 export const apiMemberCreate = route.define<
-  errorModule.Context & db.WriteContext
+  errorModule.Context & appQuery.WriteContext
 >(
   ['POST'],
   /^\/api\/member\/create$/,
   async (ctx, request) => {
     const requestObject = await checkRequestJson(
-      apiPayload.checkMemberCreateRequest,
+      appPayload.checkMemberCreateRequest,
       request
     )
     const id = crypto.hash(
@@ -45,22 +45,22 @@ export const apiMemberCreate = route.define<
     await retryConflictQuery(
       ctx,
       'member create',
-      apiPayload.MemberCreateConflictError,
-      apiPayload.checkMemberCreateConflictResponse,
+      appPayload.MemberCreateConflictError,
+      appPayload.checkMemberCreateConflictResponse,
       {
         ['member_email_key']: 'email',
         ['member_handle_key']: 'handle',
       },
       () =>
         ctx.databaseApiWrite.query(
-          memberQuery.create,
+          appQueryMember.create,
           id,
           requestObject.email,
           requestObject.handle
         )
     )
     return checkOkResponse(
-      apiPayload.checkMemberCreateOkResponse,
+      appPayload.checkMemberCreateOkResponse,
       {
         id: id.toString('hex'),
       }
