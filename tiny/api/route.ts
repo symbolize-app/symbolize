@@ -1,3 +1,4 @@
+import type * as endpoint from '@tiny/core/endpoint.ts'
 import type * as http from 'http'
 import * as stream from 'stream'
 import * as streamPromises from 'stream/promises'
@@ -68,6 +69,17 @@ export function define<Context = unknown>(
   handler: Handler<Context>
 ): Route<Context> {
   return { methods, match, handler }
+}
+
+export function defineEndpoint<Context = unknown>(
+  endpoint: endpoint.BaseEndpoint<string>,
+  handler: Handler<Context>
+): Route<Context> {
+  return {
+    methods: [endpoint.method],
+    match: endpoint.path,
+    handler,
+  }
 }
 
 export function handle<Context>(
