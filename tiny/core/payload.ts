@@ -28,7 +28,9 @@ export class PayloadError extends Error {
 }
 
 export function checkObject<
-  Value extends { [Key in string]: typeFest.JsonValue }
+  Value extends {
+    [Key in string]: typeFest.JsonValue
+  } = Record<string, never>
 >(
   config: { [Key in keyof Value]: Validator<Value[Key]> }
 ): Validator<Value> {

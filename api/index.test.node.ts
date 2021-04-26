@@ -4,7 +4,7 @@ import * as widget from '@tiny/ui/widget.ts'
 import jsdom from 'jsdom'
 
 export const all: test.TestCollection = () => [
-  import('@fe/api/route.test.ts'),
+  import('@fe/api/route/member.test.ts'),
 ]
 
 export async function run(

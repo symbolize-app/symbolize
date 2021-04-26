@@ -1,11 +1,9 @@
-import * as appPayload from '@fe/core/payload.ts'
-import * as errorModule from '@tiny/core/error.ts'
-import type * as payload from '@tiny/core/payload.ts'
+import * as appEndpoint from '@fe/core/endpoint.ts'
+import * as appSubmit from '@fe/ui/submit.ts'
+import type * as errorModule from '@tiny/core/error.ts'
 import * as random from '@tiny/core/random.ts'
-import * as time from '@tiny/core/time.ts'
 import type * as submit from '@tiny/ui/submit.ts'
 import * as widget from '@tiny/ui/widget.ts'
-import ms from 'ms'
 
 const button = widget.html.button
 const div = widget.html.div
@@ -50,14 +48,10 @@ export const custom = widget.define<
   async function submit(event: Event) {
     event.preventDefault()
     try {
-      const responseObject = await retryConflictPostSubmit(
+      const responseObject = await appSubmit.retryConflictPostSubmit(
         ctx,
         'create member',
-        appPayload.checkMemberCreateRequest,
-        appPayload.checkMemberCreateOkResponse,
-        appPayload.MemberCreateConflictError,
-        appPayload.checkMemberCreateConflictResponse,
-        '/api/member/create',
+        appEndpoint.memberCreate,
         {
           requestId: requestIdInput.value,
           email: emailInput.value,
@@ -70,7 +64,7 @@ export const custom = widget.define<
     } catch (error: unknown) {
       if (
         error instanceof
-        appPayload.MemberCreateConflictError
+        appEndpoint.memberCreate.conflictError
       ) {
         status.content = [
           `Unique constraint error ${error.field}`,
@@ -81,124 +75,3 @@ export const custom = widget.define<
     }
   }
 })
-function postSubmit<Request>(
-  ctx: errorModule.Context & submit.Context,
-  checkRequest: payload.Validator<Request>,
-  path: string,
-  requestObject: Request
-): () => Promise<submit.Response> {
-  const method = 'POST'
-  const headers = { 'content-type': 'application/json' }
-  const body = checkRequest(requestObject)
-  return () =>
-    ctx.submit({
-      path,
-      method,
-      headers,
-      body,
-    })
-}
-
-async function retrySubmit<OkResponse>(
-  ctx: errorModule.Context & submit.Context,
-  description: string,
-  checkOkResponse: payload.Validator<OkResponse>,
-  submit: () => Promise<submit.Response>,
-  onError?: (error: unknown) => void
-): Promise<OkResponse> {
-  return await errorModule.retry(
-    ctx,
-    async () => {
-      const response = await submit()
-      if (response.status === 200) {
-        return checkOkResponse(await response.json())
-      } else {
-        throw new Error(
-          `Unexpected status ${response.status} response during ${description}`
-        )
-      }
-    },
-    {
-      maxAttempts: 15,
-      minDelayMs: time.interval({
-        milliseconds: 10,
-      }),
-      windowMs: time.interval({ seconds: 30 }),
-      onError(error, attempt, nextDelayMs) {
-        if (onError) {
-          onError(error)
-        }
-        console.error(
-          `Retrying ${description} submit (attempt ${attempt}, delay ${ms(
-            nextDelayMs
-          )})`,
-          error
-        )
-      },
-    }
-  )
-}
-
-function retryConflictSubmit<
-  OkResponse,
-  ConflictResponse extends { conflict: string }
->(
-  ctx: errorModule.Context & submit.Context,
-  description: string,
-  checkOkResponse: payload.Validator<OkResponse>,
-  conflictError: new (
-    field: ConflictResponse['conflict']
-  ) => payload.ConflictError<ConflictResponse>,
-  checkConflictResponse: payload.Validator<ConflictResponse>,
-  submit: () => Promise<submit.Response>
-): Promise<OkResponse> {
-  return retrySubmit(
-    ctx,
-    description,
-    checkOkResponse,
-    async () => {
-      const response = await submit()
-      if (response.status === 409) {
-        const conflictResponseObject = checkConflictResponse(
-          await response.json()
-        )
-        throw new conflictError(
-          conflictResponseObject.conflict
-        )
-      } else {
-        return response
-      }
-    },
-    (error: unknown) => {
-      if (error instanceof conflictError) {
-        throw error
-      }
-    }
-  )
-}
-
-function retryConflictPostSubmit<
-  Request,
-  OkResponse,
-  ConflictResponse extends { conflict: string }
->(
-  ctx: errorModule.Context & submit.Context,
-  description: string,
-  checkRequest: payload.Validator<Request>,
-  checkOkResponse: payload.Validator<OkResponse>,
-  conflictError: new (
-    field: ConflictResponse['conflict']
-  ) => payload.ConflictError<ConflictResponse>,
-  checkConflictResponse: payload.Validator<ConflictResponse>,
-  path: string,
-  requestObject: Request
-): Promise<OkResponse> {
-  return retryConflictSubmit(
-    ctx,
-    description,
-    checkOkResponse,
-    conflictError,
-    checkConflictResponse,
-    postSubmit(ctx, checkRequest, path, requestObject)
-  )
-}

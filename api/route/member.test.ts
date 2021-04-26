@@ -1,4 +1,4 @@
-import * as appRoute from '@fe/api/route.ts'
+import * as appRouteMember from '@fe/api/route/member.ts'
 import type * as appQuery from '@fe/db/query/index.ts'
 import * as appQueryMember from '@fe/db/query/member.ts'
 import * as routeTest from '@tiny/api/route.test.ts'
@@ -29,7 +29,7 @@ export const tests = {
     const expectedId =
       'd2f17ea3a0e36a7c79442855ca7d0a71a4eb616e10704121b4d169b6486f3bdc'
     const response = test.sync(
-      appRoute.apiMemberCreate.handler(
+      appRouteMember.create.handler(
         ctx,
         routeTest.mockReqeuest({
           json: () =>
@@ -82,7 +82,7 @@ export const tests = {
     const expectedId =
       'd2f17ea3a0e36a7c79442855ca7d0a71a4eb616e10704121b4d169b6486f3bdc'
     const response = test.sync(
-      appRoute.apiMemberCreate.handler(
+      appRouteMember.create.handler(
         ctx,
         routeTest.mockReqeuest({
           json: () =>
@@ -128,7 +128,7 @@ export const tests = {
       }),
     }
     const response = test.sync(
-      appRoute.apiMemberCreate.handler(
+      appRouteMember.create.handler(
         ctx,
         routeTest.mockReqeuest({
           json: () =>
