@@ -1,6 +1,7 @@
 import * as appMessage from '@fe/core/message.ts'
 import * as appWidgetButton from '@fe/ui/widget/button.ts'
 import * as appWidgetMember from '@fe/ui/widget/member.ts'
+import * as appWidgetTopic from '@fe/ui/widget/topic.ts'
 import type * as errorModule from '@tiny/core/error.ts'
 import * as random from '@tiny/core/random.ts'
 import * as timeBrowser from '@tiny/core/time.browser.ts'
@@ -116,7 +117,8 @@ async function main(): Promise<void> {
           }),
         ],
       }),
-      appWidgetMember.custom(ctx, {}),
+      appWidgetMember.create(ctx, {}),
+      appWidgetTopic.list(ctx, {}),
     ],
   })
 

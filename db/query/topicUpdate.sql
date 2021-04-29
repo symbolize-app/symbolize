@@ -44,7 +44,8 @@ WITH
     AS (
       INSERT
       INTO
-        topic (topic_id, updated, title, slug, content)
+        topic_history
+          (topic_id, updated, title, slug, content)
       SELECT
         topic_update.id,
         topic_update.updated_old,
@@ -54,7 +55,9 @@ WITH
       FROM
         topic_update
       WHERE
-        topic_update.update > topic_update.update_old
+        topic_update.updated > topic_update.updated_old
+      RETURNING
+        topic_history.updated AS updated
     ),
   topic_slug_insert
     AS (
@@ -67,6 +70,8 @@ WITH
         topic_update
       WHERE
         topic_update.slug != topic_update.slug_old
+      RETURNING
+        topic_slug.slug AS slug
     )
 SELECT
   topic_update.updated AS updated

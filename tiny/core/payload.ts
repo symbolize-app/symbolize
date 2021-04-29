@@ -11,14 +11,14 @@ export type Validator<Value extends typeFest.JsonValue> = (
   path?: Path
 ) => Value
 
-export type Path = undefined | (() => string[])
+export type Path = undefined | (() => (string | number)[])
 
 export class PayloadError extends Error {
   constructor(message: string, path: Path) {
     super(
       `${message} at (root)${(path ? path() : [])
         .map((part) =>
-          /^[A-Za-z_]\S*$/.exec(part)
+          /^[A-Za-z_]\S*$/.exec(part.toString())
             ? `.${part}`
             : `[${JSON.stringify(part)}]`
         )
@@ -71,6 +71,30 @@ export function checkObject<
             buildPath(key, path)
           )
         }
+      }
+      return result
+    }
+  }
+}
+
+export function checkArray<
+  Value extends typeFest.JsonValue = never[]
+>(config: Validator<Value>): Validator<Value[]> {
+  return (input, path) => {
+    if (
+      input === null ||
+      typeof input !== 'object' ||
+      !Array.isArray(input)
+    ) {
+      throw new PayloadError(
+        `Invalid array (wrong type ${getTypeName(input)})`,
+        path
+      )
+    } else {
+      const result = [] as Value[]
+      for (let i = 0; i < input.length; i++) {
+        const item = input[i]
+        result[i] = config(item, buildPath(i, path))
       }
       return result
     }
@@ -233,7 +257,7 @@ export class ConflictError<
 }
 
 export function buildPath(
-  part: string,
+  part: string | number,
   parentPath: Path
 ): Path {
   return () => [...(parentPath ? parentPath() : []), part]

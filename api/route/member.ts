@@ -1,5 +1,5 @@
 import * as appRoute from '@fe/api/route/index.ts'
-import * as appEndpoint from '@fe/core/endpoint.ts'
+import * as appEndpointMember from '@fe/core/endpoint/member.ts'
 import type * as appQuery from '@fe/db/query/index.ts'
 import * as appQueryMember from '@fe/db/query/member.ts'
 import * as route from '@tiny/api/route.ts'
@@ -8,18 +8,19 @@ import type * as errorModule from '@tiny/core/error.ts'
 
 export const create = route.defineEndpoint<
   errorModule.Context & appQuery.WriteContext
->(appEndpoint.memberCreate, async (ctx, request) => {
-  const requestObject = await appRoute.checkRequestJson(
-    appEndpoint.memberCreate,
+>(appEndpointMember.create, async (ctx, request) => {
+  const requestData = await appRoute.checkRequestJson(
+    appEndpointMember.create,
     request
   )
   const id = crypto.hash(
-    Buffer.from(requestObject.requestId, 'hex')
+    Buffer.from(requestData.requestId, 'hex')
   )
+  const { email, handle } = requestData
   await appRoute.retryConflictQuery(
     ctx,
     'member create',
-    appEndpoint.memberCreate,
+    appEndpointMember.create,
     {
       ['member_email_key']: 'email',
       ['member_handle_key']: 'handle',
@@ -28,12 +29,12 @@ export const create = route.defineEndpoint<
       ctx.databaseApiWrite.query(
         appQueryMember.create,
         id,
-        requestObject.email,
-        requestObject.handle
+        email,
+        handle
       )
   )
   return appRoute.checkOkResponse(
-    appEndpoint.memberCreate,
+    appEndpointMember.create,
     {
       id: id.toString('hex'),
     }
