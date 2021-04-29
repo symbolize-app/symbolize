@@ -278,7 +278,7 @@ const update = widget.define<
     } catch (error: unknown) {
       if (
         error instanceof
-        appEndpointTopic.create.conflictError
+        appEndpointTopic.update.conflictError
       ) {
         status.content = [
           `Unique constraint error ${error.field}`,

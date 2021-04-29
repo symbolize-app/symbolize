@@ -70,7 +70,7 @@ export const update = route.defineEndpoint<
     appEndpointTopic.update,
     request
   )
-  const id = crypto.hash(Buffer.from(requestData.id, 'hex'))
+  const id = Buffer.from(requestData.id, 'hex')
   const updatedOld = new Date(requestData.updatedOld)
   const { title, slug, content } = requestData
   const result = await appRoute.retryConflictQuery(
