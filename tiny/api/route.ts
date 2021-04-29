@@ -20,7 +20,7 @@ export type Request = {
 export type Response = typeFest.Promisable<
   | {
       status: number
-      headers: Record<string, string>
+      headers?: Record<string, string>
       body?: typeFest.Promisable<
         | undefined
         | string
@@ -36,7 +36,7 @@ export type Response = typeFest.Promisable<
 export class ResponseError extends Error {
   response: {
     status: number
-    headers: Record<string, string>
+    headers?: Record<string, string>
     body?:
       | undefined
       | string
@@ -173,7 +173,7 @@ async function handleRequest<Context>(
         headResponse.headers
       )
       const body = await Promise.resolve(headResponse.body)
-      if (typeof body === undefined) {
+      if (body === undefined) {
         // No body
       } else if (typeof body === 'string') {
         res.write(body)

@@ -5,6 +5,23 @@ import * as time from '@tiny/core/time.ts'
 import type * as submit from '@tiny/ui/submit.ts'
 import ms from 'ms'
 
+export function retryGetSubmit<
+  Request extends Record<string, string>,
+  OkResponse
+>(
+  ctx: errorModule.Context & submit.Context,
+  description: string,
+  endpoint: endpoint.GetEndpoint<Request, OkResponse>,
+  requestData: Request
+): Promise<OkResponse> {
+  return retrySubmit(
+    ctx,
+    description,
+    endpoint,
+    submitParams(ctx, endpoint, requestData)
+  )
+}
+
 export function retryConflictPostSubmit<
   Request,
   OkResponse,
@@ -17,25 +34,43 @@ export function retryConflictPostSubmit<
     OkResponse,
     ConflictResponse
   >,
-  requestObject: Request
+  requestData: Request
 ): Promise<OkResponse> {
   return retryConflictSubmit(
     ctx,
     description,
     endpoint,
-    submitJson(ctx, endpoint, requestObject)
+    submitJson(ctx, endpoint, requestData)
   )
+}
+
+function submitParams<
+  Request extends Record<string, string>
+>(
+  ctx: errorModule.Context & submit.Context,
+  endpoint: endpoint.BaseEndpoint<'GET'> & {
+    checkRequest: payload.Validator<Request>
+  },
+  requestData: Request
+): () => Promise<submit.Response> {
+  const params = endpoint.checkRequest(requestData)
+  return () =>
+    ctx.submit({
+      path: endpoint.path,
+      method: endpoint.method,
+      params,
+    })
 }
 
 function submitJson<Request>(
   ctx: errorModule.Context & submit.Context,
-  endpoint: endpoint.BaseEndpoint<string> & {
+  endpoint: endpoint.BaseEndpoint<'POST'> & {
     checkRequest: payload.Validator<Request>
   },
-  requestObject: Request
+  requestData: Request
 ): () => Promise<submit.Response> {
   const headers = { 'content-type': 'application/json' }
-  const body = endpoint.checkRequest(requestObject)
+  const body = endpoint.checkRequest(requestData)
   return () =>
     ctx.submit({
       path: endpoint.path,
@@ -111,11 +146,11 @@ function retryConflictSubmit<
     async () => {
       const response = await submit()
       if (response.status === 409) {
-        const conflictResponseObject = endpoint.checkConflictResponse(
+        const conflictResponseData = endpoint.checkConflictResponse(
           await response.json()
         )
         throw new endpoint.conflictError(
-          conflictResponseObject.conflict
+          conflictResponseData.conflict
         )
       } else {
         return response
