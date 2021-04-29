@@ -12,32 +12,27 @@ export const tests = {
   },
   ['email, ok']: (): void => {
     const check = appPayload.checkEmail
-    const input =
-      'a@b.c'
+    const input = 'a@b.c'
     test.assertDeepEquals(check(input), input)
   },
   ['handle, ok']: (): void => {
     const check = appPayload.checkHandle
-    const input =
-      'xyz'
+    const input = 'xyz'
     test.assertDeepEquals(check(input), input)
   },
   ['title, ok']: (): void => {
     const check = appPayload.checkTitle
-    const input =
-      'the'
+    const input = 'the'
     test.assertDeepEquals(check(input), input)
   },
   ['slug, ok']: (): void => {
     const check = appPayload.checkSlug
-    const input =
-      'oth'
+    const input = 'oth'
     test.assertDeepEquals(check(input), input)
   },
   ['content, ok']: (): void => {
     const check = appPayload.checkContent
-    const input =
-      'yzx'
+    const input = 'yzx'
     test.assertDeepEquals(check(input), input)
   },
 }

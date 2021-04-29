@@ -31,7 +31,7 @@ export const tests = {
         submit,
       }
       ctx.document.body.content = [
-        appWidgetMember.custom(ctx, {}),
+        appWidgetMember.create(ctx, {}),
       ]
       const form = ctx.document.body.querySelector(
         ':scope > form'
@@ -101,7 +101,7 @@ export const tests = {
         submit,
       }
       ctx.document.body.content = [
-        appWidgetMember.custom(ctx, {}),
+        appWidgetMember.create(ctx, {}),
       ]
       const form = ctx.document.body.querySelector(
         ':scope > form'

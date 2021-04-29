@@ -6,10 +6,26 @@ import * as query from '@tiny/db/query.ts'
 import ms from 'ms'
 import type * as typeFest from 'type-fest'
 
+export function checkRequestParams<
+  Request extends Record<string, string>
+>(
+  endpoint: {
+    method: 'GET'
+    checkRequest: payload.Validator<Request>
+  },
+  request: route.Request
+): Request {
+  const input = request.params
+  return checkRequestBase(endpoint, input)
+}
+
 export async function checkRequestJson<
   Request extends typeFest.JsonObject
 >(
-  endpoint: { checkRequest: payload.Validator<Request> },
+  endpoint: {
+    method: 'POST'
+    checkRequest: payload.Validator<Request>
+  },
   request: route.Request
 ): Promise<Request> {
   if (
@@ -179,13 +195,13 @@ export function checkOkResponse<OkResponse>(
   endpoint: {
     checkOkResponse: payload.Validator<OkResponse>
   },
-  responseObject: OkResponse
+  okResponseData: OkResponse
 ): route.Response {
   return {
     status: 200,
     headers: {
       'content-type': 'application/json',
     },
-    body: endpoint.checkOkResponse(responseObject),
+    body: endpoint.checkOkResponse(okResponseData),
   }
 }

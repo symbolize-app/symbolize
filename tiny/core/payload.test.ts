@@ -57,6 +57,41 @@ export const tests = {
       'Invalid object (missing key "z") at (root).x["space y"]'
     )
   },
+  ['checkArray, ok']: (): void => {
+    const check = payload.checkArray(
+      payload.checkObject({})
+    )
+    const input = [{}]
+    test.assertDeepEquals(check(input), input)
+  },
+  ['checkArray, wrong type']: (): void => {
+    const check = payload.checkArray(
+      payload.checkObject({})
+    )
+    const error = test.assertThrows(() => check(null))
+    test.assertInstanceOf(error, payload.PayloadError)
+    test.assertEquals(
+      error.message,
+      'Invalid array (wrong type null) at (root)'
+    )
+  },
+  ['checkArray, nested missing key']: (): void => {
+    const check = payload.checkArray(
+      payload.checkObject({
+        ['space y']: payload.checkObject({
+          z: payload.checkObject({}),
+        }),
+      })
+    )
+    const error = test.assertThrows(() =>
+      check([{ ['space y']: {} }])
+    )
+    test.assertInstanceOf(error, payload.PayloadError)
+    test.assertEquals(
+      error.message,
+      'Invalid object (missing key "z") at (root)[0]["space y"]'
+    )
+  },
   ['checkString, ok']: (): void => {
     const check = payload.checkString({
       min: 2,

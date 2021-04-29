@@ -17,32 +17,36 @@ function defineBaseEndpoint<Method extends string>(
 }
 
 export type Request<
-  Endpoint
-> = Endpoint extends GetEndpoint<
-  infer Request,
-  typeFest.JsonObject
->
-  ? Request
-  : Endpoint extends PostEndpoint<
-      infer Request,
-      typeFest.JsonObject
-    >
+  Endpoint extends BaseEndpoint<string>
+> = Endpoint extends {
+  checkRequest: payload.Validator<infer Request>
+}
   ? Request
   : never
 
 export type OkResponse<
-  Endpoint
-> = Endpoint extends GetEndpoint<
-  Record<string, string>,
-  infer OkResponse
->
-  ? OkResponse
-  : Endpoint extends PostEndpoint<
-      typeFest.JsonObject,
-      infer OkResponse
-    >
+  Endpoint extends BaseEndpoint<string>
+> = Endpoint extends {
+  checkOkResponse: payload.Validator<infer OkResponse>
+}
   ? OkResponse
   : never
+
+export type ConflictResponse<
+  Endpoint extends BaseEndpoint<string>
+> = Endpoint extends {
+  checkConflictResponse: payload.Validator<
+    infer ConflictResponse
+  >
+}
+  ? ConflictResponse extends { conflict: string }
+    ? ConflictResponse
+    : never
+  : never
+
+export type ConflictError<
+  Endpoint extends BaseEndpoint<string>
+> = payload.ConflictError<ConflictResponse<Endpoint>>
 
 export type GetEndpoint<
   Request extends Record<string, string>,

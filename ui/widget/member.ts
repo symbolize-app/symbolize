@@ -1,4 +1,4 @@
-import * as appEndpoint from '@fe/core/endpoint.ts'
+import * as appEndpointMember from '@fe/core/endpoint/member.ts'
 import * as appSubmit from '@fe/ui/submit.ts'
 import type * as errorModule from '@tiny/core/error.ts'
 import * as random from '@tiny/core/random.ts'
@@ -10,7 +10,7 @@ const div = widget.html.div
 const form = widget.html.form
 const input = widget.html.input
 
-export const custom = widget.define<
+export const create = widget.define<
   {
     body: widget.Widget
   },
@@ -29,13 +29,14 @@ export const custom = widget.define<
     name: 'handle',
     value: 'aaa',
   })
-  const status = div(ctx, {})
+  const statusDiv = div(ctx, {})
   const body = form(ctx, {
     content: [
+      requestIdInput,
       emailInput,
       handleInput,
       button(ctx, { content: ['Submit'] }),
-      status,
+      statusDiv,
     ],
     listen: {
       submit,
@@ -48,25 +49,25 @@ export const custom = widget.define<
   async function submit(event: Event) {
     event.preventDefault()
     try {
-      const responseObject = await appSubmit.retryConflictPostSubmit(
+      const okResponseData = await appSubmit.retryConflictPostSubmit(
         ctx,
         'create member',
-        appEndpoint.memberCreate,
+        appEndpointMember.create,
         {
           requestId: requestIdInput.value,
           email: emailInput.value,
           handle: handleInput.value,
         }
       )
-      status.content = [
-        `Member created ${JSON.stringify(responseObject)}`,
+      statusDiv.content = [
+        `Member created ${JSON.stringify(okResponseData)}`,
       ]
     } catch (error: unknown) {
       if (
         error instanceof
-        appEndpoint.memberCreate.conflictError
+        appEndpointMember.create.conflictError
       ) {
-        status.content = [
+        statusDiv.content = [
           `Unique constraint error ${error.field}`,
         ]
         return

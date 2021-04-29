@@ -1,5 +1,6 @@
 import * as appRouteMember from '@fe/api/route/member.ts'
 import * as appRouteMessage from '@fe/api/route/message.ts'
+import * as appRouteTopic from '@fe/api/route/topic.ts'
 import * as appQuery from '@fe/db/query/index.ts'
 import * as appWidgetButton from '@fe/ui/widget/button.ts'
 import * as route from '@tiny/api/route.ts'
@@ -81,6 +82,7 @@ async function main(): Promise<void> {
       js,
       ...appRouteMember.routes,
       ...appRouteMessage.routes,
+      ...appRouteTopic.routes,
       notFound,
     ])
   )
