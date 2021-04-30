@@ -77,6 +77,16 @@ jobs:
         if: github.ref == 'refs/heads/main'
         run: pnpm prune --prod
 
+      - name: Migrate
+        if: github.ref == 'refs/heads/main'
+        run: |
+          mkdir -p .crdb/certs
+          echo ${DATABASE_CA_CRT} > .crdb/certs/cc-ca.crt
+          direnv exec . pnpm db migrate
+        env:
+          DATABASE_CA_CRT: ${{ secrets.DATABASE_CA_CRT }}
+          DATABASE_URL_ADMIN: ${{ secrets.DATABASE_URL_ADMIN }}
+
       - name: Deploy
         if: github.ref == 'refs/heads/main'
         run: direnv exec . flyctl deploy --build-arg NODE_OPTIONS="${NODE_OPTIONS_PRODUCTION}"
