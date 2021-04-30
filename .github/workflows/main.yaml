@@ -81,7 +81,8 @@ jobs:
         if: github.ref == 'refs/heads/main'
         run: |
           mkdir -p .crdb/certs
-          echo ${DATABASE_CA_CRT} > .crdb/certs/cc-ca.crt
+          echo "${DATABASE_CA_CRT}" > .crdb/certs/cc-ca.crt
+          cat .crdb/certs/cc-ca.crt
           direnv exec . pnpm db migrate
         env:
           DATABASE_CA_CRT: ${{ secrets.DATABASE_CA_CRT }}
