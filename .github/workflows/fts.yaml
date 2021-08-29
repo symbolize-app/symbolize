@@ -1,0 +1,37 @@
+name: FTS
+
+on:
+  push:
+    paths:
+      - *
+      - .github/**
+      - db/**
+      - fts/**
+
+jobs:
+  main:
+    name: Main
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Fly
+        if: github.ref == 'refs/heads/main'
+        run: |
+          curl -fsSL https://fly.io/install.sh | sudo FLYCTL_INSTALL=/usr/local sh
+
+      - name: Set up Rust
+        run: rustup show
+      
+      - name: Check rustfmt
+        run: cargo fmt --all -- --check
+
+      - name: Check rustc
+        if: github.ref != 'refs/heads/main'
+        run: cargo check
+
+      - name: Build
+        if: github.ref == 'refs/heads/main'
+        run: cargo build --release

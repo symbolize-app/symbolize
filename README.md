@@ -5,6 +5,10 @@
 1. Install [pnpm](https://pnpm.js.org/en/installation)
 1. Run `pnpm install`
 
+## Rustup
+
+1. Install [rustup](https://rustup.rs), pick defaults from `rust-toolchain.toml`
+
 ## Visual Studio Code
 
 1. Install [Visual Studio Code](https://code.visualstudio.com/docs/setup/setup-overview)
@@ -19,6 +23,7 @@
 1. Run `cockroach cert create-client root --certs-dir=.crdb/certs --ca-key=.crdb/ca/ca.key`
 1. Run `cockroach cert create-client api_read --certs-dir=.crdb/certs --ca-key=.crdb/ca/ca.key`
 1. Run `cockroach cert create-client api_write --certs-dir=.crdb/certs --ca-key=.crdb/ca/ca.key`
+
 
 # Development
 
