@@ -4,5 +4,10 @@ version = "0.1.0"
 edition = "2018"
 
 [dependencies]
+cargo-watch = "8.1.1"
 hyper = { version = "0.14", features = ["full"] }
+tantivy = "0.16.1"
+tantivy-cli = "0.15.0"
+tempfile = "3.2.0"
 tokio = { version = "1.5", features = ["full"] }
+url = "1.7.2"
