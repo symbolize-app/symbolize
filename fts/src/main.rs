@@ -8,41 +8,46 @@ use std::convert::Infallible;
 use std::error::Error;
 use std::net::SocketAddr;
 use tantivy::collector::TopDocs;
+use tantivy::directory::MmapDirectory;
 use tantivy::doc;
 use tantivy::query::QueryParser;
 use tantivy::schema::*;
 use tantivy::Index;
 use tantivy::IndexReader;
 use tantivy::ReloadPolicy;
-use tempfile::TempDir;
 
 use std::collections::HashMap;
+use std::fs::create_dir_all;
+use std::path::Path;
 use url::form_urlencoded;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
   let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
-  let index_path = TempDir::new()?;
+  let index_path = Path::new("./.tantivy/topic");
+  create_dir_all(index_path)?;
+  let index_dir = MmapDirectory::open(index_path)?;
   let mut schema_builder = Schema::builder();
-  schema_builder.add_text_field("title", TEXT | STORED);
-  schema_builder.add_text_field("body", TEXT);
+  let title =
+    schema_builder.add_text_field("title", TEXT | STORED);
+  let body = schema_builder.add_text_field("body", TEXT);
   let schema = schema_builder.build();
   let index =
-    Index::create_in_dir(&index_path, schema.clone())?;
-  let mut index_writer = index.writer(50_000_000)?;
-  let title = schema.get_field("title").unwrap();
-  let body = schema.get_field("body").unwrap();
-  let mut old_man_doc = Document::default();
-  old_man_doc.add_text(title, "The Old Man and the Sea");
-  old_man_doc.add_text(
+    Index::open_or_create(index_dir, schema.clone())?;
+  let index_meta = index.load_metas()?;
+  if index_meta.payload != Some("TEST".to_string()) {
+    let mut index_writer = index.writer(50_000_000)?;
+    let mut old_man_doc = Document::default();
+    old_man_doc.add_text(title, "The Old Man and the Sea");
+    old_man_doc.add_text(
         body,
         "He was an old man who fished alone in a skiff in the Gulf Stream and \
          he had gone eighty-four days now without taking a fish.",
     );
 
-  // ... and add it to the `IndexWriter`.
-  index_writer.add_document(old_man_doc);
-  index_writer.add_document(doc!(
+    // ... and add it to the `IndexWriter`.
+    index_writer.add_document(old_man_doc);
+    index_writer.add_document(doc!(
     title => "Of Mice and Men",
     body => "A few miles south of Soledad, the Salinas River drops in close to the hillside \
             bank and runs deep and green. The water is warm too, for it has slipped twinkling \
@@ -53,7 +58,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
             debris of the winter’s flooding; and sycamores with mottled, white, recumbent \
             limbs and branches that arch over the pool"
     ));
-  index_writer.add_document(doc!(
+    index_writer.add_document(doc!(
       title => "Frankenstein",
       title => "The Modern Prometheus",
       body => "You will rejoice to hear that no disaster has accompanied the commencement of an \
@@ -61,7 +66,12 @@ async fn main() -> Result<(), Box<dyn Error>> {
                yesterday, and my first task is to assure my dear sister of my welfare and \
                increasing confidence in the success of my undertaking."
       ));
-  index_writer.commit()?;
+    let mut prepared_commit =
+      index_writer.prepare_commit()?;
+    prepared_commit.set_payload("TEST");
+    prepared_commit.commit()?;
+  }
+
   let reader = index
     .reader_builder()
     .reload_policy(ReloadPolicy::OnCommit)
