@@ -4,21 +4,23 @@ use hyper::Body;
 use hyper::Request;
 use hyper::Response;
 use hyper::Server;
+use std::collections::HashMap;
 use std::convert::Infallible;
 use std::error::Error;
+use std::fs::create_dir_all;
 use std::net::SocketAddr;
+use std::path::Path;
 use tantivy::collector::TopDocs;
 use tantivy::directory::MmapDirectory;
 use tantivy::doc;
 use tantivy::query::QueryParser;
-use tantivy::schema::*;
+use tantivy::schema;
+use tantivy::schema::Document;
+use tantivy::schema::Field;
+use tantivy::schema::Schema;
 use tantivy::Index;
 use tantivy::IndexReader;
 use tantivy::ReloadPolicy;
-
-use std::collections::HashMap;
-use std::fs::create_dir_all;
-use std::path::Path;
 use url::form_urlencoded;
 
 #[tokio::main]
@@ -28,9 +30,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
   create_dir_all(index_path)?;
   let index_dir = MmapDirectory::open(index_path)?;
   let mut schema_builder = Schema::builder();
-  let title =
-    schema_builder.add_text_field("title", TEXT | STORED);
-  let body = schema_builder.add_text_field("body", TEXT);
+  let title = schema_builder
+    .add_text_field("title", schema::TEXT | schema::STORED);
+  let body =
+    schema_builder.add_text_field("body", schema::TEXT);
   let schema = schema_builder.build();
   let index =
     Index::open_or_create(index_dir, schema.clone())?;
