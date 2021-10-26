@@ -22,9 +22,18 @@ jobs:
         run: |
           curl -fsSL https://fly.io/install.sh | sudo FLYCTL_INSTALL=/usr/local sh
 
+      - name: Cache Rust toolchain
+        uses: actions/cache@v2
+        with:
+          path: /usr/share/rust/.rustup
+          key: rust-toolchain-1
+
       - name: Set up Rust
         run: rustup show
       
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@v1
+
       - name: Check rustfmt
         run: cargo fmt --all -- --check
 
