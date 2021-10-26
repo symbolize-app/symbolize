@@ -630,7 +630,6 @@ dependencies = [
  "hyper 0.14.7",
  "tantivy 0.16.1",
  "tantivy-cli",
- "tempfile",
  "tokio",
  "url",
 ]
