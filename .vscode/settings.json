@@ -8,5 +8,8 @@
   "editor.tabSize": 2,
   "files.autoSave": "onFocusChange",
   "typescript.tsdk": "node_modules/typescript/lib",
-  "eslint.validate": ["javascript", "typescript"]
+  "eslint.validate": ["javascript", "typescript"],
+  "rust-analyzer.assist.importGranularity": "item",
+  "rust-analyzer.assist.importGroup": false,
+  "rust-analyzer.assist.importPrefix": "crate"
 }
