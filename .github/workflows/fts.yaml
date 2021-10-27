@@ -26,7 +26,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: /usr/share/rust/.rustup
-          key: rust-toolchain-1
+          key: rust-toolchain-${{ runner.os }}-${{ hashFiles('rust-toolchain.toml') }}
 
       - name: Set up Rust
         run: rustup show

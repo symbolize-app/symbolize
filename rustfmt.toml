@@ -1,7 +1,8 @@
 max_width = 60
 tab_spaces = 2
+edition = "2021"
 use_try_shorthand = true
+use_field_init_shorthand = true
 # group_imports = "One"
-# unstable_features = true
 # imports_granularity = Item
 # trailing_semicolon = true
