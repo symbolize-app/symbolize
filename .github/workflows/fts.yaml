@@ -34,8 +34,11 @@ jobs:
       - name: Cache Rust dependencies
         uses: Swatinem/rust-cache@v1
 
-      - name: Check rustfmt
+      - name: Check Rustfmt
         run: cargo fmt --all -- --check
+
+      - name: Check Clippy
+        run: cargo check-clippy
 
       - name: Check rustc
         if: github.ref != 'refs/heads/main'
