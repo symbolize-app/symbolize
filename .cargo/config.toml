@@ -1,0 +1,11 @@
+[alias]
+check-clippy = "clippy --all-targets --all-features -- -W clippy::dbg_macro -D clippy::unused_async -D clippy::unused_self -D clippy::semicolon_if_nothing_returned -D warnings"
+cc = "check-clippy"
+fix-clippy = "clippy --all-targets --all-features --fix -- -W clippy::dbg_macro -D clippy::unused_async -D clippy::unused_self -D clippy::semicolon_if_nothing_returned"
+fc = "fix-clippy"
+check-fmt = "fmt --all -- --check"
+cf = "check-clippy"
+fix-fmt = "fmt --all"
+ff = "fix-fmt"
+watch-run = "watch -x run"
+wr = "watch-run"

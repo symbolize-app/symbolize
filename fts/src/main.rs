@@ -108,6 +108,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
   Ok(())
 }
 
+#[allow(clippy::unused_async)]
 async fn hello_world(
   schema: Schema,
   title: Field,

@@ -51,8 +51,8 @@ Open a CockroachDB SQL prompt
 
 ## `cargo fetch`
 
-## `cargo watch -x run`
+## `cargo watch-run`
 
-## `cargo fmt --all`
+## `cargo fix-fmt`
 
-## `cargo check`
+## `cargo fix-clippy`
