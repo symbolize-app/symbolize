@@ -47,3 +47,6 @@ jobs:
       - name: Build
         if: github.ref == 'refs/heads/main'
         run: cargo build --release
+
+      - name: Test
+        run: cargo test

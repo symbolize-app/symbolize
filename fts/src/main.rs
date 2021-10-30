@@ -1,3 +1,6 @@
+mod message;
+
+use crate::message::get_message;
 use hyper::service::make_service_fn;
 use hyper::service::service_fn;
 use hyper::Body;
@@ -120,6 +123,7 @@ async fn hello_world(
   let searcher = reader.searcher();
   let query_parser =
     QueryParser::for_index(&index, vec![title, body]);
+  print!("{}", get_message());
   let query = query_parser
     .parse_query(
       form_urlencoded::parse(
