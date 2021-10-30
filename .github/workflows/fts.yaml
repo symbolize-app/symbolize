@@ -44,9 +44,14 @@ jobs:
         if: github.ref != 'refs/heads/main'
         run: cargo check
 
+      - name: Test
+        if: github.ref != 'refs/heads/main'
+        run: cargo test
+
       - name: Build
         if: github.ref == 'refs/heads/main'
         run: cargo build --release
 
-      - name: Test
-        run: cargo test
+      - name: Test (release)
+        if: github.ref == 'refs/heads/main'
+        run: cargo test --release
