@@ -3,7 +3,8 @@ name: FTS
 on:
   push:
     paths:
-      - "*"
+      - '*'
+      - .cargo/**
       - .github/**
       - db/**
       - fts/**
@@ -30,7 +31,7 @@ jobs:
 
       - name: Set up Rust
         run: rustup show
-      
+
       - name: Cache Rust dependencies
         uses: Swatinem/rust-cache@v1
 
