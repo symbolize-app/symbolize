@@ -24,7 +24,6 @@
 1. Run `cockroach cert create-client api_read --certs-dir=.crdb/certs --ca-key=.crdb/ca/ca.key`
 1. Run `cockroach cert create-client api_write --certs-dir=.crdb/certs --ca-key=.crdb/ca/ca.key`
 
-
 # App development
 
 ## `pnpm start`
@@ -45,7 +44,6 @@ Open a CockroachDB SQL prompt
 
 - Use `select id::string from member` to view hex
 - Use `'\xabc123'` to write hex
-
 
 # FTS development
 

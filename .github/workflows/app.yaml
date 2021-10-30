@@ -3,7 +3,7 @@ name: App
 on:
   push:
     paths:
-      - *
+      - '*'
       - .github/**
       - app/**
       - db/**
@@ -65,14 +65,8 @@ jobs:
           curl -fsSL https://pnpm.js.org/pnpm.js | node - add --global pnpm
           pnpm install --frozen-lockfile
 
-      - name: Set up Rust
-        run: rustup show
-
       - name: Check Prettier
         run: pnpm check-prettier
-      
-      - name: Check rustfmt
-        run: cargo fmt --all -- --check
 
       - name: Check ESLint
         run: pnpm check-eslint
