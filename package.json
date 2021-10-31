@@ -10,7 +10,7 @@
     "check-tsc": "tsc",
     "db": "dbmate --url ${DATABASE_URL_ADMIN}",
     "dev": "node --experimental-loader ./loader.js bin/dev.ts",
-    "fix": "eslint --ignore-path .gitignore --fix .",
+    "fix-lint": "eslint --ignore-path .gitignore --fix .",
     "fmt": "prettier --ignore-path .gitignore --plugin ./prettier-plugin-cockroach.cjs --write '**/*.cjs' '**/*.js' '**/*.json' '**/*.ts' '**/*.html' '**/*.md' '**/*.yaml' '!pnpm-lock.yaml' '**/*.sql' && dprint fmt",
     "sql": "cockroach sql --url ${DATABASE_URL_API_WRITE}",
     "sql-admin": "cockroach sql --url ${DATABASE_URL_ADMIN}",
