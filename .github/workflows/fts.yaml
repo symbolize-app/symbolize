@@ -35,6 +35,9 @@ jobs:
       - name: Cache Rust dependencies
         uses: Swatinem/rust-cache@v1
 
+      - name: Set up Cargo
+        uses: cargo update --locked
+
       - name: Check Rustfmt
         run: cargo fmt --all -- --check
 
