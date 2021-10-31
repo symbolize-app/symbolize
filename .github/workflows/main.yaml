@@ -67,11 +67,18 @@ jobs:
         if: github.ref == 'refs/heads/main'
         run: pnpm prune --prod
 
-      - name: Upload
+      - name: Upload output (modules)
         if: github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v2
         with:
-          name: node
+          name: node-modules
+          path: node_modules
+
+      - name: Upload output (build)
+        if: github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v2
+        with:
+          name: node-build
           path: build
 
   rust:
@@ -119,7 +126,7 @@ jobs:
         if: github.ref == 'refs/heads/main'
         run: cargo test --release
 
-      - name: Upload
+      - name: Upload output
         if: github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v2
         with:
@@ -166,10 +173,15 @@ jobs:
           curl -fsSL https://github.com/amacneil/dbmate/releases/latest/download/dbmate-linux-amd64 | sudo tee /usr/local/bin/dbmate > /dev/null
           sudo chmod +x /usr/local/bin/dbmate
 
-      - name: Download Node output
+      - name: Download Node output (modules)
         uses: actions/download-artifact@v2
         with:
-          name: node
+          name: node-modules
+
+      - name: Download Node output (build)
+        uses: actions/download-artifact@v2
+        with:
+          name: node-build
 
       - name: Download Rust output
         uses: actions/download-artifact@v2
