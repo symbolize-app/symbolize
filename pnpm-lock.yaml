@@ -25,6 +25,7 @@ devDependencies:
   bufferutil: 4.0.3
   chokidar: 3.5.1
   diff: 5.0.0
+  dprint: 0.18.1
   esbuild: 0.9.6
   eslint: 7.22.0
   eslint-config-prettier: 8.1.0_eslint@7.22.0
@@ -727,6 +728,12 @@ packages:
       node: '>=8'
     resolution:
       integrity: sha512-yxJ2mFy/sibVQlu5qHjOkf9J3K6zgmCxgJ94u2EdvDOV09H+32LtRswEcUsmUWN72pVLOEnTSRaIVVzVQgS0dg==
+  /dprint/0.18.1:
+    dev: true
+    hasBin: true
+    requiresBuild: true
+    resolution:
+      integrity: sha512-1zIATsZ3AdKaorl8lpXStbYUn/dG8RJmluEKCnlqeYDeZVtBxfOfGTSEHHta4ThbBErhN+QmCvTt4TV6jL/70w==
   /ecc-jsbn/0.1.2:
     dependencies:
       jsbn: 0.1.1
@@ -2650,6 +2657,7 @@ specifiers:
   chokidar: ^3.5.1
   cookie: ^0.4.1
   diff: ^5.0.0
+  dprint: ^0.18.1
   esbuild: ^0.9.6
   eslint: ^7.22.0
   eslint-config-prettier: ^8.1.0
