@@ -95,7 +95,7 @@ jobs:
         uses: Swatinem/rust-cache@v1
 
       - name: Set up Cargo
-        uses: cargo update --locked
+        run: cargo update --locked
 
       - name: Check formatting
         run: cargo fmt --all -- --check
