@@ -1,0 +1,194 @@
+name: Main
+
+on: [push]
+
+jobs:
+  node:
+    name: Node
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Cache /tmp/cockroach
+        uses: actions/cache@v1
+        with:
+          path: /tmp/cockroach-v20.2.6.linux-amd64
+          key: cockroach-v20.2.6.linux-amd64
+
+      - name: Set up CockroachDB
+        run: |
+          if [ ! -d /tmp/cockroach-v20.2.6.linux-amd64 ]; then curl -fsSL https://binaries.cockroachdb.com/cockroach-v20.2.6.linux-amd64.tgz | tar xvzC /tmp; fi
+          sudo cp /tmp/cockroach-v20.2.6.linux-amd64/cockroach /usr/local/bin
+          sudo mkdir /usr/local/lib/cockroach
+          sudo cp /tmp/cockroach-v20.2.6.linux-amd64/lib/libgeos.so /usr/local/lib/cockroach/
+          sudo cp /tmp/cockroach-v20.2.6.linux-amd64/lib/libgeos_c.so /usr/local/lib/cockroach/
+
+      - name: Set up direnv
+        run: |
+          curl -fsSL https://github.com/direnv/direnv/releases/latest/download/direnv.linux-amd64 | sudo tee /usr/local/bin/direnv > /dev/null
+          sudo chmod +x /usr/local/bin/direnv
+          echo > .env
+          direnv allow
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 15
+
+      - name: Cache .pnpm-store
+        uses: actions/cache@v1
+        with:
+          path: ~/.pnpm-store
+          key: pnpm-${{ hashFiles('./pnpm-lock.yaml') }}
+
+      - name: Set up pnpm
+        run: |
+          curl -fsSL https://pnpm.js.org/pnpm.js | node - add --global pnpm
+          pnpm install --frozen-lockfile
+
+      - name: Check formatting
+        run: pnpm check-fmt
+
+      - name: Check lint
+        run: pnpm check-lint
+
+      - name: Check TypeScript
+        run: pnpm check-tsc
+
+      - name: Test
+        run: direnv exec . pnpm test
+
+      - name: Build
+        run: direnv exec . pnpm build
+
+      - name: Prune
+        if: github.ref == 'refs/heads/main'
+        run: pnpm prune --prod
+
+      - name: Upload
+        if: github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v2
+        with:
+          name: node
+          path: build
+
+  rust:
+    name: Rust
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Cache Rust toolchain
+        uses: actions/cache@v2
+        with:
+          path: /usr/share/rust/.rustup
+          key: rust-toolchain-${{ runner.os }}-${{ hashFiles('rust-toolchain.toml') }}
+
+      - name: Set up Rust
+        run: rustup show
+
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@v1
+
+      - name: Set up Cargo
+        uses: cargo update --locked
+
+      - name: Check formatting
+        run: cargo fmt --all -- --check
+
+      - name: Check lint
+        run: cargo check-clippy
+
+      - name: Check rustc
+        if: github.ref != 'refs/heads/main'
+        run: cargo check
+
+      - name: Test
+        if: github.ref != 'refs/heads/main'
+        run: cargo test
+
+      - name: Build
+        if: github.ref == 'refs/heads/main'
+        run: cargo build --release
+
+      - name: Test (release)
+        if: github.ref == 'refs/heads/main'
+        run: cargo test --release
+
+      - name: Upload
+        if: github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v2
+        with:
+          name: rust
+          path: target/release/fertile-earth
+
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    needs: [check-typescript, check-rust]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Cache /tmp/cockroach
+        uses: actions/cache@v1
+        with:
+          path: /tmp/cockroach-v20.2.6.linux-amd64
+          key: cockroach-v20.2.6.linux-amd64
+
+      - name: Set up CockroachDB
+        run: |
+          if [ ! -d /tmp/cockroach-v20.2.6.linux-amd64 ]; then curl -fsSL https://binaries.cockroachdb.com/cockroach-v20.2.6.linux-amd64.tgz | tar xvzC /tmp; fi
+          sudo cp /tmp/cockroach-v20.2.6.linux-amd64/cockroach /usr/local/bin
+          sudo mkdir /usr/local/lib/cockroach
+          sudo cp /tmp/cockroach-v20.2.6.linux-amd64/lib/libgeos.so /usr/local/lib/cockroach/
+          sudo cp /tmp/cockroach-v20.2.6.linux-amd64/lib/libgeos_c.so /usr/local/lib/cockroach/
+
+      - name: Set up direnv
+        run: |
+          curl -fsSL https://github.com/direnv/direnv/releases/latest/download/direnv.linux-amd64 | sudo tee /usr/local/bin/direnv > /dev/null
+          sudo chmod +x /usr/local/bin/direnv
+          echo > .env
+          direnv allow
+
+      - name: Set up Fly
+        run: |
+          curl -fsSL https://fly.io/install.sh | sudo FLYCTL_INSTALL=/usr/local sh
+
+      - name: Set up Dbmate
+        run: |
+          curl -fsSL https://github.com/amacneil/dbmate/releases/latest/download/dbmate-linux-amd64 | sudo tee /usr/local/bin/dbmate > /dev/null
+          sudo chmod +x /usr/local/bin/dbmate
+
+      - name: Download Node output
+        uses: actions/download-artifact@v2
+        with:
+          name: node
+
+      - name: Download Rust output
+        uses: actions/download-artifact@v2
+        with:
+          name: rust
+
+      - name: Migrate DB
+        if: github.ref == 'refs/heads/main'
+        run: |
+          mkdir -p .crdb/certs
+          echo "${DATABASE_CA_CRT}" > .crdb/certs/cc-ca.crt
+          direnv exec . dbmate --url ${DATABASE_URL_ADMIN} migrate
+        env:
+          DATABASE_CA_CRT: ${{ secrets.DATABASE_CA_CRT }}
+          DATABASE_URL_ADMIN: ${{ secrets.DATABASE_URL_ADMIN }}
+
+      - name: Deploy app
+        if: github.ref == 'refs/heads/main'
+        run: direnv exec . flyctl deploy --build-arg NODE_OPTIONS="${NODE_OPTIONS_PRODUCTION}"
+        env:
+          FLY_ACCESS_TOKEN: ${{ secrets.FLY_ACCESS_TOKEN }}
+
