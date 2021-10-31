@@ -1,0 +1,15 @@
+{
+  "incremental": true,
+  "toml": {
+    "lineWidth": 60
+  },
+  "dockerfile": {
+    "lineWidth": 60
+  },
+  "includes": ["**/*.{toml,dockerfile}", "**/Dockerfile"],
+  "excludes": ["**/build", "**/node_modules", "**/target"],
+  "plugins": [
+    "https://plugins.dprint.dev/toml-0.5.2.wasm",
+    "https://plugins.dprint.dev/dockerfile-0.1.1.wasm"
+  ]
+}

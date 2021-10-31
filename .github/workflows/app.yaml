@@ -65,11 +65,11 @@ jobs:
           curl -fsSL https://pnpm.js.org/pnpm.js | node - add --global pnpm
           pnpm install --frozen-lockfile
 
-      - name: Check Prettier
+      - name: Check formatting
         run: pnpm check-prettier
 
-      - name: Check ESLint
-        run: pnpm check-eslint
+      - name: Check lint
+        run: pnpm check-lint
 
       - name: Check TypeScript
         run: pnpm check-tsc
