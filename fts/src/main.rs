@@ -9,6 +9,7 @@ use hyper::Response;
 use hyper::Server;
 use std::collections::HashMap;
 use std::convert::Infallible;
+use std::env;
 use std::error::Error;
 use std::fs::create_dir_all;
 use std::net::SocketAddr;
@@ -25,7 +26,6 @@ use tantivy::Index;
 use tantivy::IndexReader;
 use tantivy::ReloadPolicy;
 use url::form_urlencoded;
-use std::env;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
