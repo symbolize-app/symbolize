@@ -1,17 +1,13 @@
 {
   "include": [
-    "api/**/*.ts",
-    "bin/**/*.ts",
-    "core/**/*.ts",
-    "db/**/*.ts",
+    "app/**/*.ts",
     "db/**/*.sql",
-    "bin/dev.ts",
+    "db/**/*.ts",
     "global.d.ts",
     "loader.js",
+    "prettier-plugin-cockroach.cjs",
     "suppress.cjs",
-    "tiny/**/*.ts",
-    "tiny/core/prettier-plugin-cockroach.cjs",
-    "ui/**/*.ts"
+    "tiny/**/*.ts"
   ],
   "compilerOptions": {
     "allowUnreachableCode": false,
@@ -31,13 +27,9 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "paths": {
-      "@fe/api/*.ts": ["./api/*.ts"],
-      "@fe/bin/*.ts": ["./bin/*.ts"],
-      "@fe/core/*.ts": ["./core/*.ts"],
-      "@fe/db/*.ts": ["./db/*.ts"],
-      "@fe/db/*.sql": ["./db/*.sql"],
-      "@fe/ui/*.ts": ["./ui/*.ts"],
-      "@tiny/*.ts": ["./tiny/*.ts"],
+      "@fe/*.ts": ["./app/src/*.ts"],
+      "@fe-bin/*.ts": ["./app/bin/*.ts"],
+      "@tiny/*.ts": ["./tiny/src/*.ts"],
       "@sinonjs/fake-timers": [
         "./node_modules/@types/sinonjs__fake-timers"
       ],
