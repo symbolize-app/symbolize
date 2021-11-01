@@ -1,4 +1,4 @@
-import * as appBuild from '@fe/bin/build.ts'
+import * as appBuild from '@fe-bin/build.ts'
 import * as route from '@tiny/api/route.ts'
 import * as concurrency from '@tiny/core/concurrency.ts'
 import chalk from 'chalk'
@@ -12,7 +12,7 @@ import type * as net from 'net'
 import urlModule from 'url'
 import WebSocket from 'ws'
 
-import tsconfig from '../tsconfig.json'
+import tsconfig from '../../tsconfig.json'
 
 type Context = {
   sourceTree: SourceTree
