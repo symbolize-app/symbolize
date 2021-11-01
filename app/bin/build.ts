@@ -14,7 +14,7 @@ async function main(): Promise<void> {
     recursive: true,
   })
   await fsPromises.copyFile(
-    'public/index.html',
+    'app/public/index.html',
     'build/browser/index.html'
   )
   await all({
