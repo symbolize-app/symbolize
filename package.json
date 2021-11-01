@@ -48,7 +48,7 @@
     "bufferutil": "^4.0.3",
     "chokidar": "^3.5.1",
     "diff": "^5.0.0",
-    "dprint": "^0.18.1",
+    "dprint": "^0.18.2",
     "esbuild": "^0.9.6",
     "eslint": "^7.22.0",
     "eslint-config-prettier": "^8.1.0",
