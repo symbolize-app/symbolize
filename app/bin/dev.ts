@@ -79,7 +79,7 @@ const api = route.define<{
   return (req, res) =>
     ctx.proxy.web(req, res, {
       target: `http://localhost:${
-        process.env.PORT as string
+        process.env.APP_PORT as string
       }`,
     })
 })
@@ -195,7 +195,7 @@ async function main(): Promise<void> {
     ws.on('error', console.error)
   })
   await reload()
-  httpServer.listen(process.env.DEV_PORT)
+  httpServer.listen(process.env.APP_DEV_PORT)
   console.log(
     chalk.bold(
       `Ready at http://localhost:${

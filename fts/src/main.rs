@@ -25,10 +25,12 @@ use tantivy::Index;
 use tantivy::IndexReader;
 use tantivy::ReloadPolicy;
 use url::form_urlencoded;
+use std::env;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-  let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
+  let port: u16 = env::var("FTS_PORT")?.parse()?;
+  let addr = SocketAddr::from(([127, 0, 0, 1], port));
   let index_path = Path::new("./.tantivy/topic");
   create_dir_all(index_path)?;
   let index_dir = MmapDirectory::open(index_path)?;

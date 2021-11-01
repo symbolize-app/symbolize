@@ -1,8 +1,11 @@
-app = "throbbing-dust-8272"
+app = "wild-sunset-1146"
 
 kill_signal = "SIGINT"
 kill_timeout = 5
 processes = []
+
+[build]
+dockerfile = "Dockerfile"
 
 [env]
 
@@ -12,7 +15,7 @@ auto_rollback = true
 
 [[services]]
 http_checks = []
-internal_port = 8080
+internal_port = 7070
 processes = ["app"]
 protocol = "tcp"
 script_checks = []
