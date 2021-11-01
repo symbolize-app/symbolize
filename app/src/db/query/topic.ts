@@ -1,7 +1,7 @@
+import appQueryTopicCreate from '@db/query/topicCreate.sql'
+import appQueryTopicList from '@db/query/topicList.sql'
+import appQueryTopicUpdate from '@db/query/topicUpdate.sql'
 import type * as appQuery from '@fe/db/query/index.ts'
-import appQueryTopicCreate from '@fe/db/query/topicCreate.sql'
-import appQueryTopicList from '@fe/db/query/topicList.sql'
-import appQueryTopicUpdate from '@fe/db/query/topicUpdate.sql'
 import * as query from '@tiny/db/query.ts'
 
 export const create = query.defineVoid<

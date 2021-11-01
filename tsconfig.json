@@ -2,7 +2,6 @@
   "include": [
     "app/**/*.ts",
     "db/**/*.sql",
-    "db/**/*.ts",
     "global.d.ts",
     "loader.js",
     "prettier-plugin-cockroach.cjs",
@@ -27,12 +26,13 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "paths": {
+      "@db/*.sql": ["./db/src/*.sql"],
       "@fe/*.ts": ["./app/src/*.ts"],
       "@fe-bin/*.ts": ["./app/bin/*.ts"],
-      "@tiny/*.ts": ["./tiny/src/*.ts"],
       "@sinonjs/fake-timers": [
         "./node_modules/@types/sinonjs__fake-timers"
       ],
+      "@tiny/*.ts": ["./tiny/src/*.ts"],
       "sinonx": ["./node_modules/@types/sinon"]
     },
     "resolveJsonModule": true,
