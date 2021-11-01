@@ -63,22 +63,11 @@ jobs:
       - name: Build
         run: direnv exec . pnpm build
 
-      - name: Prune
-        if: github.ref == 'refs/heads/main'
-        run: pnpm prune --prod
-
-      - name: Upload output (modules)
+      - name: Upload output
         if: github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v2
         with:
-          name: node-modules
-          path: node_modules
-
-      - name: Upload output (build)
-        if: github.ref == 'refs/heads/main'
-        uses: actions/upload-artifact@v2
-        with:
-          name: node-build
+          name: node
           path: build
 
   rust:
@@ -143,20 +132,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Cache /tmp/cockroach
-        uses: actions/cache@v1
-        with:
-          path: /tmp/cockroach-v20.2.6.linux-amd64
-          key: cockroach-v20.2.6.linux-amd64
-
-      - name: Set up CockroachDB
-        run: |
-          if [ ! -d /tmp/cockroach-v20.2.6.linux-amd64 ]; then curl -fsSL https://binaries.cockroachdb.com/cockroach-v20.2.6.linux-amd64.tgz | tar xvzC /tmp; fi
-          sudo cp /tmp/cockroach-v20.2.6.linux-amd64/cockroach /usr/local/bin
-          sudo mkdir /usr/local/lib/cockroach
-          sudo cp /tmp/cockroach-v20.2.6.linux-amd64/lib/libgeos.so /usr/local/lib/cockroach/
-          sudo cp /tmp/cockroach-v20.2.6.linux-amd64/lib/libgeos_c.so /usr/local/lib/cockroach/
-
       - name: Set up direnv
         run: |
           curl -fsSL https://github.com/direnv/direnv/releases/latest/download/direnv.linux-amd64 | sudo tee /usr/local/bin/direnv > /dev/null
@@ -173,15 +148,26 @@ jobs:
           curl -fsSL https://github.com/amacneil/dbmate/releases/latest/download/dbmate-linux-amd64 | sudo tee /usr/local/bin/dbmate > /dev/null
           sudo chmod +x /usr/local/bin/dbmate
 
-      - name: Download Node output (modules)
-        uses: actions/download-artifact@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
         with:
-          name: node-modules
+          node-version: 15
 
-      - name: Download Node output (build)
+      - name: Cache .pnpm-store
+        uses: actions/cache@v1
+        with:
+          path: ~/.pnpm-store
+          key: pnpm-${{ hashFiles('./pnpm-lock.yaml') }}
+
+      - name: Set up pnpm
+        run: |
+          curl -fsSL https://pnpm.js.org/pnpm.js | node - add --global pnpm
+          pnpm install --frozen-lockfile --prod
+
+      - name: Download Node output
         uses: actions/download-artifact@v2
         with:
-          name: node-build
+          name: node
 
       - name: Download Rust output
         uses: actions/download-artifact@v2
