@@ -8,4 +8,4 @@ ENV NODE_ENV=production
 ENV NODE_OPTIONS=${NODE_OPTIONS}
 ENV PORT=8080
 EXPOSE 8080
-CMD ["node", "./build/node/api/index.ts.mjs"]
+CMD ["node", "./build/node/app/src/api/index.ts.mjs"]

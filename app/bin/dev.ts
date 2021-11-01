@@ -36,7 +36,7 @@ const index = route.define(['GET'], /^\/$/, () => {
     headers: {
       'content-type': 'text/html',
     },
-    body: fs.createReadStream('public/index.html'),
+    body: fs.createReadStream('app/public/index.html'),
   }
 })
 
@@ -134,7 +134,7 @@ function buildDev(entryPoint: string): SourceTree {
 function createServer(): Server {
   const ready = new concurrency.EventSemaphore()
   const exited = new concurrency.EventSemaphore()
-  const child = childProcess.fork('api/index.ts', {
+  const child = childProcess.fork('app/src/api/index.ts', {
     env: {
       ...process.env,
       ['NODE_ENV']: 'development',
