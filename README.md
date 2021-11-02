@@ -23,6 +23,7 @@
 1. Run `cockroach cert create-client root --certs-dir=.crdb/certs --ca-key=.crdb/ca/ca.key`
 1. Run `cockroach cert create-client api_read --certs-dir=.crdb/certs --ca-key=.crdb/ca/ca.key`
 1. Run `cockroach cert create-client api_write --certs-dir=.crdb/certs --ca-key=.crdb/ca/ca.key`
+1. Run `curl -fsSL -o .crdb/certs/cc-ca.crt -O https://cockroachlabs.cloud/clusters/CLUSTER_ID/cert`
 
 # App development
 
