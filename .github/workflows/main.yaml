@@ -168,11 +168,13 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: node
+          path: build
 
       - name: Download Rust output
         uses: actions/download-artifact@v2
         with:
           name: rust
+          path: target/release
 
       - name: Migrate DB
         if: github.ref == 'refs/heads/main'
