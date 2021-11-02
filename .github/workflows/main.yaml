@@ -176,6 +176,9 @@ jobs:
           name: rust
           path: target/release
 
+      - name: Fix permissions
+        run: chmod +x target/release/fertile-earth
+
       - name: Migrate DB
         if: github.ref == 'refs/heads/main'
         run: |
