@@ -87,7 +87,10 @@ async function main(): Promise<void> {
     ])
   )
   httpServer.on('error', console.error)
-  httpServer.listen(process.env.APP_PORT)
+  httpServer.listen(
+    Number.parseInt(process.env.APP_PORT as string),
+    process.env.APP_HOST as string
+  )
 
   if (process.env.NODE_ENV === 'development') {
     const dev = await import('@fe/api/dev.ts')
