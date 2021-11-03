@@ -67,7 +67,7 @@ const js = route.define(
   }
 )
 
-async function main(): Promise<void> {
+function main(): void {
   const ctx: errorModule.Context &
     appQuery.ReadContext &
     appQuery.WriteContext = {
@@ -113,5 +113,5 @@ if (
   process.argv[1] ===
   urlModule.fileURLToPath(import.meta.url)
 ) {
-  void main()
+  main()
 }
