@@ -12,6 +12,7 @@ use std::convert::Infallible;
 use std::env;
 use std::error::Error;
 use std::fs::create_dir_all;
+use std::net::Ipv4Addr;
 use std::net::SocketAddr;
 use std::path::Path;
 use tantivy::collector::TopDocs;
@@ -29,8 +30,9 @@ use url::form_urlencoded;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
+  let host: Ipv4Addr = env::var("FTS_HOST")?.parse()?;
   let port: u16 = env::var("FTS_PORT")?.parse()?;
-  let addr = SocketAddr::from(([127, 0, 0, 1], port));
+  let addr = SocketAddr::from((host, port));
   let index_path = Path::new("./.tantivy/topic");
   create_dir_all(index_path)?;
   let index_dir = MmapDirectory::open(index_path)?;
