@@ -89,21 +89,24 @@ async function main(): Promise<void> {
   httpServer.on('error', console.error)
   httpServer.listen(
     Number.parseInt(process.env.APP_PORT as string),
-    process.env.APP_HOST as string
+    process.env.APP_HOST as string,
+    () => {
+      if (process.env.NODE_ENV === 'development') {
+        void (async () => {
+          const dev = await import('@fe/api/dev.ts')
+          dev.main(ctx)
+        })()
+      } else if (process.env.NODE_ENV !== 'development') {
+        console.log(
+          chalk.bold(
+            `Ready at http://localhost:${
+              (httpServer.address() as net.AddressInfo).port
+            }/`
+          )
+        )
+      }
+    }
   )
-
-  if (process.env.NODE_ENV === 'development') {
-    const dev = await import('@fe/api/dev.ts')
-    dev.main(ctx)
-  } else {
-    console.log(
-      chalk.bold(
-        `Ready at http://localhost:${
-          (httpServer.address() as net.AddressInfo).port
-        }/`
-      )
-    )
-  }
 }
 
 if (
