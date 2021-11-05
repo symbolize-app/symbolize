@@ -9,4 +9,6 @@ hyper = { version = "0.14", features = ["full"] }
 tantivy = "0.16.1"
 tantivy-cli = "0.15.0"
 tokio = { version = "1.5", features = ["full"] }
+tower = { version = "0.4.10", features = ["make"] }
+tower-service = "0.3.1"
 url = "1.7.2"
