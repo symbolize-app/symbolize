@@ -1,7 +1,7 @@
 mod message;
 
 use crate::message::get_message;
-use hyper::service::Service;
+use hyper::service::service_fn;
 use hyper::Body;
 use hyper::Request;
 use hyper::Response;
@@ -10,12 +10,9 @@ use std::collections::HashMap;
 use std::env;
 use std::error::Error;
 use std::fs::create_dir_all;
-use std::future::Future;
 use std::net::Ipv4Addr;
 use std::net::SocketAddr;
 use std::path::Path;
-use tower::make::Shared;
-use std::pin::Pin;
 use tantivy::collector::TopDocs;
 use tantivy::directory::MmapDirectory;
 use tantivy::doc;
@@ -27,6 +24,7 @@ use tantivy::schema::Schema;
 use tantivy::Index;
 use tantivy::IndexReader;
 use tantivy::ReloadPolicy;
+use tower::make::Shared;
 use url::form_urlencoded;
 
 #[derive(Clone)]
@@ -43,32 +41,6 @@ struct FieldSet {
   body: Field,
 }
 
-impl Service<Request<Body>> for Context {
-  type Response = Response<Body>;
-  type Error = Box<dyn Error + Send + Sync>;
-
-  #[allow(clippy::type_complexity)]
-  type Future = Pin<
-    Box<
-      dyn Future<Output = Result<Self::Response, Self::Error>>
-        + Send
-        + Sync,
-    >,
-  >;
-
-  fn poll_ready(
-    &mut self,
-    _cx: &mut std::task::Context<'_>,
-  ) -> std::task::Poll<Result<(), Self::Error>> {
-    std::task::Poll::Ready(Ok(()))
-  }
-
-  fn call(&mut self, req: Request<Body>) -> Self::Future {
-    let context = self.clone();
-    Box::pin(hello_world(context, req))
-  }
-}
-
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
   let host: Ipv4Addr = env::var("FTS_HOST")?.parse()?;
@@ -76,8 +48,11 @@ async fn main() -> Result<(), Box<dyn Error>> {
   let addr = SocketAddr::from((host, port));
 
   let context = load_context()?;
+  let service = service_fn(move |req| {
+    hello_world(context.clone(), req)
+  });
   let server =
-    Server::bind(&addr).serve(Shared::new(context));
+    Server::bind(&addr).serve(Shared::new(service));
   server.await?;
 
   Ok(())
