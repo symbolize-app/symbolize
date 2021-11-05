@@ -43,18 +43,8 @@ struct FieldSet {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-  let host: Ipv4Addr = env::var("FTS_HOST")?.parse()?;
-  let port: u16 = env::var("FTS_PORT")?.parse()?;
-  let addr = SocketAddr::from((host, port));
-
   let context = load_context()?;
-  let service = service_fn(move |req| {
-    hello_world(context.clone(), req)
-  });
-  let server =
-    Server::bind(&addr).serve(Shared::new(service));
-  server.await?;
-
+  run_server(context).await?;
   Ok(())
 }
 
@@ -134,8 +124,24 @@ fn load_index() -> Result<
   ))
 }
 
+async fn run_server(
+  context: Context,
+) -> Result<(), Box<dyn Error>> {
+  let host: Ipv4Addr = env::var("FTS_HOST")?.parse()?;
+  let port: u16 = env::var("FTS_PORT")?.parse()?;
+  let addr = SocketAddr::from((host, port));
+
+  let service = service_fn(move |req| {
+    handle_request(context.clone(), req)
+  });
+  let server =
+    Server::bind(&addr).serve(Shared::new(service));
+  server.await?;
+  Ok(())
+}
+
 #[allow(clippy::unused_async)]
-async fn hello_world(
+async fn handle_request(
   context: Context,
   req: Request<Body>,
 ) -> Result<Response<Body>, Box<dyn Error + Send + Sync>> {
