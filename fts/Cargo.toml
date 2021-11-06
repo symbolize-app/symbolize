@@ -12,3 +12,7 @@ tokio = { version = "1.5", features = ["full"] }
 tower = { version = "0.4.10", features = ["make"] }
 tower-service = "0.3.1"
 url = "1.7.2"
+tokio-postgres = "0.7.5"
+postgres-openssl = "0.5.0"
+openssl = "0.10.38"
+percent-encoding = "2.1.0"

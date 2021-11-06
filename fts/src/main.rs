@@ -6,6 +6,12 @@ use hyper::Body;
 use hyper::Request;
 use hyper::Response;
 use hyper::Server;
+use openssl::ssl::SslConnector;
+use openssl::ssl::SslFiletype;
+use openssl::ssl::SslMethod;
+use openssl::ssl::SslVerifyMode;
+use percent_encoding::percent_decode_str;
+use postgres_openssl::MakeTlsConnector;
 use std::collections::HashMap;
 use std::env;
 use std::error::Error;
@@ -24,8 +30,10 @@ use tantivy::schema::Schema;
 use tantivy::Index;
 use tantivy::IndexReader;
 use tantivy::ReloadPolicy;
+use tokio_postgres::config::Config;
 use tower::make::Shared;
 use url::form_urlencoded;
+use url::Url;
 
 #[derive(Clone)]
 struct Context {
@@ -43,13 +51,14 @@ struct FieldSet {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-  let context = load_context()?;
+  let context = load_context().await?;
   run_server(context).await?;
   Ok(())
 }
 
-fn load_context() -> Result<Context, Box<dyn Error>> {
+async fn load_context() -> Result<Context, Box<dyn Error>> {
   let (schema, index, index_reader, fields) = load_index()?;
+  load_db().await?;
   Ok(Context {
     schema,
     index,
@@ -124,6 +133,69 @@ fn load_index() -> Result<
   ))
 }
 
+async fn load_db() -> Result<(), Box<dyn Error>> {
+  let url: Url =
+    env::var("DATABASE_URL_API_READ")?.parse()?;
+  let params = url
+    .query_pairs()
+    .into_owned()
+    .collect::<HashMap<String, String>>();
+  let mut tls_builder =
+    SslConnector::builder(SslMethod::tls())?;
+  if let Some(cert) = params.get("sslcert") {
+    tls_builder.set_certificate_chain_file(cert)?;
+  }
+  if let Some(key) = params.get("sslkey") {
+    tls_builder
+      .set_private_key_file(key, SslFiletype::PEM)?;
+  }
+  if let Some(root_cert) = params.get("sslrootcert") {
+    tls_builder.set_ca_file(root_cert)?;
+  }
+  if params.get("sslmode")
+    == Some(&"verify-full".to_string())
+  {
+    tls_builder.set_verify(SslVerifyMode::PEER);
+  }
+  let tls = MakeTlsConnector::new(tls_builder.build());
+  let mut config = Config::new();
+  if url.username() != "" {
+    config.user(url.username());
+  }
+  if let Some(password) = url.password() {
+    let decoded_passowrd: &str =
+      &percent_decode_str(password).decode_utf8()?;
+    config.password(decoded_passowrd);
+  }
+  if let Some(host) = url.host_str() {
+    config.host(host);
+  }
+  if let Some(port) = url.port() {
+    config.port(port);
+  }
+  if let Some(mut path_segments) = url.path_segments() {
+    if let Some(db_name) = path_segments.next() {
+      config.dbname(db_name);
+    }
+  }
+  if let Some(options) = params.get("options") {
+    config.options(options);
+  }
+  let (client, connection) = config.connect(tls).await?;
+  tokio::spawn(async move {
+    connection.await.unwrap();
+    println!("CONNECTED");
+  });
+  for row in
+    &client.query("SELECT title FROM topic", &[]).await?
+  {
+    let id: &str = row.get(0);
+    println!("{}", id);
+  }
+  println!("DONE");
+  Ok(())
+}
+
 async fn run_server(
   context: Context,
 ) -> Result<(), Box<dyn Error>> {
@@ -150,7 +222,7 @@ async fn handle_request(
     &context.index,
     vec![context.fields.title, context.fields.body],
   );
-  print!("{}", get_message());
+  println!("{}", get_message());
   let query = query_parser.parse_query(
     form_urlencoded::parse(
       req.uri().query().ok_or("invalid query")?.as_bytes(),
