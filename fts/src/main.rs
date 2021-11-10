@@ -23,10 +23,17 @@ use tantivy::collector::TopDocs;
 use tantivy::directory::MmapDirectory;
 use tantivy::doc;
 use tantivy::query::QueryParser;
-use tantivy::schema;
 use tantivy::schema::Document;
 use tantivy::schema::Field;
+use tantivy::schema::IndexRecordOption;
 use tantivy::schema::Schema;
+use tantivy::schema::TextFieldIndexing;
+use tantivy::schema::TextOptions;
+use tantivy::tokenizer::Language;
+use tantivy::tokenizer::LowerCaser;
+use tantivy::tokenizer::SimpleTokenizer;
+use tantivy::tokenizer::Stemmer;
+use tantivy::tokenizer::TextAnalyzer;
 use tantivy::Index;
 use tantivy::IndexReader;
 use tantivy::ReloadPolicy;
@@ -75,13 +82,25 @@ fn load_index() -> Result<
   create_dir_all(index_path)?;
   let index_dir = MmapDirectory::open(index_path)?;
   let mut schema_builder = Schema::builder();
+  let text_indexing_options = TextFieldIndexing::default()
+    .set_tokenizer("basic")
+    .set_index_option(
+      IndexRecordOption::WithFreqsAndPositions,
+    );
+  let text_options = TextOptions::default()
+    .set_indexing_options(text_indexing_options)
+    .set_stored();
   let title = schema_builder
-    .add_text_field("title", schema::TEXT | schema::STORED);
+    .add_text_field("title", text_options.clone());
   let body =
-    schema_builder.add_text_field("body", schema::TEXT);
+    schema_builder.add_text_field("body", text_options);
   let schema = schema_builder.build();
   let index =
     Index::open_or_create(index_dir, schema.clone())?;
+  let tokenizer = TextAnalyzer::from(SimpleTokenizer)
+    .filter(LowerCaser)
+    .filter(Stemmer::new(Language::English));
+  index.tokenizers().register("basic", tokenizer);
   let index_meta = index.load_metas()?;
   if index_meta.payload != Some("TEST".to_string()) {
     let mut index_writer = index.writer(50_000_000)?;
