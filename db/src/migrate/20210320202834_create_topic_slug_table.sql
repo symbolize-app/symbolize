@@ -1,11 +1,12 @@
 -- migrate:up
 CREATE TABLE topic_slug (
+  language
+    language NOT NULL,
   slug
-    STRING PRIMARY KEY,
-  created
-    TIMESTAMPTZ(0) DEFAULT current_timestamp(0) NOT NULL,
+    STRING NOT NULL,
   topic_id
-    BYTES NOT NULL REFERENCES topic (id)
+    BYTES NOT NULL REFERENCES topic (id),
+  PRIMARY KEY (language, slug)
 );
 GRANT SELECT ON TABLE topic_slug TO api_read;
 GRANT SELECT, INSERT ON TABLE topic_slug TO api_write;

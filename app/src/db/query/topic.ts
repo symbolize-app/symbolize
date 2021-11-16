@@ -1,6 +1,6 @@
-import appQueryTopicCreate from '@db/query/topicCreate.sql'
-import appQueryTopicList from '@db/query/topicList.sql'
-import appQueryTopicUpdate from '@db/query/topicUpdate.sql'
+import dbQueryTopicCreate from '@db/query/topic_create.sql'
+import dbQueryTopicList from '@db/query/topic_list.sql'
+import dbQueryTopicUpdate from '@db/query/topic_update.sql'
 import type * as appQuery from '@fe/db/query/index.ts'
 import * as query from '@tiny/db/query.ts'
 
@@ -13,7 +13,7 @@ export const create = query.defineVoid<
     slug: string,
     content: string
   ]
->(appQueryTopicCreate)
+>(dbQueryTopicCreate)
 
 export const list = query.defineMulti<
   appQuery.Read,
@@ -25,7 +25,7 @@ export const list = query.defineMulti<
     slug: string
     content: string
   }
->(appQueryTopicList)
+>(dbQueryTopicList)
 
 export const update = query.defineOptional<
   appQuery.Write,
@@ -37,4 +37,4 @@ export const update = query.defineOptional<
     content: string
   ],
   { updated: Date }
->(appQueryTopicUpdate)
+>(dbQueryTopicUpdate)
