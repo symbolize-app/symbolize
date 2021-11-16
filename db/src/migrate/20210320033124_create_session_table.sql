@@ -2,10 +2,12 @@
 CREATE TABLE session (
   id
     BYTES PRIMARY KEY,
-  created
+  created_at
     TIMESTAMPTZ(0) DEFAULT current_timestamp(0) NOT NULL,
-  deleted
-    TIMESTAMPTZ(0) NULL,
+  last_active_at
+    TIMESTAMPTZ(0) DEFAULT current_timestamp(0) NOT NULL,
+  deleted_at
+    TIMESTAMPTZ(0) DEFAULT NULL NOT NULL,
   member_id
     BYTES NOT NULL REFERENCES member (id),
   browser
@@ -16,8 +18,10 @@ CREATE TABLE session (
     JSONB NOT NULL,
   languages
     JSONB NOT NULL,
-  last_activity
-    TIMESTAMPTZ NOT NULL
+  recent_activity
+    JSONB
+    DEFAULT jsonb_build_array(current_timestamp(0)::STRING)
+    NOT NULL
 );
 GRANT SELECT ON TABLE session TO api_read;
 GRANT SELECT, INSERT, UPDATE ON TABLE session TO api_write;
