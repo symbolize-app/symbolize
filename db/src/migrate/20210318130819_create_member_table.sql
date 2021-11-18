@@ -8,6 +8,8 @@ CREATE TABLE member (
     TIMESTAMPTZ(0) NOT NULL,
   updated_by
     BYTES NULL REFERENCES member (id),
+  role
+    role DEFAULT 'normal' NOT NULL,
   private
     BOOL DEFAULT false NOT NULL,
   delete_scheduled
