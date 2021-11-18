@@ -10,6 +10,8 @@ CREATE TABLE topic_history (
     BOOL NOT NULL,
   published
     BOOL NOT NULL,
+  subforum_id
+    BYTES NOT NULL REFERENCES subforum (id),
   title
     STRING NOT NULL,
   slug

@@ -12,6 +12,7 @@
     "dev": "node --experimental-loader ./loader.js app/bin/dev.ts",
     "fix-lint": "eslint --ignore-path .gitignore --fix .",
     "fmt": "prettier --ignore-path .gitignore --plugin ./prettier-plugin-cockroach.cjs --write '**/*.cjs' '**/*.js' '**/*.json' '**/*.ts' '**/*.html' '**/*.md' '**/*.yaml' '!pnpm-lock.yaml' '**/*.sql' && dprint fmt",
+    "import-basic": "cat db/src/example/basic.sql | cockroach sql --url ${DATABASE_URL_API_WRITE} --echo-sql",
     "sql": "cockroach sql --url ${DATABASE_URL_API_WRITE}",
     "sql-admin": "cockroach sql --url ${DATABASE_URL_ADMIN}",
     "start": "pnpm build && NODE_ENV=production NODE_OPTIONS=\"${NODE_OPTIONS_RELEASE}\" APP_PORT=\"${APP_DEV_PORT}\" node build/node/app/src/api/index.ts.mjs",

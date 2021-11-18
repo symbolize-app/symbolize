@@ -10,8 +10,6 @@ CREATE TABLE info_history (
     BOOL NOT NULL,
   published
     BOOL NOT NULL,
-  language
-    language NOT NULL,
   cross_language_id
     BYTES NOT NULL,
   title
