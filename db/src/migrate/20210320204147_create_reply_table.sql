@@ -16,6 +16,8 @@ CREATE TABLE reply (
     BYTES NULL,
   deleted
     BOOL DEFAULT false NOT NULL,
+  published
+    BOOL NOT NULL,
   content
     STRING NOT NULL,
   PRIMARY KEY (topic_id, id),

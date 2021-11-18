@@ -9,7 +9,9 @@ CREATE TABLE reply_history (
   updated_by
     BYTES NULL REFERENCES member (id),
   deleted
-    BOOL DEFAULT false NOT NULL,
+    BOOL NOT NULL,
+  published
+    BOOL NOT NULL,
   content
     STRING NOT NULL,
   PRIMARY KEY (reply_topic_id, reply_id, updated_at),

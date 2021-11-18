@@ -6,6 +6,10 @@ CREATE TABLE topic_history (
     TIMESTAMPTZ(0) NOT NULL,
   updated_by
     BYTES NULL REFERENCES member (id),
+  deleted
+    BOOL NOT NULL,
+  published
+    BOOL NOT NULL,
   title
     STRING NOT NULL,
   slug
