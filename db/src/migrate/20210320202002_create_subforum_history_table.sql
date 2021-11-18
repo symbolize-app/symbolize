@@ -8,6 +8,8 @@ CREATE TABLE subforum_history (
     BYTES NULL REFERENCES member (id),
   deleted
     BOOL NOT NULL,
+  cross_language_id
+    BYTES NOT NULL,
   name
     STRING NOT NULL,
   slug

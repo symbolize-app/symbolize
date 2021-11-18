@@ -7,7 +7,7 @@ CREATE TABLE session (
   last_active_at
     TIMESTAMPTZ(0) DEFAULT current_timestamp(0) NOT NULL,
   deleted_at
-    TIMESTAMPTZ(0) DEFAULT NULL NOT NULL,
+    TIMESTAMPTZ(0) DEFAULT NULL NULL,
   member_id
     BYTES NOT NULL REFERENCES member (id),
   browser

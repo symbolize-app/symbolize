@@ -14,14 +14,14 @@ CREATE TABLE taxon (
     BOOL DEFAULT false NOT NULL,
   published
     BOOL NOT NULL,
-  parent_taxon_id
-    BYTES NULL REFERENCES taxon (id),
   language
     language NOT NULL,
   cross_language_id
     BYTES NOT NULL,
   rank
     rank NOT NULL,
+  parent_taxon_id
+    BYTES NULL REFERENCES taxon (id),
   names
     JSONB NOT NULL,
   slug

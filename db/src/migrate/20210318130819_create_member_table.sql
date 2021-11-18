@@ -5,7 +5,7 @@ CREATE TABLE member (
   created_at
     TIMESTAMPTZ(0) DEFAULT current_timestamp(0) NOT NULL,
   updated_at
-    TIMESTAMPTZ(0) NOT NULL,
+    TIMESTAMPTZ(0) DEFAULT current_timestamp(0) NOT NULL,
   updated_by
     BYTES NULL REFERENCES member (id),
   role

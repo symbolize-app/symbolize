@@ -16,6 +16,8 @@ CREATE TABLE topic (
     BOOL NOT NULL,
   language
     language NOT NULL,
+  subforum_id
+    BYTES NOT NULL REFERENCES subforum (id),
   title
     STRING NOT NULL,
   slug

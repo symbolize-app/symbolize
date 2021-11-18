@@ -12,8 +12,6 @@ CREATE TABLE tag_history (
     BYTES NOT NULL,
   name
     STRING NOT NULL,
-  slug
-    STRING NOT NULL,
   description
     STRING NOT NULL,
   PRIMARY KEY (tag_id, updated_at)
