@@ -8,6 +8,8 @@ CREATE TABLE taxon_history (
     BYTES NULL REFERENCES member (id),
   deleted
     BOOL NOT NULL,
+  published
+    BOOL NOT NULL,
   parent_taxon_id
     BYTES NULL REFERENCES taxon (id),
   language
@@ -20,7 +22,7 @@ CREATE TABLE taxon_history (
     JSONB NOT NULL,
   slug
     STRING NOT NULL,
-  intro
+  content
     STRING NOT NULL,
   PRIMARY KEY (taxon_id, updated_at)
 );
