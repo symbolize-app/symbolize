@@ -18,8 +18,6 @@ CREATE TABLE tag (
     BYTES NOT NULL,
   name
     STRING NOT NULL,
-  slug
-    STRING NOT NULL,
   description
     STRING NOT NULL
 );

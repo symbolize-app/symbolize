@@ -12,12 +12,12 @@ CREATE TABLE reply (
     TIMESTAMPTZ(0) DEFAULT current_timestamp(0) NOT NULL,
   updated_by
     BYTES NULL REFERENCES member (id),
-  parent_reply_id
-    BYTES NULL,
   deleted
     BOOL DEFAULT false NOT NULL,
   published
     BOOL NOT NULL,
+  parent_reply_id
+    BYTES DEFAULT NULL NULL,
   content
     STRING NOT NULL,
   PRIMARY KEY (topic_id, id),
