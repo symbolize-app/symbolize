@@ -27,7 +27,9 @@ CREATE TABLE info (
   content
     STRING NOT NULL
 );
-CREATE INDEX ON info (cross_language_id);
+CREATE INDEX info_cross_language_id_idx
+  ON info (cross_language_id);
+CREATE INDEX info_updated_at_idx ON info (updated_at);
 GRANT SELECT ON TABLE info TO api_read;
 GRANT SELECT, INSERT, UPDATE ON TABLE info TO api_write;
 

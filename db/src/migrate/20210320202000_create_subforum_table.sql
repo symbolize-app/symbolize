@@ -23,7 +23,8 @@ CREATE TABLE subforum (
   description
     STRING NOT NULL
 );
-CREATE INDEX ON subforum (cross_language_id);
+CREATE INDEX subforum_cross_language_id_idx
+  ON subforum (cross_language_id);
 GRANT SELECT ON TABLE subforum TO api_read;
 GRANT SELECT, INSERT, UPDATE ON TABLE subforum TO api_write;
 
