@@ -29,7 +29,9 @@ CREATE TABLE taxon (
   content
     STRING NOT NULL
 );
-CREATE INDEX ON taxon (cross_language_id);
+CREATE INDEX taxon_cross_language_id_idx
+  ON taxon (cross_language_id);
+CREATE INDEX taxon_updated_at_idx ON taxon (updated_at);
 GRANT SELECT ON TABLE taxon TO api_read;
 GRANT SELECT, INSERT, UPDATE ON TABLE taxon TO api_write;
 

@@ -21,7 +21,8 @@ CREATE TABLE tag (
   description
     STRING NOT NULL
 );
-CREATE INDEX ON tag (cross_language_id);
+CREATE INDEX tag_cross_language_id_idx
+  ON tag (cross_language_id);
 GRANT SELECT ON TABLE tag TO api_read;
 GRANT SELECT, INSERT, UPDATE ON TABLE tag TO api_write;
 

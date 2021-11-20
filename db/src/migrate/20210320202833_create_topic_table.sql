@@ -27,6 +27,7 @@ CREATE TABLE topic (
   content
     STRING NOT NULL
 );
+CREATE INDEX topic_updated_at_idx ON topic (updated_at);
 GRANT SELECT ON TABLE topic TO api_read;
 GRANT SELECT, INSERT, UPDATE ON TABLE topic TO api_write;
 
