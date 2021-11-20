@@ -1,9 +1,7 @@
 -- migrate:up
 CREATE TABLE reply_history (
-  reply_topic_id
-    BYTES NOT NULL,
   reply_id
-    BYTES NOT NULL,
+    BYTES NOT NULL REFERENCES reply (id),
   updated_at
     TIMESTAMPTZ(0) NOT NULL,
   updated_by
@@ -14,9 +12,7 @@ CREATE TABLE reply_history (
     BOOL NOT NULL,
   content
     STRING NOT NULL,
-  PRIMARY KEY (reply_topic_id, reply_id, updated_at),
-  FOREIGN KEY (reply_topic_id, reply_id)
-    REFERENCES reply (topic_id, id)
+  PRIMARY KEY (reply_id, updated_at)
 );
 GRANT SELECT ON TABLE reply_history TO api_read;
 GRANT SELECT, INSERT ON TABLE reply_history TO api_write;

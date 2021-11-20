@@ -362,28 +362,30 @@ INSERT
 INTO
   reply
     (
-      topic_id,
       id,
       created_at,
       created_by,
       updated_at,
       updated_by,
       published,
+      language,
+      topic_id,
       content
     )
 VALUES
   (
-    b'\x0006',
     b'\x0007',
     '2021-11-17 00:00:00+00:00',
     b'\xbb',
     '2021-11-18 00:00:00+00:00',
     b'\xbb',
     true,
+    'en',
+    b'\x0006',
     'Yo'
   )
 ON CONFLICT
-  (topic_id, id)
+  (id)
 DO
   NOTHING;
 
@@ -391,7 +393,6 @@ INSERT
 INTO
   reply_history
     (
-      reply_topic_id,
       reply_id,
       updated_at,
       updated_by,
@@ -400,7 +401,6 @@ INTO
       content
     )
 SELECT
-  reply.topic_id,
   reply.id,
   reply.created_at,
   reply.created_by,
@@ -410,9 +410,9 @@ SELECT
 FROM
   reply
 WHERE
-  reply.topic_id = b'\x0006' AND reply.id = b'\x0007'
+  reply.id = b'\x0007'
 ON CONFLICT
-  (reply_topic_id, reply_id, updated_at)
+  (reply_id, updated_at)
 DO
   NOTHING;
 
@@ -420,28 +420,30 @@ INSERT
 INTO
   reply
     (
-      topic_id,
       id,
       created_at,
       created_by,
       updated_at,
       updated_by,
       published,
+      language,
+      topic_id,
       content
     )
 VALUES
   (
-    b'\x0006',
     b'\x0008',
     '2021-11-18 01:00:00+00:00',
     b'\xbb',
     '2021-11-18 01:00:00+00:00',
     b'\xbb',
     true,
+    'en',
+    b'\x0006',
     'Test 2'
   )
 ON CONFLICT
-  (topic_id, id)
+  (id)
 DO
   NOTHING;
 
@@ -449,30 +451,32 @@ INSERT
 INTO
   reply
     (
-      topic_id,
       id,
       created_at,
       created_by,
       updated_at,
       updated_by,
       published,
+      language,
+      topic_id,
       parent_reply_id,
       content
     )
 VALUES
   (
-    b'\x0006',
     b'\x0009',
     '2021-11-18 02:00:00+00:00',
     b'\xbb',
     '2021-11-18 02:00:00+00:00',
     b'\xbb',
     true,
+    'en',
+    b'\x0006',
     b'\x0007',
     'Test 3'
   )
 ON CONFLICT
-  (topic_id, id)
+  (id)
 DO
   NOTHING;
 

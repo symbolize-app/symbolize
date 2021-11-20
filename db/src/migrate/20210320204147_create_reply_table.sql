@@ -1,9 +1,7 @@
 -- migrate:up
 CREATE TABLE reply (
-  topic_id
-    BYTES NOT NULL REFERENCES topic (id),
   id
-    BYTES,
+    BYTES PRIMARY KEY,
   created_at
     TIMESTAMPTZ(0) DEFAULT current_timestamp(0) NOT NULL,
   created_by
@@ -16,14 +14,16 @@ CREATE TABLE reply (
     BOOL DEFAULT false NOT NULL,
   published
     BOOL NOT NULL,
+  language
+    language NOT NULL,
+  topic_id
+    BYTES NOT NULL REFERENCES topic (id),
   parent_reply_id
-    BYTES DEFAULT NULL NULL,
+    BYTES DEFAULT NULL REFERENCES reply (id),
   content
-    STRING NOT NULL,
-  PRIMARY KEY (topic_id, id),
-  FOREIGN KEY (topic_id, parent_reply_id)
-    REFERENCES reply (topic_id, id)
+    STRING NOT NULL
 );
+CREATE INDEX reply_updated_at_idx ON reply (updated_at);
 GRANT SELECT ON TABLE reply TO api_read;
 GRANT SELECT, INSERT, UPDATE ON TABLE reply TO api_write;
 
