@@ -1,5 +1,5 @@
 -- migrate:up
-CREATE TYPE role AS ENUM ('admin', 'normal');
+CREATE TYPE "role" AS ENUM ('admin', 'normal');
 
 -- migrate:down
-DROP TYPE role;
+DROP TYPE "role";

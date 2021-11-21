@@ -6,7 +6,7 @@ INTO
       created_at,
       updated_at,
       updated_by,
-      role,
+      "role",
       email,
       handle
     )
@@ -50,7 +50,7 @@ INTO
       member_id,
       updated_at,
       updated_by,
-      role,
+      "role",
       private,
       delete_scheduled,
       email,
