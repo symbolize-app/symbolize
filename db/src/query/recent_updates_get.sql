@@ -1,3 +1,6 @@
+-- $1 updated_at
+-- $2 type
+-- $3 id
 WITH
   data
     AS (
@@ -78,15 +81,17 @@ WITH
           info
     )
 SELECT
-  updated_at, type, id::STRING
+  data.language
 FROM
   data
 WHERE
   data.updated_at > '2021-11-18 00:00:00+00:00'
   OR data.updated_at = '2021-11-18 00:00:00+00:00'
     AND (
-        data.type > 'reply'
-        OR data.type = 'reply' AND data.id > b'\x003037'
+        'reply' IS NULL
+        OR data.type > 'reply'
+        OR data.type = 'reply'
+          AND (b'\x003037' IS NULL OR data.id > b'\x003037')
       )
 ORDER BY
   data.updated_at, data.type, data.id

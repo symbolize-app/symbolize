@@ -1,5 +1,5 @@
 -- $1 id
--- $2 updated_old
+-- $2 updated_at_old
 -- $3 title
 -- $4 slug
 -- $5 content
