@@ -6,7 +6,7 @@ CREATE TABLE member_history (
     TIMESTAMPTZ(0) NOT NULL,
   updated_by
     BYTES NULL REFERENCES member (id),
-  role
+  "role"
     role NOT NULL,
   private
     BOOL NOT NULL,

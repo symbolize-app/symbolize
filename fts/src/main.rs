@@ -42,6 +42,34 @@ use tower::make::Shared;
 use url::form_urlencoded;
 use url::Url;
 
+use postgres_types::{FromSql, ToSql};
+
+#[derive(Debug, ToSql, FromSql)]
+#[postgres(name = "language")]
+enum FLanguage {
+  #[postgres(name = "en")]
+  English,
+  #[postgres(name = "fr")]
+  French,
+  #[postgres(name = "ja")]
+  Japanese,
+}
+
+#[derive(Debug, ToSql, FromSql)]
+#[postgres(name = "rank")]
+enum Rank {
+  #[postgres(name = "kingdom")]
+  Kingdom,
+  #[postgres(name = "family")]
+  Family,
+  #[postgres(name = "genus")]
+  Genus,
+  #[postgres(name = "species")]
+  Species,
+  #[postgres(name = "variant")]
+  Variant,
+}
+
 #[derive(Clone)]
 struct Context {
   schema: Schema,
@@ -205,11 +233,13 @@ async fn load_db() -> Result<(), Box<dyn Error>> {
     connection.await.unwrap();
     println!("CONNECTED");
   });
-  for row in
-    &client.query("SELECT title FROM topic", &[]).await?
-  {
-    let id: &str = row.get(0);
-    println!("{}", id);
+  const QUERY_TEXT: &str = include_str!(
+    "../../db/src/query/recent_updates_get.sql"
+  );
+  //const QUERY_TEXT: &str = "select 'genus'::rank;";
+  for row in &client.query(QUERY_TEXT, &[]).await? {
+    let id: FLanguage = row.try_get(0)?;
+    println!("{:?}", id);
   }
   println!("DONE");
   Ok(())
