@@ -1,11 +1,11 @@
 -- migrate:up
 CREATE TABLE taxon_slug (
+  id
+    BYTES NOT NULL REFERENCES taxon (id),
   language
     language NOT NULL,
   slug
     STRING NOT NULL,
-  taxon_id
-    BYTES NOT NULL REFERENCES taxon (id),
   PRIMARY KEY (language, slug)
 );
 GRANT SELECT ON TABLE taxon_slug TO api_read;

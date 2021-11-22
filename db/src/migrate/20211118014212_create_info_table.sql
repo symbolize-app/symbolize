@@ -11,21 +11,19 @@ CREATE TABLE info (
   updated_by
     BYTES NULL REFERENCES member (id),
   deleted
-    BOOL DEFAULT false NOT NULL,
-  published
-    BOOL NOT NULL,
+    BOOL DEFAULT true NOT NULL,
   language
     language NOT NULL,
   cross_language_id
     BYTES NOT NULL,
   title
-    STRING NOT NULL,
+    STRING DEFAULT '' NOT NULL,
   slug
-    STRING NOT NULL,
+    STRING DEFAULT '' NOT NULL,
   tags
-    JSONB NOT NULL,
+    JSONB DEFAULT jsonb_build_array() NOT NULL,
   content
-    STRING NOT NULL
+    STRING DEFAULT '' NOT NULL
 );
 CREATE INDEX info_cross_language_id_idx
   ON info (cross_language_id);
