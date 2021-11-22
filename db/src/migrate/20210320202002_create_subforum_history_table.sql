@@ -1,6 +1,6 @@
 -- migrate:up
 CREATE TABLE subforum_history (
-  subforum_id
+  id
     BYTES NOT NULL REFERENCES subforum (id),
   updated_at
     TIMESTAMPTZ(0) NOT NULL,
@@ -16,7 +16,7 @@ CREATE TABLE subforum_history (
     STRING NOT NULL,
   description
     STRING NOT NULL,
-  PRIMARY KEY (subforum_id, updated_at)
+  PRIMARY KEY (id, updated_at)
 );
 GRANT SELECT ON TABLE subforum_history TO api_read;
 GRANT SELECT, INSERT ON TABLE subforum_history TO api_write;

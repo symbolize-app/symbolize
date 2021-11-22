@@ -47,12 +47,12 @@ INSERT
 INTO
   member_history
     (
-      member_id,
+      id,
       updated_at,
       updated_by,
       "role",
       private,
-      delete_scheduled,
+      delete_scheduled_at,
       email,
       handle
     )
@@ -62,7 +62,7 @@ SELECT
   member.id,
   member.role,
   member.private,
-  member.delete_scheduled,
+  member.delete_scheduled_at,
   member.email,
   'aaz'
 FROM
@@ -70,7 +70,7 @@ FROM
 WHERE
   member.id = b'\xaa'
 ON CONFLICT
-  (member_id, updated_at)
+  (id, updated_at)
 DO
   NOTHING;
 
@@ -169,9 +169,9 @@ DO
 
 INSERT
 INTO
-  subforum_slug (language, slug, subforum_id)
+  subforum_slug (id, language, slug)
 SELECT
-  subforum.language, subforum.slug, subforum.id
+  subforum.id, subforum.language, subforum.slug
 FROM
   subforum
 WHERE
@@ -185,7 +185,7 @@ INSERT
 INTO
   subforum_history
     (
-      subforum_id,
+      id,
       updated_at,
       updated_by,
       deleted,
@@ -208,7 +208,7 @@ FROM
 WHERE
   subforum.id = b'\x0002'
 ON CONFLICT
-  (subforum_id, updated_at)
+  (id, updated_at)
 DO
   NOTHING;
 
@@ -247,7 +247,7 @@ INSERT
 INTO
   tag_history
     (
-      tag_id,
+      id,
       updated_at,
       updated_by,
       deleted,
@@ -268,7 +268,7 @@ FROM
 WHERE
   tag.id = b'\x0004'
 ON CONFLICT
-  (tag_id, updated_at)
+  (id, updated_at)
 DO
   NOTHING;
 
@@ -281,7 +281,7 @@ INTO
       created_by,
       updated_at,
       updated_by,
-      published,
+      deleted,
       language,
       subforum_id,
       title,
@@ -296,7 +296,7 @@ VALUES
     b'\xaa',
     '2021-11-18 00:00:00+00:00',
     b'\xaa',
-    true,
+    false,
     'en',
     b'\x0002',
     'Hello',
@@ -311,9 +311,9 @@ DO
 
 INSERT
 INTO
-  topic_slug (language, slug, topic_id)
+  topic_slug (id, language, slug)
 SELECT
-  topic.language, topic.slug, topic.id
+  topic.id, topic.language, topic.slug
 FROM
   topic
 WHERE
@@ -327,11 +327,12 @@ INSERT
 INTO
   topic_history
     (
-      topic_id,
+      id,
+      saved_at,
+      saved_by,
+      scheduled_at,
       updated_at,
-      updated_by,
       deleted,
-      published,
       subforum_id,
       title,
       slug,
@@ -342,8 +343,9 @@ SELECT
   topic.id,
   topic.created_at,
   topic.created_by,
+  topic.updated_at,
+  topic.updated_at,
   topic.deleted,
-  topic.published,
   topic.subforum_id,
   topic.title,
   topic.slug,
@@ -354,7 +356,7 @@ FROM
 WHERE
   topic.id = b'\x0006'
 ON CONFLICT
-  (topic_id, updated_at)
+  (id, saved_at)
 DO
   NOTHING;
 
@@ -367,7 +369,7 @@ INTO
       created_by,
       updated_at,
       updated_by,
-      published,
+      deleted,
       language,
       topic_id,
       content
@@ -379,7 +381,7 @@ VALUES
     b'\xbb',
     '2021-11-18 00:00:00+00:00',
     b'\xbb',
-    true,
+    false,
     'en',
     b'\x0006',
     'Yo'
@@ -393,26 +395,28 @@ INSERT
 INTO
   reply_history
     (
-      reply_id,
+      id,
+      saved_at,
+      saved_by,
+      scheduled_at,
       updated_at,
-      updated_by,
       deleted,
-      published,
       content
     )
 SELECT
   reply.id,
   reply.created_at,
   reply.created_by,
+  reply.created_at,
+  reply.created_at,
   reply.deleted,
-  false,
   reply.content
 FROM
   reply
 WHERE
   reply.id = b'\x0007'
 ON CONFLICT
-  (reply_id, updated_at)
+  (id, saved_at)
 DO
   NOTHING;
 
@@ -425,7 +429,7 @@ INTO
       created_by,
       updated_at,
       updated_by,
-      published,
+      deleted,
       language,
       topic_id,
       content
@@ -437,7 +441,7 @@ VALUES
     b'\xbb',
     '2021-11-18 01:00:00+00:00',
     b'\xbb',
-    true,
+    false,
     'en',
     b'\x0006',
     'Test 2'
@@ -456,7 +460,7 @@ INTO
       created_by,
       updated_at,
       updated_by,
-      published,
+      deleted,
       language,
       topic_id,
       parent_reply_id,
@@ -469,7 +473,7 @@ VALUES
     b'\xbb',
     '2021-11-18 02:00:00+00:00',
     b'\xbb',
-    true,
+    false,
     'en',
     b'\x0006',
     b'\x0007',
@@ -489,7 +493,7 @@ INTO
       created_by,
       updated_at,
       updated_by,
-      published,
+      deleted,
       language,
       cross_language_id,
       rank,
@@ -505,7 +509,7 @@ VALUES
     b'\xaa',
     '2021-11-18 00:00:00+00:00',
     b'\xaa',
-    true,
+    false,
     'en',
     b'\x000b',
     'family',
@@ -521,9 +525,9 @@ DO
 
 INSERT
 INTO
-  taxon_slug (language, slug, taxon_id)
+  taxon_slug (id, language, slug)
 SELECT
-  taxon.language, taxon.slug, taxon.id
+  taxon.id, taxon.language, taxon.slug
 FROM
   taxon
 WHERE
@@ -537,11 +541,12 @@ INSERT
 INTO
   taxon_history
     (
-      taxon_id,
+      id,
+      saved_at,
+      saved_by,
+      scheduled_at,
       updated_at,
-      updated_by,
       deleted,
-      published,
       cross_language_id,
       rank,
       parent_taxon_id,
@@ -553,8 +558,9 @@ SELECT
   taxon.id,
   taxon.created_at,
   taxon.created_by,
+  taxon.created_at,
+  taxon.created_at,
   taxon.deleted,
-  taxon.published,
   taxon.cross_language_id,
   taxon.rank,
   taxon.parent_taxon_id,
@@ -566,7 +572,7 @@ FROM
 WHERE
   taxon.id = b'\x000a'
 ON CONFLICT
-  (taxon_id, updated_at)
+  (id, saved_at)
 DO
   NOTHING;
 
@@ -579,7 +585,7 @@ INTO
       created_by,
       updated_at,
       updated_by,
-      published,
+      deleted,
       language,
       cross_language_id,
       title,
@@ -594,7 +600,7 @@ VALUES
     b'\xaa',
     '2021-11-18 00:00:00+00:00',
     b'\xaa',
-    true,
+    false,
     'en',
     b'\x000d',
     'Water',
@@ -609,9 +615,9 @@ DO
 
 INSERT
 INTO
-  info_slug (language, slug, info_id)
+  info_slug (id, language, slug)
 SELECT
-  info.language, info.slug, info.id
+  info.id, info.language, info.slug
 FROM
   info
 WHERE
@@ -625,11 +631,12 @@ INSERT
 INTO
   info_history
     (
-      info_id,
+      id,
+      saved_at,
+      saved_by,
+      scheduled_at,
       updated_at,
-      updated_by,
       deleted,
-      published,
       cross_language_id,
       title,
       slug,
@@ -640,8 +647,9 @@ SELECT
   info.id,
   info.created_at,
   info.created_by,
+  info.created_at,
+  info.created_at,
   info.deleted,
-  info.published,
   info.cross_language_id,
   'W',
   info.slug,
@@ -652,6 +660,6 @@ FROM
 WHERE
   info.id = b'\x000c'
 ON CONFLICT
-  (info_id, updated_at)
+  (id, saved_at)
 DO
   NOTHING;

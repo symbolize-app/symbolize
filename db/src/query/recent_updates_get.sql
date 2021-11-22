@@ -85,13 +85,13 @@ SELECT
 FROM
   data
 WHERE
-  data.updated_at > '2021-11-18 00:00:00+00:00'
-  OR data.updated_at = '2021-11-18 00:00:00+00:00'
+  $1 IS NULL
+  OR data.updated_at > $1
+  OR data.updated_at = $1
     AND (
-        'reply' IS NULL
-        OR data.type > 'reply'
-        OR data.type = 'reply'
-          AND (b'\x003037' IS NULL OR data.id > b'\x003037')
+        $2 IS NULL
+        OR data.type > $2
+        OR data.type = $2 AND ($3 IS NULL OR data.id > $3)
       )
 ORDER BY
   data.updated_at, data.type, data.id

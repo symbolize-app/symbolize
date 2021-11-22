@@ -11,21 +11,19 @@ CREATE TABLE topic (
   updated_by
     BYTES NULL REFERENCES member (id),
   deleted
-    BOOL DEFAULT false NOT NULL,
-  published
-    BOOL NOT NULL,
+    BOOL DEFAULT true NOT NULL,
   language
     language NOT NULL,
   subforum_id
     BYTES NOT NULL REFERENCES subforum (id),
   title
-    STRING NOT NULL,
+    STRING DEFAULT '' NOT NULL,
   slug
-    STRING NOT NULL,
+    STRING DEFAULT '' NOT NULL,
   tags
-    JSONB NOT NULL,
+    JSONB DEFAULT jsonb_build_array() NOT NULL,
   content
-    STRING NOT NULL
+    STRING DEFAULT '' NOT NULL
 );
 CREATE INDEX topic_updated_at_idx ON topic (updated_at);
 GRANT SELECT ON TABLE topic TO api_read;

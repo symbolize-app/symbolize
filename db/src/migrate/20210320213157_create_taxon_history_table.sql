@@ -1,15 +1,19 @@
 -- migrate:up
 CREATE TABLE taxon_history (
-  taxon_id
+  id
     BYTES NOT NULL REFERENCES taxon (id),
-  updated_at
+  saved_at
     TIMESTAMPTZ(0) DEFAULT current_timestamp(0) NOT NULL,
-  updated_by
+  saved_by
     BYTES NULL REFERENCES member (id),
+  scheduled_at
+    TIMESTAMPTZ(0) DEFAULT NULL NULL,
+  updated_at
+    TIMESTAMPTZ(0) DEFAULT NULL NULL,
+  latest
+    BOOL DEFAULT true NOT NULL,
   deleted
-    BOOL NOT NULL,
-  published
-    BOOL NOT NULL,
+    BOOL DEFAULT false NOT NULL,
   cross_language_id
     BYTES NOT NULL,
   rank
@@ -22,8 +26,21 @@ CREATE TABLE taxon_history (
     STRING NOT NULL,
   content
     STRING NOT NULL,
-  PRIMARY KEY (taxon_id, updated_at)
+  PRIMARY KEY (id, saved_at)
 );
+CREATE INDEX taxon_history_scheduled_at_not_updated_idx
+  ON taxon_history (scheduled_at)
+  WHERE
+    latest = true
+    AND scheduled_at IS NOT NULL
+    AND updated_at IS NULL;
+CREATE INDEX taxon_history_saved_by_updated_at_latest_scheduled_at_idx
+  ON taxon_history (
+    saved_by,
+    updated_at,
+    latest,
+    scheduled_at
+  );
 GRANT SELECT ON TABLE taxon_history TO api_read;
 GRANT SELECT, INSERT ON TABLE taxon_history TO api_write;
 

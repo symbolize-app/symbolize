@@ -11,9 +11,7 @@ CREATE TABLE taxon (
   updated_by
     BYTES NULL REFERENCES member (id),
   deleted
-    BOOL DEFAULT false NOT NULL,
-  published
-    BOOL NOT NULL,
+    BOOL DEFAULT true NOT NULL,
   language
     language NOT NULL,
   cross_language_id
@@ -23,11 +21,11 @@ CREATE TABLE taxon (
   parent_taxon_id
     BYTES NULL REFERENCES taxon (id),
   names
-    JSONB NOT NULL,
+    JSONB DEFAULT jsonb_build_array() NOT NULL,
   slug
-    STRING NOT NULL,
+    STRING DEFAULT '' NOT NULL,
   content
-    STRING NOT NULL
+    STRING DEFAULT '' NOT NULL
 );
 CREATE INDEX taxon_cross_language_id_idx
   ON taxon (cross_language_id);
