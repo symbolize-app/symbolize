@@ -16,8 +16,8 @@ CREATE TABLE taxon (
     language NOT NULL,
   cross_language_id
     BYTES NOT NULL,
-  rank
-    rank NOT NULL,
+  taxon_rank
+    taxon_rank NOT NULL,
   parent_taxon_id
     BYTES NULL REFERENCES taxon (id),
   names
