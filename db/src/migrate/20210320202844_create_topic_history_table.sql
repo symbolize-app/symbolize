@@ -8,6 +8,8 @@ CREATE TABLE topic_history (
     BYTES NULL REFERENCES member (id),
   scheduled_at
     TIMESTAMPTZ(0) DEFAULT NULL NULL,
+  in_progress_at
+    TIMESTAMPTZ(0) DEFAULT NULL NULL,
   updated_at
     TIMESTAMPTZ(0) DEFAULT NULL NULL,
   latest

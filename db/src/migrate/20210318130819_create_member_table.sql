@@ -10,8 +10,8 @@ CREATE TABLE member (
     BYTES NULL REFERENCES member (id),
   delete_scheduled_at
     TIMESTAMPTZ(0) DEFAULT NULL NULL,
-  "role"
-    role DEFAULT 'normal' NOT NULL,
+  member_role
+    member_role DEFAULT 'normal' NOT NULL,
   private
     BOOL DEFAULT false NOT NULL,
   email

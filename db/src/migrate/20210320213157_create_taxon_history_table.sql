@@ -8,6 +8,8 @@ CREATE TABLE taxon_history (
     BYTES NULL REFERENCES member (id),
   scheduled_at
     TIMESTAMPTZ(0) DEFAULT NULL NULL,
+  in_progress_at
+    TIMESTAMPTZ(0) DEFAULT NULL NULL,
   updated_at
     TIMESTAMPTZ(0) DEFAULT NULL NULL,
   latest
@@ -16,8 +18,8 @@ CREATE TABLE taxon_history (
     BOOL DEFAULT false NOT NULL,
   cross_language_id
     BYTES NOT NULL,
-  rank
-    rank NOT NULL,
+  taxon_rank
+    taxon_rank NOT NULL,
   parent_taxon_id
     BYTES NULL REFERENCES taxon (id),
   names
