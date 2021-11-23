@@ -8,8 +8,8 @@ CREATE TABLE member_history (
     BYTES NULL REFERENCES member (id),
   delete_scheduled_at
     TIMESTAMPTZ(0) NULL,
-  "role"
-    role NOT NULL,
+  member_role
+    member_role NOT NULL,
   private
     BOOL NOT NULL,
   email

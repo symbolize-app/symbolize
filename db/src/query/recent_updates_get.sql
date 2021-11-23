@@ -11,11 +11,10 @@ WITH
         topic.created_by,
         topic.updated_at,
         topic.deleted,
-        topic.published,
         topic.language,
         topic.subforum_id,
         NULL AS topic_id,
-        NULL AS rank,
+        NULL AS taxon_rank,
         topic.title,
         NULL AS names,
         topic.tags,
@@ -30,11 +29,10 @@ WITH
           reply.created_by,
           reply.updated_at,
           reply.deleted,
-          reply.published,
           reply.language,
           NULL AS subforum_id,
           reply.topic_id,
-          NULL AS rank,
+          NULL AS taxon_rank,
           NULL AS title,
           NULL AS names,
           NULL AS tags,
@@ -49,11 +47,10 @@ WITH
           taxon.created_by,
           taxon.updated_at,
           taxon.deleted,
-          taxon.published,
           taxon.language,
           NULL AS subforum_id,
           NULL AS topic_id,
-          taxon.rank,
+          taxon.taxon_rank,
           NULL AS title,
           taxon.names,
           NULL AS tags,
@@ -68,11 +65,10 @@ WITH
           info.created_by,
           info.updated_at,
           info.deleted,
-          info.published,
           info.language,
           NULL AS subforum_id,
           NULL AS topic_id,
-          NULL AS rank,
+          NULL AS taxon_rank,
           info.title,
           NULL AS names,
           info.tags,
@@ -85,13 +81,14 @@ SELECT
 FROM
   data
 WHERE
-  $1 IS NULL
-  OR data.updated_at > $1
-  OR data.updated_at = $1
+  $1::TIMESTAMPTZ(0) IS NULL
+  OR data.updated_at > $1::TIMESTAMPTZ(0)
+  OR data.updated_at = $1::TIMESTAMPTZ(0)
     AND (
-        $2 IS NULL
-        OR data.type > $2
-        OR data.type = $2 AND ($3 IS NULL OR data.id > $3)
+        $2::STRING IS NULL
+        OR data.type > $2::STRING
+        OR data.type = $2::STRING
+          AND ($3::BYTES IS NULL OR data.id > $3::BYTES)
       )
 ORDER BY
   data.updated_at, data.type, data.id

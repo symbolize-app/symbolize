@@ -29,7 +29,7 @@ use tantivy::schema::IndexRecordOption;
 use tantivy::schema::Schema;
 use tantivy::schema::TextFieldIndexing;
 use tantivy::schema::TextOptions;
-use tantivy::tokenizer::Language;
+use tantivy::tokenizer::Language as TokenizerLanguage;
 use tantivy::tokenizer::LowerCaser;
 use tantivy::tokenizer::SimpleTokenizer;
 use tantivy::tokenizer::Stemmer;
@@ -43,10 +43,11 @@ use url::form_urlencoded;
 use url::Url;
 
 use postgres_types::{FromSql, ToSql};
+use std::time::SystemTime;
 
 #[derive(Debug, ToSql, FromSql)]
 #[postgres(name = "language")]
-enum FLanguage {
+enum Language {
   #[postgres(name = "en")]
   English,
   #[postgres(name = "fr")]
@@ -56,8 +57,8 @@ enum FLanguage {
 }
 
 #[derive(Debug, ToSql, FromSql)]
-#[postgres(name = "rank")]
-enum Rank {
+#[postgres(name = "taxon_rank")]
+enum TaxonRank {
   #[postgres(name = "kingdom")]
   Kingdom,
   #[postgres(name = "family")]
@@ -127,7 +128,7 @@ fn load_index() -> Result<
     Index::open_or_create(index_dir, schema.clone())?;
   let tokenizer = TextAnalyzer::from(SimpleTokenizer)
     .filter(LowerCaser)
-    .filter(Stemmer::new(Language::English));
+    .filter(Stemmer::new(TokenizerLanguage::English));
   index.tokenizers().register("basic", tokenizer);
   let index_meta = index.load_metas()?;
   if index_meta.payload != Some("TEST".to_string()) {
@@ -236,9 +237,14 @@ async fn load_db() -> Result<(), Box<dyn Error>> {
   const QUERY_TEXT: &str = include_str!(
     "../../db/src/query/recent_updates_get.sql"
   );
-  //const QUERY_TEXT: &str = "select 'genus'::rank;";
-  for row in &client.query(QUERY_TEXT, &[]).await? {
-    let id: FLanguage = row.try_get(0)?;
+  let mut updated_at: Option<SystemTime> = None;
+  let mut typ: Option<String> = None;
+  let mut id: Option<Vec<u8>> = None;
+  for row in &client
+    .query(QUERY_TEXT, &[&updated_at, &typ, &id])
+    .await?
+  {
+    let id: Language = row.try_get(0)?;
     println!("{:?}", id);
   }
   println!("DONE");
