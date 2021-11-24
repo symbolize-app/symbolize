@@ -17,7 +17,7 @@ CREATE TABLE tag_history (
   PRIMARY KEY (id, updated_at)
 );
 GRANT SELECT ON TABLE tag_history TO api_read;
-GRANT SELECT, INSERT ON TABLE tag_history TO api_write;
+GRANT SELECT, INSERT, UPDATE ON TABLE tag_history TO api_write;
 
 -- migrate:down
 DROP TABLE tag_history;

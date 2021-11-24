@@ -281,6 +281,8 @@ INTO
       created_by,
       updated_at,
       updated_by,
+      bumped_at,
+      bumped_by,
       deleted,
       language,
       subforum_id,
@@ -295,6 +297,8 @@ VALUES
     '2021-11-17 00:00:00+00:00',
     b'\xaa',
     '2021-11-18 00:00:00+00:00',
+    b'\xaa',
+    '2021-11-19 00:00:00+00:00',
     b'\xaa',
     false,
     'en',
@@ -357,6 +361,20 @@ WHERE
   topic.id = b'\x0006'
 ON CONFLICT
   (id, saved_at)
+DO
+  NOTHING;
+
+INSERT
+INTO
+  topic_bump (id, created_at, created_by)
+SELECT
+  topic.id, topic.bumped_at, topic.bumped_by
+FROM
+  topic
+WHERE
+  topic.id = b'\x0006'
+ON CONFLICT
+  (id, created_at)
 DO
   NOTHING;
 
