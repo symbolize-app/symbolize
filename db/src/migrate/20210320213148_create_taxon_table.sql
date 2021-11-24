@@ -30,6 +30,10 @@ CREATE TABLE taxon (
 CREATE INDEX taxon_cross_language_id_idx
   ON taxon (cross_language_id);
 CREATE INDEX taxon_updated_at_idx ON taxon (updated_at);
+CREATE INDEX taxon_created_by_updated_at_idx
+  ON taxon (created_by, deleted, updated_at);
+CREATE INDEX taxon_updated_by_updated_at_idx
+  ON taxon (updated_by, deleted, updated_at);
 GRANT SELECT ON TABLE taxon TO api_read;
 GRANT SELECT, INSERT, UPDATE ON TABLE taxon TO api_write;
 

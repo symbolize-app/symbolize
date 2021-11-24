@@ -19,6 +19,8 @@ CREATE TABLE member (
   handle
     STRING NOT NULL UNIQUE
 );
+CREATE INDEX member_updated_by_updated_at_idx
+  ON member (updated_by, updated_at);
 GRANT SELECT ON TABLE member TO api_read;
 GRANT SELECT, INSERT, UPDATE ON TABLE member TO api_write;
 

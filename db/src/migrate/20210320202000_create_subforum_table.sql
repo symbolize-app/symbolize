@@ -25,6 +25,10 @@ CREATE TABLE subforum (
 );
 CREATE INDEX subforum_cross_language_id_idx
   ON subforum (cross_language_id);
+CREATE INDEX subforum_created_by_idx
+  ON subforum (created_by);
+CREATE INDEX subforum_updated_by_idx
+  ON subforum (updated_by);
 GRANT SELECT ON TABLE subforum TO api_read;
 GRANT SELECT, INSERT, UPDATE ON TABLE subforum TO api_write;
 
