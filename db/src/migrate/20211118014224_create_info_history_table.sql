@@ -42,7 +42,7 @@ CREATE INDEX info_history_saved_by_updated_at_latest_scheduled_at_idx
     scheduled_at
   );
 GRANT SELECT ON TABLE info_history TO api_read;
-GRANT SELECT, INSERT ON TABLE info_history TO api_write;
+GRANT SELECT, INSERT, UPDATE ON TABLE info_history TO api_write;
 
 -- migrate:down
 DROP TABLE info_history;

@@ -19,7 +19,7 @@ CREATE TABLE member_history (
   PRIMARY KEY (id, updated_at)
 );
 GRANT SELECT ON TABLE member_history TO api_read;
-GRANT SELECT, INSERT ON TABLE member_history TO api_write;
+GRANT SELECT, INSERT, UPDATE ON TABLE member_history TO api_write;
 
 -- migrate:down
 DROP TABLE member_history;

@@ -19,7 +19,7 @@ CREATE TABLE subforum_history (
   PRIMARY KEY (id, updated_at)
 );
 GRANT SELECT ON TABLE subforum_history TO api_read;
-GRANT SELECT, INSERT ON TABLE subforum_history TO api_write;
+GRANT SELECT, INSERT, UPDATE ON TABLE subforum_history TO api_write;
 
 -- migrate:down
 DROP TABLE subforum_history;

@@ -9,7 +9,7 @@ CREATE TABLE subforum_slug (
   PRIMARY KEY (language, slug)
 );
 GRANT SELECT ON TABLE subforum_slug TO api_read;
-GRANT SELECT, INSERT ON TABLE subforum_slug TO api_write;
+GRANT SELECT, INSERT, UPDATE ON TABLE subforum_slug TO api_write;
 
 -- migrate:down
 DROP TABLE subforum_slug;
