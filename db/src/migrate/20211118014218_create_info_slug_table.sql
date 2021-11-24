@@ -9,7 +9,7 @@ CREATE TABLE info_slug (
   PRIMARY KEY (language, slug)
 );
 GRANT SELECT ON TABLE info_slug TO api_read;
-GRANT SELECT, INSERT ON TABLE info_slug TO api_write;
+GRANT SELECT, INSERT, UPDATE ON TABLE info_slug TO api_write;
 
 -- migrate:down
 DROP TABLE info_slug;

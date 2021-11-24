@@ -34,7 +34,7 @@ CREATE INDEX reply_history_saved_by_updated_at_latest_scheduled_at_idx
     scheduled_at
   );
 GRANT SELECT ON TABLE reply_history TO api_read;
-GRANT SELECT, INSERT ON TABLE reply_history TO api_write;
+GRANT SELECT, INSERT, UPDATE ON TABLE reply_history TO api_write;
 
 -- migrate:down
 DROP TABLE reply_history;
