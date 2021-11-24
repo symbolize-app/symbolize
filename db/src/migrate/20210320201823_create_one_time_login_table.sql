@@ -11,6 +11,8 @@ CREATE TABLE one_time_login (
   session_id
     BYTES DEFAULT NULL NULL REFERENCES session (id)
 );
+CREATE INDEX one_time_login_member_id_deleted_at_created_at_idx
+  ON one_time_login (member_id, deleted_at, created_at);
 GRANT SELECT ON TABLE one_time_login TO api_read;
 GRANT SELECT, INSERT, UPDATE ON TABLE one_time_login TO api_write;
 

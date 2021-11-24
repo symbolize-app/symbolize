@@ -18,6 +18,8 @@ CREATE TABLE member_history (
     STRING NOT NULL,
   PRIMARY KEY (id, updated_at)
 );
+CREATE INDEX member_history_updated_by_updated_at_idx
+  ON member_history (updated_by, updated_at);
 GRANT SELECT ON TABLE member_history TO api_read;
 GRANT SELECT, INSERT, UPDATE ON TABLE member_history TO api_write;
 

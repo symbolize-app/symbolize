@@ -23,6 +23,8 @@ CREATE TABLE session (
     DEFAULT jsonb_build_array(current_timestamp(0)::STRING)
     NOT NULL
 );
+CREATE INDEX session_member_id_deleted_at_last_active_at_idx
+  ON session (member_id, deleted_at, last_active_at);
 GRANT SELECT ON TABLE session TO api_read;
 GRANT SELECT, INSERT, UPDATE ON TABLE session TO api_write;
 
