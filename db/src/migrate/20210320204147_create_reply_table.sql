@@ -22,6 +22,10 @@ CREATE TABLE reply (
     STRING DEFAULT '' NOT NULL
 );
 CREATE INDEX reply_updated_at_idx ON reply (updated_at);
+CREATE INDEX reply_created_by_deleted_updated_at_idx
+  ON reply (created_by, deleted, updated_at);
+CREATE INDEX reply_updated_by_deleted_updated_at_idx
+  ON reply (updated_by, deleted, updated_at);
 GRANT SELECT ON TABLE reply TO api_read;
 GRANT SELECT, INSERT, UPDATE ON TABLE reply TO api_write;
 

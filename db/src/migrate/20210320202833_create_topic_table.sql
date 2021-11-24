@@ -32,6 +32,12 @@ CREATE TABLE topic (
 CREATE INDEX topic_updated_at_idx ON topic (updated_at);
 CREATE INDEX topic_subforum_id_bumped_at_idx
   ON topic (subforum_id, bumped_at) WHERE deleted = false;
+CREATE INDEX topic_created_by_deleted_bumped_at_idx
+  ON topic (created_by, deleted, bumped_at);
+CREATE INDEX topic_updated_by_deleted_bumped_at_idx
+  ON topic (updated_by, deleted, bumped_at);
+CREATE INDEX topic_bumped_by_deleted_bumped_at_idx
+  ON topic (bumped_by, deleted, bumped_at);
 GRANT SELECT ON TABLE topic TO api_read;
 GRANT SELECT, INSERT, UPDATE ON TABLE topic TO api_write;
 

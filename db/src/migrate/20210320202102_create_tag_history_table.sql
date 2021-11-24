@@ -16,6 +16,8 @@ CREATE TABLE tag_history (
     STRING NOT NULL,
   PRIMARY KEY (id, updated_at)
 );
+CREATE INDEX tag_history_updated_by_idx
+  ON tag_history (updated_by);
 GRANT SELECT ON TABLE tag_history TO api_read;
 GRANT SELECT, INSERT, UPDATE ON TABLE tag_history TO api_write;
 

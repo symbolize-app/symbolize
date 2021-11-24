@@ -18,6 +18,8 @@ CREATE TABLE subforum_history (
     STRING NOT NULL,
   PRIMARY KEY (id, updated_at)
 );
+CREATE INDEX subforum_history_updated_by_idx
+  ON subforum_history (updated_by);
 GRANT SELECT ON TABLE subforum_history TO api_read;
 GRANT SELECT, INSERT, UPDATE ON TABLE subforum_history TO api_write;
 

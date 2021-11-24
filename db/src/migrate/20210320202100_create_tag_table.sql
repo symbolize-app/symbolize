@@ -23,6 +23,8 @@ CREATE TABLE tag (
 );
 CREATE INDEX tag_cross_language_id_idx
   ON tag (cross_language_id);
+CREATE INDEX tag_created_by_idx ON tag (created_by);
+CREATE INDEX tag_updated_by_idx ON tag (updated_by);
 GRANT SELECT ON TABLE tag TO api_read;
 GRANT SELECT, INSERT, UPDATE ON TABLE tag TO api_write;
 
