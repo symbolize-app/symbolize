@@ -6,18 +6,19 @@ edition = "2021"
 [dependencies]
 cargo-watch = "8.1.1"
 hyper = { version = "0.14", features = ["full"] }
+lindera = "0.8.1"
+lindera-core = "0.8.1"
+lindera-tantivy = "0.8.1"
 openssl = "0.10.38"
 percent-encoding = "2.1.0"
 postgres-openssl = "0.5.0"
-# postgres-openssl = { version = "0.5.0", path = "../../rust-postgres/postgres-openssl" }
 postgres-types = { version = "0.2.2", features = ["derive"] }
-# postgres-types = { version = "0.2.2", path = "../../rust-postgres/postgres-types", features= ["derive"] }
+strum = "0.23.0"
+strum_macros = "0.23"
 tantivy = "0.16.1"
 tantivy-cli = "0.15.0"
 tokio = { version = "1.5", features = ["full"] }
 tokio-postgres = "0.7.5"
-# tokio-postgres = { path = "../../rust-postgres/tokio-postgres" }
-# postgres-protocol = { version = "0.6.1", path = "../../rust-postgres/postgres-protocol" }
 tower = { version = "0.4.10", features = ["make"] }
 tower-service = "0.3.1"
 url = "1.7.2"
