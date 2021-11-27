@@ -1,39 +1,10 @@
+use crate::core::document::Language;
 use std::collections::HashMap;
 use std::env;
 use std::error::Error as StdError;
 
 pub struct Context {
   pub client: tokio_postgres::Client,
-}
-
-#[derive(
-  Debug, postgres_types::ToSql, postgres_types::FromSql,
-)]
-#[postgres(name = "language")]
-enum Language {
-  #[postgres(name = "en")]
-  English,
-  #[postgres(name = "fr")]
-  French,
-  #[postgres(name = "ja")]
-  Japanese,
-}
-
-#[derive(
-  Debug, postgres_types::ToSql, postgres_types::FromSql,
-)]
-#[postgres(name = "taxon_rank")]
-enum TaxonRank {
-  #[postgres(name = "kingdom")]
-  Kingdom,
-  #[postgres(name = "family")]
-  Family,
-  #[postgres(name = "genus")]
-  Genus,
-  #[postgres(name = "species")]
-  Species,
-  #[postgres(name = "variant")]
-  Variant,
 }
 
 pub async fn load() -> Result<Context, Box<dyn StdError>> {
