@@ -7,6 +7,7 @@
   Hash,
   strum_macros::EnumIter,
   strum_macros::AsRefStr,
+  strum_macros::EnumString,
   postgres_types::ToSql,
   postgres_types::FromSql,
 )]
