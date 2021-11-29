@@ -6,6 +6,7 @@ use std::collections::HashMap;
 use std::env;
 use std::error::Error as StdError;
 use std::net;
+use std::str::FromStr as _;
 use std::sync::Arc;
 
 pub async fn run_server(
@@ -42,11 +43,21 @@ async fn handle_request(
   hyper::Response<hyper::Body>,
   Box<dyn StdError + Send + Sync>,
 > {
+  let params = url::form_urlencoded::parse(
+    req.uri().query().ok_or("invalid query")?.as_bytes(),
+  )
+  .into_owned()
+  .collect::<HashMap<String, String>>();
+  let language =
+    params.get("l").ok_or("missing language param")?;
+  let language: Language = Language::from_str(language)?;
+  let query =
+    params.get("q").ok_or("missing query param")?;
   let search_context = search_context.as_ref();
   let _db_context = db_context.as_ref();
   let instance = search_context
     .instances
-    .get(&Language::Japanese)
+    .get(&language)
     .ok_or("Invalid language")?;
   let searcher = instance.index_reader.searcher();
   let query_parser = tantivy::query::QueryParser::for_index(
@@ -57,15 +68,7 @@ async fn handle_request(
     ],
   );
   println!("{}", message::get_message());
-  let query = query_parser.parse_query(
-    url::form_urlencoded::parse(
-      req.uri().query().ok_or("invalid query")?.as_bytes(),
-    )
-    .into_owned()
-    .collect::<HashMap<String, String>>()
-    .get("q")
-    .ok_or("missing query param")?,
-  )?;
+  let query = query_parser.parse_query(query)?;
   let top_docs = searcher.search(
     &query,
     &tantivy::collector::TopDocs::with_limit(10),
