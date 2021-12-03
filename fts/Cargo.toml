@@ -9,14 +9,17 @@ hyper = { version = "0.14", features = ["full"] }
 lindera = "0.8.1"
 lindera-core = "0.8.1"
 lindera-tantivy = "0.8.1"
+num_cpus = "1.13.0"
 openssl = "0.10.38"
 percent-encoding = "2.1.0"
 postgres-openssl = "0.5.0"
-postgres-types = { version = "0.2.2", features = ["derive"] }
+postgres-types = { version = "0.2.2", features = ["derive", "with-time-0_2"] }
+rand = "0.8.4"
 strum = "0.23.0"
 strum_macros = "0.23"
 tantivy = "0.16.1"
 tantivy-cli = "0.15.0"
+time = "0.2.27"
 tokio = { version = "1.5", features = ["full"] }
 tokio-postgres = "0.7.5"
 tower = { version = "0.4.10", features = ["make"] }

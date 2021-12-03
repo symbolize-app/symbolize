@@ -21,7 +21,8 @@ pub struct FieldSet {
   pub body: tantivy::schema::Field,
 }
 
-pub fn load() -> Result<Context, Box<dyn StdError>> {
+pub fn load(
+) -> Result<Context, Box<dyn StdError + Send + Sync>> {
   let (schema, fields) = build_schema();
   let instances = Language::iter()
     .map(|language| {
@@ -30,7 +31,7 @@ pub fn load() -> Result<Context, Box<dyn StdError>> {
     })
     .collect::<Result<
       HashMap<Language, Instance>,
-      Box<dyn StdError>,
+      Box<dyn StdError + Send + Sync>,
     >>()?;
   Ok(Context {
     schema,
@@ -64,7 +65,7 @@ fn build_schema() -> (tantivy::schema::Schema, FieldSet) {
 pub fn load_index(
   schema: &tantivy::schema::Schema,
   language: Language,
-) -> Result<Instance, Box<dyn StdError>> {
+) -> Result<Instance, Box<dyn StdError + Send + Sync>> {
   let index_path =
     format!("./.tantivy/document_{}", language.as_ref());
   let index_path = Path::new(index_path.as_str());
@@ -109,9 +110,9 @@ pub fn load_index(
   })
 }
 
-pub fn update(
+pub fn _update(
   search_context: &Context,
-) -> Result<(), Box<dyn StdError>> {
+) -> Result<(), Box<dyn StdError + Send + Sync>> {
   let instance = search_context
     .instances
     .get(&Language::Japanese)

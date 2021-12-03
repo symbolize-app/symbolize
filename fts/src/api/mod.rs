@@ -2,36 +2,124 @@ use crate::core::document::Language;
 use crate::core::message;
 use crate::db;
 use crate::search;
+use rand::rngs::StdRng;
+use rand::Rng as _;
+use rand::SeedableRng;
 use std::collections::HashMap;
 use std::env;
 use std::error::Error as StdError;
 use std::net;
 use std::str::FromStr as _;
+use std::sync::atomic::AtomicU64;
 use std::sync::Arc;
+use std::time::Duration;
+use tokio::spawn;
+use tokio::sync::Notify;
+use tokio::sync::Semaphore;
+use tokio::time::sleep;
+use tokio::try_join;
 
-pub async fn run_server(
+pub struct Context {
+  pub cpu_available: Semaphore,
+  pub search_update_requested: Notify,
+  pub search_updated_unix_timestamp: AtomicU64,
+}
+
+pub async fn run(
   search_context: search::Context,
   db_context: db::Context,
-) -> Result<(), Box<dyn StdError>> {
-  // TODO Spawn a thread and use a semaphore (max 1) to communicate reindexing needed
-  let host: net::Ipv4Addr =
-    env::var("FTS_HOST")?.parse()?;
-  let port: u16 = env::var("FTS_PORT")?.parse()?;
-  let addr = net::SocketAddr::from((host, port));
-
+  db_handle: db::Handle,
+) -> Result<(), Box<dyn StdError + Send + Sync>> {
+  let api_context = Arc::new(Context {
+    cpu_available: Semaphore::new(num_cpus::get()),
+    search_update_requested: Notify::new(),
+    search_updated_unix_timestamp: AtomicU64::from(0),
+  });
   let search_context = Arc::new(search_context);
   let db_context = Arc::new(db_context);
-  let service = hyper::service::service_fn(move |req| {
-    handle_request(
-      search_context.clone(),
-      db_context.clone(),
-      req,
-    )
-  });
-  let server = hyper::Server::bind(&addr)
-    .serve(tower::make::Shared::new(service));
-  server.await?;
+  let periodic_search_update_handle =
+    spawn(periodic_search_update(api_context.clone()));
+  let run_search_update_handle = spawn(run_search_update(
+    api_context.clone(),
+    search_context.clone(),
+    db_context.clone(),
+  ));
+  let run_server_handle = spawn(run_server(
+    api_context.clone(),
+    search_context.clone(),
+    db_context.clone(),
+  ));
+  try_join!(
+    periodic_search_update_handle,
+    run_search_update_handle,
+    run_server_handle,
+    db_handle.connection_handle
+  )?;
   Ok(())
+}
+
+async fn periodic_search_update(api_context: Arc<Context>) {
+  let mut rng = StdRng::from_entropy();
+  loop {
+    api_context.search_update_requested.notify_one();
+    sleep(Duration::from_secs_f64(
+      rng.gen_range(60.0..120.0),
+    ))
+    .await;
+  }
+}
+
+async fn run_search_update(
+  api_context: Arc<Context>,
+  _search_context: Arc<search::Context>,
+  db_context: Arc<db::Context>,
+) {
+  let result: Result<(), Box<dyn StdError + Send + Sync>> =
+    (|| async {
+      loop {
+        api_context
+          .search_update_requested
+          .notified()
+          .await;
+        println!("Starting search update...");
+        let documents =
+          db::find_recent_updates(&db_context).await?;
+        println!(
+          "Found {} document updates...",
+          documents.len()
+        );
+      }
+    })()
+    .await;
+  result.expect("search update error");
+}
+
+async fn run_server(
+  _api_context: Arc<Context>,
+  search_context: Arc<search::Context>,
+  db_context: Arc<db::Context>,
+) {
+  let result: Result<(), Box<dyn StdError + Send + Sync>> =
+    (|| async {
+      let host: net::Ipv4Addr =
+        env::var("FTS_HOST")?.parse()?;
+      let port: u16 = env::var("FTS_PORT")?.parse()?;
+      let addr = net::SocketAddr::from((host, port));
+      let service =
+        hyper::service::service_fn(move |req| {
+          handle_request(
+            search_context.clone(),
+            db_context.clone(),
+            req,
+          )
+        });
+      let server = hyper::Server::bind(&addr)
+        .serve(tower::make::Shared::new(service));
+      server.await?;
+      Ok(())
+    })()
+    .await;
+  result.expect("server error");
 }
 
 #[allow(clippy::unused_async)]

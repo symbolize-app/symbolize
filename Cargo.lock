@@ -797,14 +797,17 @@ dependencies = [
  "lindera",
  "lindera-core",
  "lindera-tantivy",
+ "num_cpus",
  "openssl",
  "percent-encoding 2.1.0",
  "postgres-openssl",
  "postgres-types",
+ "rand 0.8.4",
  "strum 0.23.0",
  "strum_macros 0.23.1",
  "tantivy 0.16.1",
  "tantivy-cli",
+ "time 0.2.27",
  "tokio",
  "tokio-postgres",
  "tower",
@@ -2239,6 +2242,7 @@ dependencies = [
  "fallible-iterator",
  "postgres-derive",
  "postgres-protocol",
+ "time 0.2.27",
 ]
 
 [[package]]
