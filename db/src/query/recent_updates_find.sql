@@ -1,6 +1,7 @@
--- $1 updated_at
--- $2 type
--- $3 id
+-- $1 limit
+-- $2 updated_at
+-- $3 type
+-- $4 id
 WITH
   data
     AS (
@@ -77,20 +78,20 @@ WITH
           info
     )
 SELECT
-  data.language
+  *
 FROM
   data
 WHERE
-  $1::TIMESTAMPTZ(0) IS NULL
-  OR data.updated_at > $1::TIMESTAMPTZ(0)
-  OR data.updated_at = $1::TIMESTAMPTZ(0)
+  $2::TIMESTAMPTZ(0) IS NULL
+  OR data.updated_at > $2::TIMESTAMPTZ(0)
+  OR data.updated_at = $2::TIMESTAMPTZ(0)
     AND (
-        $2::STRING IS NULL
-        OR data.type > $2::STRING
-        OR data.type = $2::STRING
-          AND ($3::BYTES IS NULL OR data.id > $3::BYTES)
+        $3::STRING IS NULL
+        OR data.type > $3::STRING
+        OR data.type = $3::STRING
+          AND ($4::BYTES IS NULL OR data.id > $4::BYTES)
       )
 ORDER BY
   data.updated_at, data.type, data.id
 LIMIT
-  10;
+  $1::INT8;
