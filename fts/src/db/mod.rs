@@ -1,19 +1,58 @@
-use crate::core::document::Language;
+use crate::core::document::Document;
 use std::collections::HashMap;
 use std::env;
 use std::error::Error as StdError;
+use time::OffsetDateTime;
+use tokio::spawn;
 
 pub struct Context {
   pub client: tokio_postgres::Client,
 }
 
-pub async fn load() -> Result<Context, Box<dyn StdError>> {
+pub struct Handle {
+  pub connection_handle: tokio::task::JoinHandle<()>,
+}
+
+pub async fn load() -> Result<
+  (Context, Handle),
+  Box<dyn StdError + Send + Sync>,
+> {
+  let (url, params) = get_url()?;
+  let tls = get_tls(&params)?;
+  let config = get_config(&url, &params)?;
+  let (client, connection) = config.connect(tls).await?;
+  let connection_handle = spawn(run_connection(connection));
+  Ok((Context { client }, Handle { connection_handle }))
+}
+
+async fn run_connection(
+  connection: tokio_postgres::Connection<
+    tokio_postgres::Socket,
+    postgres_openssl::TlsStream<tokio_postgres::Socket>,
+  >,
+) {
+  connection.await.expect("DB connection error");
+}
+
+fn get_url() -> Result<
+  (url::Url, HashMap<String, String>),
+  Box<dyn StdError + Send + Sync>,
+> {
   let url: url::Url =
     env::var("DATABASE_URL_API_READ")?.parse()?;
   let params = url
     .query_pairs()
     .into_owned()
     .collect::<HashMap<String, String>>();
+  Ok((url, params))
+}
+
+fn get_tls(
+  params: &HashMap<String, String>,
+) -> Result<
+  postgres_openssl::MakeTlsConnector,
+  Box<dyn StdError + Send + Sync>,
+> {
   let mut tls_builder =
     openssl::ssl::SslConnector::builder(
       openssl::ssl::SslMethod::tls(),
@@ -36,9 +75,18 @@ pub async fn load() -> Result<Context, Box<dyn StdError>> {
     tls_builder
       .set_verify(openssl::ssl::SslVerifyMode::PEER);
   }
-  let tls = postgres_openssl::MakeTlsConnector::new(
+  Ok(postgres_openssl::MakeTlsConnector::new(
     tls_builder.build(),
-  );
+  ))
+}
+
+fn get_config(
+  url: &url::Url,
+  params: &HashMap<String, String>,
+) -> Result<
+  tokio_postgres::config::Config,
+  Box<dyn StdError + Send + Sync>,
+> {
   let mut config = tokio_postgres::config::Config::new();
   if url.username() != "" {
     config.user(url.username());
@@ -63,24 +111,68 @@ pub async fn load() -> Result<Context, Box<dyn StdError>> {
   if let Some(options) = params.get("options") {
     config.options(options);
   }
-  let (client, connection) = config.connect(tls).await?;
-  tokio::spawn(async move {
-    connection.await.unwrap();
-    println!("CONNECTED");
-  });
+  Ok(config)
+}
+
+pub async fn find_recent_updates(
+  db_context: &Context,
+) -> Result<Vec<Document>, Box<dyn StdError + Send + Sync>>
+{
   const QUERY_TEXT: &str = include_str!(
-    "../../../db/src/query/recent_updates_get.sql"
+    "../../../db/src/query/recent_updates_find.sql"
   );
-  let updated_at: Option<std::time::SystemTime> = None;
-  let typ: Option<String> = None;
-  let id: Option<Vec<u8>> = None;
-  for row in &client
-    .query(QUERY_TEXT, &[&updated_at, &typ, &id])
-    .await?
-  {
-    let id: Language = row.try_get(0)?;
-    println!("{:?}", id);
+  const QUERY_LIMIT: i64 = 256;
+  let mut done = false;
+  let mut updated_at: Option<OffsetDateTime> = None;
+  let mut type_: Option<String> = None;
+  let mut id: Option<Vec<u8>> = None;
+  let mut results = Vec::<Document>::new();
+  while !done {
+    let rows = &db_context
+      .client
+      .query(
+        QUERY_TEXT,
+        &[&QUERY_LIMIT, &updated_at, &type_, &id],
+      )
+      .await?;
+    results.append(
+      &mut rows
+        .iter()
+        .map(create_document_from_row)
+        .collect::<Result<
+        Vec<Document>,
+        Box<dyn StdError + Send + Sync>,
+      >>()?,
+    );
+    if rows.len() == QUERY_LIMIT as usize {
+      let last = results.last().ok_or("no last")?;
+      updated_at = Some(last.updated_at);
+      type_ = Some(last.type_.clone());
+      id = Some(last.id.clone());
+    } else {
+      done = true;
+    }
   }
-  println!("DONE");
-  Ok(Context { client })
+  Ok(results)
+}
+
+fn create_document_from_row(
+  row: &tokio_postgres::Row,
+) -> Result<Document, Box<dyn StdError + Send + Sync>> {
+  Ok(Document {
+    type_: row.try_get("type")?,
+    id: row.try_get("id")?,
+    created_at: row.try_get("created_at")?,
+    created_by: row.try_get("created_by")?,
+    updated_at: row.try_get("updated_at")?,
+    deleted: row.try_get("deleted")?,
+    language: row.try_get("language")?,
+    subforum_id: row.try_get("subforum_id")?,
+    topic_id: row.try_get("topic_id")?,
+    taxon_rank: row.try_get("taxon_rank")?,
+    title: row.try_get("title")?,
+    names: row.try_get("names")?,
+    tags: row.try_get("tags")?,
+    content: row.try_get("content")?,
+  })
 }
