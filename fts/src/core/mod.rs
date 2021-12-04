@@ -1,2 +1,2 @@
 pub mod document;
-pub mod message;
+pub mod hex;
