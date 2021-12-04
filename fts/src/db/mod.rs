@@ -1,4 +1,5 @@
 use crate::core::document::Document;
+use crate::core::hex::from_hex;
 use std::collections::HashMap;
 use std::env;
 use std::error::Error as StdError;
@@ -171,8 +172,63 @@ fn create_document_from_row(
     topic_id: row.try_get("topic_id")?,
     taxon_rank: row.try_get("taxon_rank")?,
     title: row.try_get("title")?,
-    names: row.try_get("names")?,
-    tags: row.try_get("tags")?,
+    names: create_document_names(row.try_get("names")?)?,
+    tags: create_document_tags(row.try_get("tags")?)?,
     content: row.try_get("content")?,
   })
+}
+
+fn create_document_names(
+  value: Option<serde_json::value::Value>,
+) -> Result<
+  Option<Vec<String>>,
+  Box<dyn StdError + Send + Sync>,
+> {
+  if let Some(value) = value {
+    Ok(Some(
+      value
+        .as_array()
+        .ok_or("names is not an array")?
+        .iter()
+        .map(|item| {
+          Ok(
+            item
+              .as_str()
+              .ok_or("name is not str")?
+              .to_owned(),
+          )
+        })
+        .collect::<Result<
+          Vec<String>,
+          Box<dyn StdError + Send + Sync>,
+        >>()?,
+    ))
+  } else {
+    Ok(None)
+  }
+}
+
+fn create_document_tags(
+  value: Option<serde_json::value::Value>,
+) -> Result<
+  Option<Vec<Vec<u8>>>,
+  Box<dyn StdError + Send + Sync>,
+> {
+  if let Some(value) = value {
+    Ok(Some(
+      value
+        .as_array()
+        .ok_or("tags is not an array")?
+        .iter()
+        .map(|item| {
+          from_hex(item.as_str().ok_or("tag is not str")?)
+        })
+        .collect::<Result<
+          Vec<Vec<u8>>,
+          Box<dyn StdError + Send + Sync>,
+        >>()?,
+    ))
+  } else {
+    Ok(None)
+  }
 }

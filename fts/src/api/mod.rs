@@ -1,5 +1,4 @@
 use crate::core::document::Language;
-use crate::core::message;
 use crate::db;
 use crate::search;
 use rand::rngs::StdRng;
@@ -88,6 +87,9 @@ async fn run_search_update(
           "Found {} document updates...",
           documents.len()
         );
+        //for document in documents {
+        //  dbg!(document);
+        //}
       }
     })()
     .await;
@@ -155,7 +157,6 @@ async fn handle_request(
       search_context.fields.body,
     ],
   );
-  println!("{}", message::get_message());
   let query = query_parser.parse_query(query)?;
   let top_docs = searcher.search(
     &query,

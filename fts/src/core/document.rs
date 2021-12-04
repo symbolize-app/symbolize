@@ -43,6 +43,7 @@ pub enum TaxonRank {
   Variant,
 }
 
+#[derive(Debug)]
 pub struct Document {
   pub type_: String,
   pub id: Vec<u8>,
@@ -56,6 +57,6 @@ pub struct Document {
   pub taxon_rank: Option<TaxonRank>,
   pub title: Option<String>,
   pub names: Option<Vec<String>>,
-  pub tags: Option<Vec<u8>>,
+  pub tags: Option<Vec<Vec<u8>>>,
   pub content: String,
 }

@@ -13,8 +13,9 @@ num_cpus = "1.13.0"
 openssl = "0.10.38"
 percent-encoding = "2.1.0"
 postgres-openssl = "0.5.0"
-postgres-types = { version = "0.2.2", features = ["derive", "with-time-0_2"] }
+postgres-types = { version = "0.2.2", features = ["derive", "with-time-0_2", "with-serde_json-1"] }
 rand = "0.8.4"
+serde_json = "1.0.68"
 strum = "0.23.0"
 strum_macros = "0.23"
 tantivy = "0.16.1"

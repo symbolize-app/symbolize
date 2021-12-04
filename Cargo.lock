@@ -803,6 +803,7 @@ dependencies = [
  "postgres-openssl",
  "postgres-types",
  "rand 0.8.4",
+ "serde_json",
  "strum 0.23.0",
  "strum_macros 0.23.1",
  "tantivy 0.16.1",
@@ -2242,6 +2243,8 @@ dependencies = [
  "fallible-iterator",
  "postgres-derive",
  "postgres-protocol",
+ "serde",
+ "serde_json",
  "time 0.2.27",
 ]
 
