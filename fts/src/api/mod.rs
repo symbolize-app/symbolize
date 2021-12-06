@@ -57,6 +57,8 @@ pub async fn run(
   Ok(())
 }
 
+const SEARCH_UPDATE_BUFFER_SECONDS: i64 = 5;
+
 async fn periodic_search_update(api_context: Arc<Context>) {
   let mut rng = StdRng::from_entropy();
   loop {
@@ -81,8 +83,11 @@ async fn run_search_update(
           .notified()
           .await;
         println!("Starting search update...");
-        let documents =
-          db::find_recent_updates(&db_context).await?;
+        let documents = db::find_recent_updates(
+          &db_context,
+          SEARCH_UPDATE_BUFFER_SECONDS,
+        )
+        .await?;
         println!(
           "Found {} document updates...",
           documents.len()
@@ -154,7 +159,7 @@ async fn handle_request(
     &instance.index,
     vec![
       search_context.fields.title,
-      search_context.fields.body,
+      search_context.fields.content,
     ],
   );
   let query = query_parser.parse_query(query)?;

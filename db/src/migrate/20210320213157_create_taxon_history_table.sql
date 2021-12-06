@@ -20,8 +20,8 @@ CREATE TABLE taxon_history (
     BYTES NOT NULL,
   taxon_rank
     taxon_rank NOT NULL,
-  parent_taxon_id
-    BYTES NULL REFERENCES taxon (id),
+  parents
+    JSONB NOT NULL,
   names
     JSONB NOT NULL,
   slug
