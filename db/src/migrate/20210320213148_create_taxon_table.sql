@@ -18,8 +18,8 @@ CREATE TABLE taxon (
     BYTES NOT NULL,
   taxon_rank
     taxon_rank NOT NULL,
-  parent_taxon_id
-    BYTES NULL REFERENCES taxon (id),
+  parents
+    JSONB DEFAULT jsonb_build_array() NOT NULL,
   names
     JSONB DEFAULT jsonb_build_array() NOT NULL,
   slug

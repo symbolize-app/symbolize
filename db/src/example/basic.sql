@@ -305,7 +305,7 @@ VALUES
     b'\x0002',
     'Hello',
     'hello',
-    jsonb_build_array(e'\\x0004'),
+    jsonb_build_array('0004'),
     'Hi there'
   )
 ON CONFLICT
@@ -515,7 +515,7 @@ INTO
       language,
       cross_language_id,
       taxon_rank,
-      parent_taxon_id,
+      parents,
       names,
       slug,
       content
@@ -531,7 +531,7 @@ VALUES
     'en',
     b'\x000b',
     'family',
-    NULL,
+    jsonb_build_array(),
     jsonb_build_array('flower', 'fleur'),
     'flower',
     'Number of petals'
@@ -567,7 +567,7 @@ INTO
       deleted,
       cross_language_id,
       taxon_rank,
-      parent_taxon_id,
+      parents,
       names,
       slug,
       content
@@ -581,7 +581,7 @@ SELECT
   taxon.deleted,
   taxon.cross_language_id,
   taxon.taxon_rank,
-  taxon.parent_taxon_id,
+  taxon.parents,
   jsonb_build_array('flower'),
   taxon.slug,
   taxon.content
@@ -591,6 +591,59 @@ WHERE
   taxon.id = b'\x000a'
 ON CONFLICT
   (id, saved_at)
+DO
+  NOTHING;
+
+INSERT
+INTO
+  taxon
+    (
+      id,
+      created_at,
+      created_by,
+      updated_at,
+      updated_by,
+      deleted,
+      language,
+      cross_language_id,
+      taxon_rank,
+      parents,
+      names,
+      slug,
+      content
+    )
+VALUES
+  (
+    b'\x000d',
+    '2021-11-18 00:00:00+00:00',
+    b'\xaa',
+    '2021-11-18 00:00:00+00:00',
+    b'\xaa',
+    false,
+    'en',
+    b'\x000b',
+    'species',
+    jsonb_build_array('000a'),
+    jsonb_build_array('sunflower'),
+    'sunflower',
+    'Faces the sun'
+  )
+ON CONFLICT
+  (id)
+DO
+  NOTHING;
+
+INSERT
+INTO
+  taxon_slug (id, language, slug)
+SELECT
+  taxon.id, taxon.language, taxon.slug
+FROM
+  taxon
+WHERE
+  taxon.id = b'\x000d'
+ON CONFLICT
+  (language, slug)
 DO
   NOTHING;
 
@@ -623,7 +676,7 @@ VALUES
     b'\x000d',
     'Water',
     'water',
-    jsonb_build_array(e'\\x0004'),
+    jsonb_build_array('0004'),
     'Check if wet or dry'
   )
 ON CONFLICT

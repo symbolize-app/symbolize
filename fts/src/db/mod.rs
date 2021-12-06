@@ -1,5 +1,5 @@
 use crate::core::document::Document;
-use crate::core::hex::from_hex;
+use crate::core::hex::FromHex as _;
 use std::collections::HashMap;
 use std::env;
 use std::error::Error as StdError;
@@ -117,6 +117,7 @@ fn get_config(
 
 pub async fn find_recent_updates(
   db_context: &Context,
+  buffer_seconds: i64,
 ) -> Result<Vec<Document>, Box<dyn StdError + Send + Sync>>
 {
   const QUERY_TEXT: &str = include_str!(
@@ -133,7 +134,13 @@ pub async fn find_recent_updates(
       .client
       .query(
         QUERY_TEXT,
-        &[&QUERY_LIMIT, &updated_at, &type_, &id],
+        &[
+          &buffer_seconds,
+          &QUERY_LIMIT,
+          &updated_at,
+          &type_,
+          &id,
+        ],
       )
       .await?;
     results.append(
@@ -171,60 +178,47 @@ fn create_document_from_row(
     subforum_id: row.try_get("subforum_id")?,
     topic_id: row.try_get("topic_id")?,
     taxon_rank: row.try_get("taxon_rank")?,
+    parents: from_json_array(
+      row.try_get("parents")?,
+      Vec::from_hex,
+    )?,
     title: row.try_get("title")?,
-    names: create_document_names(row.try_get("names")?)?,
-    tags: create_document_tags(row.try_get("tags")?)?,
+    names: from_json_array(
+      row.try_get("names")?,
+      |item| Ok(item.to_owned()),
+    )?,
+    tags: from_json_array(
+      row.try_get("tags")?,
+      Vec::from_hex,
+    )?,
     content: row.try_get("content")?,
   })
 }
 
-fn create_document_names(
+fn from_json_array<B, F>(
   value: Option<serde_json::value::Value>,
-) -> Result<
-  Option<Vec<String>>,
-  Box<dyn StdError + Send + Sync>,
-> {
+  mut f: F,
+) -> Result<Option<Vec<B>>, Box<dyn StdError + Send + Sync>>
+where
+  F: FnMut(
+    &str,
+  ) -> Result<B, Box<dyn StdError + Send + Sync>>,
+{
   if let Some(value) = value {
     Ok(Some(
       value
         .as_array()
-        .ok_or("names is not an array")?
+        .ok_or("not an array")?
         .iter()
-        .map(|item| {
-          Ok(
+        .map(move |item| {
+          f(
             item
               .as_str()
-              .ok_or("name is not str")?
-              .to_owned(),
+              .ok_or("not a str")?
           )
         })
         .collect::<Result<
-          Vec<String>,
-          Box<dyn StdError + Send + Sync>,
-        >>()?,
-    ))
-  } else {
-    Ok(None)
-  }
-}
-
-fn create_document_tags(
-  value: Option<serde_json::value::Value>,
-) -> Result<
-  Option<Vec<Vec<u8>>>,
-  Box<dyn StdError + Send + Sync>,
-> {
-  if let Some(value) = value {
-    Ok(Some(
-      value
-        .as_array()
-        .ok_or("tags is not an array")?
-        .iter()
-        .map(|item| {
-          from_hex(item.as_str().ok_or("tag is not str")?)
-        })
-        .collect::<Result<
-          Vec<Vec<u8>>,
+          Vec<B>,
           Box<dyn StdError + Send + Sync>,
         >>()?,
     ))

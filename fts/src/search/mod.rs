@@ -17,8 +17,18 @@ pub struct Instance {
 }
 
 pub struct FieldSet {
+  pub type_: tantivy::schema::Field,
+  pub id: tantivy::schema::Field,
+  pub created_at: tantivy::schema::Field,
+  pub created_by: tantivy::schema::Field,
+  pub updated_at: tantivy::schema::Field,
+  pub subforum_id: tantivy::schema::Field,
+  pub topic_id: tantivy::schema::Field,
+  pub taxon_rank: tantivy::schema::Field,
+  pub parents: tantivy::schema::Field,
   pub title: tantivy::schema::Field,
-  pub body: tantivy::schema::Field,
+  pub name: tantivy::schema::Field,
+  pub content: tantivy::schema::Field,
 }
 
 pub fn load(
@@ -43,23 +53,62 @@ pub fn load(
 fn build_schema() -> (tantivy::schema::Schema, FieldSet) {
   let mut schema_builder =
     tantivy::schema::Schema::builder();
-  let text_indexing_options = tantivy::schema::TextFieldIndexing::default()
-    .set_tokenizer("basic")
-    .set_index_option(
-      tantivy::schema::IndexRecordOption::WithFreqsAndPositions,
-    );
-  let text_options =
-    tantivy::schema::TextOptions::default()
-      .set_indexing_options(text_indexing_options)
-      .set_stored();
   let fields = FieldSet {
+    type_: schema_builder
+      .add_facet_field("type", get_facet_options()),
+    id: schema_builder
+      .add_text_field("id", get_string_options()),
+    created_at: schema_builder
+      .add_i64_field("created_at", get_int_options()),
+    created_by: schema_builder
+      .add_text_field("created_by", get_string_options()),
+    updated_at: schema_builder
+      .add_i64_field("updated_at", get_int_options()),
+    subforum_id: schema_builder
+      .add_facet_field("subforum_id", get_facet_options()),
+    topic_id: schema_builder
+      .add_text_field("topic_id", get_string_options()),
+    taxon_rank: schema_builder
+      .add_facet_field("taxon_rank", get_facet_options()),
+    parents: schema_builder
+      .add_facet_field("parents", get_facet_options()),
     title: schema_builder
-      .add_text_field("title", text_options.clone()),
-    body: schema_builder
-      .add_text_field("body", text_options),
+      .add_text_field("title", get_text_options()),
+    name: schema_builder
+      .add_text_field("name", get_text_options()),
+    content: schema_builder
+      .add_text_field("content", get_text_options()),
   };
   let schema = schema_builder.build();
   (schema, fields)
+}
+
+fn get_string_options() -> tantivy::schema::TextOptions {
+  tantivy::schema::STRING.set_stored()
+}
+
+fn get_text_options() -> tantivy::schema::TextOptions {
+  tantivy::schema::TextOptions::default()
+      .set_indexing_options(
+        tantivy::schema::TextFieldIndexing::default()
+          .set_tokenizer("basic")
+          .set_index_option(
+            tantivy::schema::IndexRecordOption::WithFreqsAndPositions,
+          )
+      )
+      .set_stored()
+}
+
+fn get_int_options() -> tantivy::schema::IntOptions {
+  tantivy::schema::IntOptions::default()
+    .set_indexed()
+    .set_stored()
+}
+
+fn get_facet_options() -> tantivy::schema::FacetOptions {
+  tantivy::schema::FacetOptions::default()
+    .set_indexed()
+    .set_stored()
 }
 
 pub fn load_index(
@@ -117,18 +166,21 @@ pub fn _update(
     .instances
     .get(&Language::Japanese)
     .ok_or("Invalid language")?;
+  let fields = &search_context.fields;
   let index_meta = instance.index.load_metas()?;
   if index_meta.payload != Some("TEST".to_string()) {
     let mut index_writer =
       instance.index.writer(50_000_000)?;
+    index_writer.delete_term(
+      tantivy::Term::from_field_text(fields.id, "a"),
+    );
     let mut old_man_doc =
       tantivy::schema::Document::default();
+    old_man_doc.add_text(fields.id, "a");
+    old_man_doc
+      .add_text(fields.title, "The Old Man and the Sea");
     old_man_doc.add_text(
-      search_context.fields.title,
-      "The Old Man and the Sea",
-    );
-    old_man_doc.add_text(
-        search_context.fields.body,
+        fields.content,
         "He was an old man who fished alone in a skiff in the Gulf Stream and \
          he had gone eighty-four days now without taking a fish.",
     );
@@ -136,20 +188,20 @@ pub fn _update(
     // ... and add it to the `IndexWriter`.
     index_writer.add_document(old_man_doc);
     index_writer.add_document(tantivy::doc!(
-    search_context.fields.title => "Of Mice and Men",
-    search_context.fields.body => "A few miles south of Soledad, the Salinas River drops in close to the hillside \
-            bank and runs deep and green. The water is warm too, for it has slipped twinkling \
-            over the yellow sands in the sunlight before reaching the narrow pool. On one \
-            side of the river the golden foothill slopes curve up to the strong and rocky \
-            Gabilan Mountains, but on the valley side the water is lined with trees—willows \
-            fresh and green with every spring, carrying in their lower leaf junctures the \
-            debris of the winter’s flooding; and sycamores with mottled, white, recumbent \
-            limbs and branches that arch over the pool"
+      fields.title => "Of Mice and Men",
+      fields.content => "A few miles south of Soledad, the Salinas River drops in close to the hillside \
+              bank and runs deep and green. The water is warm too, for it has slipped twinkling \
+              over the yellow sands in the sunlight before reaching the narrow pool. On one \
+              side of the river the golden foothill slopes curve up to the strong and rocky \
+              Gabilan Mountains, but on the valley side the water is lined with trees—willows \
+              fresh and green with every spring, carrying in their lower leaf junctures the \
+              debris of the winter’s flooding; and sycamores with mottled, white, recumbent \
+              limbs and branches that arch over the pool"
     ));
     index_writer.add_document(tantivy::doc!(
-      search_context.fields.title => "Frankenstein",
-      search_context.fields.title => "The Modern Prometheus",
-      search_context.fields.body => "You will rejoice to hear that no disaster has accompanied the commencement of an \
+      fields.title => "Frankenstein",
+      fields.title => "The Modern Prometheus",
+      fields.content => "You will rejoice to hear that no disaster has accompanied the commencement of an \
                enterprise which you have regarded with such evil forebodings.  I arrived here \
                yesterday, and my first task is to assure my dear sister of my welfare and \
                increasing confidence in the success of my undertaking."
