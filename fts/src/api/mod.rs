@@ -12,9 +12,12 @@ use std::str::FromStr as _;
 use std::sync::atomic::AtomicU64;
 use std::sync::Arc;
 use std::time::Duration;
+use time::format_description::well_known::Rfc3339;
+use time::OffsetDateTime;
 use tokio::spawn;
 use tokio::sync::Notify;
 use tokio::sync::Semaphore;
+use tokio::task::spawn_blocking;
 use tokio::time::sleep;
 use tokio::try_join;
 
@@ -25,8 +28,10 @@ pub struct Context {
 }
 
 pub async fn run(
-  search_context: search::Context,
-  db_context: db::Context,
+  search_context_map: Arc<
+    HashMap<Language, Arc<search::Context>>,
+  >,
+  db_context: Arc<db::Context>,
   db_handle: db::Handle,
 ) -> Result<(), Box<dyn StdError + Send + Sync>> {
   let api_context = Arc::new(Context {
@@ -34,19 +39,16 @@ pub async fn run(
     search_update_requested: Notify::new(),
     search_updated_unix_timestamp: AtomicU64::from(0),
   });
-  let search_context = Arc::new(search_context);
-  let db_context = Arc::new(db_context);
   let periodic_search_update_handle =
     spawn(periodic_search_update(api_context.clone()));
   let run_search_update_handle = spawn(run_search_update(
     api_context.clone(),
-    search_context.clone(),
+    search_context_map.clone(),
     db_context.clone(),
   ));
   let run_server_handle = spawn(run_server(
     api_context.clone(),
-    search_context.clone(),
-    db_context.clone(),
+    search_context_map.clone(),
   ));
   try_join!(
     periodic_search_update_handle,
@@ -72,7 +74,9 @@ async fn periodic_search_update(api_context: Arc<Context>) {
 
 async fn run_search_update(
   api_context: Arc<Context>,
-  _search_context: Arc<search::Context>,
+  search_context_map: Arc<
+    HashMap<Language, Arc<search::Context>>,
+  >,
   db_context: Arc<db::Context>,
 ) {
   let result: Result<(), Box<dyn StdError + Send + Sync>> =
@@ -82,29 +86,82 @@ async fn run_search_update(
           .search_update_requested
           .notified()
           .await;
-        println!("Starting search update...");
-        let documents = db::find_recent_updates(
-          &db_context,
-          SEARCH_UPDATE_BUFFER_SECONDS,
-        )
-        .await?;
-        println!(
-          "Found {} document updates...",
-          documents.len()
-        );
-        //for document in documents {
-        //  dbg!(document);
-        //}
+        for (language, search_context) in
+          search_context_map.iter()
+        {
+          run_search_update_for_language(
+            &api_context,
+            *language,
+            search_context,
+            &db_context,
+          )
+          .await?;
+        }
       }
     })()
     .await;
   result.expect("search update error");
 }
 
+async fn run_search_update_for_language(
+  api_context: &Arc<Context>,
+  language: Language,
+  search_context: &Arc<search::Context>,
+  db_context: &Arc<db::Context>,
+) -> Result<(), Box<dyn StdError + Send + Sync>> {
+  let updated_at =
+    *search_context.updated_at.read().await;
+  let new_current_at = OffsetDateTime::now_utc();
+  let documents = db::find_recent_updates(
+    db_context,
+    SEARCH_UPDATE_BUFFER_SECONDS,
+    language,
+    updated_at,
+  )
+  .await?;
+  if let Some(new_updated_at) = documents
+    .iter()
+    .map(|document| document.updated_at)
+    .max()
+  {
+    println!(
+      "Found {:?} {} document updates ({})",
+      language,
+      documents.len(),
+      new_updated_at.format(&Rfc3339)?
+    );
+    {
+      let permit =
+        api_context.cpu_available.acquire().await?;
+      let search_context = search_context.clone();
+      let new_updated_at = new_updated_at;
+      let new_current_at = new_current_at;
+      spawn_blocking(move ||
+        search::update(
+          search_context,
+          new_updated_at,
+          new_current_at,
+          documents,
+        )
+      )
+      .await?;
+      drop(permit);
+    }
+    *search_context.updated_at.write().await =
+      Some(new_updated_at);
+    *search_context.current_at.write().await =
+      Some(new_current_at);
+  } else {
+    println!("No {:?} document updates", language);
+  }
+  Ok(())
+}
+
 async fn run_server(
   _api_context: Arc<Context>,
-  search_context: Arc<search::Context>,
-  db_context: Arc<db::Context>,
+  search_context_map: Arc<
+    HashMap<Language, Arc<search::Context>>,
+  >,
 ) {
   let result: Result<(), Box<dyn StdError + Send + Sync>> =
     (|| async {
@@ -114,11 +171,7 @@ async fn run_server(
       let addr = net::SocketAddr::from((host, port));
       let service =
         hyper::service::service_fn(move |req| {
-          handle_request(
-            search_context.clone(),
-            db_context.clone(),
-            req,
-          )
+          handle_request(search_context_map.clone(), req)
         });
       let server = hyper::Server::bind(&addr)
         .serve(tower::make::Shared::new(service));
@@ -131,8 +184,9 @@ async fn run_server(
 
 #[allow(clippy::unused_async)]
 async fn handle_request(
-  search_context: Arc<search::Context>,
-  db_context: Arc<db::Context>,
+  search_context_map: Arc<
+    HashMap<Language, Arc<search::Context>>,
+  >,
   req: hyper::Request<hyper::Body>,
 ) -> Result<
   hyper::Response<hyper::Body>,
@@ -148,17 +202,16 @@ async fn handle_request(
   let language: Language = Language::from_str(language)?;
   let query =
     params.get("q").ok_or("missing query param")?;
-  let search_context = search_context.as_ref();
-  let _db_context = db_context.as_ref();
-  let instance = search_context
-    .instances
+  let search_context_map = search_context_map.as_ref();
+  let search_context = search_context_map
     .get(&language)
-    .ok_or("Invalid language")?;
-  let searcher = instance.index_reader.searcher();
+    .ok_or("invalid language")?;
+  let searcher = search_context.index_reader.searcher();
   let query_parser = tantivy::query::QueryParser::for_index(
-    &instance.index,
+    &search_context.index,
     vec![
       search_context.fields.title,
+      search_context.fields.names,
       search_context.fields.content,
     ],
   );
@@ -167,7 +220,7 @@ async fn handle_request(
     &query,
     &tantivy::collector::TopDocs::with_limit(10),
   )?;
-  let mut result = "".to_string();
+  let mut result = String::new();
   for (_score, doc_address) in top_docs {
     let retrieved_doc = searcher.doc(doc_address)?;
     result.push_str(

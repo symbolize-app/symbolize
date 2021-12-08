@@ -29,7 +29,8 @@ CREATE TABLE topic (
   content
     STRING DEFAULT '' NOT NULL
 );
-CREATE INDEX topic_updated_at_idx ON topic (updated_at);
+CREATE INDEX topic_language_updated_at_idx
+  ON topic (language, updated_at);
 CREATE INDEX topic_subforum_id_bumped_at_idx
   ON topic (subforum_id, bumped_at) WHERE deleted = false;
 CREATE INDEX topic_created_by_deleted_bumped_at_idx

@@ -27,7 +27,8 @@ CREATE TABLE info (
 );
 CREATE INDEX info_cross_language_id_idx
   ON info (cross_language_id);
-CREATE INDEX info_updated_at_idx ON info (updated_at);
+CREATE INDEX info_language_updated_at_idx
+  ON info (language, updated_at);
 CREATE INDEX info_created_by_deleted_updated_at_idx
   ON info (created_by, deleted, updated_at);
 CREATE INDEX info_updated_by_deleted_updated_at_idx

@@ -27,7 +27,10 @@ pub enum Language {
 }
 
 #[derive(
-  Debug, postgres_types::ToSql, postgres_types::FromSql,
+  Debug,
+  postgres_types::ToSql,
+  postgres_types::FromSql,
+  strum_macros::AsRefStr,
 )]
 #[postgres(name = "taxon_rank")]
 pub enum TaxonRank {
