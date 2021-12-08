@@ -6,6 +6,9 @@ use std::error::Error as StdError;
 use time::OffsetDateTime;
 use tokio::spawn;
 
+use crate::core::document::Language;
+use std::sync::Arc;
+
 pub struct Context {
   pub client: tokio_postgres::Client,
 }
@@ -14,16 +17,24 @@ pub struct Handle {
   pub connection_handle: tokio::task::JoinHandle<()>,
 }
 
-pub async fn load() -> Result<
-  (Context, Handle),
-  Box<dyn StdError + Send + Sync>,
-> {
-  let (url, params) = get_url()?;
-  let tls = get_tls(&params)?;
-  let config = get_config(&url, &params)?;
-  let (client, connection) = config.connect(tls).await?;
-  let connection_handle = spawn(run_connection(connection));
-  Ok((Context { client }, Handle { connection_handle }))
+pub async fn load() -> (Arc<Context>, Handle) {
+  let result: Result<
+    (Arc<Context>, Handle),
+    Box<dyn StdError + Send + Sync>,
+  > = (|| async {
+    let (url, params) = get_url()?;
+    let tls = get_tls(&params)?;
+    let config = get_config(&url, &params)?;
+    let (client, connection) = config.connect(tls).await?;
+    let connection_handle =
+      spawn(run_connection(connection));
+    Ok((
+      Arc::new(Context { client }),
+      Handle { connection_handle },
+    ))
+  })()
+  .await;
+  result.expect("DB load error")
 }
 
 async fn run_connection(
@@ -116,8 +127,10 @@ fn get_config(
 }
 
 pub async fn find_recent_updates(
-  db_context: &Context,
+  db_context: &Arc::<Context>,
   buffer_seconds: i64,
+  language: Language,
+  mut updated_at: Option<OffsetDateTime>,
 ) -> Result<Vec<Document>, Box<dyn StdError + Send + Sync>>
 {
   const QUERY_TEXT: &str = include_str!(
@@ -125,7 +138,6 @@ pub async fn find_recent_updates(
   );
   const QUERY_LIMIT: i64 = 256;
   let mut done = false;
-  let mut updated_at: Option<OffsetDateTime> = None;
   let mut type_: Option<String> = None;
   let mut id: Option<Vec<u8>> = None;
   let mut results = Vec::<Document>::new();
@@ -137,6 +149,7 @@ pub async fn find_recent_updates(
         &[
           &buffer_seconds,
           &QUERY_LIMIT,
+          &language,
           &updated_at,
           &type_,
           &id,

@@ -808,7 +808,7 @@ dependencies = [
  "strum_macros 0.23.1",
  "tantivy 0.16.1",
  "tantivy-cli",
- "time 0.2.27",
+ "time 0.3.5",
  "tokio",
  "tokio-postgres",
  "tower",
@@ -2245,7 +2245,7 @@ dependencies = [
  "postgres-protocol",
  "serde",
  "serde_json",
- "time 0.2.27",
+ "time 0.3.5",
 ]
 
 [[package]]
@@ -3347,6 +3347,16 @@ dependencies = [
  "time-macros",
  "version_check 0.9.3",
  "winapi 0.3.9",
+]
+
+[[package]]
+name = "time"
+version = "0.3.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "41effe7cfa8af36f439fac33861b66b049edc6f9a32331e2312660529c1c24ad"
+dependencies = [
+ "itoa",
+ "libc",
 ]
 
 [[package]]
