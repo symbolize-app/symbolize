@@ -1,8 +1,9 @@
 -- $1 buffer_seconds
 -- $2 limit
--- $3 updated_at
--- $4 type
--- $5 id
+-- $3 language
+-- $4 updated_at
+-- $5 type
+-- $6 id
 WITH
   data
     AS (
@@ -15,7 +16,7 @@ WITH
         topic.deleted,
         topic.language,
         topic.subforum_id,
-        topic.id,
+        topic.id AS topic_id,
         NULL AS taxon_rank,
         NULL AS parents,
         topic.title,
@@ -87,17 +88,17 @@ SELECT
 FROM
   data
 WHERE
-  data.updated_at
-  < current_timestamp(0) - '1 second'::INTERVAL * $1::INT8
+  data.language = $3
+  AND data.updated_at
+    < current_timestamp(0) - '1 second'::INTERVAL * $1::INT8
   AND (
-      $3::TIMESTAMPTZ(0) IS NULL
-      OR data.updated_at > $3::TIMESTAMPTZ(0)
-      OR data.updated_at = $3::TIMESTAMPTZ(0)
+      $4::TIMESTAMPTZ(0) IS NULL
+      OR data.updated_at > $4::TIMESTAMPTZ(0)
+      OR data.updated_at = $4::TIMESTAMPTZ(0)
         AND (
-            $4::STRING IS NULL
-            OR data.type > $4::STRING
-            OR data.type = $4::STRING
-              AND ($5::BYTES IS NULL OR data.id > $5::BYTES)
+            data.type > $5::STRING
+            OR data.type = $5::STRING
+              AND data.id > $6::BYTES
           )
     )
 ORDER BY

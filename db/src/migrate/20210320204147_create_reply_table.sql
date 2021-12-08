@@ -21,7 +21,8 @@ CREATE TABLE reply (
   content
     STRING DEFAULT '' NOT NULL
 );
-CREATE INDEX reply_updated_at_idx ON reply (updated_at);
+CREATE INDEX reply_language_updated_at_idx
+  ON reply (language, updated_at);
 CREATE INDEX reply_created_by_deleted_updated_at_idx
   ON reply (created_by, deleted, updated_at);
 CREATE INDEX reply_updated_by_deleted_updated_at_idx
