@@ -1,16 +1,42 @@
 use crate::core::document::Document;
 use crate::core::document::Language;
+use crate::core::document::TaxonRank;
+use crate::core::hex::FromHex as _;
 use crate::core::hex::ToHex as _;
+use crate::core::result::DynResult;
+use itertools::Itertools as _;
 use std::collections::HashMap;
-use std::error::Error as StdError;
 use std::fs;
 use std::path::Path;
+use std::str::FromStr as _;
 use std::sync::Arc;
 use strum::IntoEnumIterator as _;
 use time::OffsetDateTime;
 use tokio::sync::RwLock;
 
-pub struct Context {
+#[derive(Clone)]
+pub struct ContextMap(Arc<HashMap<Language, Context>>);
+
+impl std::ops::Deref for ContextMap {
+  type Target = Arc<HashMap<Language, Context>>;
+
+  fn deref(&self) -> &Self::Target {
+    &self.0
+  }
+}
+
+#[derive(Clone)]
+pub struct Context(Arc<InnerContext>);
+
+impl std::ops::Deref for Context {
+  type Target = Arc<InnerContext>;
+
+  fn deref(&self) -> &Self::Target {
+    &self.0
+  }
+}
+
+pub struct InnerContext {
   pub schema: tantivy::schema::Schema,
   pub fields: FieldSet,
   pub index: tantivy::Index,
@@ -19,7 +45,7 @@ pub struct Context {
   pub current_at: RwLock<Option<OffsetDateTime>>,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct FieldSet {
   pub type_: tantivy::schema::Field,
   pub id: tantivy::schema::Field,
@@ -36,13 +62,10 @@ pub struct FieldSet {
   pub content: tantivy::schema::Field,
 }
 
-pub fn load_map() -> Arc<HashMap<Language, Arc<Context>>> {
-  let result: Result<
-    Arc<HashMap<Language, Arc<Context>>>,
-    Box<dyn StdError + Send + Sync>,
-  > = (|| {
+pub fn load_map() -> ContextMap {
+  let result: DynResult<ContextMap> = (|| {
     let (schema, fields) = build_schema();
-    Ok(Arc::new(
+    Ok(ContextMap(Arc::new(
       Language::iter()
         .map(|language| {
           let schema = schema.clone();
@@ -58,21 +81,19 @@ pub fn load_map() -> Arc<HashMap<Language, Arc<Context>>> {
           let current_at = RwLock::new(current_at);
           Ok((
             language,
-            Arc::new(Context {
+            Context(Arc::new(InnerContext {
               schema,
               fields,
               index,
               index_reader,
               updated_at,
               current_at,
-            }),
+            })),
           ))
         })
-        .collect::<Result<
-          HashMap<Language, Arc<Context>>,
-          Box<dyn StdError + Send + Sync>,
-        >>()?,
-    ))
+        .collect::<DynResult<HashMap<Language, Context>>>(
+        )?,
+    )))
   })();
   result.expect("search load error")
 }
@@ -143,8 +164,7 @@ fn get_facet_options() -> tantivy::schema::FacetOptions {
 pub fn load_index(
   schema: &tantivy::schema::Schema,
   language: Language,
-) -> Result<tantivy::Index, Box<dyn StdError + Send + Sync>>
-{
+) -> DynResult<tantivy::Index> {
   let index_path =
     format!("./.tantivy/document_{}", language.as_ref());
   let index_path = Path::new(index_path.as_str());
@@ -184,10 +204,10 @@ pub fn load_index(
 
 fn parse_index_meta(
   index: &tantivy::Index,
-) -> Result<
-  (Option<OffsetDateTime>, Option<OffsetDateTime>),
-  Box<dyn StdError + Send + Sync>,
-> {
+) -> DynResult<(
+  Option<OffsetDateTime>,
+  Option<OffsetDateTime>,
+)> {
   let index_meta = index.load_metas()?;
   if let Some(payload) = index_meta.payload {
     if let [updated_at, current_at] = &payload
@@ -197,10 +217,7 @@ fn parse_index_meta(
           item.parse()?,
         )?)
       })
-      .collect::<Result<
-        Vec<OffsetDateTime>,
-        Box<dyn StdError + Send + Sync>,
-      >>()?[..]
+      .collect::<DynResult<Vec<OffsetDateTime>>>()?[..]
     {
       Ok((Some(*updated_at), Some(*current_at)))
     } else {
@@ -212,40 +229,39 @@ fn parse_index_meta(
 }
 
 pub fn update(
-  search_context: Arc<Context>,
+  search_context: Context,
   new_updated_at: OffsetDateTime,
   new_current_at: OffsetDateTime,
   documents: Vec<Document>,
 ) {
-  let result: Result<(), Box<dyn StdError + Send + Sync>> =
-    (|| {
-      let mut index_writer =
-        search_context.index.writer(50_000_000)?;
-      for document in documents {
-        update_document(
-          &search_context,
-          &index_writer,
-          document,
-        )?;
-      }
-      let mut prepared_commit =
-        index_writer.prepare_commit()?;
-      prepared_commit.set_payload(
-        &[new_updated_at, new_current_at]
-          .map(|item| item.unix_timestamp().to_string())
-          .join("/"),
-      );
-      prepared_commit.commit()?;
-      Ok(())
-    })();
+  let result: DynResult<()> = (|| {
+    let mut index_writer =
+      search_context.index.writer(50_000_000)?;
+    for document in documents {
+      update_document(
+        &search_context,
+        &index_writer,
+        document,
+      )?;
+    }
+    let mut prepared_commit =
+      index_writer.prepare_commit()?;
+    prepared_commit.set_payload(
+      &[new_updated_at, new_current_at]
+        .map(|item| item.unix_timestamp().to_string())
+        .join("/"),
+    );
+    prepared_commit.commit()?;
+    Ok(())
+  })();
   result.expect("search update error");
 }
 
 pub fn update_document(
-  search_context: &Arc<Context>,
+  search_context: &Context,
   index_writer: &tantivy::IndexWriter,
   document: Document,
-) -> Result<(), Box<dyn StdError + Send + Sync>> {
+) -> DynResult<()> {
   let fields = &search_context.fields;
   let id = document.id.to_hex();
   index_writer.delete_term(tantivy::Term::from_field_text(
@@ -286,19 +302,19 @@ pub fn update_document(
   }
   if let Some(parents) = document.parents {
     search_document.add_facet_path(
-      fields.taxon_rank,
-      parents.iter().map(|parent| parent.to_hex()),
+      fields.parents,
+      parents.into_iter().map(|parent| parent.to_hex()),
     );
   }
   if let Some(title) = document.title {
     search_document.add_text(fields.title, &title);
   }
-  for name in document.names.unwrap_or_default() {
+  for name in document.names {
     search_document.add_text(fields.names, &name);
   }
-  for tag in document.tags.unwrap_or_default() {
+  for tag in document.tags {
     search_document
-      .add_facet_path(fields.names, &[&tag.to_hex()]);
+      .add_facet_path(fields.tags, &[&tag.to_hex()]);
   }
   search_document
     .add_text(fields.content, &document.content);
@@ -329,5 +345,233 @@ impl IndexWriterExt for tantivy::Document {
       field,
       tantivy::schema::Facet::from_path(path),
     );
+  }
+}
+
+pub fn execute_query(
+  search_context: &Context,
+  query: &str,
+) -> DynResult<Vec<Document>> {
+  let query_parser = tantivy::query::QueryParser::for_index(
+    &search_context.index,
+    vec![
+      search_context.fields.title,
+      search_context.fields.names,
+      search_context.fields.content,
+    ],
+  );
+  let query = query_parser.parse_query(query)?;
+  let searcher = search_context.index_reader.searcher();
+  let top_docs = searcher.search(
+    &query,
+    &tantivy::collector::TopDocs::with_limit(10),
+  )?;
+  top_docs
+    .into_iter()
+    .map(|(_score, doc_address)| {
+      create_document(
+        searcher.doc(doc_address)?,
+        &search_context.fields,
+      )
+    })
+    .collect::<DynResult<Vec<Document>>>()
+}
+
+fn create_document(
+  document: tantivy::Document,
+  fields: &FieldSet,
+) -> DynResult<Document> {
+  let document_fields = document
+    .field_values()
+    .iter()
+    .map(|field_value| {
+      (field_value.field(), field_value.value())
+    })
+    .into_group_map();
+  Ok(Document {
+    type_: document_fields
+      .get_field(fields.type_)
+      .first()
+      .ok_or("missing")?
+      .facet_value()
+      .ok_or("not facet")?
+      .to_path()
+      .first()
+      .ok_or("missing")?
+      .to_owned()
+      .to_owned(),
+    id: Vec::from_hex(
+      (document_fields
+        .get_field(fields.id)
+        .first()
+        .ok_or("missing")?
+        .text()
+        .ok_or("not text"))?,
+    )?,
+    created_at: OffsetDateTime::from_unix_timestamp(
+      document_fields
+        .get_field(fields.created_at)
+        .first()
+        .ok_or("missing")?
+        .i64_value()
+        .ok_or("not i64")?
+        .to_owned(),
+    )?,
+    created_by: Vec::from_hex(
+      (document_fields
+        .get_field(fields.created_by)
+        .first()
+        .ok_or("missing")?
+        .text()
+        .ok_or("not text"))?,
+    )?,
+    updated_at: OffsetDateTime::from_unix_timestamp(
+      document_fields
+        .get_field(fields.updated_at)
+        .first()
+        .ok_or("missing")?
+        .i64_value()
+        .ok_or("not i64")?
+        .to_owned(),
+    )?,
+    deleted: false,
+    subforum_id: {
+      if let Some(value) = document_fields
+        .get_field(fields.subforum_id)
+        .first()
+      {
+        Some(Vec::from_hex(
+          value
+            .facet_value()
+            .ok_or("not facet")?
+            .to_path()
+            .first()
+            .ok_or("missing")?,
+        )?)
+      } else {
+        None
+      }
+    },
+    topic_id: {
+      if let Some(value) =
+        document_fields.get_field(fields.topic_id).first()
+      {
+        Some(Vec::from_hex(
+          value.text().ok_or("not text")?,
+        )?)
+      } else {
+        None
+      }
+    },
+    taxon_rank: {
+      if let Some(value) =
+        document_fields.get_field(fields.taxon_rank).first()
+      {
+        Some(
+          (TaxonRank::from_str(
+            value
+              .facet_value()
+              .ok_or("not facet")?
+              .to_path()
+              .first()
+              .ok_or("missing")?,
+          ))?,
+        )
+      } else {
+        None
+      }
+    },
+    parents: {
+      if let Some(value) =
+        document_fields.get_field(fields.parents).first()
+      {
+        Some(
+          value
+            .facet_value()
+            .ok_or("not facet")?
+            .to_path()
+            .into_iter()
+            .map(Vec::from_hex)
+            .collect::<DynResult<Vec<Vec<u8>>>>()?,
+        )
+      } else {
+        None
+      }
+    },
+    title: {
+      if let Some(value) =
+        document_fields.get_field(fields.title).first()
+      {
+        Some((value.text().ok_or("not text"))?.to_owned())
+      } else {
+        None
+      }
+    },
+    names: document_fields
+      .get_field(fields.names)
+      .iter()
+      .map(|value| {
+        Ok(((value).text().ok_or("not text"))?.to_owned())
+      })
+      .collect::<DynResult<Vec<String>>>()?,
+    tags: document_fields
+      .get_field(fields.tags)
+      .iter()
+      .map(|value| {
+        Vec::from_hex(
+          value
+            .facet_value()
+            .ok_or("not facet")?
+            .to_path()
+            .first()
+            .ok_or("missing")?,
+        )
+      })
+      .collect::<DynResult<Vec<Vec<u8>>>>()?,
+    content: (document_fields
+      .get_field(fields.content)
+      .first()
+      .ok_or("missing")?
+      .text()
+      .ok_or("not text"))?
+    .to_owned(),
+  })
+}
+
+trait HashMapExt {
+  fn get_field(
+    &self,
+    field: tantivy::schema::Field,
+  ) -> &Vec<&tantivy::schema::Value>;
+}
+
+const NO_VALUES: &Vec<&tantivy::schema::Value> =
+  &Vec::new();
+
+impl HashMapExt
+  for HashMap<
+    tantivy::schema::Field,
+    Vec<&tantivy::schema::Value>,
+  >
+{
+  fn get_field(
+    &self,
+    field: tantivy::schema::Field,
+  ) -> &Vec<&tantivy::schema::Value> {
+    self.get(&field).unwrap_or(NO_VALUES)
+  }
+}
+
+trait ValueExt {
+  fn facet_value(&self) -> Option<&tantivy::schema::Facet>;
+}
+
+impl ValueExt for tantivy::schema::Value {
+  fn facet_value(&self) -> Option<&tantivy::schema::Facet> {
+    if let tantivy::schema::Value::Facet(facet) = self {
+      Some(facet)
+    } else {
+      None
+    }
   }
 }
