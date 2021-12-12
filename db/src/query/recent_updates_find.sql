@@ -5,7 +5,7 @@
 -- $5 type
 -- $6 id
 WITH
-  data
+  document
     AS (
       SELECT
         'topic' AS type,
@@ -20,7 +20,7 @@ WITH
         NULL AS taxon_rank,
         NULL AS parents,
         topic.title,
-        NULL AS names,
+        jsonb_build_array() AS names,
         topic.tags,
         topic.content
       FROM
@@ -39,8 +39,8 @@ WITH
           NULL AS taxon_rank,
           NULL AS parents,
           NULL AS title,
-          NULL AS names,
-          NULL AS tags,
+          jsonb_build_array() AS names,
+          jsonb_build_array() AS tags,
           reply.content
         FROM
           reply
@@ -59,7 +59,7 @@ WITH
           taxon.parents,
           NULL AS title,
           taxon.names,
-          NULL AS tags,
+          jsonb_build_array() AS tags,
           taxon.content
         FROM
           taxon
@@ -77,31 +77,45 @@ WITH
           NULL AS taxon_rank,
           NULL AS parents,
           info.title,
-          NULL AS names,
+          jsonb_build_array() AS names,
           info.tags,
           info.content
         FROM
           info
     )
 SELECT
-  *
+  document.type,
+  document.id,
+  document.created_at,
+  document.created_by,
+  document.updated_at,
+  document.deleted,
+  document.subforum_id,
+  document.topic_id,
+  document.taxon_rank,
+  document.parents,
+  document.title,
+  document.names,
+  document.tags,
+  document.content
 FROM
-  data
+  document
 WHERE
-  data.language = $3
-  AND data.updated_at
-    < current_timestamp(0) - '1 second'::INTERVAL * $1::INT8
+  document.language = $3
+  AND document.updated_at
+    < current_timestamp(0)
+      - '1 second'::INTERVAL * $1::FLOAT8
   AND (
       $4::TIMESTAMPTZ(0) IS NULL
-      OR data.updated_at > $4::TIMESTAMPTZ(0)
-      OR data.updated_at = $4::TIMESTAMPTZ(0)
+      OR document.updated_at > $4::TIMESTAMPTZ(0)
+      OR document.updated_at = $4::TIMESTAMPTZ(0)
         AND (
-            data.type > $5::STRING
-            OR data.type = $5::STRING
-              AND data.id > $6::BYTES
+            document.type > $5::STRING
+            OR document.type = $5::STRING
+              AND document.id > $6::BYTES
           )
     )
 ORDER BY
-  data.updated_at, data.type, data.id
+  document.updated_at, document.type, document.id
 LIMIT
   $2::INT8;

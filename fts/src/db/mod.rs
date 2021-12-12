@@ -2,14 +2,25 @@ use crate::core::document::Document;
 use crate::core::hex::FromHex as _;
 use std::collections::HashMap;
 use std::env;
-use std::error::Error as StdError;
 use time::OffsetDateTime;
 use tokio::spawn;
 
 use crate::core::document::Language;
+use crate::core::result::DynResult;
 use std::sync::Arc;
 
-pub struct Context {
+#[derive(Clone)]
+pub struct Context(Arc<InnerContext>);
+
+impl std::ops::Deref for Context {
+  type Target = Arc<InnerContext>;
+
+  fn deref(&self) -> &Self::Target {
+    &self.0
+  }
+}
+
+pub struct InnerContext {
   pub client: tokio_postgres::Client,
 }
 
@@ -17,11 +28,8 @@ pub struct Handle {
   pub connection_handle: tokio::task::JoinHandle<()>,
 }
 
-pub async fn load() -> (Arc<Context>, Handle) {
-  let result: Result<
-    (Arc<Context>, Handle),
-    Box<dyn StdError + Send + Sync>,
-  > = (|| async {
+pub async fn load() -> (Context, Handle) {
+  let result: DynResult<(Context, Handle)> = (|| async {
     let (url, params) = get_url()?;
     let tls = get_tls(&params)?;
     let config = get_config(&url, &params)?;
@@ -29,7 +37,7 @@ pub async fn load() -> (Arc<Context>, Handle) {
     let connection_handle =
       spawn(run_connection(connection));
     Ok((
-      Arc::new(Context { client }),
+      Context(Arc::new(InnerContext { client })),
       Handle { connection_handle },
     ))
   })()
@@ -46,10 +54,8 @@ async fn run_connection(
   connection.await.expect("DB connection error");
 }
 
-fn get_url() -> Result<
-  (url::Url, HashMap<String, String>),
-  Box<dyn StdError + Send + Sync>,
-> {
+fn get_url(
+) -> DynResult<(url::Url, HashMap<String, String>)> {
   let url: url::Url =
     env::var("DATABASE_URL_API_READ")?.parse()?;
   let params = url
@@ -61,10 +67,7 @@ fn get_url() -> Result<
 
 fn get_tls(
   params: &HashMap<String, String>,
-) -> Result<
-  postgres_openssl::MakeTlsConnector,
-  Box<dyn StdError + Send + Sync>,
-> {
+) -> DynResult<postgres_openssl::MakeTlsConnector> {
   let mut tls_builder =
     openssl::ssl::SslConnector::builder(
       openssl::ssl::SslMethod::tls(),
@@ -95,10 +98,7 @@ fn get_tls(
 fn get_config(
   url: &url::Url,
   params: &HashMap<String, String>,
-) -> Result<
-  tokio_postgres::config::Config,
-  Box<dyn StdError + Send + Sync>,
-> {
+) -> DynResult<tokio_postgres::config::Config> {
   let mut config = tokio_postgres::config::Config::new();
   if url.username() != "" {
     config.user(url.username());
@@ -127,12 +127,11 @@ fn get_config(
 }
 
 pub async fn find_recent_updates(
-  db_context: &Arc::<Context>,
-  buffer_seconds: i64,
+  db_context: &Context,
+  buffer_seconds: f64,
   language: Language,
   mut updated_at: Option<OffsetDateTime>,
-) -> Result<Vec<Document>, Box<dyn StdError + Send + Sync>>
-{
+) -> DynResult<Vec<Document>> {
   const QUERY_TEXT: &str = include_str!(
     "../../../db/src/query/recent_updates_find.sql"
   );
@@ -156,30 +155,26 @@ pub async fn find_recent_updates(
         ],
       )
       .await?;
+    done = rows.len() < QUERY_LIMIT as usize;
     results.append(
       &mut rows
         .iter()
-        .map(create_document_from_row)
-        .collect::<Result<
-        Vec<Document>,
-        Box<dyn StdError + Send + Sync>,
-      >>()?,
+        .map(create_document)
+        .collect::<DynResult<Vec<Document>>>()?,
     );
-    if rows.len() == QUERY_LIMIT as usize {
+    if !done {
       let last = results.last().ok_or("no last")?;
       updated_at = Some(last.updated_at);
       type_ = Some(last.type_.clone());
       id = Some(last.id.clone());
-    } else {
-      done = true;
     }
   }
   Ok(results)
 }
 
-fn create_document_from_row(
+fn create_document(
   row: &tokio_postgres::Row,
-) -> Result<Document, Box<dyn StdError + Send + Sync>> {
+) -> DynResult<Document> {
   Ok(Document {
     type_: row.try_get("type")?,
     id: row.try_get("id")?,
@@ -187,11 +182,10 @@ fn create_document_from_row(
     created_by: row.try_get("created_by")?,
     updated_at: row.try_get("updated_at")?,
     deleted: row.try_get("deleted")?,
-    language: row.try_get("language")?,
     subforum_id: row.try_get("subforum_id")?,
     topic_id: row.try_get("topic_id")?,
     taxon_rank: row.try_get("taxon_rank")?,
-    parents: from_json_array(
+    parents: from_option_json_array(
       row.try_get("parents")?,
       Vec::from_hex,
     )?,
@@ -209,32 +203,31 @@ fn create_document_from_row(
 }
 
 fn from_json_array<B, F>(
-  value: Option<serde_json::value::Value>,
+  value: serde_json::value::Value,
   mut f: F,
-) -> Result<Option<Vec<B>>, Box<dyn StdError + Send + Sync>>
+) -> DynResult<Vec<B>>
 where
-  F: FnMut(
-    &str,
-  ) -> Result<B, Box<dyn StdError + Send + Sync>>,
+  F: FnMut(&str) -> DynResult<B>,
+{
+    value
+      .as_array()
+      .ok_or("not an array")?
+      .iter()
+      .map(move |item| {
+        f(item.as_str().ok_or("not a str")?)
+      })
+      .collect::<DynResult<Vec<B>>>()
+}
+
+fn from_option_json_array<B, F>(
+  value: Option<serde_json::value::Value>,
+  f: F,
+) -> DynResult<Option<Vec<B>>>
+where
+  F: FnMut(&str) -> DynResult<B>,
 {
   if let Some(value) = value {
-    Ok(Some(
-      value
-        .as_array()
-        .ok_or("not an array")?
-        .iter()
-        .map(move |item| {
-          f(
-            item
-              .as_str()
-              .ok_or("not a str")?
-          )
-        })
-        .collect::<Result<
-          Vec<B>,
-          Box<dyn StdError + Send + Sync>,
-        >>()?,
-    ))
+    Ok(Some(from_json_array(value, f)?))
   } else {
     Ok(None)
   }

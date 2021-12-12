@@ -6,6 +6,7 @@ edition = "2021"
 [dependencies]
 cargo-watch = "8.1.1"
 hyper = { version = "0.14", features = ["full"] }
+itertools = "0.10.3"
 lindera = "0.8.1"
 lindera-core = "0.8.1"
 lindera-tantivy = "0.8.1"
@@ -15,7 +16,10 @@ percent-encoding = "2.1.0"
 postgres-openssl = "0.5.0"
 postgres-types = { version = "0.2.2", features = ["derive", "with-time-0_3", "with-serde_json-1"] }
 rand = "0.8.4"
+serde = "1.0.130"
+serde_derive = "1.0.130"
 serde_json = "1.0.68"
+serde_urlencoded = "0.7.0"
 strum = "0.23.0"
 strum_macros = "0.23"
 tantivy = "0.16.1"

@@ -1,18 +1,14 @@
-use std::error::Error as StdError;
+use crate::core::result::DynResult;
 use std::fmt::Write as _;
 
 pub trait FromHex {
-  fn from_hex(
-    value: &str,
-  ) -> Result<Self, Box<dyn StdError + Send + Sync>>
+  fn from_hex(value: &str) -> DynResult<Self>
   where
     Self: Sized;
 }
 
 impl FromHex for Vec<u8> {
-  fn from_hex(
-    value: &str,
-  ) -> Result<Self, Box<dyn StdError + Send + Sync>> {
+  fn from_hex(value: &str) -> DynResult<Self> {
     if value.len() % 2 != 0 {
       Err("invalid hex size".into())
     } else {
