@@ -389,7 +389,9 @@ INTO
       updated_by,
       deleted,
       language,
+      subforum_id,
       topic_id,
+      tags,
       content
     )
 VALUES
@@ -401,7 +403,9 @@ VALUES
     b'\xbb',
     false,
     'en',
+    b'\x0002',
     b'\x0006',
+    jsonb_build_array('0004'),
     'Yo'
   )
 ON CONFLICT
@@ -449,7 +453,9 @@ INTO
       updated_by,
       deleted,
       language,
+      subforum_id,
       topic_id,
+      tags,
       content
     )
 VALUES
@@ -461,7 +467,9 @@ VALUES
     b'\xbb',
     false,
     'en',
+    b'\x0002',
     b'\x0006',
+    jsonb_build_array('0004'),
     'Test 2'
   )
 ON CONFLICT
@@ -480,8 +488,10 @@ INTO
       updated_by,
       deleted,
       language,
+      subforum_id,
       topic_id,
       parent_reply_id,
+      tags,
       content
     )
 VALUES
@@ -493,8 +503,10 @@ VALUES
     b'\xbb',
     false,
     'en',
+    b'\x0002',
     b'\x0006',
     b'\x0007',
+    jsonb_build_array('0004'),
     'Test 3'
   )
 ON CONFLICT

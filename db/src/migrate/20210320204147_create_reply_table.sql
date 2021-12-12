@@ -14,10 +14,14 @@ CREATE TABLE reply (
     BOOL DEFAULT true NOT NULL,
   language
     language NOT NULL,
+  subforum_id
+    BYTES NOT NULL REFERENCES subforum (id),
   topic_id
     BYTES NOT NULL REFERENCES topic (id),
   parent_reply_id
     BYTES DEFAULT NULL REFERENCES reply (id),
+  tags
+    JSONB DEFAULT jsonb_build_array() NOT NULL,
   content
     STRING DEFAULT '' NOT NULL
 );

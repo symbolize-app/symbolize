@@ -209,14 +209,12 @@ fn from_json_array<B, F>(
 where
   F: FnMut(&str) -> DynResult<B>,
 {
-    value
-      .as_array()
-      .ok_or("not an array")?
-      .iter()
-      .map(move |item| {
-        f(item.as_str().ok_or("not a str")?)
-      })
-      .collect::<DynResult<Vec<B>>>()
+  value
+    .as_array()
+    .ok_or("not an array")?
+    .iter()
+    .map(move |item| f(item.as_str().ok_or("not a str")?))
+    .collect::<DynResult<Vec<B>>>()
 }
 
 fn from_option_json_array<B, F>(

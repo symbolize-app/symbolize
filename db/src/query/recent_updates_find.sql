@@ -34,13 +34,13 @@ WITH
           reply.updated_at,
           reply.deleted,
           reply.language,
-          NULL AS subforum_id,
+          reply.subforum_id,
           reply.topic_id,
           NULL AS taxon_rank,
           NULL AS parents,
           NULL AS title,
           jsonb_build_array() AS names,
-          jsonb_build_array() AS tags,
+          reply.tags,
           reply.content
         FROM
           reply
