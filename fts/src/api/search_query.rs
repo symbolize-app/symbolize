@@ -6,9 +6,9 @@ use crate::search;
 use tokio::task::spawn_blocking;
 
 #[derive(Debug, serde::Deserialize)]
-struct Params<'a> {
+struct Params {
   language: Language,
-  query: &'a str,
+  query: String,
 }
 
 pub async fn handle(
@@ -25,7 +25,7 @@ pub async fn handle(
     let search_context = search_context_map
       .get(&params.language)
       .ok_or("invalid language")?;
-    search::execute_query(search_context, params.query)
+    search::execute_query(search_context, &params.query)
   })
   .await??;
   drop(permit);
