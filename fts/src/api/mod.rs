@@ -1,3 +1,4 @@
+pub mod auth;
 pub mod search_query;
 pub mod search_update;
 
@@ -24,6 +25,7 @@ impl std::ops::Deref for Context {
 }
 
 pub struct InnerContext {
+  pub auth: auth::Auth,
   pub cpu_available: Semaphore,
   pub search_update_requested: Notify,
 }
@@ -33,7 +35,9 @@ pub async fn run(
   db_context: db::Context,
   db_handle: db::Handle,
 ) -> DynResult<()> {
+  let password: String = env::var("FTS_PASSWORD")?;
   let api_context = Context(Arc::new(InnerContext {
+    auth: auth::Auth::new("", &password),
     cpu_available: Semaphore::new(num_cpus::get()),
     search_update_requested: Notify::new(),
   }));
@@ -99,7 +103,7 @@ async fn handle_request(
         .await
       }
       ("POST", "/update") => {
-        search_update::handle(api_context)
+        search_update::handle(api_context, req)
       }
       _ => Ok(
         hyper::Response::builder()

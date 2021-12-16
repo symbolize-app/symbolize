@@ -16,6 +16,9 @@ pub async fn handle(
   search_context_map: search::ContextMap,
   req: hyper::Request<hyper::Body>,
 ) -> DynResult<hyper::Response<hyper::Body>> {
+  if let Err(res) = api_context.auth.check_request(&req) {
+    return Ok(res);
+  }
   let permit = api_context.cpu_available.acquire().await?;
   let documents = spawn_blocking(move || {
     let params: Params = serde_urlencoded::from_str(

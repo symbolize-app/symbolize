@@ -107,7 +107,11 @@ pub async fn periodic(api_context: api::Context) {
 
 pub fn handle(
   api_context: api::Context,
+  req: hyper::Request<hyper::Body>,
 ) -> DynResult<hyper::Response<hyper::Body>> {
+  if let Err(res) = api_context.auth.check_request(&req) {
+    return Ok(res);
+  }
   spawn(handle_queue(api_context));
   Ok(
     hyper::Response::builder()
