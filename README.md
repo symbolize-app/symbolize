@@ -27,7 +27,11 @@
 
 # App development
 
-## `pnpm start`
+## `pnpm db up`
+
+## `pnpm import-basic`
+
+## `pnpm dev`
 
 Runs the development server
 
@@ -55,3 +59,5 @@ Open a CockroachDB SQL prompt
 ## `cargo fix-fmt`
 
 ## `cargo fix-clippy`
+
+## `curl -i -G -u :$FTS_PASSWORD 'localhost:7070/query' --data-urlencode 'language=en' --data-urlencode 'query=flower'`
