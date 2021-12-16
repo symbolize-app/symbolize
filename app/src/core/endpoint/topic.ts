@@ -30,7 +30,7 @@ export const list = endpoint.defineGetEndpoint(
     results: payload.checkArray(
       payload.checkObject({
         id: appPayload.checkId,
-        updated: payload.checkTimestamp,
+        updatedAt: payload.checkTimestamp,
         title: appPayload.checkTitle,
         slug: appPayload.checkSlug,
         content: appPayload.checkContent,

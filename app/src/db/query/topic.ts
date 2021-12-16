@@ -20,7 +20,7 @@ export const list = query.defineMulti<
   [],
   {
     id: Buffer
-    updated: Date
+    updated_at: Date
     title: string
     slug: string
     content: string
