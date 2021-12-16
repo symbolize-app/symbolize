@@ -792,6 +792,7 @@ dependencies = [
 name = "fertile-earth"
 version = "0.1.0"
 dependencies = [
+ "base64 0.9.3",
  "cargo-watch",
  "hyper 0.14.7",
  "itertools",
