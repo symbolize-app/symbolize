@@ -74,6 +74,6 @@ WITH
         topic_slug.slug AS slug
     )
 SELECT
-  topic_update.updated AS updated
+  topic_update.updated
 FROM
   topic_update;

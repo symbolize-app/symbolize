@@ -55,7 +55,7 @@ export const list = route.defineEndpoint<
   return appRoute.checkOkResponse(appEndpointTopic.list, {
     results: results.map((row) => ({
       id: row.id.toString('hex'),
-      updated: row.updated.getTime(),
+      updatedAt: row.updated_at.getTime(),
       title: row.title,
       slug: row.slug,
       content: row.content,

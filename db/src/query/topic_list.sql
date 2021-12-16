@@ -1,14 +1,14 @@
 SELECT
-  topic.id AS id,
-  topic.updated AS updated,
-  topic.title AS title,
-  topic.slug AS slug,
-  topic.content AS content
+  topic.id,
+  topic.updated_at,
+  topic.title,
+  topic.slug,
+  topic.content
 FROM
   topic
 WHERE
-  topic.deleted IS NULL
+  topic.deleted = false
 ORDER BY
-  topic.created DESC
+  topic.created_at DESC
 LIMIT
   5;
