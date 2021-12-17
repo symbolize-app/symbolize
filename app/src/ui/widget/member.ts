@@ -1,8 +1,8 @@
 import * as appEndpointMember from '@fe/core/endpoint/member.ts'
-import * as appSubmit from '@fe/ui/submit.ts'
+import * as appSubmit from '@fe/core/submit.ts'
 import type * as errorModule from '@tiny/core/error.ts'
 import * as random from '@tiny/core/random.ts'
-import type * as submit from '@tiny/ui/submit.ts'
+import type * as submit from '@tiny/core/submit.ts'
 import * as widget from '@tiny/ui/widget.ts'
 
 const button = widget.html.button
@@ -54,9 +54,11 @@ export const create = widget.define<
         'create member',
         appEndpointMember.create,
         {
-          requestId: requestIdInput.value,
-          email: emailInput.value,
-          handle: handleInput.value,
+          body: {
+            requestId: requestIdInput.value,
+            email: emailInput.value,
+            handle: handleInput.value,
+          },
         }
       )
       statusDiv.content = [

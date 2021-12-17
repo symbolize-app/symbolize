@@ -1,8 +1,8 @@
 import * as appWidgetMember from '@fe/ui/widget/member.ts'
 import type * as errorModule from '@tiny/core/error.ts'
 import * as test from '@tiny/test/index.ts'
-import * as submitTest from '@tiny/ui/submit.test.ts'
-import type * as submit from '@tiny/ui/submit.ts'
+import * as submitTest from '@tiny/core/submit.test.ts'
+import type * as submit from '@tiny/core/submit.ts'
 import * as widgetTest from '@tiny/ui/widget.test.ts'
 import type * as widget from '@tiny/ui/widget.ts'
 
@@ -63,6 +63,7 @@ export const tests = {
       test.assertDeepEquals(submit[test.mockHistory], [
         [
           {
+            origin: undefined,
             path: '/api/member/create',
             method: 'POST',
             headers: {
@@ -133,6 +134,7 @@ export const tests = {
       test.assertDeepEquals(submit[test.mockHistory], [
         [
           {
+            origin: undefined,
             path: '/api/member/create',
             method: 'POST',
             headers: {

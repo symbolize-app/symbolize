@@ -2,8 +2,10 @@ dependencies:
   '@types/pg': 7.14.11
   chalk: 4.1.0
   cookie: 0.4.1
+  formdata-polyfill: 4.0.10
   jsdom: 16.5.1_c70f8fc5586dd378b8c866035dbe710b
   ms: 2.1.3
+  node-fetch: 3.1.0
   pg: 8.5.1
   pg-connection-string: 2.4.0
   sodium-native: 3.2.1
@@ -639,6 +641,12 @@ packages:
       node: '>=0.10'
     resolution:
       integrity: sha1-hTz6D3y+L+1d4gMmuN1YEDX24vA=
+  /data-uri-to-buffer/4.0.0:
+    dev: false
+    engines:
+      node: '>= 12'
+    resolution:
+      integrity: sha512-Vr3mLBA8qWmcuschSLAOogKgQ/Jwxulv3RNE4FXnYWRGujzrRWQI4m12fQqRkwX06C0KanhLr4hK+GydchZsaA==
   /data-urls/2.0.0:
     dependencies:
       abab: 2.0.5
@@ -1064,6 +1072,14 @@ packages:
     dev: true
     resolution:
       integrity: sha512-7Eczs8gIPDrVzT+EksYBcupqMyxSHXXrHOLRRxU2/DicV8789MRBRR8+Hc2uWzUupOs4YS4JzBmBxjjCVBxD/g==
+  /fetch-blob/3.1.3:
+    dependencies:
+      web-streams-polyfill: 3.2.0
+    dev: false
+    engines:
+      node: ^12.20 || >= 14.13
+    resolution:
+      integrity: sha512-ax1Y5I9w+9+JiM+wdHkhBoxew+zG4AJ2SvAD1v1szpddUIiPERVGBxrMcB2ZqW0Y3PP8bOWYv2zqQq1Jp2kqUQ==
   /file-entry-cache/6.0.1:
     dependencies:
       flat-cache: 3.0.4
@@ -1126,6 +1142,14 @@ packages:
       node: '>= 0.12'
     resolution:
       integrity: sha512-1lLKB2Mu3aGP1Q/2eCOx0fNbRMe7XdwktwOruhfqqd0rIJWwN4Dh+E3hrPSlDCXnSR7UtZ1N38rVXm+6+MEhJQ==
+  /formdata-polyfill/4.0.10:
+    dependencies:
+      fetch-blob: 3.1.3
+    dev: false
+    engines:
+      node: '>=12.20.0'
+    resolution:
+      integrity: sha512-buewHzMvYL29jdeQTVILecSaZKnt/RJWjoZCF5OW60Z67/GmSLBkOFM7qh1PI3zFNtJbaZL5eQu1vLfazOwj4g==
   /fs.realpath/1.0.0:
     dev: true
     resolution:
@@ -1668,6 +1692,16 @@ packages:
     dev: true
     resolution:
       integrity: sha1-Sr6/7tdUHywnrPspvbvRXI1bpPc=
+  /node-fetch/3.1.0:
+    dependencies:
+      data-uri-to-buffer: 4.0.0
+      fetch-blob: 3.1.3
+      formdata-polyfill: 4.0.10
+    dev: false
+    engines:
+      node: ^12.20.0 || ^14.13.1 || >=16.0.0
+    resolution:
+      integrity: sha512-QU0WbIfMUjd5+MUzQOYhenAazakV7Irh1SGkWCsRzBwvm4fAhzEUaHMJ6QLP7gWT6WO9/oH2zhKMMGMuIrDyKw==
   /node-gyp-build/4.2.3:
     hasBin: true
     resolution:
@@ -2542,6 +2576,12 @@ packages:
       node: '>=10'
     resolution:
       integrity: sha512-4tzD0mF8iSiMiNs30BiLO3EpfGLZUT2MSX/G+o7ZywDzliWQ3OPtTZ0PTC3B3ca1UAf4cJMHB+2Bf56EriJuRA==
+  /web-streams-polyfill/3.2.0:
+    dev: false
+    engines:
+      node: '>= 8'
+    resolution:
+      integrity: sha512-EqPmREeOzttaLRm5HS7io98goBgZ7IVz79aDvqjD0kYXLtFZTc0T/U6wHTPKyIjb+MdN7DFIIX6hgdBEpWmfPA==
   /webidl-conversions/5.0.0:
     dev: false
     engines:
@@ -2665,10 +2705,12 @@ specifiers:
   eslint-plugin-prettier: ^3.3.1
   eslint-plugin-simple-import-sort: ^7.0.0
   fast-mersenne-twister: ^1.0.3
+  formdata-polyfill: ^4.0.10
   http-proxy: ^1.18.1
   jsdom: ^16.5.1
   lodash-es: ^4.17.21
   ms: ^2.1.3
+  node-fetch: ^3.1.0
   pg: ^8.5.1
   pg-connection-string: ^2.4.0
   picomatch: ^2.2.2

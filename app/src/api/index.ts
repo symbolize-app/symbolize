@@ -1,5 +1,7 @@
 import * as appRouteMember from '@fe/api/route/member.ts'
+import type * as submit from '@tiny/core/submit.ts'
 import * as appRouteMessage from '@fe/api/route/message.ts'
+import * as appRouteSearch from '@fe/api/route/search.ts'
 import * as appRouteTopic from '@fe/api/route/topic.ts'
 import * as appQuery from '@fe/db/query/index.ts'
 import * as appWidgetButton from '@fe/ui/widget/button.ts'
@@ -7,6 +9,7 @@ import * as route from '@tiny/api/route.ts'
 import type * as errorModule from '@tiny/core/error.ts'
 import * as random from '@tiny/core/random.ts'
 import * as timeNode from '@tiny/core/time.node.ts'
+import * as submitNode from '@tiny/core/submit.node.ts'
 import * as widget from '@tiny/ui/widget.ts'
 import chalk from 'chalk'
 import * as fs from 'fs'
@@ -70,10 +73,12 @@ const js = route.define(
 function main(): void {
   const ctx: errorModule.Context &
     appQuery.ReadContext &
-    appQuery.WriteContext = {
+    appQuery.WriteContext &
+    submit.Context = {
     ...random.initContext(),
     ...timeNode.initContext(),
     ...appQuery.initContext(),
+    ...submitNode.initContext(),
   }
   const httpServer = http.createServer(
     route.handle(ctx, [
@@ -82,6 +87,7 @@ function main(): void {
       js,
       ...appRouteMember.routes,
       ...appRouteMessage.routes,
+      ...appRouteSearch.routes,
       ...appRouteTopic.routes,
       notFound,
     ])

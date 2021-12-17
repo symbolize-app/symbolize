@@ -29,11 +29,14 @@ export type Context = {
 }
 
 export function initContext(
-  window: Window & typeof globalThis
+  window: Pick<
+    Window & typeof globalThis,
+    'fetch' | 'FormData'
+  >
 ): Context {
   return {
     async submit(request) {
-      let windowBody
+      let body
       if (
         request.body === undefined ||
         typeof request.body === 'string' ||
@@ -41,9 +44,9 @@ export function initContext(
         request.body instanceof Uint8Array ||
         request.body instanceof window.FormData
       ) {
-        windowBody = request.body
+        body = request.body
       } else {
-        windowBody = JSON.stringify(request.body)
+        body = JSON.stringify(request.body)
       }
       let url = request.path
       if (request.origin) {
@@ -57,30 +60,30 @@ export function initContext(
           url = `${url}?${params}`
         }
       }
-      const windowResponse = await window.fetch(url, {
+      const response = await window.fetch(url, {
         method: request.method,
         headers: request.headers,
-        body: windowBody,
+        body: body,
       })
       return {
-        status: windowResponse.status,
+        status: response.status,
         headers: Object.fromEntries(
-          windowResponse.headers.entries()
+          response.headers.entries()
         ),
         stream() {
-          if (!windowResponse.body) {
+          if (!response.body) {
             throw new Error('No response stream')
           }
-          return windowResponse.body
+          return response.body
         },
         buffer() {
-          return windowResponse.arrayBuffer()
+          return response.arrayBuffer()
         },
         text() {
-          return windowResponse.text()
+          return response.text()
         },
         json() {
-          return windowResponse.json()
+          return response.json()
         },
       }
     },

@@ -2,11 +2,12 @@ import * as appMessage from '@fe/core/message.ts'
 import * as appWidgetButton from '@fe/ui/widget/button.ts'
 import * as appWidgetMember from '@fe/ui/widget/member.ts'
 import * as appWidgetTopic from '@fe/ui/widget/topic.ts'
+import * as appWidgetSearch from '@fe/ui/widget/search.ts'
 import type * as errorModule from '@tiny/core/error.ts'
 import * as random from '@tiny/core/random.ts'
 import * as timeBrowser from '@tiny/core/time.browser.ts'
 import * as style from '@tiny/ui/style.ts'
-import * as submit from '@tiny/ui/submit.ts'
+import * as submit from '@tiny/core/submit.ts'
 import * as widget from '@tiny/ui/widget.ts'
 
 console.log(appMessage.hi)
@@ -119,6 +120,7 @@ async function main(): Promise<void> {
       }),
       appWidgetMember.create(ctx, {}),
       appWidgetTopic.list(ctx, {}),
+      appWidgetSearch.query(ctx, {}),
     ],
   })
 

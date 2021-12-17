@@ -20,14 +20,10 @@ export const tests = {
       'Invalid object (wrong type null) at (root)'
     )
   },
-  ['checkObject, extra key']: (): void => {
+  ['checkObject, extra key ok']: (): void => {
     const check = payload.checkObject({})
-    const error = test.assertThrows(() => check({ x: 1 }))
-    test.assertInstanceOf(error, payload.PayloadError)
-    test.assertEquals(
-      error.message,
-      'Invalid object (extra key "x") at (root)'
-    )
+    const input = { x: {} }
+    test.assertDeepEquals(check(input), {})
   },
   ['checkObject, missing key']: (): void => {
     const check = payload.checkObject({
