@@ -10,10 +10,7 @@ export type QueryResult = typeFest.IterableElement<
 export const query = endpoint.defineGetEndpoint(
   '/api/search/query',
   payload.checkObject({
-    language: payload.checkString({
-      min: 2,
-      max: 16,
-    }) /* TODO enum */,
+    language: appPayload.checkLanguage,
     query: payload.checkString({
       min: 0,
       max: 256,
