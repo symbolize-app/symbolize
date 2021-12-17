@@ -1,24 +1,21 @@
 import type * as endpoint from '@tiny/core/endpoint.ts'
 import * as errorModule from '@tiny/core/error.ts'
 import type * as payload from '@tiny/core/payload.ts'
-import * as time from '@tiny/core/time.ts'
 import type * as submit from '@tiny/core/submit.ts'
+import * as time from '@tiny/core/time.ts'
 import ms from 'ms'
+import type * as typeFest from 'type-fest'
 
 export function retryGetSubmit<
-  RequestData extends Record<string, string>,
-  OkResponseData
+  Endpoint extends endpoint.GetEndpoint
 >(
   ctx: errorModule.Context & submit.Context,
   description: string,
-  endpoint: endpoint.GetEndpoint<
-    RequestData,
-    OkResponseData
-  >,
+  endpoint: Endpoint,
   request: Pick<submit.Request, 'origin' | 'headers'> & {
-    params: RequestData
+    params: endpoint.RequestData<Endpoint>
   }
-): Promise<OkResponseData> {
+): Promise<endpoint.OkResponseData<Endpoint>> {
   return retryBaseSubmit(ctx, description, endpoint, {
     origin: request.origin,
     path: endpoint.path,
@@ -29,21 +26,15 @@ export function retryGetSubmit<
 }
 
 export function retryConflictPostSubmit<
-  RequestData,
-  OkResponseData,
-  ConflictResponseData extends { conflict: string }
+  Endpoint extends endpoint.ConflictPostEndpoint
 >(
   ctx: errorModule.Context & submit.Context,
   description: string,
-  endpoint: endpoint.ConflictPostEndpoint<
-    RequestData,
-    OkResponseData,
-    ConflictResponseData
-  >,
+  endpoint: Endpoint,
   request: Pick<submit.Request, 'origin' | 'headers'> & {
-    body: RequestData
+    body: endpoint.RequestData<Endpoint>
   }
-): Promise<OkResponseData> {
+): Promise<endpoint.OkResponseData<Endpoint>> {
   return retryConflictSubmit(ctx, description, endpoint, {
     origin: request.origin,
     path: endpoint.path,
@@ -56,17 +47,19 @@ export function retryConflictPostSubmit<
   })
 }
 
-async function retryBaseSubmit<OkResponseData>(
+async function retryBaseSubmit<
+  Endpoint extends {
+    checkOkResponse: payload.Validator<typeFest.JsonObject>
+  }
+>(
   ctx: errorModule.Context & submit.Context,
   description: string,
-  endpoint: {
-    checkOkResponse: payload.Validator<OkResponseData>
-  },
+  endpoint: Endpoint,
   request: submit.Request,
   onResponse?: (response: submit.Response) => Promise<void>,
   onError?: (error: unknown) => void
-): Promise<OkResponseData> {
-  return await errorModule.retry(
+): Promise<endpoint.OkResponseData<Endpoint>> {
+  return (await errorModule.retry(
     ctx,
     async () => {
       const response = await ctx.submit(request)
@@ -101,24 +94,31 @@ async function retryBaseSubmit<OkResponseData>(
         )
       },
     }
-  )
+  )) as endpoint.OkResponseData<Endpoint>
 }
 
 function retryConflictSubmit<
-  OkResponseData,
-  ConflictResponseData extends { conflict: string }
+  Endpoint extends {
+    checkOkResponse: payload.Validator<typeFest.JsonObject>
+    conflictError: new (
+      field: string
+    ) => payload.ConflictError<
+      typeFest.JsonObject & {
+        conflict: string
+      }
+    >
+    checkConflictResponse: payload.Validator<
+      typeFest.JsonObject & {
+        conflict: string
+      }
+    >
+  }
 >(
   ctx: errorModule.Context & submit.Context,
   description: string,
-  endpoint: {
-    checkOkResponse: payload.Validator<OkResponseData>
-    conflictError: new (
-      field: ConflictResponseData['conflict']
-    ) => payload.ConflictError<ConflictResponseData>
-    checkConflictResponse: payload.Validator<ConflictResponseData>
-  },
+  endpoint: Endpoint,
   request: submit.Request
-): Promise<OkResponseData> {
+): Promise<endpoint.OkResponseData<Endpoint>> {
   return retryBaseSubmit(
     ctx,
     description,

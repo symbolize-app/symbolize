@@ -18,6 +18,7 @@ export const create = query.defineVoid<
 export const list = query.defineMulti<
   appQuery.Read,
   [],
+  /* eslint-disable @typescript-eslint/naming-convention */
   {
     id: Buffer
     updated_at: Date
@@ -25,6 +26,7 @@ export const list = query.defineMulti<
     slug: string
     content: string
   }
+  /* eslint-enable @typescript-eslint/naming-convention */
 >(dbQueryTopicList)
 
 export const update = query.defineOptional<

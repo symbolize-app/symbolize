@@ -17,40 +17,39 @@ function defineBaseEndpoint<Method extends string>(
 }
 
 export type RequestData<
-  Endpoint extends BaseEndpoint<string>
-> = Endpoint extends {
-  checkRequest: payload.Validator<infer RequestData>
-}
-  ? RequestData
-  : never
+  Endpoint extends {
+    checkRequest: payload.Validator<typeFest.JsonObject>
+  }
+> = ReturnType<Endpoint['checkRequest']>
 
 export type OkResponseData<
-  Endpoint extends BaseEndpoint<string>
-> = Endpoint extends {
-  checkOkResponse: payload.Validator<infer OkResponseData>
-}
-  ? OkResponseData
-  : never
+  Endpoint extends {
+    checkOkResponse: payload.Validator<typeFest.JsonObject>
+  }
+> = ReturnType<Endpoint['checkOkResponse']>
 
 export type ConflictResponseData<
-  Endpoint extends BaseEndpoint<string>
-> = Endpoint extends {
-  checkConflictResponse: payload.Validator<
-    infer ConflictResponseData
-  >
-}
-  ? ConflictResponseData extends { conflict: string }
-    ? ConflictResponseData
-    : never
-  : never
+  Endpoint extends {
+    checkConflictResponse: payload.Validator<
+      typeFest.JsonObject & { conflict: string }
+    >
+  }
+> = ReturnType<Endpoint['checkConflictResponse']>
 
 export type ConflictError<
-  Endpoint extends BaseEndpoint<string>
+  Endpoint extends {
+    checkConflictResponse: payload.Validator<
+      typeFest.JsonObject & { conflict: string }
+    >
+  }
 > = payload.ConflictError<ConflictResponseData<Endpoint>>
 
 export type GetEndpoint<
-  RequestData extends Record<string, string>,
-  OkResponseData extends typeFest.JsonObject
+  RequestData extends Record<string, string> = Record<
+    string,
+    string
+  >,
+  OkResponseData extends typeFest.JsonObject = typeFest.JsonObject
 > = BaseEndpoint<'GET'> & {
   checkRequest: payload.Validator<RequestData>
   checkOkResponse: payload.Validator<OkResponseData>
@@ -95,14 +94,16 @@ export function definePostEndpoint<
 }
 
 export type ConflictPostEndpoint<
-  RequestData extends typeFest.JsonObject,
-  OkResponseData extends typeFest.JsonObject,
+  RequestData extends typeFest.JsonObject = typeFest.JsonObject,
+  OkResponseData extends typeFest.JsonObject = typeFest.JsonObject,
   ConflictResponseData extends typeFest.JsonObject & {
+    conflict: string
+  } = typeFest.JsonObject & {
     conflict: string
   }
 > = PostEndpoint<RequestData, OkResponseData> & {
   conflictError: new (
-    field: ConflictResponseData['conflict']
+    field: string
   ) => payload.ConflictError<ConflictResponseData>
   checkConflictResponse: payload.Validator<ConflictResponseData>
 }
