@@ -263,7 +263,7 @@ export function checkConflictResponse<Field extends string>(
 }
 
 export class ConflictError<
-  ConflictResponse extends { conflict: string }
+  ConflictResponse extends { conflict: unknown }
 > extends Error {
   field: ConflictResponse['conflict']
   constructor(field: ConflictResponse['conflict']) {

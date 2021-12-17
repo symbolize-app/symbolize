@@ -1,8 +1,8 @@
 import * as appWidgetMember from '@fe/ui/widget/member.ts'
 import type * as errorModule from '@tiny/core/error.ts'
-import * as test from '@tiny/test/index.ts'
 import * as submitTest from '@tiny/core/submit.test.ts'
 import type * as submit from '@tiny/core/submit.ts'
+import * as test from '@tiny/test/index.ts'
 import * as widgetTest from '@tiny/ui/widget.test.ts'
 import type * as widget from '@tiny/ui/widget.ts'
 

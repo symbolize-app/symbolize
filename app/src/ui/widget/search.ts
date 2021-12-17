@@ -1,10 +1,10 @@
 import * as appEndpointSearch from '@fe/core/endpoint/search.ts'
-import * as appSubmit from '@fe/core/submit.ts'
 import * as appLanguage from '@fe/core/language.ts'
+import * as appSubmit from '@fe/core/submit.ts'
 import type * as errorModule from '@tiny/core/error.ts'
-import * as random from '@tiny/core/random.ts'
-import * as style from '@tiny/ui/style.ts'
+import type * as random from '@tiny/core/random.ts'
 import type * as submit from '@tiny/core/submit.ts'
+import * as style from '@tiny/ui/style.ts'
 import * as widget from '@tiny/ui/widget.ts'
 
 const button = widget.html.button
@@ -59,7 +59,7 @@ export const query = widget.define<
       appEndpointSearch.query,
       {
         params: {
-          language: appLanguage.Language.English,
+          language: appLanguage.Language.english,
           query: queryInput.value,
         },
       }
