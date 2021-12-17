@@ -1,11 +1,11 @@
 import * as appRoute from '@fe/api/route/index.ts'
-import * as appPayload from '@fe/core/payload.ts'
-import * as endpoint from '@tiny/core/endpoint.ts'
-import * as payload from '@tiny/core/payload.ts'
-import * as appSubmit from '@fe/core/submit.ts'
 import * as appEndpointSearch from '@fe/core/endpoint/search.ts'
+import * as appPayload from '@fe/core/payload.ts'
+import * as appSubmit from '@fe/core/submit.ts'
 import * as route from '@tiny/api/route.ts'
+import * as endpoint from '@tiny/core/endpoint.ts'
 import type * as errorModule from '@tiny/core/error.ts'
+import * as payload from '@tiny/core/payload.ts'
 import type * as submit from '@tiny/core/submit.ts'
 
 export const query = route.defineEndpoint<
@@ -20,10 +20,12 @@ export const query = route.defineEndpoint<
     'search query',
     ftsQueryEndpoint,
     {
-      origin: `http://${process.env.FTS_HOST}:${process.env.FTS_PORT}/` /* TODO scheme */,
+      origin: `http://${process.env.FTS_HOST as string}:${
+        process.env.FTS_PORT as string
+      }/` /* TODO scheme */,
       headers: {
-        Authorization: `Basic ${Buffer.from(
-          `:${process.env.FTS_PASSWORD}`
+        ['Authorization']: `Basic ${Buffer.from(
+          `:${process.env.FTS_PASSWORD as string}`
         ).toString('base64')}`,
       },
       params: {
@@ -44,10 +46,7 @@ export const query = route.defineEndpoint<
 export const ftsQueryEndpoint = endpoint.defineGetEndpoint(
   '/query',
   payload.checkObject({
-    language: payload.checkString({
-      min: 2,
-      max: 16,
-    }),
+    language: appPayload.checkLanguage,
     query: payload.checkString({
       min: 0,
       max: 256,
@@ -55,11 +54,13 @@ export const ftsQueryEndpoint = endpoint.defineGetEndpoint(
   }),
   payload.checkObject({
     results: payload.checkArray(
+      /* eslint-disable @typescript-eslint/naming-convention */
       payload.checkObject({
         id: appPayload.checkId,
         updated_at: payload.checkTimestamp,
         content: appPayload.checkContent,
       })
+      /* eslint-enable @typescript-eslint/naming-convention */
     ),
   })
 )

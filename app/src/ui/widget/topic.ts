@@ -2,8 +2,8 @@ import * as appEndpointTopic from '@fe/core/endpoint/topic.ts'
 import * as appSubmit from '@fe/core/submit.ts'
 import type * as errorModule from '@tiny/core/error.ts'
 import * as random from '@tiny/core/random.ts'
-import * as style from '@tiny/ui/style.ts'
 import type * as submit from '@tiny/core/submit.ts'
+import * as style from '@tiny/ui/style.ts'
 import * as widget from '@tiny/ui/widget.ts'
 
 const button = widget.html.button

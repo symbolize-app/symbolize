@@ -1,5 +1,5 @@
-import * as test from '@tiny/test/index.ts'
 import type * as submit from '@tiny/core/submit.ts'
+import * as test from '@tiny/test/index.ts'
 
 export function mockResponse(
   response: Partial<submit.Response>
