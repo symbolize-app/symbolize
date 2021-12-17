@@ -46,16 +46,6 @@ export function checkObject<
       )
     } else {
       const result = {} as Value
-      for (const key in input) {
-        if (!(key in config)) {
-          throw new PayloadError(
-            `Invalid object (extra key ${JSON.stringify(
-              key
-            )})`,
-            path
-          )
-        }
-      }
       for (const key in config) {
         const value = input[key]
         if (value === undefined) {
