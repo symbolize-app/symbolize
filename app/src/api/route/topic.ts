@@ -20,20 +20,18 @@ export const create = route.defineEndpoint<
   const { title, slug, content } = requestData
   await appRoute.retryConflictQuery(
     ctx,
+    ctx.databaseApiWrite,
     'topic create',
     appEndpointTopic.create,
     {
       ['primary']: 'slug',
     },
-    () =>
-      ctx.databaseApiWrite.query(
-        appQueryTopic.create,
-        id,
-        memberId,
-        title,
-        slug,
-        content
-      )
+    appQueryTopic.create,
+    id,
+    memberId,
+    title,
+    slug,
+    content
   )
   return appRoute.checkOkResponse(appEndpointTopic.create, {
     id: id.toString('hex'),
@@ -49,8 +47,9 @@ export const list = route.defineEndpoint<
   )
   const results = await appRoute.retryQuery(
     ctx,
+    ctx.databaseApiRead,
     'topic list',
-    () => ctx.databaseApiRead.query(appQueryTopic.list)
+    appQueryTopic.list
   )
   return appRoute.checkOkResponse(appEndpointTopic.list, {
     results: results.map((row) => ({
@@ -75,20 +74,18 @@ export const update = route.defineEndpoint<
   const { title, slug, content } = requestData
   const result = await appRoute.retryConflictQuery(
     ctx,
+    ctx.databaseApiWrite,
     'topic update',
     appEndpointTopic.update,
     {
       ['primary']: 'slug',
     },
-    () =>
-      ctx.databaseApiWrite.query(
-        appQueryTopic.update,
-        id,
-        updatedOld,
-        title,
-        slug,
-        content
-      )
+    appQueryTopic.update,
+    id,
+    updatedOld,
+    title,
+    slug,
+    content
   )
   if (result) {
     return appRoute.checkOkResponse(

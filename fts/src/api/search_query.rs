@@ -2,6 +2,7 @@ use crate::api;
 use crate::core::document::Language;
 use crate::core::hex::ToHex as _;
 use crate::core::result::DynResult;
+use crate::core::time::OffsetDateTimeExt as _;
 use crate::search;
 use tokio::task::spawn_blocking;
 
@@ -34,21 +35,23 @@ pub async fn handle(
   drop(permit);
   Ok(hyper::Response::new(
     serde_json::to_string(
-      &documents.into_iter().map(|document| serde_json::json!({
-        "type": document.type_,
-        "id": document.id.to_hex(),
-        "created_at": document.created_at.unix_timestamp(),
-        "created_by": document.created_by.to_hex(),
-        "updated_at": document.updated_at.unix_timestamp(),
-        "subforum_id": document.subforum_id.map(|value| value.to_hex()),
-        "topic_id": document.topic_id.map(|value| value.to_hex()),
-        "taxon_rank": document.taxon_rank,
-        "parents": document.parents.map(|values| values.into_iter().map(|value| value.to_hex()).collect::<Vec<String>>()),
-        "title": document.title,
-        "names": document.names,
-        "tags": document.tags.into_iter().map(|value| value.to_hex()).collect::<Vec<String>>(),
-        "content": document.content
-      })).collect::<Vec<serde_json::Value>>()
-    )?.into(),
+      &serde_json::json!({
+        "results": documents.into_iter().map(|document| serde_json::json!({
+          "type": document.type_,
+          "id": document.id.to_hex(),
+          "created_at": document.created_at.unix_timestamp_millis(),
+          "created_by": document.created_by.to_hex(),
+          "updated_at": document.updated_at.unix_timestamp_millis(),
+          "subforum_id": document.subforum_id.map(|value| value.to_hex()),
+          "topic_id": document.topic_id.map(|value| value.to_hex()),
+          "taxon_rank": document.taxon_rank,
+          "parents": document.parents.map(|values| values.into_iter().map(|value| value.to_hex()).collect::<Vec<String>>()),
+          "title": document.title,
+          "names": document.names,
+          "tags": document.tags.into_iter().map(|value| value.to_hex()).collect::<Vec<String>>(),
+          "content": document.content
+        })).collect::<Vec<serde_json::Value>>()
+      })
+      )?.into(),
   ))
 }

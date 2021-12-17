@@ -21,7 +21,7 @@ export const create = endpoint.defineConflictPostEndpoint(
 
 export type List = typeof list
 export type ListResult = typeFest.IterableElement<
-  endpoint.OkResponse<List>['results']
+  endpoint.OkResponseData<List>['results']
 >
 export const list = endpoint.defineGetEndpoint(
   '/api/topic/list',

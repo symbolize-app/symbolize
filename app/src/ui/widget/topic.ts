@@ -1,9 +1,9 @@
 import * as appEndpointTopic from '@fe/core/endpoint/topic.ts'
-import * as appSubmit from '@fe/ui/submit.ts'
+import * as appSubmit from '@fe/core/submit.ts'
 import type * as errorModule from '@tiny/core/error.ts'
 import * as random from '@tiny/core/random.ts'
 import * as style from '@tiny/ui/style.ts'
-import type * as submit from '@tiny/ui/submit.ts'
+import type * as submit from '@tiny/core/submit.ts'
 import * as widget from '@tiny/ui/widget.ts'
 
 const button = widget.html.button
@@ -52,7 +52,9 @@ export const list = widget.define<
       ctx,
       'create topic',
       appEndpointTopic.list,
-      {}
+      {
+        params: {},
+      }
     )
     const { results } = okResponseData
     resultsRange.content = results.length
@@ -166,11 +168,13 @@ const create = widget.define<
         'create topic',
         appEndpointTopic.create,
         {
-          requestId: requestIdInput.value,
-          memberId: memberIdInput.value,
-          title: titleInput.value,
-          slug: slugInput.value,
-          content: contentInput.value,
+          body: {
+            requestId: requestIdInput.value,
+            memberId: memberIdInput.value,
+            title: titleInput.value,
+            slug: slugInput.value,
+            content: contentInput.value,
+          },
         }
       )
       status.content = [
@@ -264,11 +268,13 @@ const update = widget.define<
         'update topic',
         appEndpointTopic.update,
         {
-          id: topic.id,
-          updatedOld: topic.updated,
-          title: titleInput.value,
-          slug: slugInput.value,
-          content: contentInput.value,
+          body: {
+            id: topic.id,
+            updatedOld: topic.updatedAt,
+            title: titleInput.value,
+            slug: slugInput.value,
+            content: contentInput.value,
+          },
         }
       )
       status.content = [

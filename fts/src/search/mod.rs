@@ -4,6 +4,7 @@ use crate::core::document::TaxonRank;
 use crate::core::hex::FromHex as _;
 use crate::core::hex::ToHex as _;
 use crate::core::result::DynResult;
+use crate::core::time::OffsetDateTimeExt as _;
 use itertools::Itertools as _;
 use std::collections::HashMap;
 use std::fs;
@@ -213,7 +214,7 @@ fn parse_index_meta(
     if let [updated_at, current_at] = &payload
       .split('/')
       .map(|item| {
-        Ok(OffsetDateTime::from_unix_timestamp(
+        Ok(OffsetDateTime::from_unix_timestamp_millis(
           item.parse()?,
         )?)
       })
@@ -248,7 +249,9 @@ pub fn update(
       index_writer.prepare_commit()?;
     prepared_commit.set_payload(
       &[new_updated_at, new_current_at]
-        .map(|item| item.unix_timestamp().to_string())
+        .map(|item| {
+          item.unix_timestamp_millis().to_string()
+        })
         .join("/"),
     );
     prepared_commit.commit()?;
@@ -274,7 +277,7 @@ pub fn update_document(
   search_document.add_text(fields.id, &id);
   search_document.add_i64(
     fields.created_at,
-    document.created_at.unix_timestamp(),
+    document.created_at.unix_timestamp_millis(),
   );
   search_document.add_text(
     fields.created_by,
@@ -282,7 +285,7 @@ pub fn update_document(
   );
   search_document.add_i64(
     fields.updated_at,
-    document.updated_at.unix_timestamp(),
+    document.updated_at.unix_timestamp_millis(),
   );
   if let Some(subforum_id) = document.subforum_id {
     search_document.add_facet_path(
@@ -408,7 +411,7 @@ fn create_document(
         .text()
         .ok_or("not text"))?,
     )?,
-    created_at: OffsetDateTime::from_unix_timestamp(
+    created_at: OffsetDateTime::from_unix_timestamp_millis(
       document_fields
         .get_field(fields.created_at)
         .first()
@@ -425,7 +428,7 @@ fn create_document(
         .text()
         .ok_or("not text"))?,
     )?,
-    updated_at: OffsetDateTime::from_unix_timestamp(
+    updated_at: OffsetDateTime::from_unix_timestamp_millis(
       document_fields
         .get_field(fields.updated_at)
         .first()

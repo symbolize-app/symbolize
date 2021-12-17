@@ -85,35 +85,37 @@ function checkRequestBase<Value>(
   }
 }
 
-export async function retryQuery<Value>(
+export async function retryQuery<
+  Id extends unknown,
+  Values extends query.SupportedType[],
+  Row extends Record<string, query.SupportedType>,
+  Transform extends unknown
+>(
   ctx: errorModule.Context,
+  database: query.Database<Id>,
   description: string,
-  query: () => Promise<Value>,
-  onError?: (error: unknown) => void
-): Promise<Value> {
-  return await errorModule.retry(ctx, query, {
-    maxAttempts: 15,
-    minDelayMs: time.interval({ milliseconds: 10 }),
-    windowMs: time.interval({ seconds: 30 }),
-    onError(error, attempt, nextDelayMs) {
-      if (onError) {
-        onError(error)
-      }
-      console.error(
-        `Retrying ${description} query (attempt ${attempt}, delay ${ms(
-          nextDelayMs
-        )})`,
-        error
-      )
-    },
-  })
+  query_: query.Query<Id, Values, Row, Transform>,
+  ...values: Values
+): Promise<Transform> {
+  return await retryBaseQuery(
+    ctx,
+    database,
+    description,
+    query_,
+    undefined,
+    ...values
+  )
 }
 
 export async function retryConflictQuery<
-  Value,
+  Id extends unknown,
+  Values extends query.SupportedType[],
+  Row extends Record<string, query.SupportedType>,
+  Transform extends unknown,
   ConflictResponse extends { conflict: string }
 >(
   ctx: errorModule.Context,
+  database: query.Database<Id>,
   description: string,
   endpoint: {
     conflictError: new (
@@ -125,24 +127,67 @@ export async function retryConflictQuery<
     string,
     ConflictResponse['conflict'] | undefined
   >,
-  queryCallback: () => Promise<Value>
-): Promise<Value> {
+  query_: query.Query<Id, Values, Row, Transform>,
+  ...values: Values
+): Promise<Transform> {
   return await checkConflictQuery(endpoint, () =>
-    retryQuery(ctx, description, queryCallback, (error) => {
-      if (
-        query.isQueryError(error) &&
-        error.code === query.errorCode.uniqueViolation
-      ) {
-        const constraintName = query.getUniqueViolationConstraintName(
+    retryBaseQuery(
+      ctx,
+      database,
+      description,
+      query_,
+      (error) => {
+        if (
+          query.isQueryError(error) &&
+          error.code === query.errorCode.uniqueViolation
+        ) {
+          const constraintName = query.getUniqueViolationConstraintName(
+            error
+          )
+          const conflictField =
+            constraintName && conflictMap[constraintName]
+          if (conflictField) {
+            throw new endpoint.conflictError(conflictField)
+          }
+        }
+      },
+      ...values
+    )
+  )
+}
+
+async function retryBaseQuery<
+  Id extends unknown,
+  Values extends query.SupportedType[],
+  Row extends Record<string, query.SupportedType>,
+  Transform extends unknown
+>(
+  ctx: errorModule.Context,
+  database: query.Database<Id>,
+  description: string,
+  query_: query.Query<Id, Values, Row, Transform>,
+  onError: ((error: unknown) => void) | undefined,
+  ...values: Values
+): Promise<Transform> {
+  return await errorModule.retry(
+    ctx,
+    () => database.query(query_, ...values),
+    {
+      maxAttempts: 15,
+      minDelayMs: time.interval({ milliseconds: 10 }),
+      windowMs: time.interval({ seconds: 30 }),
+      onError(error, attempt, nextDelayMs) {
+        if (onError) {
+          onError(error)
+        }
+        console.error(
+          `Retrying ${description} query (attempt ${attempt}, delay ${ms(
+            nextDelayMs
+          )})`,
           error
         )
-        const conflictField =
-          constraintName && conflictMap[constraintName]
-        if (conflictField) {
-          throw new endpoint.conflictError(conflictField)
-        }
-      }
-    })
+      },
+    }
   )
 }
 
