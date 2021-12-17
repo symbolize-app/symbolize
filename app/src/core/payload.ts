@@ -1,8 +1,9 @@
 import * as payload from '@tiny/core/payload.ts'
+import * as appLanguage from '@fe/core/language.ts'
 
-export const checkId = payload.checkString({
-  min: 64,
-  max: 64,
+export const checkContent = payload.checkString({
+  min: 3,
+  max: 4096,
 })
 
 export const checkEmail = payload.checkString({
@@ -15,17 +16,21 @@ export const checkHandle = payload.checkString({
   max: 64,
 })
 
-export const checkTitle = payload.checkString({
-  min: 3,
-  max: 128,
+export const checkId = payload.checkString({
+  min: 64,
+  max: 64,
 })
+
+export const checkLanguage = payload.checkStringEnum(
+  appLanguage.Language
+)
 
 export const checkSlug = payload.checkString({
   min: 3,
   max: 128,
 })
 
-export const checkContent = payload.checkString({
+export const checkTitle = payload.checkString({
   min: 3,
-  max: 4096,
+  max: 128,
 })
