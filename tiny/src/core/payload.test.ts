@@ -155,6 +155,28 @@ export const tests = {
       'Invalid string option (not "abc" | "xyz") at (root)'
     )
   },
+  ['checkStringEnum, ok']: (): void => {
+    enum Test {
+      x = 'x',
+      y = 'y2',
+    }
+    const check = payload.checkStringEnum(Test)
+    const input = 'y2'
+    test.assertDeepEquals(check(input), Test.y)
+  },
+  ['checkStringEnum, wrong enum']: (): void => {
+    enum Test {
+      x = 'x',
+      y = 'y2',
+    }
+    const check = payload.checkStringEnum(Test)
+    const error = test.assertThrows(() => check('y'))
+    test.assertInstanceOf(error, payload.PayloadError)
+    test.assertEquals(
+      error.message,
+      'Invalid enum (not "x" | "y2") at (root)'
+    )
+  },
   ['checkConflictResponse, ok']: (): void => {
     const check = payload.checkConflictResponse(
       'abc',

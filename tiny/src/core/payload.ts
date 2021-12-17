@@ -165,6 +165,32 @@ export function checkStringMatch(config: {
   }
 }
 
+export function checkStringEnum<Value extends string>(
+  mapping: Record<string, Value>
+): Validator<Value> {
+  return (input, path) => {
+    if (typeof input !== 'string') {
+      throw new PayloadError(
+        `Invalid enum (wrong type ${getTypeName(input)})`,
+        path
+      )
+    } else {
+      const values = Object.values(mapping)
+      for (const value of values) {
+        if (input === value) {
+          return value
+        }
+      }
+      throw new PayloadError(
+        `Invalid enum (not ${values
+          .map((value) => JSON.stringify(value))
+          .join(' | ')})`,
+        path
+      )
+    }
+  }
+}
+
 export function checkNumber(config: {
   min: number
   max: number

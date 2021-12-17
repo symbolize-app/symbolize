@@ -1,5 +1,6 @@
 import * as appEndpointSearch from '@fe/core/endpoint/search.ts'
 import * as appSubmit from '@fe/core/submit.ts'
+import * as appLanguage from '@fe/core/language.ts'
 import type * as errorModule from '@tiny/core/error.ts'
 import * as random from '@tiny/core/random.ts'
 import * as style from '@tiny/ui/style.ts'
@@ -58,7 +59,7 @@ export const query = widget.define<
       appEndpointSearch.query,
       {
         params: {
-          language: 'en',
+          language: appLanguage.Language.English,
           query: queryInput.value,
         },
       }
