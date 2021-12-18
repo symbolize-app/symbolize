@@ -4,7 +4,7 @@ import * as appTaxonRank from '@fe/core/taxonRank.ts'
 import * as payload from '@tiny/core/payload.ts'
 
 export const checkContent = payload.checkString({
-  min: 3,
+  min: 1,
   max: 4096,
 })
 

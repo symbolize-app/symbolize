@@ -5,6 +5,7 @@ import jsdom from 'jsdom'
 
 export const all: test.TestCollection = () => [
   import('@fe/api/route/member.test.ts'),
+  import('@fe/api/route/search.test.ts'),
 ]
 
 export async function run(

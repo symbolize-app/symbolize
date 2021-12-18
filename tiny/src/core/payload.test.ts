@@ -4,6 +4,14 @@ import * as test from '@tiny/test/index.ts'
 export const url = import.meta.url
 
 export const tests = {
+  ['checkNull, ok']: (): void => {
+    const check = payload.checkObject({
+      x: payload.checkNull(payload.checkObject({})),
+      y: payload.checkNull(payload.checkObject({})),
+    })
+    const input = { x: null, y: {} }
+    test.assertDeepEquals(check(input), input)
+  },
   ['checkObject, ok']: (): void => {
     const check = payload.checkObject({
       x: payload.checkObject({}),
