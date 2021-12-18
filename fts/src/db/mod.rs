@@ -185,7 +185,7 @@ fn create_document(
     subforum_id: row.try_get("subforum_id")?,
     topic_id: row.try_get("topic_id")?,
     taxon_rank: row.try_get("taxon_rank")?,
-    parents: from_option_json_array(
+    parents: from_json_array(
       row.try_get("parents")?,
       Vec::from_hex,
     )?,
@@ -215,18 +215,4 @@ where
     .iter()
     .map(move |item| f(item.as_str().ok_or("not a str")?))
     .collect::<DynResult<Vec<B>>>()
-}
-
-fn from_option_json_array<B, F>(
-  value: Option<serde_json::value::Value>,
-  f: F,
-) -> DynResult<Option<Vec<B>>>
-where
-  F: FnMut(&str) -> DynResult<B>,
-{
-  if let Some(value) = value {
-    Ok(Some(from_json_array(value, f)?))
-  } else {
-    Ok(None)
-  }
 }

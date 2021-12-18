@@ -36,8 +36,18 @@ export const query = route.defineEndpoint<
   )
   return appRoute.checkOkResponse(appEndpointSearch.query, {
     results: results.map((result) => ({
+      type: result.type,
       id: result.id,
+      createdAt: result.created_at,
+      createdBy: result.created_by,
       updatedAt: result.updated_at,
+      subforumId: result.subforum_id,
+      topicId: result.topic_id,
+      taxonRank: result.taxon_rank,
+      parents: result.parents,
+      title: result.title,
+      names: result.names,
+      tags: result.tags,
       content: result.content,
     })),
   })
@@ -56,8 +66,20 @@ export const ftsQueryEndpoint = endpoint.defineGetEndpoint(
     results: payload.checkArray(
       /* eslint-disable @typescript-eslint/naming-convention */
       payload.checkObject({
+        type: appPayload.checkDocumentType,
         id: appPayload.checkId,
+        created_at: payload.checkTimestamp,
+        created_by: appPayload.checkId,
         updated_at: payload.checkTimestamp,
+        subforum_id: payload.checkNull(appPayload.checkId),
+        topic_id: payload.checkNull(appPayload.checkId),
+        taxon_rank: payload.checkNull(
+          appPayload.checkTaxonRank
+        ),
+        parents: payload.checkArray(appPayload.checkId),
+        title: payload.checkNull(appPayload.checkTitle),
+        names: payload.checkArray(appPayload.checkName),
+        tags: payload.checkArray(appPayload.checkId),
         content: appPayload.checkContent,
       })
       /* eslint-enable @typescript-eslint/naming-convention */

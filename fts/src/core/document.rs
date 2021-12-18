@@ -73,7 +73,7 @@ pub struct Document {
   pub subforum_id: Option<Vec<u8>>,
   pub topic_id: Option<Vec<u8>>,
   pub taxon_rank: Option<TaxonRank>,
-  pub parents: Option<Vec<Vec<u8>>>,
+  pub parents: Vec<Vec<u8>>,
   pub title: Option<String>,
   pub names: Vec<String>,
   pub tags: Vec<Vec<u8>>,
