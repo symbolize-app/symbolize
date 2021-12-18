@@ -141,8 +141,8 @@ jobs:
 
       - name: Set up Fly
         run: |
-          curl -fsSL https://fly.io/install.sh | sudo FLYCTL_INSTALL=/usr/local sh
-          flyctl auth login --access-token ${{ secrets.FLY_ACCESS_TOKEN }}
+          curl -fsSL https://fly.io/install.sh | sh
+          ~/.fly/bin/flyctl auth login --access-token ${{ secrets.FLY_ACCESS_TOKEN }}
 
       - name: Set up Dbmate
         run: |
@@ -192,8 +192,8 @@ jobs:
 
       - name: Deploy app
         if: github.ref == 'refs/heads/main'
-        run: direnv exec . flyctl deploy --build-arg NODE_OPTIONS="${NODE_OPTIONS_PRODUCTION}" --config app
+        run: direnv exec . ~/.fly/bin/flyctl deploy --build-arg NODE_OPTIONS="${NODE_OPTIONS_PRODUCTION}" --config app
 
       - name: Deploy FTS
         if: github.ref == 'refs/heads/main'
-        run: direnv exec . flyctl deploy --config fts
+        run: direnv exec . ~/.fly/bin/flyctl deploy --config fts
