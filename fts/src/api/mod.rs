@@ -6,7 +6,7 @@ use crate::core::result::DynResult;
 use crate::db;
 use crate::search;
 use std::env;
-use std::net;
+use std::net::ToSocketAddrs as _;
 use std::sync::Arc;
 use tokio::spawn;
 use tokio::sync::Notify;
@@ -66,10 +66,13 @@ async fn run_server(
   search_context_map: search::ContextMap,
 ) {
   let result: DynResult<()> = (|| async {
-    let host: net::Ipv4Addr =
-      env::var("FTS_HOST")?.parse()?;
+    let host = env::var("FTS_HOST")?;
     let port: u16 = env::var("FTS_PORT")?.parse()?;
-    let addr = net::SocketAddr::from((host, port));
+    let addr = (host, port)
+      .to_socket_addrs()?
+      .into_iter()
+      .next()
+      .ok_or("unresolved address")?;
     let service = hyper::service::service_fn(move |req| {
       handle_request(
         api_context.clone(),
@@ -77,8 +80,9 @@ async fn run_server(
         req,
       )
     });
-    let server = hyper::Server::bind(&addr)
+    let server = hyper::Server::try_bind(&addr)?
       .serve(tower::make::Shared::new(service));
+    println!("Ready at http://localhost:{}/", port);
     server.await?;
     Ok(())
   })()
