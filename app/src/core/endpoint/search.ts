@@ -19,10 +19,21 @@ export const query = endpoint.defineGetEndpoint(
   payload.checkObject({
     results: payload.checkArray(
       payload.checkObject({
+        type: appPayload.checkDocumentType,
         id: appPayload.checkId,
+        createdAt: payload.checkTimestamp,
+        createdBy: appPayload.checkId,
         updatedAt: payload.checkTimestamp,
+        subforumId: payload.checkNull(appPayload.checkId),
+        topicId: payload.checkNull(appPayload.checkId),
+        taxonRank: payload.checkNull(
+          appPayload.checkTaxonRank
+        ),
+        parents: payload.checkArray(appPayload.checkId),
+        title: payload.checkNull(appPayload.checkTitle),
+        names: payload.checkArray(appPayload.checkName),
+        tags: payload.checkArray(appPayload.checkId),
         content: appPayload.checkContent,
-        /* TODO more */
       })
     ),
   })

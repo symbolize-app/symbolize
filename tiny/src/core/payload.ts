@@ -27,6 +27,18 @@ export class PayloadError extends Error {
   }
 }
 
+export function checkNull<Value extends typeFest.JsonValue>(
+  config: Validator<Value>
+): Validator<Value | null> {
+  return (input, path) => {
+    if (input === null) {
+      return null
+    } else {
+      return config(input, path)
+    }
+  }
+}
+
 export function checkObject<
   Value extends {
     [Key in string]: typeFest.JsonValue
