@@ -20,6 +20,8 @@ CREATE TABLE reply (
     BYTES NOT NULL REFERENCES topic (id),
   parent_reply_id
     BYTES DEFAULT NULL REFERENCES reply (id),
+  slug
+    STRING NOT NULL,
   tags
     JSONB DEFAULT jsonb_build_array() NOT NULL,
   content
