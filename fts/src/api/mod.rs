@@ -6,7 +6,6 @@ use crate::core::result::DynResult;
 use crate::db;
 use crate::search;
 use std::env;
-use std::net::ToSocketAddrs as _;
 use std::sync::Arc;
 use tokio::spawn;
 use tokio::sync::Notify;
@@ -68,8 +67,8 @@ async fn run_server(
   let result: DynResult<()> = (|| async {
     let host = env::var("FTS_HOST")?;
     let port: u16 = env::var("FTS_PORT")?.parse()?;
-    let addr = (host, port)
-      .to_socket_addrs()?
+    let addr = tokio::net::lookup_host((host, port))
+      .await?
       .into_iter()
       .next()
       .ok_or("unresolved address")?;
