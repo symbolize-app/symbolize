@@ -48,8 +48,9 @@ pub async fn handle(
           "parents": document.parents.into_iter().map(|value| value.to_hex()).collect::<Vec<String>>(),
           "title": document.title,
           "names": document.names,
+          "slug": document.slug,
           "tags": document.tags.into_iter().map(|value| value.to_hex()).collect::<Vec<String>>(),
-          "content": document.content
+          "content": document.content,
         })).collect::<Vec<serde_json::Value>>()
       })
       )?.into(),

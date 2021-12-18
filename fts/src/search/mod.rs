@@ -59,6 +59,7 @@ pub struct FieldSet {
   pub parents: tantivy::schema::Field,
   pub title: tantivy::schema::Field,
   pub names: tantivy::schema::Field,
+  pub slug: tantivy::schema::Field,
   pub tags: tantivy::schema::Field,
   pub content: tantivy::schema::Field,
 }
@@ -125,6 +126,8 @@ fn build_schema() -> (tantivy::schema::Schema, FieldSet) {
       .add_text_field("title", get_text_options()),
     names: schema_builder
       .add_text_field("names", get_text_options()),
+    slug: schema_builder
+      .add_text_field("slug", get_string_options()),
     tags: schema_builder
       .add_facet_field("tags", get_facet_options()),
     content: schema_builder
@@ -318,6 +321,7 @@ pub fn update_document(
   for name in document.names {
     search_document.add_text(fields.names, &name);
   }
+  search_document.add_text(fields.slug, &document.slug);
   for tag in document.tags {
     search_document
       .add_facet_path(fields.tags, &[&tag.to_hex()]);
@@ -518,6 +522,13 @@ fn create_document(
         Ok(((value).text().ok_or("not text"))?.to_owned())
       })
       .collect::<DynResult<Vec<String>>>()?,
+    slug: (document_fields
+      .get_field(fields.slug)
+      .first()
+      .ok_or("missing")?
+      .text()
+      .ok_or("not text"))?
+    .to_owned(),
     tags: document_fields
       .get_field(fields.tags)
       .iter()

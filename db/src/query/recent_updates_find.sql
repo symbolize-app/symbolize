@@ -21,6 +21,7 @@ WITH
         jsonb_build_array() AS parents,
         topic.title,
         jsonb_build_array() AS names,
+        topic.slug,
         topic.tags,
         topic.content
       FROM
@@ -40,6 +41,7 @@ WITH
           jsonb_build_array() AS parents,
           NULL AS title,
           jsonb_build_array() AS names,
+          reply.slug,
           reply.tags,
           reply.content
         FROM
@@ -59,6 +61,7 @@ WITH
           taxon.parents,
           NULL AS title,
           taxon.names,
+          taxon.slug,
           jsonb_build_array() AS tags,
           taxon.content
         FROM
@@ -78,6 +81,7 @@ WITH
           jsonb_build_array() AS parents,
           info.title,
           jsonb_build_array() AS names,
+          info.slug,
           info.tags,
           info.content
         FROM
@@ -96,6 +100,7 @@ SELECT
   document.parents,
   document.title,
   document.names,
+  document.slug,
   document.tags,
   document.content
 FROM

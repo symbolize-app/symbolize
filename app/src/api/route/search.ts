@@ -47,6 +47,7 @@ export const query = route.defineEndpoint<
       parents: result.parents,
       title: result.title,
       names: result.names,
+      slug: result.slug,
       tags: result.tags,
       content: result.content,
     })),
@@ -79,6 +80,7 @@ export const ftsQueryEndpoint = endpoint.defineGetEndpoint(
         parents: payload.checkArray(appPayload.checkId),
         title: payload.checkNull(appPayload.checkTitle),
         names: payload.checkArray(appPayload.checkName),
+        slug: appPayload.checkSlug,
         tags: payload.checkArray(appPayload.checkId),
         content: appPayload.checkContent,
       })

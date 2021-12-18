@@ -32,6 +32,7 @@ export const query = endpoint.defineGetEndpoint(
         parents: payload.checkArray(appPayload.checkId),
         title: payload.checkNull(appPayload.checkTitle),
         names: payload.checkArray(appPayload.checkName),
+        slug: appPayload.checkSlug,
         tags: payload.checkArray(appPayload.checkId),
         content: appPayload.checkContent,
       })

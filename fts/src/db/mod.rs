@@ -194,6 +194,7 @@ fn create_document(
       row.try_get("names")?,
       |item| Ok(item.to_owned()),
     )?,
+    slug: row.try_get("slug")?,
     tags: from_json_array(
       row.try_get("tags")?,
       Vec::from_hex,
