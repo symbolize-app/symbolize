@@ -1,3 +1,4 @@
+import * as appFts from '@fe/api/fts.ts'
 import * as appRouteMember from '@fe/api/route/member.ts'
 import * as appRouteMessage from '@fe/api/route/message.ts'
 import * as appRouteSearch from '@fe/api/route/search.ts'
@@ -74,11 +75,13 @@ function main(): void {
   const ctx: errorModule.Context &
     appQuery.ReadContext &
     appQuery.WriteContext &
-    submit.Context = {
+    submit.Context &
+    appFts.Context = {
     ...random.initContext(),
     ...timeNode.initContext(),
     ...appQuery.initContext(),
     ...submitNode.initContext(),
+    ...appFts.initContext(),
   }
   const httpServer = http.createServer(
     route.handle(ctx, [
