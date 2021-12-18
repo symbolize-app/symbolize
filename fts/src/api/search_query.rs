@@ -45,7 +45,7 @@ pub async fn handle(
           "subforum_id": document.subforum_id.map(|value| value.to_hex()),
           "topic_id": document.topic_id.map(|value| value.to_hex()),
           "taxon_rank": document.taxon_rank,
-          "parents": document.parents.map(|values| values.into_iter().map(|value| value.to_hex()).collect::<Vec<String>>()),
+          "parents": document.parents.into_iter().map(|value| value.to_hex()).collect::<Vec<String>>(),
           "title": document.title,
           "names": document.names,
           "tags": document.tags.into_iter().map(|value| value.to_hex()).collect::<Vec<String>>(),

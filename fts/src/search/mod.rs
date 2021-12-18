@@ -303,10 +303,13 @@ pub fn update_document(
       &[taxon_rank.as_ref()],
     );
   }
-  if let Some(parents) = document.parents {
+  if !document.parents.is_empty() {
     search_document.add_facet_path(
       fields.parents,
-      parents.into_iter().map(|parent| parent.to_hex()),
+      document
+        .parents
+        .into_iter()
+        .map(|parent| parent.to_hex()),
     );
   }
   if let Some(title) = document.title {
@@ -488,17 +491,15 @@ fn create_document(
       if let Some(value) =
         document_fields.get_field(fields.parents).first()
       {
-        Some(
-          value
-            .facet_value()
-            .ok_or("not facet")?
-            .to_path()
-            .into_iter()
-            .map(Vec::from_hex)
-            .collect::<DynResult<Vec<Vec<u8>>>>()?,
-        )
+        value
+          .facet_value()
+          .ok_or("not facet")?
+          .to_path()
+          .into_iter()
+          .map(Vec::from_hex)
+          .collect::<DynResult<Vec<Vec<u8>>>>()?
       } else {
-        None
+        Vec::new()
       }
     },
     title: {

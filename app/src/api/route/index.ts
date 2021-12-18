@@ -1,4 +1,5 @@
 import * as route from '@tiny/api/route.ts'
+import type * as endpoint from '@tiny/core/endpoint.ts'
 import * as errorModule from '@tiny/core/error.ts'
 import * as payload from '@tiny/core/payload.ts'
 import * as time from '@tiny/core/time.ts'
@@ -218,12 +219,14 @@ async function checkConflictQuery<
 }
 
 function createConflictResponseError<
-  ConflictResponse extends { conflict: string }
+  Endpoint extends {
+    checkConflictResponse: payload.Validator<{
+      conflict: string
+    }>
+  }
 >(
-  endpoint: {
-    checkConflictResponse: payload.Validator<ConflictResponse>
-  },
-  field: ConflictResponse['conflict']
+  endpoint: Endpoint,
+  field: endpoint.ConflictResponseData<Endpoint>['conflict']
 ): route.ResponseError {
   return new route.ResponseError({
     status: 409,
@@ -236,11 +239,13 @@ function createConflictResponseError<
   })
 }
 
-export function checkOkResponse<OkResponse>(
-  endpoint: {
-    checkOkResponse: payload.Validator<OkResponse>
-  },
-  okResponseData: OkResponse
+export function checkOkResponse<
+  Endpoint extends {
+    checkOkResponse: payload.Validator<typeFest.JsonObject>
+  }
+>(
+  endpoint: Endpoint,
+  okResponseData: endpoint.OkResponseData<Endpoint>
 ): route.Response {
   return {
     status: 200,
