@@ -76,6 +76,7 @@ pub struct Document {
   pub parents: Vec<Vec<u8>>,
   pub title: Option<String>,
   pub names: Vec<String>,
+  pub slug: String,
   pub tags: Vec<Vec<u8>>,
   pub content: String,
 }
