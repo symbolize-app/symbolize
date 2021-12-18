@@ -14,16 +14,16 @@ jobs:
       - name: Cache /tmp/cockroach
         uses: actions/cache@v1
         with:
-          path: /tmp/cockroach-v20.2.6.linux-amd64
-          key: cockroach-v20.2.6.linux-amd64
+          path: /tmp/cockroach-v21.2.0.linux-amd64
+          key: cockroach-v21.2.0.linux-amd64
 
       - name: Set up CockroachDB
         run: |
-          if [ ! -d /tmp/cockroach-v20.2.6.linux-amd64 ]; then curl -fsSL https://binaries.cockroachdb.com/cockroach-v20.2.6.linux-amd64.tgz | tar xvzC /tmp; fi
-          sudo cp /tmp/cockroach-v20.2.6.linux-amd64/cockroach /usr/local/bin
+          if [ ! -d /tmp/cockroach-v21.2.0.linux-amd64 ]; then curl -fsSL https://binaries.cockroachdb.com/cockroach-v21.2.0.linux-amd64.tgz | tar xvzC /tmp; fi
+          sudo cp /tmp/cockroach-v21.2.0.linux-amd64/cockroach /usr/local/bin
           sudo mkdir /usr/local/lib/cockroach
-          sudo cp /tmp/cockroach-v20.2.6.linux-amd64/lib/libgeos.so /usr/local/lib/cockroach/
-          sudo cp /tmp/cockroach-v20.2.6.linux-amd64/lib/libgeos_c.so /usr/local/lib/cockroach/
+          sudo cp /tmp/cockroach-v21.2.0.linux-amd64/lib/libgeos.so /usr/local/lib/cockroach/
+          sudo cp /tmp/cockroach-v21.2.0.linux-amd64/lib/libgeos_c.so /usr/local/lib/cockroach/
 
       - name: Set up direnv
         run: |
