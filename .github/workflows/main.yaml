@@ -2,6 +2,11 @@ name: Main
 
 on: [push]
 
+secrets:
+  - DATABASE_CA_CRT
+  - DATABASE_URL_ADMIN
+  - FLY_ACCESS_TOKEN
+
 jobs:
   node:
     name: Node
@@ -142,6 +147,7 @@ jobs:
       - name: Set up Fly
         run: |
           curl -fsSL https://fly.io/install.sh | sh
+          echo "$HOME/.fly/bin" >> $GITHUB_PATH
 
       - name: Set up Dbmate
         run: |
@@ -191,12 +197,12 @@ jobs:
 
       - name: Deploy app
         if: github.ref == 'refs/heads/main'
-        run: direnv exec . ~/.fly/bin/flyctl deploy --build-arg NODE_OPTIONS="${NODE_OPTIONS_PRODUCTION}" --config app
+        run: direnv exec . flyctl deploy --build-arg NODE_OPTIONS="${NODE_OPTIONS_PRODUCTION}" --config app
         env:
           FLY_ACCESS_TOKEN: ${{ secrets.FLY_ACCESS_TOKEN }}
 
       - name: Deploy FTS
         if: github.ref == 'refs/heads/main'
-        run: direnv exec . ~/.fly/bin/flyctl deploy --config fts
+        run: direnv exec . flyctl deploy --config fts
         env:
           FLY_ACCESS_TOKEN: ${{ secrets.FLY_ACCESS_TOKEN }}
