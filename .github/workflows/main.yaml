@@ -2,10 +2,10 @@ name: Main
 
 on: [push]
 
-secrets:
-  - DATABASE_CA_CRT
-  - DATABASE_URL_ADMIN
-  - FLY_ACCESS_TOKEN
+# secrets:
+#  - DATABASE_CA_CRT
+#  - DATABASE_URL_ADMIN
+#  - FLY_ACCESS_TOKEN
 
 jobs:
   node:
