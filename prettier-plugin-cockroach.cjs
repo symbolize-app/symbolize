@@ -1,7 +1,7 @@
 /* eslint-env node */
 'use strict'
 
-const prettier = require('prettier')
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const childProcess = require('child_process')
 
 const languages = [
@@ -33,13 +33,14 @@ const parsers = {
   },
 }
 
-const lineParser = /^(?<comment>--.*$\n)|(?<blank>\s*$\n)|(?<query>[^;]*;?\n)/gm
+const lineParser =
+  /^(?<comment>--.*$\n)|(?<blank>\s*$\n)|(?<query>[^;]*;?\n)/gm
 
 const printers = {
   'cockroach-ast': {
     /**
-     * @param {prettier.FastPath<{text: string}>} path
-     * @param {prettier.Options} options
+     * @param {import("prettier").FastPath<{text: string}>} path
+     * @param {import("prettier").Options} options
      * @returns {string}
      */
     print(path, options) {
@@ -47,7 +48,7 @@ const printers = {
       const node = path.getValue()
       let matchLength = 0
       for (const match of node.text.matchAll(lineParser)) {
-        const { comment, blank, query } = match.groups
+        const { comment, blank, query } = match.groups ?? {}
         if (comment) {
           lines.push(comment)
           matchLength += comment.length
@@ -61,9 +62,9 @@ const printers = {
               [
                 'sqlfmt',
                 '--print-width',
-                `${options.printWidth}`,
+                `${options.printWidth ?? 0}`,
                 '--tab-width',
-                `${options.tabWidth}`,
+                `${options.tabWidth ?? 0}`,
                 '--use-spaces',
               ],
               { encoding: 'utf-8', input: query }

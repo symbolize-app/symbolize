@@ -43,9 +43,9 @@ export function checkObject<
   Value extends {
     [Key in string]: typeFest.JsonValue
   } = Record<string, never>
->(
-  config: { [Key in keyof Value]: Validator<Value[Key]> }
-): Validator<Value> {
+>(config: {
+  [Key in keyof Value]: Validator<Value[Key]>
+}): Validator<Value> {
   return (input, path) => {
     if (
       input === null ||

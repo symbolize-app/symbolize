@@ -19,25 +19,25 @@ async function main(): Promise<void> {
   )
   await all({
     entryPoints: [
-      await import.meta.resolve('@fe/ui/index.ts'),
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      await import.meta.resolve!('@fe/ui/index.ts'),
     ],
     platform: 'browser',
     define: {
-      ['import.meta.env.NODE_ENV']: JSON.stringify(
-        'production'
-      ),
+      ['import.meta.env.NODE_ENV']:
+        JSON.stringify('production'),
     },
   })
   await fsPromises.mkdir('build/node', { recursive: true })
   await all({
     entryPoints: [
-      await import.meta.resolve('@fe/api/index.ts'),
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      await import.meta.resolve!('@fe/api/index.ts'),
     ],
     platform: 'node',
     define: {
-      ['import.meta.env.NODE_ENV']: JSON.stringify(
-        'production'
-      ),
+      ['import.meta.env.NODE_ENV']:
+        JSON.stringify('production'),
     },
   })
   console.log('Done build')
@@ -109,9 +109,8 @@ export async function oneStep(
 export async function oneStep(
   options: BuildOptions
 ): Promise<BuildResult & { output?: SourceFile }> {
-  const [fullEntryPointPath, outfile] = getBuildPaths(
-    options
-  )
+  const [fullEntryPointPath, outfile] =
+    getBuildPaths(options)
   const nextSteps: string[] = []
   try {
     const result = await esbuild.build({
@@ -157,7 +156,8 @@ export async function oneStep(
         args.kind === 'import-statement' ||
         args.kind === 'dynamic-import'
       ) {
-        let url = await import.meta.resolve(
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        let url = await import.meta.resolve!(
           args.path,
           urlModule.pathToFileURL(args.importer).toString()
         )
@@ -165,7 +165,8 @@ export async function oneStep(
           options.platform === 'browser' &&
           url.endsWith('/lodash-es/isBuffer.js')
         ) {
-          url = await import.meta.resolve(
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          url = await import.meta.resolve!(
             'lodash-es/stubFalse.js',
             urlModule
               .pathToFileURL(args.importer)

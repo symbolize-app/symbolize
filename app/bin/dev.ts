@@ -89,9 +89,8 @@ function buildDev(entryPoint: string): SourceTree {
   const baseOptions = {
     platform: 'browser',
     define: {
-      ['import.meta.env.NODE_ENV']: JSON.stringify(
-        'development'
-      ),
+      ['import.meta.env.NODE_ENV']:
+        JSON.stringify('development'),
     },
     write: false,
   } as const
@@ -103,9 +102,8 @@ function buildDev(entryPoint: string): SourceTree {
       ...baseOptions,
       entryPoint: step,
     } as const
-    sourceTree[appBuild.getOutputPath(options)] = start(
-      step
-    )
+    sourceTree[appBuild.getOutputPath(options)] =
+      start(step)
   }
 
   async function start(
@@ -167,7 +165,8 @@ async function main(): Promise<void> {
     'all',
     debounce(() => void reload())
   )
-  const entryPoint = await import.meta.resolve(
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const entryPoint = await import.meta.resolve!(
     '@fe/ui/index.ts'
   )
   const proxy = new HttpProxy({})

@@ -49,18 +49,19 @@ export const create = widget.define<
   async function submit(event: Event) {
     event.preventDefault()
     try {
-      const okResponseData = await appSubmit.retryConflictPostSubmit(
-        ctx,
-        'create member',
-        appEndpointMember.create,
-        {
-          body: {
-            requestId: requestIdInput.value,
-            email: emailInput.value,
-            handle: handleInput.value,
-          },
-        }
-      )
+      const okResponseData =
+        await appSubmit.retryConflictPostSubmit(
+          ctx,
+          'create member',
+          appEndpointMember.create,
+          {
+            body: {
+              requestId: requestIdInput.value,
+              email: emailInput.value,
+              handle: handleInput.value,
+            },
+          }
+        )
       statusDiv.content = [
         `Member created ${JSON.stringify(okResponseData)}`,
       ]

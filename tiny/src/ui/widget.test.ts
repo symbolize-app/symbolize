@@ -12,9 +12,8 @@ export function withTempDocument<
   ) => typeFest.Promisable<void>
 ): (ctx: CustomContext & widget.Context) => Promise<void> {
   return async (baseContext) => {
-    const iframe = baseContext.document.createElement(
-      'iframe'
-    )
+    const iframe =
+      baseContext.document.createElement('iframe')
     iframe.style.display = 'none'
     baseContext.document.body.append(iframe)
     try {

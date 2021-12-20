@@ -19,8 +19,7 @@ export const tests = {
   ['member create ok response, ok']: (): void => {
     const check = appEndpointMember.create.checkOkResponse
     const input = {
-      id:
-        'd2f17ea3a0e36a7c79442855ca7d0a71a4eb616e10704121b4d169b6486f3bdc',
+      id: 'd2f17ea3a0e36a7c79442855ca7d0a71a4eb616e10704121b4d169b6486f3bdc',
     }
     test.assertDeepEquals(check(input), input)
   },

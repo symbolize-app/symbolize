@@ -31,12 +31,13 @@ export function initContext(): ReadContext & WriteContext {
   }
 }
 
-function initDatabase<Id extends unknown>(
+function initDatabase<Id>(
   connectionString: string
 ): query.Database<Id> {
   const max = 10
-  const user = pgConnectionString.parse(connectionString)
-    .user
+  const user = pgConnectionString.parse(
+    connectionString
+  ).user
   if (!user) {
     throw new Error('No DB user')
   }
@@ -71,7 +72,7 @@ function initDatabase<Id extends unknown>(
     async query<
       Values extends query.SupportedType[],
       Row extends Record<string, query.SupportedType>,
-      Transform extends unknown
+      Transform
     >(
       query: query.Query<Id, Values, Row, Transform>,
       ...values: Values
