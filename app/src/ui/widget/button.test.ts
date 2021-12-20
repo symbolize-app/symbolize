@@ -11,9 +11,10 @@ export const tests = {
       ctx.document.body.content = [
         appWidgetButton.custom(ctx, {}),
       ]
-      const button = ctx.document.body.querySelector<HTMLButtonElement>(
-        ':scope > button'
-      )
+      const button =
+        ctx.document.body.querySelector<HTMLButtonElement>(
+          ':scope > button'
+        )
       test.assertEquals(button?.textContent, 'OK')
     }
   ),

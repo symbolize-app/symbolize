@@ -13,18 +13,17 @@ export type SupportedType =
   | typeFest.JsonArray
   | typeFest.JsonObject
 
-export type BaseDatabase<
-  Id extends unknown
-> = Database<Id> extends typeFest.Opaque<infer Type, Id>
-  ? Type
-  : never
+export type BaseDatabase<Id> =
+  Database<Id> extends typeFest.Opaque<infer Type, Id>
+    ? Type
+    : never
 
-export type Database<Id extends unknown> = typeFest.Opaque<
+export type Database<Id> = typeFest.Opaque<
   {
     query<
       Values extends SupportedType[],
       Row extends Record<string, SupportedType>,
-      Transform extends unknown
+      Transform
     >(
       query: Query<Id, Values, Row, Transform>,
       ...values: Values
@@ -34,10 +33,10 @@ export type Database<Id extends unknown> = typeFest.Opaque<
 >
 
 export type BaseQuery<
-  DatabaseId extends unknown,
+  DatabaseId,
   Values extends SupportedType[],
   Row extends Record<string, SupportedType>,
-  Transform extends unknown
+  Transform
 > = Query<
   DatabaseId,
   Values,
@@ -48,10 +47,10 @@ export type BaseQuery<
   : never
 
 export type Query<
-  DatabaseId extends unknown,
+  DatabaseId,
   Values extends SupportedType[],
   Row extends Record<string, SupportedType>,
-  Transform extends unknown
+  Transform
 > = typeFest.Opaque<
   {
     name: string
@@ -61,17 +60,17 @@ export type Query<
   [DatabaseId, Values]
 >
 
-export function createDatabase<Id extends unknown>(
+export function createDatabase<Id>(
   database: BaseDatabase<Id>
 ): Database<Id> {
   return database as Database<Id>
 }
 
 export function createQuery<
-  DatabaseId extends unknown,
+  DatabaseId,
   Values extends SupportedType[],
   Row extends Record<string, SupportedType>,
-  Transform extends unknown
+  Transform
 >(
   query: BaseQuery<DatabaseId, Values, Row, Transform>
 ): Query<DatabaseId, Values, Row, Transform> {
@@ -79,10 +78,10 @@ export function createQuery<
 }
 
 export function defineMultiTransform<
-  DatabaseId extends unknown,
+  DatabaseId,
   Values extends SupportedType[],
   Row extends Record<string, SupportedType>,
-  Transform extends unknown
+  Transform
 >(
   text: string,
   transform: (rows: Row[]) => Transform
@@ -99,7 +98,7 @@ export function defineMultiTransform<
 }
 
 export function defineMulti<
-  DatabaseId extends unknown,
+  DatabaseId,
   Values extends SupportedType[],
   Row extends Record<string, SupportedType>
 >(
@@ -114,7 +113,7 @@ export function defineMulti<
 }
 
 export function defineOptional<
-  DatabaseId extends unknown,
+  DatabaseId,
   Values extends SupportedType[],
   Row extends Record<string, SupportedType>
 >(
@@ -139,7 +138,7 @@ export function defineOptional<
 }
 
 export function defineSingle<
-  DatabaseId extends unknown,
+  DatabaseId,
   Values extends SupportedType[],
   Row extends Record<string, SupportedType>
 >(queryText: string): Query<DatabaseId, Values, Row, Row> {
@@ -160,7 +159,7 @@ export function defineSingle<
 }
 
 export function defineVoid<
-  DatabaseId extends unknown,
+  DatabaseId,
   Values extends SupportedType[]
 >(
   queryText: string
@@ -202,7 +201,8 @@ export const errorCode = {
   uniqueViolation: '23505',
 } as const
 
-const uniqueViolationConstraintNamePattern = / unique constraint "([^"]*)"$/
+const uniqueViolationConstraintNamePattern =
+  / unique constraint "([^"]*)"$/
 
 export function getUniqueViolationConstraintName(
   error: QueryError

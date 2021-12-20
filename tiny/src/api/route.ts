@@ -132,7 +132,11 @@ async function handleRequest<Context>(
         return new Promise((resolve, reject) => {
           const chunks: Buffer[] = []
           request.stream().on('data', (chunk) => {
-            chunks.push(chunk)
+            if (chunk instanceof Buffer) {
+              chunks.push(chunk)
+            } else {
+              console.error('invalid chunk', chunk)
+            }
           })
           request.stream().on('end', () => {
             resolve(Buffer.concat(chunks))

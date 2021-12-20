@@ -213,7 +213,7 @@ export function collect(
 
 type WidgetFunction<
   Body extends Widget & { [Key in keyof Body]: Body[Key] },
-  CustomContext extends unknown = unknown
+  CustomContext = unknown
 > = (
   ctx: CustomContext & Context,
   data: Partial<Body>
@@ -221,7 +221,7 @@ type WidgetFunction<
 
 export function define<
   Body extends Widget & { [Key in keyof Body]: Body[Key] },
-  CustomContext extends unknown = unknown
+  CustomContext = unknown
 >(
   body: (ctx: CustomContext & Context) => Body
 ): WidgetFunction<Body, CustomContext> {
@@ -244,9 +244,8 @@ export function toHtmlWidget<T extends HTMLElement>(
     element,
     elementProperties
   ) as HtmlWidget<T>
-  ;((widget as unknown) as { [context]: Context })[
-    context
-  ] = ctx
+  ;(widget as unknown as { [context]: Context })[context] =
+    ctx
   return widget
 }
 
@@ -263,14 +262,19 @@ export const html: HtmlWidgetMap = new Proxy(
       target: unknown,
       property: K
     ) {
-      return ((target as Record<
-        K,
-        WidgetFunction<HtmlWidget<HTMLElementTagNameMap[K]>>
-      >)[property] ??= define((ctx) =>
+      return ((
+        target as Record<
+          K,
+          WidgetFunction<
+            HtmlWidget<HTMLElementTagNameMap[K]>
+          >
+        >
+      )[property] ??= define((ctx) =>
         toHtmlWidget(
           ctx,
           ctx.document.createElement(property)
-        )))
+        )
+      ))
     },
   }
 )

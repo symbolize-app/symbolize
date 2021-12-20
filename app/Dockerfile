@@ -1,5 +1,5 @@
 ARG NODE_OPTIONS
-FROM node:15-slim
+FROM node:17-slim
 WORKDIR /app
 COPY .crdb/certs .crdb/certs
 COPY build build

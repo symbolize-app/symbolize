@@ -87,10 +87,10 @@ function checkRequestBase<Value>(
 }
 
 export async function retryQuery<
-  Id extends unknown,
+  Id,
   Values extends query.SupportedType[],
   Row extends Record<string, query.SupportedType>,
-  Transform extends unknown
+  Transform
 >(
   ctx: errorModule.Context,
   database: query.Database<Id>,
@@ -109,10 +109,10 @@ export async function retryQuery<
 }
 
 export async function retryConflictQuery<
-  Id extends unknown,
+  Id,
   Values extends query.SupportedType[],
   Row extends Record<string, query.SupportedType>,
-  Transform extends unknown,
+  Transform,
   ConflictResponse extends { conflict: string }
 >(
   ctx: errorModule.Context,
@@ -142,9 +142,8 @@ export async function retryConflictQuery<
           query.isQueryError(error) &&
           error.code === query.errorCode.uniqueViolation
         ) {
-          const constraintName = query.getUniqueViolationConstraintName(
-            error
-          )
+          const constraintName =
+            query.getUniqueViolationConstraintName(error)
           const conflictField =
             constraintName && conflictMap[constraintName]
           if (conflictField) {
@@ -158,10 +157,10 @@ export async function retryConflictQuery<
 }
 
 async function retryBaseQuery<
-  Id extends unknown,
+  Id,
   Values extends query.SupportedType[],
   Row extends Record<string, query.SupportedType>,
-  Transform extends unknown
+  Transform
 >(
   ctx: errorModule.Context,
   database: query.Database<Id>,

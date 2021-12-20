@@ -33,9 +33,8 @@ export const tests = {
       ctx.document.body.content = [
         appWidgetMember.create(ctx, {}),
       ]
-      const form = ctx.document.body.querySelector(
-        ':scope > form'
-      )
+      const form =
+        ctx.document.body.querySelector(':scope > form')
       test.assertInstanceOf(
         form,
         ctx.window.HTMLFormElement
@@ -80,75 +79,80 @@ export const tests = {
       ])
     }
   ),
-  ['member create, uniqueness error']: widgetTest.withTempDocument(
-    async (baseContext: test.Context & widget.Context) => {
-      const submit = test.mock<
-        () => Promise<submit.Response>
-      >([
-        () =>
-          Promise.resolve(
-            submitTest.mockResponse({
-              status: 409,
-              json: () =>
-                Promise.resolve({ conflict: 'email' }),
-            })
-          ),
-      ])
-      const ctx: test.Context &
-        widget.Context &
-        errorModule.Context &
-        submit.Context = {
-        ...baseContext,
-        submit,
+  ['member create, uniqueness error']:
+    widgetTest.withTempDocument(
+      async (
+        baseContext: test.Context & widget.Context
+      ) => {
+        const submit = test.mock<
+          () => Promise<submit.Response>
+        >([
+          () =>
+            Promise.resolve(
+              submitTest.mockResponse({
+                status: 409,
+                json: () =>
+                  Promise.resolve({ conflict: 'email' }),
+              })
+            ),
+        ])
+        const ctx: test.Context &
+          widget.Context &
+          errorModule.Context &
+          submit.Context = {
+          ...baseContext,
+          submit,
+        }
+        ctx.document.body.content = [
+          appWidgetMember.create(ctx, {}),
+        ]
+        const form =
+          ctx.document.body.querySelector(':scope > form')
+        test.assertInstanceOf(
+          form,
+          ctx.window.HTMLFormElement
+        )
+        const submitButton = form.querySelector(
+          ':scope > button'
+        )
+        test.assertInstanceOf(
+          submitButton,
+          ctx.window.HTMLButtonElement
+        )
+        const status = form.querySelector(':scope > div')
+        test.assertInstanceOf(
+          status,
+          ctx.window.HTMLDivElement
+        )
+        test.assertEquals(
+          submitButton.textContent,
+          'Submit'
+        )
+        test.assertEquals(submitButton.type, 'submit')
+        submitButton.click()
+        await ctx.clock.tickAsync(0)
+        test.assertEquals(
+          status.textContent,
+          'Unique constraint error email'
+        )
+        test.assertDeepEquals(submit[test.mockHistory], [
+          [
+            {
+              origin: undefined,
+              path: '/api/member/create',
+              method: 'POST',
+              headers: {
+                'content-type': 'application/json',
+              },
+              body: {
+                requestId:
+                  '94194353ecc2a1448503e12775b8a20dc956a9ca26ef10f2fa930be7931bfa74',
+                email: 'a@b.com',
+                handle: 'aaa',
+              },
+            },
+          ],
+        ])
       }
-      ctx.document.body.content = [
-        appWidgetMember.create(ctx, {}),
-      ]
-      const form = ctx.document.body.querySelector(
-        ':scope > form'
-      )
-      test.assertInstanceOf(
-        form,
-        ctx.window.HTMLFormElement
-      )
-      const submitButton = form.querySelector(
-        ':scope > button'
-      )
-      test.assertInstanceOf(
-        submitButton,
-        ctx.window.HTMLButtonElement
-      )
-      const status = form.querySelector(':scope > div')
-      test.assertInstanceOf(
-        status,
-        ctx.window.HTMLDivElement
-      )
-      test.assertEquals(submitButton.textContent, 'Submit')
-      test.assertEquals(submitButton.type, 'submit')
-      submitButton.click()
-      await ctx.clock.tickAsync(0)
-      test.assertEquals(
-        status.textContent,
-        'Unique constraint error email'
-      )
-      test.assertDeepEquals(submit[test.mockHistory], [
-        [
-          {
-            origin: undefined,
-            path: '/api/member/create',
-            method: 'POST',
-            headers: {
-              'content-type': 'application/json',
-            },
-            body: {
-              requestId:
-                '94194353ecc2a1448503e12775b8a20dc956a9ca26ef10f2fa930be7931bfa74',
-              email: 'a@b.com',
-              handle: 'aaa',
-            },
-          },
-        ],
-      ])
-    }
-  ),
+    ),
 }

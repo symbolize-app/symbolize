@@ -131,9 +131,8 @@ function renderNestedStyle(
     )
   }
 
-  const existingStyleClasses = fullSelectorStyleMap.get(
-    style
-  )
+  const existingStyleClasses =
+    fullSelectorStyleMap.get(style)
   if (existingStyleClasses) {
     return existingStyleClasses
   }
