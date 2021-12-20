@@ -4,9 +4,9 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-base64 = "0.9.3"
+base64 = "0.13.0"
 cargo-watch = "8.1.1"
-hyper = { version = "0.14", features = ["full"] }
+hyper = { version = "0.14.16", features = ["full"] }
 itertools = "0.10.3"
 lindera = "0.8.1"
 lindera-core = "0.8.1"
@@ -17,17 +17,17 @@ percent-encoding = "2.1.0"
 postgres-openssl = "0.5.0"
 postgres-types = { version = "0.2.2", features = ["derive", "with-time-0_3", "with-serde_json-1"] }
 rand = "0.8.4"
-serde = "1.0.130"
-serde_derive = "1.0.130"
-serde_json = "1.0.68"
+serde = "1.0.132"
+serde_derive = "1.0.132"
+serde_json = "1.0.73"
 serde_urlencoded = "0.7.0"
 strum = "0.23.0"
-strum_macros = "0.23"
+strum_macros = "0.23.1"
 tantivy = "0.16.1"
 tantivy-cli = "0.15.0"
 time = { version = "0.3.5", features = ["formatting"] }
-tokio = { version = "1.5", features = ["full"] }
+tokio = { version = "1.15.0", features = ["full"] }
 tokio-postgres = "0.7.5"
-tower = { version = "0.4.10", features = ["make"] }
+tower = { version = "0.4.11", features = ["make"] }
 tower-service = "0.3.1"
-url = "1.7.2"
+url = "2.2.2"
