@@ -126,9 +126,10 @@ function retryConflictSubmit<
     request,
     async (response) => {
       if (response.status === 409) {
-        const conflictResponseData = endpoint.checkConflictResponse(
-          await response.json()
-        )
+        const conflictResponseData =
+          endpoint.checkConflictResponse(
+            await response.json()
+          )
         throw new endpoint.conflictError(
           conflictResponseData.conflict
         )

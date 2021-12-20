@@ -8,9 +8,7 @@ import isEqual from 'lodash-es/isEqual.js'
 import ms from 'ms'
 import type * as typeFest from 'type-fest'
 
-export type Test<
-  CustomContext extends unknown = unknown
-> = (
+export type Test<CustomContext = unknown> = (
   ctx: CustomContext & Context
 ) => typeFest.Promisable<void>
 
@@ -18,20 +16,17 @@ export type Context = timeTest.Context & random.Context
 
 export type RunContext = time.Context
 
-type TestModule<CustomContext extends unknown = unknown> = {
+type TestModule<CustomContext = unknown> = {
   url: string
   tests: {
     [testName: string]: Test<CustomContext>
   }
 }
 
-export type TestCollection<
-  CustomContext extends unknown = unknown
-> = () => Promise<TestModule<CustomContext>>[]
+export type TestCollection<CustomContext = unknown> =
+  () => Promise<TestModule<CustomContext>>[]
 
-type TestCollectionModule<
-  CustomContext extends unknown = unknown
-> = {
+type TestCollectionModule<CustomContext = unknown> = {
   all: TestCollection<CustomContext>
 }
 
@@ -64,13 +59,11 @@ export async function runAll<
     TestCollectionModule<CustomContext>
   >[]
 ): Promise<boolean> {
-  const testModules = ([] as Promise<
-    TestModule<CustomContext>
-  >[]).concat(
-    ...(
-      await Promise.all(testCollectionModules)
-    ).map((testCollectionModule) =>
-      testCollectionModule.all()
+  const testModules = (
+    [] as Promise<TestModule<CustomContext>>[]
+  ).concat(
+    ...(await Promise.all(testCollectionModules)).map(
+      (testCollectionModule) => testCollectionModule.all()
     )
   )
   const resolvedTestModules = await Promise.all(testModules)
@@ -151,10 +144,8 @@ export async function runAll<
           )
           if (assertionInfo.diff) {
             const diffSections = diff.diffJson(
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              assertionInfo.expected as any,
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              assertionInfo.actual as any
+              assertionInfo.expected as string | object,
+              assertionInfo.actual as string | object
             )
             const outputLines = []
             for (const diffSection of diffSections) {

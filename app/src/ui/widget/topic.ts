@@ -163,20 +163,21 @@ const create = widget.define<
   async function submit(event: Event) {
     event.preventDefault()
     try {
-      const okResponseData = await appSubmit.retryConflictPostSubmit(
-        ctx,
-        'create topic',
-        appEndpointTopic.create,
-        {
-          body: {
-            requestId: requestIdInput.value,
-            memberId: memberIdInput.value,
-            title: titleInput.value,
-            slug: slugInput.value,
-            content: contentInput.value,
-          },
-        }
-      )
+      const okResponseData =
+        await appSubmit.retryConflictPostSubmit(
+          ctx,
+          'create topic',
+          appEndpointTopic.create,
+          {
+            body: {
+              requestId: requestIdInput.value,
+              memberId: memberIdInput.value,
+              title: titleInput.value,
+              slug: slugInput.value,
+              content: contentInput.value,
+            },
+          }
+        )
       status.content = [
         `Topic created ${JSON.stringify(okResponseData)}`,
       ]
@@ -263,20 +264,21 @@ const update = widget.define<
       return
     }
     try {
-      const okResponseData = await appSubmit.retryConflictPostSubmit(
-        ctx,
-        'update topic',
-        appEndpointTopic.update,
-        {
-          body: {
-            id: topic.id,
-            updatedOld: topic.updatedAt,
-            title: titleInput.value,
-            slug: slugInput.value,
-            content: contentInput.value,
-          },
-        }
-      )
+      const okResponseData =
+        await appSubmit.retryConflictPostSubmit(
+          ctx,
+          'update topic',
+          appEndpointTopic.update,
+          {
+            body: {
+              id: topic.id,
+              updatedOld: topic.updatedAt,
+              title: titleInput.value,
+              slug: slugInput.value,
+              content: contentInput.value,
+            },
+          }
+        )
       status.content = [
         `Topic created ${JSON.stringify(okResponseData)}`,
       ]

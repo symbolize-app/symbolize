@@ -3,9 +3,8 @@ import * as test from '@tiny/test/index.ts'
 import * as fastMersenneTwister from 'fast-mersenne-twister'
 
 export function initContext(): random.Context {
-  const twister = fastMersenneTwister.MersenneTwister(
-    1616952581493
-  )
+  const twister =
+    fastMersenneTwister.MersenneTwister(1616952581493)
   return {
     randomNumber: () => twister.random(),
     randomCryptoBits(bits) {
@@ -28,38 +27,9 @@ export const tests = {
     test.assertDeepEquals(
       random.requestId(ctx),
       new Uint8Array([
-        148,
-        25,
-        67,
-        83,
-        236,
-        194,
-        161,
-        68,
-        133,
-        3,
-        225,
-        39,
-        117,
-        184,
-        162,
-        13,
-        201,
-        86,
-        169,
-        202,
-        38,
-        239,
-        16,
-        242,
-        250,
-        147,
-        11,
-        231,
-        147,
-        27,
-        250,
-        116,
+        148, 25, 67, 83, 236, 194, 161, 68, 133, 3, 225, 39,
+        117, 184, 162, 13, 201, 86, 169, 202, 38, 239, 16,
+        242, 250, 147, 11, 231, 147, 27, 250, 116,
       ])
     )
   },
