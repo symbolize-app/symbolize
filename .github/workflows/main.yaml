@@ -197,12 +197,18 @@ jobs:
 
       - name: Deploy app
         if: github.ref == 'refs/heads/main'
-        run: direnv exec . flyctl deploy --build-arg NODE_OPTIONS="${NODE_OPTIONS_PRODUCTION}" --config app
+        run: direnv exec . fly deploy --build-arg NODE_OPTIONS="${NODE_OPTIONS_PRODUCTION}" --config app
         env:
           FLY_ACCESS_TOKEN: ${{ secrets.FLY_ACCESS_TOKEN }}
 
       - name: Deploy FTS
         if: github.ref == 'refs/heads/main'
-        run: direnv exec . flyctl deploy --config fts
+        run: direnv exec . fly deploy --config fts
+        env:
+          FLY_ACCESS_TOKEN: ${{ secrets.FLY_ACCESS_TOKEN }}
+
+      - name: Deploy cache
+        if: github.ref == 'refs/heads/main'
+        run: direnv exec . fly deploy --config cache
         env:
           FLY_ACCESS_TOKEN: ${{ secrets.FLY_ACCESS_TOKEN }}
