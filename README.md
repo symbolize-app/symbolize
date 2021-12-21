@@ -25,6 +25,13 @@
 1. Run `cockroach cert create-client api_write --certs-dir=.crdb/certs --ca-key=.crdb/ca/ca.key`
 1. Run `curl -fsSL -o .crdb/certs/cc-ca.crt -O https://cockroachlabs.cloud/clusters/CLUSTER_ID/cert`
 
+## Redis
+
+1. Install [Redis](https://redis.io/download#installation)
+1. Edit `/etc/redis/redis.conf`
+1. Set `requirepass <NEW_PASSWORD>` config
+1. Set `maxmemory 128mb` config
+
 # App development
 
 ## `pnpm db up`
