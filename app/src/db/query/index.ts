@@ -1,5 +1,5 @@
 import * as time from '@tiny/core/time.ts'
-import * as query from '@tiny/db/query.ts'
+import * as dbQuery from '@tiny/db/query.ts'
 import chalk from 'chalk'
 import pg from 'pg'
 import pgConnectionString from 'pg-connection-string'
@@ -9,7 +9,7 @@ declare const readSymbol: unique symbol
 export type Read = typeof readSymbol
 
 export type ReadContext = {
-  databaseApiRead: query.Database<Read>
+  databaseApiRead: dbQuery.Database<Read>
 }
 
 declare const writeSymbol: unique symbol
@@ -17,7 +17,7 @@ declare const writeSymbol: unique symbol
 export type Write = typeof writeSymbol
 
 export type WriteContext = {
-  databaseApiWrite: query.Database<Write>
+  databaseApiWrite: dbQuery.Database<Write>
 }
 
 export function initContext(): ReadContext & WriteContext {
@@ -33,7 +33,7 @@ export function initContext(): ReadContext & WriteContext {
 
 function initDatabase<Id>(
   connectionString: string
-): query.Database<Id> {
+): dbQuery.Database<Id> {
   const max = 10
   const user = pgConnectionString.parse(
     connectionString
@@ -68,13 +68,13 @@ function initDatabase<Id>(
       )
     )
   })
-  return query.createDatabase({
+  return dbQuery.createDatabase({
     async query<
-      Values extends query.SupportedType[],
-      Row extends Record<string, query.SupportedType>,
+      Values extends dbQuery.SupportedType[],
+      Row extends Record<string, dbQuery.SupportedType>,
       Transform
     >(
-      query: query.Query<Id, Values, Row, Transform>,
+      query: dbQuery.Query<Id, Values, Row, Transform>,
       ...values: Values
     ): Promise<Transform> {
       const result = await pool.query<Row, Values>(
