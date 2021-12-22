@@ -3,7 +3,7 @@ import type * as endpoint from '@tiny/core/endpoint.ts'
 import * as errorModule from '@tiny/core/error.ts'
 import * as payload from '@tiny/core/payload.ts'
 import * as time from '@tiny/core/time.ts'
-import * as query from '@tiny/db/query.ts'
+import * as dbQuery from '@tiny/db/query.ts'
 import ms from 'ms'
 import type * as typeFest from 'type-fest'
 
@@ -86,37 +86,37 @@ function checkRequestBase<Value>(
   }
 }
 
-export async function retryQuery<
+export async function retryDbQuery<
   Id,
-  Values extends query.SupportedType[],
-  Row extends Record<string, query.SupportedType>,
+  Values extends dbQuery.SupportedType[],
+  Row extends Record<string, dbQuery.SupportedType>,
   Transform
 >(
   ctx: errorModule.Context,
-  database: query.Database<Id>,
+  database: dbQuery.Database<Id>,
   description: string,
-  query_: query.Query<Id, Values, Row, Transform>,
+  query: dbQuery.Query<Id, Values, Row, Transform>,
   ...values: Values
 ): Promise<Transform> {
-  return await retryBaseQuery(
+  return await retryDbBaseQuery(
     ctx,
     database,
     description,
-    query_,
+    query,
     undefined,
     ...values
   )
 }
 
-export async function retryConflictQuery<
+export async function retryDbConflictQuery<
   Id,
-  Values extends query.SupportedType[],
-  Row extends Record<string, query.SupportedType>,
+  Values extends dbQuery.SupportedType[],
+  Row extends Record<string, dbQuery.SupportedType>,
   Transform,
   ConflictResponse extends { conflict: string }
 >(
   ctx: errorModule.Context,
-  database: query.Database<Id>,
+  database: dbQuery.Database<Id>,
   description: string,
   endpoint: {
     conflictError: new (
@@ -128,22 +128,22 @@ export async function retryConflictQuery<
     string,
     ConflictResponse['conflict'] | undefined
   >,
-  query_: query.Query<Id, Values, Row, Transform>,
+  query: dbQuery.Query<Id, Values, Row, Transform>,
   ...values: Values
 ): Promise<Transform> {
   return await checkConflictQuery(endpoint, () =>
-    retryBaseQuery(
+    retryDbBaseQuery(
       ctx,
       database,
       description,
-      query_,
+      query,
       (error) => {
         if (
-          query.isQueryError(error) &&
-          error.code === query.errorCode.uniqueViolation
+          dbQuery.isQueryError(error) &&
+          error.code === dbQuery.errorCode.uniqueViolation
         ) {
           const constraintName =
-            query.getUniqueViolationConstraintName(error)
+            dbQuery.getUniqueViolationConstraintName(error)
           const conflictField =
             constraintName && conflictMap[constraintName]
           if (conflictField) {
@@ -156,22 +156,22 @@ export async function retryConflictQuery<
   )
 }
 
-async function retryBaseQuery<
+async function retryDbBaseQuery<
   Id,
-  Values extends query.SupportedType[],
-  Row extends Record<string, query.SupportedType>,
+  Values extends dbQuery.SupportedType[],
+  Row extends Record<string, dbQuery.SupportedType>,
   Transform
 >(
   ctx: errorModule.Context,
-  database: query.Database<Id>,
+  database: dbQuery.Database<Id>,
   description: string,
-  query_: query.Query<Id, Values, Row, Transform>,
+  query: dbQuery.Query<Id, Values, Row, Transform>,
   onError: ((error: unknown) => void) | undefined,
   ...values: Values
 ): Promise<Transform> {
   return await errorModule.retry(
     ctx,
-    () => database.query(query_, ...values),
+    () => database.query(query, ...values),
     {
       maxAttempts: 15,
       minDelayMs: time.interval({ milliseconds: 10 }),

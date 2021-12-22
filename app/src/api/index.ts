@@ -3,7 +3,8 @@ import * as appRouteMember from '@fe/api/route/member.ts'
 import * as appRouteMessage from '@fe/api/route/message.ts'
 import * as appRouteSearch from '@fe/api/route/search.ts'
 import * as appRouteTopic from '@fe/api/route/topic.ts'
-import * as appQuery from '@fe/db/query/index.ts'
+import * as appCacheQuery from '@fe/cache/query/index.ts'
+import * as appDbQuery from '@fe/db/query/index.ts'
 import * as appWidgetButton from '@fe/ui/widget/button.ts'
 import * as route from '@tiny/api/route.ts'
 import type * as errorModule from '@tiny/core/error.ts'
@@ -73,13 +74,15 @@ const js = route.define(
 
 function main(): void {
   const ctx: errorModule.Context &
-    appQuery.ReadContext &
-    appQuery.WriteContext &
+    appCacheQuery.Context &
+    appDbQuery.ReadContext &
+    appDbQuery.WriteContext &
     submit.Context &
     appFts.Context = {
     ...random.initContext(),
     ...timeNode.initContext(),
-    ...appQuery.initContext(),
+    ...appCacheQuery.initContext(),
+    ...appDbQuery.initContext(),
     ...submitNode.initContext(),
     ...appFts.initContext(),
   }

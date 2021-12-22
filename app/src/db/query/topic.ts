@@ -1,11 +1,11 @@
 import dbQueryTopicCreate from '@db/query/topic_create.sql'
 import dbQueryTopicList from '@db/query/topic_list.sql'
 import dbQueryTopicUpdate from '@db/query/topic_update.sql'
-import type * as appQuery from '@fe/db/query/index.ts'
-import * as query from '@tiny/db/query.ts'
+import type * as appDbQuery from '@fe/db/query/index.ts'
+import * as dbQuery from '@tiny/db/query.ts'
 
-export const create = query.defineVoid<
-  appQuery.Write,
+export const create = dbQuery.defineVoid<
+  appDbQuery.Write,
   [
     id: Buffer,
     memberId: Buffer,
@@ -15,8 +15,8 @@ export const create = query.defineVoid<
   ]
 >(dbQueryTopicCreate)
 
-export const list = query.defineMulti<
-  appQuery.Read,
+export const list = dbQuery.defineMulti<
+  appDbQuery.Read,
   [],
   /* eslint-disable @typescript-eslint/naming-convention */
   {
@@ -29,8 +29,8 @@ export const list = query.defineMulti<
   /* eslint-enable @typescript-eslint/naming-convention */
 >(dbQueryTopicList)
 
-export const update = query.defineOptional<
-  appQuery.Write,
+export const update = dbQuery.defineOptional<
+  appDbQuery.Write,
   [
     id: Buffer,
     updatedOld: Date,

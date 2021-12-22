@@ -1,12 +1,12 @@
 import * as appRouteMember from '@fe/api/route/member.ts'
-import type * as appQuery from '@fe/db/query/index.ts'
-import * as appQueryMember from '@fe/db/query/member.ts'
+import type * as appDbQuery from '@fe/db/query/index.ts'
+import * as appDbQueryMember from '@fe/db/query/member.ts'
 import * as routeTest from '@tiny/api/route.test.ts'
 import * as route from '@tiny/api/route.ts'
 import type * as errorModule from '@tiny/core/error.ts'
 import * as random from '@tiny/core/random.ts'
-import * as queryTest from '@tiny/db/query.test.ts'
-import * as query from '@tiny/db/query.ts'
+import * as dbQueryTest from '@tiny/db/query.test.ts'
+import * as dbQuery from '@tiny/db/query.ts'
 import * as test from '@tiny/test/index.ts'
 
 export const url = import.meta.url
@@ -16,13 +16,13 @@ export const tests = {
     baseContext: test.Context
   ): Promise<void> => {
     const queryMethod = test.mock<
-      query.Database<appQuery.Write>['query']
+      dbQuery.Database<appDbQuery.Write>['query']
     >([() => Promise.resolve()])
     const ctx: test.Context &
       errorModule.Context &
-      appQuery.WriteContext = {
+      appDbQuery.WriteContext = {
       ...baseContext,
-      databaseApiWrite: query.createDatabase({
+      databaseApiWrite: dbQuery.createDatabase({
         query: queryMethod,
       }),
     }
@@ -51,7 +51,7 @@ export const tests = {
     })
     test.assertDeepEquals(queryMethod[test.mockHistory], [
       [
-        appQueryMember.create,
+        appDbQueryMember.create,
         Buffer.from(expectedId, 'hex'),
         'test@example.org',
         'test',
@@ -62,20 +62,20 @@ export const tests = {
     baseContext: test.Context
   ): Promise<void> => {
     const queryMethod = test.mock<
-      query.Database<appQuery.Write>['query']
+      dbQuery.Database<appDbQuery.Write>['query']
     >([
       () =>
         Promise.reject(
-          new queryTest.MockUniqueViolationConstraintError(
+          new dbQueryTest.MockUniqueViolationConstraintError(
             'member_email_key'
           )
         ),
     ])
     const ctx: test.Context &
       errorModule.Context &
-      appQuery.WriteContext = {
+      appDbQuery.WriteContext = {
       ...baseContext,
-      databaseApiWrite: query.createDatabase({
+      databaseApiWrite: dbQuery.createDatabase({
         query: queryMethod,
       }),
     }
@@ -107,7 +107,7 @@ export const tests = {
     })
     test.assertDeepEquals(queryMethod[test.mockHistory], [
       [
-        appQueryMember.create,
+        appDbQueryMember.create,
         Buffer.from(expectedId, 'hex'),
         'test@example.org',
         'test',
@@ -119,11 +119,11 @@ export const tests = {
   ): Promise<void> => {
     const ctx: test.Context &
       errorModule.Context &
-      appQuery.WriteContext = {
+      appDbQuery.WriteContext = {
       ...baseContext,
-      databaseApiWrite: query.createDatabase({
+      databaseApiWrite: dbQuery.createDatabase({
         query: test.mock<
-          query.Database<appQuery.Write>['query']
+          dbQuery.Database<appDbQuery.Write>['query']
         >([]),
       }),
     }
