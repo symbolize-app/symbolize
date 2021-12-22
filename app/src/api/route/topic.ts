@@ -1,13 +1,13 @@
 import * as appRoute from '@fe/api/route/index.ts'
 import * as appEndpointTopic from '@fe/core/endpoint/topic.ts'
-import type * as appQuery from '@fe/db/query/index.ts'
-import * as appQueryTopic from '@fe/db/query/topic.ts'
+import type * as appDbQuery from '@fe/db/query/index.ts'
+import * as appDbQueryTopic from '@fe/db/query/topic.ts'
 import * as route from '@tiny/api/route.ts'
 import * as crypto from '@tiny/core/crypto.node.ts'
 import type * as errorModule from '@tiny/core/error.ts'
 
 export const create = route.defineEndpoint<
-  errorModule.Context & appQuery.WriteContext
+  errorModule.Context & appDbQuery.WriteContext
 >(appEndpointTopic.create, async (ctx, request) => {
   const requestData = await appRoute.checkRequestJson(
     appEndpointTopic.create,
@@ -18,7 +18,7 @@ export const create = route.defineEndpoint<
   )
   const memberId = Buffer.from(requestData.memberId, 'hex')
   const { title, slug, content } = requestData
-  await appRoute.retryConflictQuery(
+  await appRoute.retryDbConflictQuery(
     ctx,
     ctx.databaseApiWrite,
     'topic create',
@@ -26,7 +26,7 @@ export const create = route.defineEndpoint<
     {
       ['primary']: 'slug',
     },
-    appQueryTopic.create,
+    appDbQueryTopic.create,
     id,
     memberId,
     title,
@@ -39,17 +39,17 @@ export const create = route.defineEndpoint<
 })
 
 export const list = route.defineEndpoint<
-  errorModule.Context & appQuery.ReadContext
+  errorModule.Context & appDbQuery.ReadContext
 >(appEndpointTopic.list, async (ctx, request) => {
   appRoute.checkRequestParams(
     appEndpointTopic.list,
     request
   )
-  const results = await appRoute.retryQuery(
+  const results = await appRoute.retryDbQuery(
     ctx,
     ctx.databaseApiRead,
     'topic list',
-    appQueryTopic.list
+    appDbQueryTopic.list
   )
   return appRoute.checkOkResponse(appEndpointTopic.list, {
     results: results.map((row) => ({
@@ -63,7 +63,7 @@ export const list = route.defineEndpoint<
 })
 
 export const update = route.defineEndpoint<
-  errorModule.Context & appQuery.WriteContext
+  errorModule.Context & appDbQuery.WriteContext
 >(appEndpointTopic.update, async (ctx, request) => {
   const requestData = await appRoute.checkRequestJson(
     appEndpointTopic.update,
@@ -72,7 +72,7 @@ export const update = route.defineEndpoint<
   const id = Buffer.from(requestData.id, 'hex')
   const updatedOld = new Date(requestData.updatedOld)
   const { title, slug, content } = requestData
-  const result = await appRoute.retryConflictQuery(
+  const result = await appRoute.retryDbConflictQuery(
     ctx,
     ctx.databaseApiWrite,
     'topic update',
@@ -80,7 +80,7 @@ export const update = route.defineEndpoint<
     {
       ['primary']: 'slug',
     },
-    appQueryTopic.update,
+    appDbQueryTopic.update,
     id,
     updatedOld,
     title,

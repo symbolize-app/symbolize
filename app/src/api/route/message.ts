@@ -1,18 +1,18 @@
 import * as appRoute from '@fe/api/route/index.ts'
 import * as appMessage from '@fe/core/message.ts'
-import type * as appQuery from '@fe/db/query/index.ts'
-import * as appQueryMember from '@fe/db/query/member.ts'
+import type * as appDbQuery from '@fe/db/query/index.ts'
+import * as appDbQueryMember from '@fe/db/query/member.ts'
 import * as route from '@tiny/api/route.ts'
 import type * as errorModule from '@tiny/core/error.ts'
 
 export const show = route.define<
-  errorModule.Context & appQuery.ReadContext
+  errorModule.Context & appDbQuery.ReadContext
 >(['GET'], /^\/api\/message$/, async (ctx) => {
-  const row = await appRoute.retryQuery(
+  const row = await appRoute.retryDbQuery(
     ctx,
     ctx.databaseApiRead,
     'member find',
-    appQueryMember.find,
+    appDbQueryMember.find,
     Buffer.from('ABCD', 'hex')
   )
   return {
