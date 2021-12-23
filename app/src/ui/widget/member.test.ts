@@ -68,7 +68,7 @@ export const tests = {
             headers: {
               'content-type': 'application/json',
             },
-            body: {
+            json: {
               requestId:
                 '94194353ecc2a1448503e12775b8a20dc956a9ca26ef10f2fa930be7931bfa74',
               email: 'a@b.com',
@@ -144,7 +144,7 @@ export const tests = {
               headers: {
                 'content-type': 'application/json',
               },
-              body: {
+              json: {
                 requestId:
                   '94194353ecc2a1448503e12775b8a20dc956a9ca26ef10f2fa930be7931bfa74',
                 email: 'a@b.com',

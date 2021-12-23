@@ -34,7 +34,7 @@ export async function checkRequestJson<
       headers: {
         'content-type': 'application/json',
       },
-      body: {
+      json: {
         error: 'content-type: application/json required',
       },
     })
@@ -42,14 +42,14 @@ export async function checkRequestJson<
   let input: typeFest.JsonValue
   try {
     input = await request.json()
-  } catch (error: unknown) {
+  } catch (error) {
     if (error instanceof SyntaxError) {
       throw new route.ResponseError({
         status: 400,
         headers: {
           'content-type': 'application/json',
         },
-        body: {
+        json: {
           error: 'JSON syntax error',
         },
       })
@@ -66,14 +66,14 @@ function checkRequestBase<Value>(
 ): Value {
   try {
     return validator.check(input)
-  } catch (error: unknown) {
+  } catch (error) {
     if (error instanceof payload.PayloadError) {
       throw new route.ResponseError({
         status: 400,
         headers: {
           'content-type': 'application/json',
         },
-        body: {
+        json: {
           error: error.message,
         },
       })
@@ -141,7 +141,9 @@ export async function retryDbConflictQuery<
           const conflictField =
             constraintName && conflictMap[constraintName]
           if (conflictField) {
-            throw new endpoint.conflictResponseJson.error(conflictField as never)
+            throw new endpoint.conflictResponseJson.error(
+              conflictField as never
+            )
           }
         }
       },
@@ -196,8 +198,10 @@ async function checkConflictQuery<
 ): Promise<Value> {
   try {
     return await query()
-  } catch (error: unknown) {
-    if (error instanceof endpoint.conflictResponseJson.error) {
+  } catch (error) {
+    if (
+      error instanceof endpoint.conflictResponseJson.error
+    ) {
       throw createConflictResponseError(
         endpoint,
         error.field
@@ -214,14 +218,16 @@ function createConflictResponseError<
   }
 >(
   endpoint: Endpoint,
-  field: payload.Payload<Endpoint["conflictResponseJson"]>['conflict']
+  field: payload.Payload<
+    Endpoint['conflictResponseJson']
+  >['conflict']
 ): route.ResponseError {
   return new route.ResponseError({
     status: 409,
     headers: {
       'content-type': 'application/json',
     },
-    body: endpoint.conflictResponseJson.check({
+    json: endpoint.conflictResponseJson.check({
       conflict: field,
     }),
   })
@@ -233,13 +239,15 @@ export function checkOkResponse<
   }
 >(
   endpoint: Endpoint,
-  okResponseData: payload.Payload<Endpoint["okResponseJson"]>
+  okResponseData: payload.Payload<
+    Endpoint['okResponseJson']
+  >
 ): route.Response {
   return {
     status: 200,
     headers: {
       'content-type': 'application/json',
     },
-    body: endpoint.okResponseJson.check(okResponseData),
+    json: endpoint.okResponseJson.check(okResponseData),
   }
 }

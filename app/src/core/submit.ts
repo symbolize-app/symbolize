@@ -15,9 +15,9 @@ export function retryGetJsonSubmit<
   description: string,
   endpoint: Endpoint,
   request: Pick<submit.Request, 'origin' | 'headers'> & {
-    params: payload.Payload<Endpoint["requestParams"]>
+    params: payload.Payload<Endpoint['requestParams']>
   }
-): Promise<payload.Payload<Endpoint["okResponseJson"]>> {
+): Promise<payload.Payload<Endpoint['okResponseJson']>> {
   return retryBaseSubmit(ctx, description, endpoint, {
     origin: request.origin,
     path: endpoint.path,
@@ -38,9 +38,9 @@ export function retryConflictPostSubmit<
   description: string,
   endpoint: Endpoint,
   request: Pick<submit.Request, 'origin' | 'headers'> & {
-    body: payload.Payload<Endpoint["requestJson"]>
+    body: payload.Payload<Endpoint['requestJson']>
   }
-): Promise<payload.Payload<Endpoint["okResponseJson"]>> {
+): Promise<payload.Payload<Endpoint['okResponseJson']>> {
   return retryConflictSubmit(ctx, description, endpoint, {
     origin: request.origin,
     path: endpoint.path,
@@ -49,7 +49,7 @@ export function retryConflictPostSubmit<
       'content-type': 'application/json',
       ...request.headers,
     },
-    body: endpoint.requestJson.check(request.body),
+    json: endpoint.requestJson.check(request.body),
   })
 }
 
@@ -64,8 +64,8 @@ async function retryBaseSubmit<
   request: submit.Request,
   onResponse?: (response: submit.Response) => Promise<void>,
   onError?: (error: unknown) => void
-): Promise<payload.Payload<Endpoint["okResponseJson"]>> {
-  return (await errorModule.retry(
+): Promise<payload.Payload<Endpoint['okResponseJson']>> {
+  return await errorModule.retry(
     ctx,
     async () => {
       const response = await ctx.submit(request)
@@ -75,7 +75,7 @@ async function retryBaseSubmit<
       if (response.status === 200) {
         return endpoint.okResponseJson.check(
           await response.json()
-        ) as payload.Payload<Endpoint["okResponseJson"]>
+        ) as payload.Payload<Endpoint['okResponseJson']>
       } else {
         throw new Error(
           `Unexpected status ${response.status} response during ${description}`
@@ -100,7 +100,7 @@ async function retryBaseSubmit<
         )
       },
     }
-  ))
+  )
 }
 
 function retryConflictSubmit<
@@ -113,7 +113,7 @@ function retryConflictSubmit<
   description: string,
   endpoint: Endpoint,
   request: submit.Request
-): Promise<payload.Payload<Endpoint["okResponseJson"]>> {
+): Promise<payload.Payload<Endpoint['okResponseJson']>> {
   return retryBaseSubmit(
     ctx,
     description,
@@ -131,7 +131,9 @@ function retryConflictSubmit<
       }
     },
     (error) => {
-      if (error instanceof endpoint.conflictResponseJson.error) {
+      if (
+        error instanceof endpoint.conflictResponseJson.error
+      ) {
         throw error
       }
     }

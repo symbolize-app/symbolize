@@ -1,6 +1,7 @@
 import type * as endpoint from '@tiny/core/endpoint.ts'
+import * as formData from 'formdata-polyfill/esm.min.js'
 import type * as http from 'http'
-import * as stream from 'stream'
+import * as nodeFetch from 'node-fetch'
 import * as streamPromises from 'stream/promises'
 import type * as typeFest from 'type-fest'
 
@@ -11,24 +12,22 @@ export type Request = {
   params: Record<string, string>
   method: string
   headers: Record<string, string>
-  stream(): stream.Readable
-  buffer(): Promise<Buffer>
+  stream(): NodeJS.ReadableStream
+  buffer(): Promise<ArrayBuffer>
   text(): Promise<string>
-  json(): Promise<typeFest.JsonObject>
+  form(): Promise<FormData>
+  json(): Promise<typeFest.JsonValue>
 }
 
 export type Response = typeFest.Promisable<
   | {
       status: number
       headers?: Record<string, string>
-      body?: typeFest.Promisable<
-        | undefined
-        | string
-        | Buffer
-        | Uint8Array
-        | stream.Readable
-        | typeFest.JsonObject
-      >
+      stream?: typeFest.Promisable<NodeJS.ReadableStream>
+      buffer?: typeFest.Promisable<ArrayBuffer>
+      text?: typeFest.Promisable<string>
+      form?: typeFest.Promisable<FormData>
+      json?: typeFest.Promisable<typeFest.JsonValue>
     }
   | http.RequestListener
 >
@@ -37,13 +36,10 @@ export class ResponseError extends Error {
   response: {
     status: number
     headers?: Record<string, string>
-    body?:
-      | undefined
-      | string
-      | Buffer
-      | Uint8Array
-      | stream.Readable
-      | typeFest.JsonObject
+    buffer?: ArrayBuffer
+    text?: string
+    form?: FormData
+    json?: typeFest.JsonValue
   }
 
   constructor(response: ResponseError['response']) {
@@ -131,21 +127,24 @@ async function handleRequest<Context>(
       async buffer() {
         return new Promise((resolve, reject) => {
           const chunks: Buffer[] = []
-          request.stream().on('data', (chunk) => {
+          req.on('data', (chunk) => {
             if (chunk instanceof Buffer) {
               chunks.push(chunk)
             } else {
               console.error('invalid chunk', chunk)
             }
           })
-          request.stream().on('end', () => {
+          req.on('end', () => {
             resolve(Buffer.concat(chunks))
           })
-          request.stream().on('error', reject)
+          req.on('error', reject)
         })
       },
       async text() {
         return (await request.buffer()).toString()
+      },
+      async form() {
+        return await new nodeFetch.BodyMixin(req).formData()
       },
       async json() {
         const result: unknown = JSON.parse(
@@ -159,10 +158,10 @@ async function handleRequest<Context>(
       },
     }
     const response = match(ctx, request, routes)
-    let headResponse: typeFest.PromiseValue<Response>
+    let headResponse: Awaited<Response>
     try {
       headResponse = await Promise.resolve(response)
-    } catch (error: unknown) {
+    } catch (error) {
       if (error instanceof ResponseError) {
         headResponse = error.response
       } else {
@@ -176,24 +175,31 @@ async function handleRequest<Context>(
         headResponse.status,
         headResponse.headers
       )
-      const body = await Promise.resolve(headResponse.body)
-      if (body === undefined) {
-        // No body
-      } else if (typeof body === 'string') {
-        res.write(body)
-      } else if (body instanceof Buffer) {
-        res.write(body)
-      } else if (body instanceof Uint8Array) {
-        res.write(body)
-      } else if (body instanceof stream.Readable) {
-        await streamPromises.pipeline(body, res)
-      } else {
-        const result = JSON.stringify(body)
+      if (headResponse.stream !== undefined) {
+        await streamPromises.pipeline(
+          await Promise.resolve(headResponse.stream),
+          res
+        )
+      } else if (headResponse.buffer !== undefined) {
+        res.write(
+          await Promise.resolve(headResponse.buffer)
+        )
+      } else if (headResponse.text !== undefined) {
+        res.write(await Promise.resolve(headResponse.text))
+      } else if (headResponse.form !== undefined) {
+        const result = formData.formDataToBlob(
+          await Promise.resolve(headResponse.form)
+        )
+        res.write(result)
+      } else if (headResponse.json !== undefined) {
+        const result = JSON.stringify(
+          await Promise.resolve(headResponse.json)
+        )
         res.write(result)
       }
       res.end()
     }
-  } catch (error: unknown) {
+  } catch (error) {
     console.error(error)
     if (res.headersSent) {
       console.error('Headers already sent')

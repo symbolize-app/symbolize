@@ -21,7 +21,9 @@ export const tests = {
   },
   ['object, wrong type']: (): void => {
     const validator = payload.object({})
-    const error = test.assertThrows(() => validator.check(null))
+    const error = test.assertThrows(() =>
+      validator.check(null)
+    )
     test.assertInstanceOf(error, payload.PayloadError)
     test.assertEquals(
       error.message,
@@ -37,7 +39,9 @@ export const tests = {
     const validator = payload.object({
       x: payload.object({}),
     })
-    const error = test.assertThrows(() => validator.check({}))
+    const error = test.assertThrows(() =>
+      validator.check({})
+    )
     test.assertInstanceOf(error, payload.PayloadError)
     test.assertEquals(
       error.message,
@@ -62,17 +66,15 @@ export const tests = {
     )
   },
   ['array, ok']: (): void => {
-    const validator = payload.array(
-      payload.object({})
-    )
+    const validator = payload.array(payload.object({}))
     const input = [{}]
     test.assertDeepEquals(validator.check(input), input)
   },
   ['array, wrong type']: (): void => {
-    const validator = payload.array(
-      payload.object({})
+    const validator = payload.array(payload.object({}))
+    const error = test.assertThrows(() =>
+      validator.check(null)
     )
-    const error = test.assertThrows(() => validator.check(null))
     test.assertInstanceOf(error, payload.PayloadError)
     test.assertEquals(
       error.message,
@@ -109,7 +111,9 @@ export const tests = {
       min: 2,
       max: 5,
     })
-    const error = test.assertThrows(() => validator.check([]))
+    const error = test.assertThrows(() =>
+      validator.check([])
+    )
     test.assertInstanceOf(error, payload.PayloadError)
     test.assertEquals(
       error.message,
@@ -121,7 +125,9 @@ export const tests = {
       min: 2,
       max: 5,
     })
-    const error = test.assertThrows(() => validator.check('a'))
+    const error = test.assertThrows(() =>
+      validator.check('a')
+    )
     test.assertInstanceOf(error, payload.PayloadError)
     test.assertEquals(
       error.message,
@@ -133,7 +139,9 @@ export const tests = {
       min: 2,
       max: 5,
     })
-    const error = test.assertThrows(() => validator.check('abcdef'))
+    const error = test.assertThrows(() =>
+      validator.check('abcdef')
+    )
     test.assertInstanceOf(error, payload.PayloadError)
     test.assertEquals(
       error.message,
@@ -147,7 +155,9 @@ export const tests = {
   },
   ['stringOptions, wrong type']: (): void => {
     const validator = payload.stringOption('abc', 'xyz')
-    const error = test.assertThrows(() => validator.check(2))
+    const error = test.assertThrows(() =>
+      validator.check(2)
+    )
     test.assertInstanceOf(error, payload.PayloadError)
     test.assertEquals(
       error.message,
@@ -156,7 +166,9 @@ export const tests = {
   },
   ['stringOptions, wrong option']: (): void => {
     const validator = payload.stringOption('abc', 'xyz')
-    const error = test.assertThrows(() => validator.check('a'))
+    const error = test.assertThrows(() =>
+      validator.check('a')
+    )
     test.assertInstanceOf(error, payload.PayloadError)
     test.assertEquals(
       error.message,
@@ -178,7 +190,9 @@ export const tests = {
       y = 'y2',
     }
     const validator = payload.stringEnum(Test)
-    const error = test.assertThrows(() => validator.check('y'))
+    const error = test.assertThrows(() =>
+      validator.check('y')
+    )
     test.assertInstanceOf(error, payload.PayloadError)
     test.assertEquals(
       error.message,
@@ -186,10 +200,7 @@ export const tests = {
     )
   },
   ['conflictResponse, ok']: (): void => {
-    const validator = payload.conflict(
-      'abc',
-      'xyz'
-    )
+    const validator = payload.conflict('abc', 'xyz')
     const input = { conflict: 'abc' }
     test.assertDeepEquals(validator.check(input), input)
   },

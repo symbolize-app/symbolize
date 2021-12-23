@@ -10,6 +10,7 @@ export function mockResponse(
     stream: test.mock([]),
     buffer: test.mock([]),
     text: test.mock([]),
+    form: test.mock([]),
     json: test.mock([]),
     ...response,
   }
