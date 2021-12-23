@@ -14,6 +14,9 @@ export const create = endpoint.definePostEndpoint(
     okResponseJson: payload.object({
       id: appPayload.id,
     }),
-    conflictResponseJson: payload.conflict('email', 'handle')
+    conflictResponseJson: payload.conflict(
+      'email',
+      'handle'
+    ),
   }
 )

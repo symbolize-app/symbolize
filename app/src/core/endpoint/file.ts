@@ -7,7 +7,7 @@ export const create = endpoint.definePostEndpoint(
   '/api/file/create',
   {
     checkRequestParams: payload.object({
-    requestId: appPayload.id,
-  })
+      requestId: appPayload.id,
+    }),
   }
 )

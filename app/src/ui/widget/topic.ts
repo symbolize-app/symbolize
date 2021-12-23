@@ -48,14 +48,15 @@ export const list = widget.define<
 
   async function load() {
     resetEditRange()
-    const okResponseData = await appSubmit.retryGetJsonSubmit(
-      ctx,
-      'create topic',
-      appEndpointTopic.list,
-      {
-        params: {},
-      }
-    )
+    const okResponseData =
+      await appSubmit.retryGetJsonSubmit(
+        ctx,
+        'create topic',
+        appEndpointTopic.list,
+        {
+          params: {},
+        }
+      )
     const { results } = okResponseData
     resultsRange.content = results.length
       ? results.map((result) =>
@@ -182,7 +183,7 @@ const create = widget.define<
         `Topic created ${JSON.stringify(okResponseData)}`,
       ]
       listen.submit?.()
-    } catch (error: unknown) {
+    } catch (error) {
       if (
         error instanceof
         appEndpointTopic.create.conflictResponseJson.error
@@ -283,7 +284,7 @@ const update = widget.define<
         `Topic created ${JSON.stringify(okResponseData)}`,
       ]
       listen.submit?.()
-    } catch (error: unknown) {
+    } catch (error) {
       if (
         error instanceof
         appEndpointTopic.update.conflictResponseJson.error
