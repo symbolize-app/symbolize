@@ -1,5 +1,4 @@
 import * as route from '@tiny/api/route.ts'
-import type * as endpoint from '@tiny/core/endpoint.ts'
 import * as errorModule from '@tiny/core/error.ts'
 import * as payload from '@tiny/core/payload.ts'
 import * as time from '@tiny/core/time.ts'
@@ -8,27 +7,25 @@ import ms from 'ms'
 import type * as typeFest from 'type-fest'
 
 export function checkRequestParams<
-  Request extends Record<string, string>
+  Value extends Record<string, string>
 >(
   endpoint: {
-    method: 'GET'
-    checkRequest: payload.Validator<Request>
+    requestParams: payload.Validator<Value>
   },
   request: route.Request
-): Request {
+): Value {
   const input = request.params
-  return checkRequestBase(endpoint, input)
+  return checkRequestBase(endpoint.requestParams, input)
 }
 
 export async function checkRequestJson<
-  Request extends typeFest.JsonObject
+  Value extends typeFest.JsonObject
 >(
   endpoint: {
-    method: 'POST'
-    checkRequest: payload.Validator<Request>
+    requestJson: payload.Validator<Value>
   },
   request: route.Request
-): Promise<Request> {
+): Promise<Value> {
   if (
     request.headers['content-type'] !== 'application/json'
   ) {
@@ -60,15 +57,15 @@ export async function checkRequestJson<
       throw error
     }
   }
-  return checkRequestBase(endpoint, input)
+  return checkRequestBase(endpoint.requestJson, input)
 }
 
 function checkRequestBase<Value>(
-  endpoint: { checkRequest: payload.Validator<Value> },
+  validator: payload.Validator<Value>,
   input: typeFest.JsonValue
 ): Value {
   try {
-    return endpoint.checkRequest(input)
+    return validator.check(input)
   } catch (error: unknown) {
     if (error instanceof payload.PayloadError) {
       throw new route.ResponseError({
@@ -119,10 +116,7 @@ export async function retryDbConflictQuery<
   database: dbQuery.Database<Id>,
   description: string,
   endpoint: {
-    conflictError: new (
-      field: ConflictResponse['conflict']
-    ) => payload.ConflictError<ConflictResponse>
-    checkConflictResponse: payload.Validator<ConflictResponse>
+    conflictResponseJson: payload.ConflictValidator
   },
   conflictMap: Record<
     string,
@@ -147,7 +141,7 @@ export async function retryDbConflictQuery<
           const conflictField =
             constraintName && conflictMap[constraintName]
           if (conflictField) {
-            throw new endpoint.conflictError(conflictField)
+            throw new endpoint.conflictResponseJson.error(conflictField as never)
           }
         }
       },
@@ -193,20 +187,17 @@ async function retryDbBaseQuery<
 
 async function checkConflictQuery<
   Value,
-  ConflictResponse extends { conflict: string }
+  Field extends string
 >(
   endpoint: {
-    conflictError: new (
-      field: ConflictResponse['conflict']
-    ) => payload.ConflictError<ConflictResponse>
-    checkConflictResponse: payload.Validator<ConflictResponse>
+    conflictResponseJson: payload.ConflictValidator<Field>
   },
   query: () => Promise<Value>
 ): Promise<Value> {
   try {
     return await query()
   } catch (error: unknown) {
-    if (error instanceof endpoint.conflictError) {
+    if (error instanceof endpoint.conflictResponseJson.error) {
       throw createConflictResponseError(
         endpoint,
         error.field
@@ -219,20 +210,18 @@ async function checkConflictQuery<
 
 function createConflictResponseError<
   Endpoint extends {
-    checkConflictResponse: payload.Validator<{
-      conflict: string
-    }>
+    conflictResponseJson: payload.ConflictValidator
   }
 >(
   endpoint: Endpoint,
-  field: endpoint.ConflictResponseData<Endpoint>['conflict']
+  field: payload.Payload<Endpoint["conflictResponseJson"]>['conflict']
 ): route.ResponseError {
   return new route.ResponseError({
     status: 409,
     headers: {
       'content-type': 'application/json',
     },
-    body: endpoint.checkConflictResponse({
+    body: endpoint.conflictResponseJson.check({
       conflict: field,
     }),
   })
@@ -240,17 +229,17 @@ function createConflictResponseError<
 
 export function checkOkResponse<
   Endpoint extends {
-    checkOkResponse: payload.Validator<typeFest.JsonObject>
+    okResponseJson: payload.Validator<typeFest.JsonObject>
   }
 >(
   endpoint: Endpoint,
-  okResponseData: endpoint.OkResponseData<Endpoint>
+  okResponseData: payload.Payload<Endpoint["okResponseJson"]>
 ): route.Response {
   return {
     status: 200,
     headers: {
       'content-type': 'application/json',
     },
-    body: endpoint.checkOkResponse(okResponseData),
+    body: endpoint.okResponseJson.check(okResponseData),
   }
 }

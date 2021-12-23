@@ -1,15 +1,15 @@
 import type * as typeFest from 'type-fest'
 
 export type Payload<
-  CustomValidator extends Validator<typeFest.JsonValue>
-> = CustomValidator extends Validator<infer Value>
-  ? Value
-  : never
+  CustomValidator extends Validator
+> = ReturnType<CustomValidator["check"]>
 
-export type Validator<Value extends typeFest.JsonValue> = (
+export type Validator<Value extends typeFest.JsonValue = typeFest.JsonValue> = {
+  check: (
   input: typeFest.JsonValue,
   path?: Path
 ) => Value
+  }
 
 export type Path = undefined | (() => (string | number)[])
 
@@ -27,26 +27,26 @@ export class PayloadError extends Error {
   }
 }
 
-export function checkNull<Value extends typeFest.JsonValue>(
+export function nullOr<Value extends typeFest.JsonValue>(
   config: Validator<Value>
 ): Validator<Value | null> {
-  return (input, path) => {
+  return { check(input, path) {
     if (input === null) {
       return null
     } else {
-      return config(input, path)
+      return config.check(input, path)
     }
   }
-}
+}}
 
-export function checkObject<
+export function object<
   Value extends {
     [Key in string]: typeFest.JsonValue
   } = Record<string, never>
 >(config: {
   [Key in keyof Value]: Validator<Value[Key]>
 }): Validator<Value> {
-  return (input, path) => {
+  return { check(input, path) {
     if (
       input === null ||
       typeof input !== 'object' ||
@@ -68,7 +68,7 @@ export function checkObject<
             path
           )
         } else {
-          result[key] = config[key](
+          result[key] = config[key].check(
             value,
             buildPath(key, path)
           )
@@ -78,11 +78,12 @@ export function checkObject<
     }
   }
 }
+}
 
-export function checkArray<
+export function array<
   Value extends typeFest.JsonValue = never[]
 >(config: Validator<Value>): Validator<Value[]> {
-  return (input, path) => {
+  return { check(input, path) {
     if (
       input === null ||
       typeof input !== 'object' ||
@@ -96,18 +97,19 @@ export function checkArray<
       const result = [] as Value[]
       for (let i = 0; i < input.length; i++) {
         const item = input[i]
-        result[i] = config(item, buildPath(i, path))
+        result[i] = config.check(item, buildPath(i, path))
       }
       return result
     }
   }
 }
+}
 
-export function checkString(config: {
+export function string(config: {
   min: number
   max: number
 }): Validator<string> {
-  return (input, path) => {
+  return { check(input, path) {
     if (typeof input !== 'string') {
       throw new PayloadError(
         `Invalid string (wrong type ${getTypeName(input)})`,
@@ -128,11 +130,12 @@ export function checkString(config: {
     }
   }
 }
+}
 
-export function checkStringOption<Options extends string>(
+export function stringOption<Options extends string>(
   ...options: Options[]
 ): Validator<Options> {
-  return (input, path) => {
+  return { check(input, path) {
     if (typeof input !== 'string') {
       throw new PayloadError(
         `Invalid string option (wrong type ${getTypeName(
@@ -155,15 +158,16 @@ export function checkStringOption<Options extends string>(
     }
   }
 }
+}
 
-export function checkStringMatch(config: {
+export function stringMatch(config: {
   min: number
   max: number
   match: RegExp
 }): Validator<string> {
-  const base = checkString(config)
-  return (baseInput, path) => {
-    const input = base(baseInput, path)
+  const base = string(config)
+  return { check(baseInput, path) {
+    const input = base.check(baseInput, path)
     if (!config.match.exec(input)) {
       throw new PayloadError(
         `Invalid string match (for ${JSON.stringify(
@@ -176,11 +180,12 @@ export function checkStringMatch(config: {
     }
   }
 }
+}
 
-export function checkStringEnum<Value extends string>(
+export function stringEnum<Value extends string>(
   mapping: Record<string, Value>
 ): Validator<Value> {
-  return (input, path) => {
+  return { check(input, path) {
     if (typeof input !== 'string') {
       throw new PayloadError(
         `Invalid enum (wrong type ${getTypeName(input)})`,
@@ -201,13 +206,13 @@ export function checkStringEnum<Value extends string>(
       )
     }
   }
-}
+}}
 
-export function checkNumber(config: {
+export function number(config: {
   min: number
   max: number
 }): Validator<number> {
-  return (input, path) => {
+  return { check(input, path) {
     if (typeof input !== 'number') {
       throw new PayloadError(
         `Invalid number (wrong type ${getTypeName(input)})`,
@@ -227,15 +232,15 @@ export function checkNumber(config: {
       return input
     }
   }
-}
+}}
 
-export function checkInteger(config: {
+export function integer(config: {
   min: number
   max: number
 }): Validator<number> {
-  const base = checkNumber(config)
-  return (baseInput, path) => {
-    const input = base(baseInput, path)
+  const base = number(config)
+  return { check(baseInput, path) {
+    const input = base.check(baseInput, path)
     if ((input | 0) !== input) {
       throw new PayloadError(
         'Invalid integer (includes fractional component)',
@@ -245,17 +250,17 @@ export function checkInteger(config: {
       return input
     }
   }
-}
+}}
 
-const checkTimestampBase = checkNumber({
+const timestampBase = number({
   min: Date.UTC(1000, 1, 1),
   max: Date.UTC(10000, 1, 1),
 })
-export const checkTimestamp: Validator<number> = (
+export const timestamp: Validator<number> = { check(
   baseInput,
   path
-) => {
-  const input = checkTimestampBase(baseInput, path)
+){
+  const input = timestampBase.check(baseInput, path)
   if (input % 1000 !== 0) {
     throw new PayloadError(
       'Invalid timestamp (includes fractional seconds)',
@@ -264,24 +269,30 @@ export const checkTimestamp: Validator<number> = (
   } else {
     return input
   }
-}
+}}
 
-export function checkConflictResponse<Field extends string>(
-  ...options: Field[]
-): Validator<{ conflict: Field }> {
-  return checkObject({
-    conflict: checkStringOption(...options),
-  })
-}
-
-export class ConflictError<
-  ConflictResponse extends { conflict: unknown }
-> extends Error {
-  field: ConflictResponse['conflict']
-  constructor(field: ConflictResponse['conflict']) {
+export class ConflictError<Field extends string> extends Error {
+  field: Field
+  constructor(field: Field) {
     super(`Conflict on ${JSON.stringify(field)}`)
     this.field = field
   }
+}
+
+export type ConflictValidator<Field extends string = string> = Validator<{ conflict: Field }> & {
+  error: new (field: never) => ConflictError<Field>
+}
+
+export function conflict<Field extends string>(
+  ...options: Field[]
+): ConflictValidator<Field> {
+  class CustomConflictError extends ConflictError<Field> {}
+  return {
+    ...object({
+    conflict: stringOption(...options),
+  }),
+  error: CustomConflictError
+}
 }
 
 export function buildPath(

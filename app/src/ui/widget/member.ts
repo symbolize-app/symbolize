@@ -68,7 +68,7 @@ export const create = widget.define<
     } catch (error: unknown) {
       if (
         error instanceof
-        appEndpointMember.create.conflictError
+        appEndpointMember.create.conflictResponseJson.error
       ) {
         statusDiv.content = [
           `Unique constraint error ${error.field}`,

@@ -4,53 +4,57 @@ import * as payload from '@tiny/core/payload.ts'
 import type * as typeFest from 'type-fest'
 
 export type Create = typeof create
-export const create = endpoint.defineConflictPostEndpoint(
+export const create = endpoint.definePostEndpoint(
   '/api/topic/create',
-  payload.checkObject({
-    requestId: appPayload.checkId,
-    memberId: appPayload.checkId,
-    title: appPayload.checkTitle,
-    slug: appPayload.checkSlug,
-    content: appPayload.checkContent,
+  {
+  requestJson: payload.object({
+    requestId: appPayload.id,
+    memberId: appPayload.id,
+    title: appPayload.title,
+    slug: appPayload.slug,
+    content: appPayload.content,
   }),
-  payload.checkObject({
-    id: appPayload.checkId,
+  okResponseJson: payload.object({
+    id: appPayload.id,
   }),
-  payload.checkConflictResponse('slug')
+  conflictResponseJson: payload.conflict('slug')
+  },
 )
 
 export type List = typeof list
 export type ListResult = typeFest.IterableElement<
-  endpoint.OkResponseData<List>['results']
+  payload.Payload<List['okResponseJson']>['results']
 >
 export const list = endpoint.defineGetEndpoint(
   '/api/topic/list',
-  payload.checkObject({}),
-  payload.checkObject({
-    results: payload.checkArray(
-      payload.checkObject({
-        id: appPayload.checkId,
-        updatedAt: payload.checkTimestamp,
-        title: appPayload.checkTitle,
-        slug: appPayload.checkSlug,
-        content: appPayload.checkContent,
+  {
+  requestParams: payload.object({}),
+  okResponseJson: payload.object({
+    results: payload.array(
+      payload.object({
+        id: appPayload.id,
+        updatedAt: payload.timestamp,
+        title: appPayload.title,
+        slug: appPayload.slug,
+        content: appPayload.content,
       })
     ),
-  })
+  })}
 )
 
 export type Update = typeof update
-export const update = endpoint.defineConflictPostEndpoint(
+export const update = endpoint.definePostEndpoint(
   '/api/topic/update',
-  payload.checkObject({
-    id: appPayload.checkId,
-    updatedOld: payload.checkTimestamp,
-    title: appPayload.checkTitle,
-    slug: appPayload.checkSlug,
-    content: appPayload.checkContent,
+  {
+  requestJson: payload.object({
+    id: appPayload.id,
+    updatedOld: payload.timestamp,
+    title: appPayload.title,
+    slug: appPayload.slug,
+    content: appPayload.content,
   }),
-  payload.checkObject({
-    updated: payload.checkTimestamp,
+  okResponseJson: payload.object({
+    updated: payload.timestamp,
   }),
-  payload.checkConflictResponse('slug')
+  conflictResponseJson: payload.conflict('slug')}
 )
