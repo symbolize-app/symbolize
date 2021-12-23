@@ -3,49 +3,49 @@ import * as appLanguage from '@fe/core/language.ts'
 import * as appTaxonRank from '@fe/core/taxonRank.ts'
 import * as payload from '@tiny/core/payload.ts'
 
-export const checkContent = payload.checkString({
+export const content = payload.string({
   min: 1,
   max: 4096,
 })
 
-export const checkDocumentType = payload.checkStringEnum(
+export const documentType = payload.stringEnum(
   appDocumentType.DocumentType
 )
 
-export const checkEmail = payload.checkString({
+export const email = payload.string({
   min: 5,
   max: 64,
 })
 
-export const checkHandle = payload.checkString({
+export const handle = payload.string({
   min: 3,
   max: 64,
 })
 
-export const checkId = payload.checkString({
+export const id = payload.string({
   min: 64,
   max: 64,
 })
 
-export const checkLanguage = payload.checkStringEnum(
+export const language = payload.stringEnum(
   appLanguage.Language
 )
 
-export const checkName = payload.checkString({
+export const name = payload.string({
   min: 3,
   max: 128,
 })
 
-export const checkSlug = payload.checkString({
+export const slug = payload.string({
   min: 3,
   max: 128,
 })
 
-export const checkTaxonRank = payload.checkStringEnum(
+export const taxonRank = payload.stringEnum(
   appTaxonRank.TaxonRank
 )
 
-export const checkTitle = payload.checkString({
+export const title = payload.string({
   min: 3,
   max: 128,
 })

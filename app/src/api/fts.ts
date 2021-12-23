@@ -22,35 +22,37 @@ export function initContext(): Context {
 
 export const queryEndpoint = endpoint.defineGetEndpoint(
   '/query',
-  payload.checkObject({
-    language: appPayload.checkLanguage,
-    query: payload.checkString({
+  {
+  requestParams: payload.object({
+    language: appPayload.language,
+    query: payload.string({
       min: 0,
       max: 256,
     }),
   }),
-  payload.checkObject({
-    results: payload.checkArray(
+  okResponseJson: payload.object({
+    results: payload.array(
       /* eslint-disable @typescript-eslint/naming-convention */
-      payload.checkObject({
-        type: appPayload.checkDocumentType,
-        id: appPayload.checkId,
-        created_at: payload.checkTimestamp,
-        created_by: appPayload.checkId,
-        updated_at: payload.checkTimestamp,
-        subforum_id: payload.checkNull(appPayload.checkId),
-        topic_id: payload.checkNull(appPayload.checkId),
-        taxon_rank: payload.checkNull(
-          appPayload.checkTaxonRank
+      payload.object({
+        type: appPayload.documentType,
+        id: appPayload.id,
+        created_at: payload.timestamp,
+        created_by: appPayload.id,
+        updated_at: payload.timestamp,
+        subforum_id: payload.nullOr(appPayload.id),
+        topic_id: payload.nullOr(appPayload.id),
+        taxon_rank: payload.nullOr(
+          appPayload.taxonRank
         ),
-        parents: payload.checkArray(appPayload.checkId),
-        title: payload.checkNull(appPayload.checkTitle),
-        names: payload.checkArray(appPayload.checkName),
-        slug: appPayload.checkSlug,
-        tags: payload.checkArray(appPayload.checkId),
-        content: appPayload.checkContent,
+        parents: payload.array(appPayload.id),
+        title: payload.nullOr(appPayload.title),
+        names: payload.array(appPayload.name),
+        slug: appPayload.slug,
+        tags: payload.array(appPayload.id),
+        content: appPayload.content,
       })
       /* eslint-enable @typescript-eslint/naming-convention */
     ),
   })
+}
 )

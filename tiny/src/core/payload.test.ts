@@ -4,56 +4,56 @@ import * as test from '@tiny/test/index.ts'
 export const url = import.meta.url
 
 export const tests = {
-  ['checkNull, ok']: (): void => {
-    const check = payload.checkObject({
-      x: payload.checkNull(payload.checkObject({})),
-      y: payload.checkNull(payload.checkObject({})),
+  ['null, ok']: (): void => {
+    const validator = payload.object({
+      x: payload.nullOr(payload.object({})),
+      y: payload.nullOr(payload.object({})),
     })
     const input = { x: null, y: {} }
-    test.assertDeepEquals(check(input), input)
+    test.assertDeepEquals(validator.check(input), input)
   },
-  ['checkObject, ok']: (): void => {
-    const check = payload.checkObject({
-      x: payload.checkObject({}),
+  ['object, ok']: (): void => {
+    const validator = payload.object({
+      x: payload.object({}),
     })
     const input = { x: {} }
-    test.assertDeepEquals(check(input), input)
+    test.assertDeepEquals(validator.check(input), input)
   },
-  ['checkObject, wrong type']: (): void => {
-    const check = payload.checkObject({})
-    const error = test.assertThrows(() => check(null))
+  ['object, wrong type']: (): void => {
+    const validator = payload.object({})
+    const error = test.assertThrows(() => validator.check(null))
     test.assertInstanceOf(error, payload.PayloadError)
     test.assertEquals(
       error.message,
       'Invalid object (wrong type null) at (root)'
     )
   },
-  ['checkObject, extra key ok']: (): void => {
-    const check = payload.checkObject({})
+  ['object, extra key ok']: (): void => {
+    const validator = payload.object({})
     const input = { x: {} }
-    test.assertDeepEquals(check(input), {})
+    test.assertDeepEquals(validator.check(input), {})
   },
-  ['checkObject, missing key']: (): void => {
-    const check = payload.checkObject({
-      x: payload.checkObject({}),
+  ['object, missing key']: (): void => {
+    const validator = payload.object({
+      x: payload.object({}),
     })
-    const error = test.assertThrows(() => check({}))
+    const error = test.assertThrows(() => validator.check({}))
     test.assertInstanceOf(error, payload.PayloadError)
     test.assertEquals(
       error.message,
       'Invalid object (missing key "x") at (root)'
     )
   },
-  ['checkObject, nested missing key']: (): void => {
-    const check = payload.checkObject({
-      x: payload.checkObject({
-        ['space y']: payload.checkObject({
-          z: payload.checkObject({}),
+  ['object, nested missing key']: (): void => {
+    const validator = payload.object({
+      x: payload.object({
+        ['space y']: payload.object({
+          z: payload.object({}),
         }),
       }),
     })
     const error = test.assertThrows(() =>
-      check({ x: { ['space y']: {} } })
+      validator.check({ x: { ['space y']: {} } })
     )
     test.assertInstanceOf(error, payload.PayloadError)
     test.assertEquals(
@@ -61,34 +61,34 @@ export const tests = {
       'Invalid object (missing key "z") at (root).x["space y"]'
     )
   },
-  ['checkArray, ok']: (): void => {
-    const check = payload.checkArray(
-      payload.checkObject({})
+  ['array, ok']: (): void => {
+    const validator = payload.array(
+      payload.object({})
     )
     const input = [{}]
-    test.assertDeepEquals(check(input), input)
+    test.assertDeepEquals(validator.check(input), input)
   },
-  ['checkArray, wrong type']: (): void => {
-    const check = payload.checkArray(
-      payload.checkObject({})
+  ['array, wrong type']: (): void => {
+    const validator = payload.array(
+      payload.object({})
     )
-    const error = test.assertThrows(() => check(null))
+    const error = test.assertThrows(() => validator.check(null))
     test.assertInstanceOf(error, payload.PayloadError)
     test.assertEquals(
       error.message,
       'Invalid array (wrong type null) at (root)'
     )
   },
-  ['checkArray, nested missing key']: (): void => {
-    const check = payload.checkArray(
-      payload.checkObject({
-        ['space y']: payload.checkObject({
-          z: payload.checkObject({}),
+  ['array, nested missing key']: (): void => {
+    const validator = payload.array(
+      payload.object({
+        ['space y']: payload.object({
+          z: payload.object({}),
         }),
       })
     )
     const error = test.assertThrows(() =>
-      check([{ ['space y']: {} }])
+      validator.check([{ ['space y']: {} }])
     )
     test.assertInstanceOf(error, payload.PayloadError)
     test.assertEquals(
@@ -96,102 +96,102 @@ export const tests = {
       'Invalid object (missing key "z") at (root)[0]["space y"]'
     )
   },
-  ['checkString, ok']: (): void => {
-    const check = payload.checkString({
+  ['string, ok']: (): void => {
+    const validator = payload.string({
       min: 2,
       max: 5,
     })
     const input = 'abcde'
-    test.assertDeepEquals(check(input), input)
+    test.assertDeepEquals(validator.check(input), input)
   },
-  ['checkString, wrong type']: (): void => {
-    const check = payload.checkString({
+  ['string, wrong type']: (): void => {
+    const validator = payload.string({
       min: 2,
       max: 5,
     })
-    const error = test.assertThrows(() => check([]))
+    const error = test.assertThrows(() => validator.check([]))
     test.assertInstanceOf(error, payload.PayloadError)
     test.assertEquals(
       error.message,
       'Invalid string (wrong type array) at (root)'
     )
   },
-  ['checkString, too short']: (): void => {
-    const check = payload.checkString({
+  ['string, too short']: (): void => {
+    const validator = payload.string({
       min: 2,
       max: 5,
     })
-    const error = test.assertThrows(() => check('a'))
+    const error = test.assertThrows(() => validator.check('a'))
     test.assertInstanceOf(error, payload.PayloadError)
     test.assertEquals(
       error.message,
       'Invalid string (too short, min 2) at (root)'
     )
   },
-  ['checkString, too long']: (): void => {
-    const check = payload.checkString({
+  ['string, too long']: (): void => {
+    const validator = payload.string({
       min: 2,
       max: 5,
     })
-    const error = test.assertThrows(() => check('abcdef'))
+    const error = test.assertThrows(() => validator.check('abcdef'))
     test.assertInstanceOf(error, payload.PayloadError)
     test.assertEquals(
       error.message,
       'Invalid string (too long, max 5) at (root)'
     )
   },
-  ['checkStringOptions, ok']: (): void => {
-    const check = payload.checkStringOption('abc', 'xyz')
+  ['stringOptions, ok']: (): void => {
+    const validator = payload.stringOption('abc', 'xyz')
     const input = 'abc'
-    test.assertDeepEquals(check(input), input)
+    test.assertDeepEquals(validator.check(input), input)
   },
-  ['checkStringOptions, wrong type']: (): void => {
-    const check = payload.checkStringOption('abc', 'xyz')
-    const error = test.assertThrows(() => check(2))
+  ['stringOptions, wrong type']: (): void => {
+    const validator = payload.stringOption('abc', 'xyz')
+    const error = test.assertThrows(() => validator.check(2))
     test.assertInstanceOf(error, payload.PayloadError)
     test.assertEquals(
       error.message,
       'Invalid string option (wrong type number) at (root)'
     )
   },
-  ['checkStringOptions, wrong option']: (): void => {
-    const check = payload.checkStringOption('abc', 'xyz')
-    const error = test.assertThrows(() => check('a'))
+  ['stringOptions, wrong option']: (): void => {
+    const validator = payload.stringOption('abc', 'xyz')
+    const error = test.assertThrows(() => validator.check('a'))
     test.assertInstanceOf(error, payload.PayloadError)
     test.assertEquals(
       error.message,
       'Invalid string option (not "abc" | "xyz") at (root)'
     )
   },
-  ['checkStringEnum, ok']: (): void => {
+  ['stringEnum, ok']: (): void => {
     enum Test {
       x = 'x',
       y = 'y2',
     }
-    const check = payload.checkStringEnum(Test)
+    const validator = payload.stringEnum(Test)
     const input = 'y2'
-    test.assertDeepEquals(check(input), Test.y)
+    test.assertDeepEquals(validator.check(input), Test.y)
   },
-  ['checkStringEnum, wrong enum']: (): void => {
+  ['stringEnum, wrong enum']: (): void => {
     enum Test {
       x = 'x',
       y = 'y2',
     }
-    const check = payload.checkStringEnum(Test)
-    const error = test.assertThrows(() => check('y'))
+    const validator = payload.stringEnum(Test)
+    const error = test.assertThrows(() => validator.check('y'))
     test.assertInstanceOf(error, payload.PayloadError)
     test.assertEquals(
       error.message,
       'Invalid enum (not "x" | "y2") at (root)'
     )
   },
-  ['checkConflictResponse, ok']: (): void => {
-    const check = payload.checkConflictResponse(
+  ['conflictResponse, ok']: (): void => {
+    const validator = payload.conflict(
       'abc',
       'xyz'
     )
     const input = { conflict: 'abc' }
-    test.assertDeepEquals(check(input), input)
+    test.assertDeepEquals(validator.check(input), input)
   },
   ['getTypeName, wrong option']: (): void => {
     test.assertEquals(payload.getTypeName(null), 'null')

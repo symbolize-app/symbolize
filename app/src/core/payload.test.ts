@@ -5,34 +5,34 @@ export const url = import.meta.url
 
 export const tests = {
   ['id, ok']: (): void => {
-    const check = appPayload.checkId
+    const validator = appPayload.id
     const input =
       'd2f17ea3a0e36a7c79442855ca7d0a71a4eb616e10704121b4d169b6486f3bdc'
-    test.assertDeepEquals(check(input), input)
+    test.assertDeepEquals(validator.check(input), input)
   },
   ['email, ok']: (): void => {
-    const check = appPayload.checkEmail
+    const validator = appPayload.email
     const input = 'a@b.c'
-    test.assertDeepEquals(check(input), input)
+    test.assertDeepEquals(validator.check(input), input)
   },
   ['handle, ok']: (): void => {
-    const check = appPayload.checkHandle
+    const validator = appPayload.handle
     const input = 'xyz'
-    test.assertDeepEquals(check(input), input)
+    test.assertDeepEquals(validator.check(input), input)
   },
   ['title, ok']: (): void => {
-    const check = appPayload.checkTitle
+    const validator = appPayload.title
     const input = 'the'
-    test.assertDeepEquals(check(input), input)
+    test.assertDeepEquals(validator.check(input), input)
   },
   ['slug, ok']: (): void => {
-    const check = appPayload.checkSlug
+    const validator = appPayload.slug
     const input = 'oth'
-    test.assertDeepEquals(check(input), input)
+    test.assertDeepEquals(validator.check(input), input)
   },
   ['content, ok']: (): void => {
-    const check = appPayload.checkContent
+    const validator = appPayload.content
     const input = 'yzx'
-    test.assertDeepEquals(check(input), input)
+    test.assertDeepEquals(validator.check(input), input)
   },
 }

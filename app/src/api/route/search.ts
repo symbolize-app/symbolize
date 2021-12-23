@@ -13,7 +13,7 @@ export const query = route.defineEndpoint<
     appEndpointSearch.query,
     request
   )
-  const { results } = await appSubmit.retryGetSubmit(
+  const { results } = await appSubmit.retryGetJsonSubmit(
     ctx,
     'search query',
     appFts.queryEndpoint,

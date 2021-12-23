@@ -53,7 +53,7 @@ export const query = widget.define<
 
   async function query(event: Event) {
     event.preventDefault()
-    const okResponseData = await appSubmit.retryGetSubmit(
+    const okResponseData = await appSubmit.retryGetJsonSubmit(
       ctx,
       'execute search',
       appEndpointSearch.query,
