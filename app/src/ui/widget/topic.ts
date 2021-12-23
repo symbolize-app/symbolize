@@ -48,7 +48,7 @@ export const list = widget.define<
 
   async function load() {
     resetEditRange()
-    const okResponseData = await appSubmit.retryGetSubmit(
+    const okResponseData = await appSubmit.retryGetJsonSubmit(
       ctx,
       'create topic',
       appEndpointTopic.list,
@@ -185,7 +185,7 @@ const create = widget.define<
     } catch (error: unknown) {
       if (
         error instanceof
-        appEndpointTopic.create.conflictError
+        appEndpointTopic.create.conflictResponseJson.error
       ) {
         status.content = [
           `Unique constraint error ${error.field}`,
@@ -286,7 +286,7 @@ const update = widget.define<
     } catch (error: unknown) {
       if (
         error instanceof
-        appEndpointTopic.update.conflictError
+        appEndpointTopic.update.conflictResponseJson.error
       ) {
         status.content = [
           `Unique constraint error ${error.field}`,

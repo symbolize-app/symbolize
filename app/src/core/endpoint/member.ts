@@ -3,15 +3,17 @@ import * as endpoint from '@tiny/core/endpoint.ts'
 import * as payload from '@tiny/core/payload.ts'
 
 export type Create = typeof create
-export const create = endpoint.defineConflictPostEndpoint(
+export const create = endpoint.definePostEndpoint(
   '/api/member/create',
-  payload.checkObject({
-    requestId: appPayload.checkId,
-    email: appPayload.checkEmail,
-    handle: appPayload.checkHandle,
-  }),
-  payload.checkObject({
-    id: appPayload.checkId,
-  }),
-  payload.checkConflictResponse('email', 'handle')
+  {
+    requestJson: payload.object({
+      requestId: appPayload.id,
+      email: appPayload.email,
+      handle: appPayload.handle,
+    }),
+    okResponseJson: payload.object({
+      id: appPayload.id,
+    }),
+    conflictResponseJson: payload.conflict('email', 'handle')
+  }
 )

@@ -1,137 +1,34 @@
-import * as payload from '@tiny/core/payload.ts'
-import type * as typeFest from 'type-fest'
-
-export type BaseEndpoint<Method extends string> = {
+export type BaseEndpoint<Method extends string = string, Checks = unknown> = {
   method: Method
   path: string
-}
+} & Checks
 
-function defineBaseEndpoint<Method extends string>(
+function defineBaseEndpoint<Method extends string, Checks>(
   method: Method,
-  path: string
-): BaseEndpoint<Method> {
+  path: string,
+  checks: Checks
+): BaseEndpoint<Method, Checks> {
   return {
     method,
     path,
+    ...checks
   }
 }
 
-export type RequestData<
-  Endpoint extends {
-    checkRequest: payload.Validator<typeFest.JsonObject>
-  }
-> = ReturnType<Endpoint['checkRequest']>
+export type GetEndpoint<Checks = unknown> = BaseEndpoint<'GET', Checks>
 
-export type OkResponseData<
-  Endpoint extends {
-    checkOkResponse: payload.Validator<typeFest.JsonObject>
-  }
-> = ReturnType<Endpoint['checkOkResponse']>
-
-export type ConflictResponseData<
-  Endpoint extends {
-    checkConflictResponse: payload.Validator<
-      typeFest.JsonObject & { conflict: string }
-    >
-  }
-> = ReturnType<Endpoint['checkConflictResponse']>
-
-export type ConflictError<
-  Endpoint extends {
-    checkConflictResponse: payload.Validator<
-      typeFest.JsonObject & { conflict: string }
-    >
-  }
-> = payload.ConflictError<ConflictResponseData<Endpoint>>
-
-export type GetEndpoint<
-  RequestData extends Record<string, string> = Record<
-    string,
-    string
-  >,
-  OkResponseData extends typeFest.JsonObject = typeFest.JsonObject
-> = BaseEndpoint<'GET'> & {
-  checkRequest: payload.Validator<RequestData>
-  checkOkResponse: payload.Validator<OkResponseData>
-}
-
-export function defineGetEndpoint<
-  RequestData extends Record<string, string>,
-  OkResponseData extends typeFest.JsonObject
->(
+export function defineGetEndpoint<Checks>(
   path: string,
-  checkRequest: payload.Validator<RequestData>,
-  checkOkResponse: payload.Validator<OkResponseData>
-): GetEndpoint<RequestData, OkResponseData> {
-  return {
-    ...defineBaseEndpoint('GET', path),
-    checkRequest,
-    checkOkResponse,
-  }
+  checks: Checks
+): GetEndpoint<Checks> {
+  return defineBaseEndpoint('GET', path, checks)
 }
 
-export type PostEndpoint<
-  RequestData extends typeFest.JsonObject,
-  OkResponseData extends typeFest.JsonObject
-> = BaseEndpoint<'POST'> & {
-  checkRequest: payload.Validator<RequestData>
-  checkOkResponse: payload.Validator<OkResponseData>
-}
+export type PostEndpoint<Checks = unknown> = BaseEndpoint<'POST', Checks>
 
-export function definePostEndpoint<
-  RequestData extends typeFest.JsonObject,
-  OkResponseData extends typeFest.JsonObject
->(
+export function definePostEndpoint<Checks>(
   path: string,
-  checkRequest: payload.Validator<RequestData>,
-  checkOkResponse: payload.Validator<OkResponseData>
-): PostEndpoint<RequestData, OkResponseData> {
-  return {
-    ...defineBaseEndpoint('POST', path),
-    checkRequest,
-    checkOkResponse,
-  }
-}
-
-export type ConflictPostEndpoint<
-  RequestData extends typeFest.JsonObject = typeFest.JsonObject,
-  OkResponseData extends typeFest.JsonObject = typeFest.JsonObject,
-  ConflictResponseData extends typeFest.JsonObject & {
-    conflict: string
-  } = typeFest.JsonObject & {
-    conflict: string
-  }
-> = PostEndpoint<RequestData, OkResponseData> & {
-  conflictError: new (
-    field: string
-  ) => payload.ConflictError<ConflictResponseData>
-  checkConflictResponse: payload.Validator<ConflictResponseData>
-}
-
-export function defineConflictPostEndpoint<
-  RequestData extends typeFest.JsonObject,
-  OkResponseData extends typeFest.JsonObject,
-  ConflictResponseData extends typeFest.JsonObject & {
-    conflict: string
-  }
->(
-  path: string,
-  checkRequest: payload.Validator<RequestData>,
-  checkOkResponse: payload.Validator<OkResponseData>,
-  checkConflictResponse: payload.Validator<ConflictResponseData>
-): ConflictPostEndpoint<
-  RequestData,
-  OkResponseData,
-  ConflictResponseData
-> {
-  class ConflictError extends payload.ConflictError<ConflictResponseData> {}
-  return {
-    ...definePostEndpoint(
-      path,
-      checkRequest,
-      checkOkResponse
-    ),
-    conflictError: ConflictError,
-    checkConflictResponse,
-  }
+  checks: Checks
+): PostEndpoint<Checks> {
+  return defineBaseEndpoint('POST', path, checks)
 }

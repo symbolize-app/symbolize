@@ -72,7 +72,7 @@ export function define<Context = unknown>(
 }
 
 export function defineEndpoint<Context = unknown>(
-  endpoint: endpoint.BaseEndpoint<string>,
+  endpoint: endpoint.BaseEndpoint,
   handler: Handler<Context>
 ): Route<Context> {
   return {

@@ -12,7 +12,7 @@ export type Request = {
     | ArrayBuffer
     | Uint8Array
     | FormData
-    | typeFest.JsonObject
+    | typeFest.JsonValue
 }
 
 export type Response = {
