@@ -65,7 +65,7 @@ export const create = widget.define<
       statusDiv.content = [
         `Member created ${JSON.stringify(okResponseData)}`,
       ]
-    } catch (error: unknown) {
+    } catch (error) {
       if (
         error instanceof
         appEndpointMember.create.conflictResponseJson.error

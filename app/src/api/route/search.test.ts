@@ -123,7 +123,7 @@ export const tests = {
     test.assertDeepEquals(response.resolvedValue, {
       status: 200,
       headers: { 'content-type': 'application/json' },
-      body: {
+      json: {
         results,
       },
     })

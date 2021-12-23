@@ -161,7 +161,7 @@
         }
       ],
       "@typescript-eslint/no-implicit-any-catch": [
-        "warn"
+        "off"
       ],
       "@typescript-eslint/no-implied-eval": [
         "off"

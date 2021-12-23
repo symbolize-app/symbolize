@@ -26,7 +26,7 @@ export async function retry<Result>(
   while (true) {
     try {
       return await callback()
-    } catch (error: unknown) {
+    } catch (error) {
       if (attempt === config.maxAttempts - 1) {
         throw error
       }

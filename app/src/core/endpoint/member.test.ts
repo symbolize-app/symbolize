@@ -17,7 +17,8 @@ export const tests = {
     test.assertDeepEquals(validator.check(input), input)
   },
   ['member create ok response, ok']: (): void => {
-    const validator = appEndpointMember.create.okResponseJson
+    const validator =
+      appEndpointMember.create.okResponseJson
     const input = {
       id: 'd2f17ea3a0e36a7c79442855ca7d0a71a4eb616e10704121b4d169b6486f3bdc',
     }

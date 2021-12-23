@@ -84,7 +84,7 @@ export async function runAll<
         }
         await test(testContext)
         pass += 1
-      } catch (error: unknown) {
+      } catch (error) {
         const basicInfo =
           error instanceof Error
             ? {
@@ -332,7 +332,7 @@ export function assertThrows(
   let result: unknown
   try {
     result = callback()
-  } catch (error: unknown) {
+  } catch (error) {
     return error
   }
   throw new AssertionError(

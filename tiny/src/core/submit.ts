@@ -6,13 +6,11 @@ export type Request = {
   params?: Record<string, string>
   method: string
   headers?: Record<string, string>
-  body?:
-    | undefined
-    | string
-    | ArrayBuffer
-    | Uint8Array
-    | FormData
-    | typeFest.JsonValue
+  stream?: ReadableStream
+  buffer?: ArrayBuffer
+  text?: string
+  form?: FormData
+  json?: typeFest.JsonValue
 }
 
 export type Response = {
@@ -21,7 +19,8 @@ export type Response = {
   stream(): ReadableStream
   buffer(): Promise<ArrayBuffer>
   text(): Promise<string>
-  json(): Promise<typeFest.JsonObject>
+  form(): Promise<FormData>
+  json(): Promise<typeFest.JsonValue>
 }
 
 export type Context = {
@@ -29,24 +28,17 @@ export type Context = {
 }
 
 export function initContext(
-  window: Pick<
-    Window & typeof globalThis,
-    'fetch' | 'FormData'
-  >
+  window: Pick<Window, 'fetch'>
 ): Context {
   return {
     async submit(request) {
-      let body
-      if (
-        request.body === undefined ||
-        typeof request.body === 'string' ||
-        request.body instanceof ArrayBuffer ||
-        request.body instanceof Uint8Array ||
-        request.body instanceof window.FormData
-      ) {
-        body = request.body
-      } else {
-        body = JSON.stringify(request.body)
+      let body =
+        request.stream ??
+        request.buffer ??
+        request.text ??
+        request.form
+      if (request.json !== undefined) {
+        body = JSON.stringify(request.json)
       }
       let url = request.path
       if (request.origin) {
@@ -81,6 +73,9 @@ export function initContext(
         },
         text() {
           return response.text()
+        },
+        form() {
+          return response.formData()
         },
         json() {
           return response.json()

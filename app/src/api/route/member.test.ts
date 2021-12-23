@@ -45,7 +45,7 @@ export const tests = {
     test.assertDeepEquals(response.resolvedValue, {
       status: 200,
       headers: { 'content-type': 'application/json' },
-      body: {
+      json: {
         id: expectedId,
       },
     })
@@ -101,7 +101,7 @@ export const tests = {
     test.assertDeepEquals(response.rejectedValue.response, {
       status: 409,
       headers: { 'content-type': 'application/json' },
-      body: {
+      json: {
         conflict: 'email',
       },
     })
@@ -147,7 +147,7 @@ export const tests = {
     test.assertDeepEquals(response.rejectedValue.response, {
       status: 400,
       headers: { 'content-type': 'application/json' },
-      body: {
+      json: {
         error:
           'Invalid string (too short, min 3) at (root).handle',
       },

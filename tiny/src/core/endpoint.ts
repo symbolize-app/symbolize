@@ -1,4 +1,7 @@
-export type BaseEndpoint<Method extends string = string, Checks = unknown> = {
+export type BaseEndpoint<
+  Method extends string = string,
+  Checks = unknown
+> = {
   method: Method
   path: string
 } & Checks
@@ -11,11 +14,14 @@ function defineBaseEndpoint<Method extends string, Checks>(
   return {
     method,
     path,
-    ...checks
+    ...checks,
   }
 }
 
-export type GetEndpoint<Checks = unknown> = BaseEndpoint<'GET', Checks>
+export type GetEndpoint<Checks = unknown> = BaseEndpoint<
+  'GET',
+  Checks
+>
 
 export function defineGetEndpoint<Checks>(
   path: string,
@@ -24,7 +30,10 @@ export function defineGetEndpoint<Checks>(
   return defineBaseEndpoint('GET', path, checks)
 }
 
-export type PostEndpoint<Checks = unknown> = BaseEndpoint<'POST', Checks>
+export type PostEndpoint<Checks = unknown> = BaseEndpoint<
+  'POST',
+  Checks
+>
 
 export function definePostEndpoint<Checks>(
   path: string,
