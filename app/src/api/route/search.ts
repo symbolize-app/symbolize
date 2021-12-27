@@ -13,23 +13,25 @@ export const query = route.defineEndpoint<
     appEndpointSearch.query,
     request
   )
-  const { results } = await appSubmit.retryGetJsonSubmit(
-    ctx,
-    'search query',
-    appFts.queryEndpoint,
-    {
-      origin: ctx.fts.origin,
-      headers: {
-        ['Authorization']: `Basic ${Buffer.from(
-          `:${ctx.fts.password}`
-        ).toString('base64')}`,
-      },
-      params: {
-        language: requestData.language,
-        query: requestData.query,
-      },
-    }
-  )
+  const { results } = (
+    await appSubmit.retrySubmit(
+      ctx,
+      'search query',
+      appFts.queryEndpoint,
+      {
+        origin: ctx.fts.origin,
+        headers: {
+          ['Authorization']: `Basic ${Buffer.from(
+            `:${ctx.fts.password}`
+          ).toString('base64')}`,
+        },
+        params: {
+          language: requestData.language,
+          query: requestData.query,
+        },
+      }
+    )
+  ).json
   return appRoute.checkOkResponse(appEndpointSearch.query, {
     results: results.map((result) => ({
       type: result.type,

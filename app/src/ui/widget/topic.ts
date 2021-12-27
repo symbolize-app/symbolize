@@ -48,16 +48,15 @@ export const list = widget.define<
 
   async function load() {
     resetEditRange()
-    const okResponseData =
-      await appSubmit.retryGetJsonSubmit(
-        ctx,
-        'create topic',
-        appEndpointTopic.list,
-        {
-          params: {},
-        }
-      )
-    const { results } = okResponseData
+    const okResponseData = await appSubmit.retrySubmit(
+      ctx,
+      'create topic',
+      appEndpointTopic.list,
+      {
+        params: {},
+      }
+    )
+    const { results } = okResponseData.json
     resultsRange.content = results.length
       ? results.map((result) =>
           div(ctx, {
@@ -164,21 +163,20 @@ const create = widget.define<
   async function submit(event: Event) {
     event.preventDefault()
     try {
-      const okResponseData =
-        await appSubmit.retryConflictPostSubmit(
-          ctx,
-          'create topic',
-          appEndpointTopic.create,
-          {
-            body: {
-              requestId: requestIdInput.value,
-              memberId: memberIdInput.value,
-              title: titleInput.value,
-              slug: slugInput.value,
-              content: contentInput.value,
-            },
-          }
-        )
+      const okResponseData = await appSubmit.retrySubmit(
+        ctx,
+        'create topic',
+        appEndpointTopic.create,
+        {
+          json: {
+            requestId: requestIdInput.value,
+            memberId: memberIdInput.value,
+            title: titleInput.value,
+            slug: slugInput.value,
+            content: contentInput.value,
+          },
+        }
+      )
       status.content = [
         `Topic created ${JSON.stringify(okResponseData)}`,
       ]
@@ -265,21 +263,20 @@ const update = widget.define<
       return
     }
     try {
-      const okResponseData =
-        await appSubmit.retryConflictPostSubmit(
-          ctx,
-          'update topic',
-          appEndpointTopic.update,
-          {
-            body: {
-              id: topic.id,
-              updatedOld: topic.updatedAt,
-              title: titleInput.value,
-              slug: slugInput.value,
-              content: contentInput.value,
-            },
-          }
-        )
+      const okResponseData = await appSubmit.retrySubmit(
+        ctx,
+        'update topic',
+        appEndpointTopic.update,
+        {
+          json: {
+            id: topic.id,
+            updatedOld: topic.updatedAt,
+            title: titleInput.value,
+            slug: slugInput.value,
+            content: contentInput.value,
+          },
+        }
+      )
       status.content = [
         `Topic created ${JSON.stringify(okResponseData)}`,
       ]

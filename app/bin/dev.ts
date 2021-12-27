@@ -36,7 +36,7 @@ const index = route.define(['GET'], /^\/$/, () => {
     headers: {
       'content-type': 'text/html',
     },
-    body: fs.createReadStream('app/public/index.html'),
+    stream: fs.createReadStream('app/public/index.html'),
   }
 })
 
@@ -44,7 +44,6 @@ const notFound = route.define(undefined, /.*/, () => {
   return {
     status: 404,
     headers: {},
-    body: '',
   }
 })
 
@@ -63,7 +62,7 @@ const js = route.define<Context>(
         headers: {
           'content-type': 'application/javascript',
         },
-        body: sourceFile.contents,
+        buffer: sourceFile.contents,
       }
     } else {
       return route.forward(ctx, request, {}, notFound)

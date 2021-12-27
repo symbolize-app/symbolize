@@ -125,6 +125,7 @@ export async function retryDbConflictQuery<
   query: dbQuery.Query<Id, Values, Row, Transform>,
   ...values: Values
 ): Promise<Transform> {
+  // TODO Put conflict map into query, merge with retry DB query, move to app/db
   return await checkConflictQuery(endpoint, () =>
     retryDbBaseQuery(
       ctx,
@@ -243,6 +244,7 @@ export function checkOkResponse<
     Endpoint['okResponseJson']
   >
 ): route.Response {
+  // TODO Put response in JSON
   return {
     status: 200,
     headers: {

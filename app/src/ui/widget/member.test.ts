@@ -62,7 +62,6 @@ export const tests = {
       test.assertDeepEquals(submit[test.mockHistory], [
         [
           {
-            origin: undefined,
             path: '/api/member/create',
             method: 'POST',
             headers: {
@@ -138,7 +137,6 @@ export const tests = {
         test.assertDeepEquals(submit[test.mockHistory], [
           [
             {
-              origin: undefined,
               path: '/api/member/create',
               method: 'POST',
               headers: {
