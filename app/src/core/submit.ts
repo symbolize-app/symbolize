@@ -156,7 +156,9 @@ export function createRequest<
       : { json?: never })
 ): submit.Request {
   return {
-    ...(request.origin !== undefined && {origin: request.origin}),
+    ...(request.origin !== undefined && {
+      origin: request.origin,
+    }),
     path: endpoint.path,
     method: endpoint.method,
     headers: {
