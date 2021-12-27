@@ -125,20 +125,9 @@ async function handleRequest<Context>(
         return req
       },
       async buffer() {
-        return new Promise((resolve, reject) => {
-          const chunks: Buffer[] = []
-          req.on('data', (chunk) => {
-            if (chunk instanceof Buffer) {
-              chunks.push(chunk)
-            } else {
-              console.error('invalid chunk', chunk)
-            }
-          })
-          req.on('end', () => {
-            resolve(Buffer.concat(chunks))
-          })
-          req.on('error', reject)
-        })
+        return await new nodeFetch.BodyMixin(
+          req
+        ).arrayBuffer()
       },
       async text() {
         return (await request.buffer()).toString()

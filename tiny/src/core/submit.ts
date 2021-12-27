@@ -40,19 +40,7 @@ export function initContext(
       if (request.json !== undefined) {
         body = JSON.stringify(request.json)
       }
-      let url = request.path
-      if (request.origin) {
-        url = new URL(url, request.origin).toString()
-      }
-      if (request.params) {
-        const params = new URLSearchParams(
-          request.params
-        ).toString()
-        if (params) {
-          url = `${url}?${params}`
-        }
-      }
-      const response = await window.fetch(url, {
+      const response = await window.fetch(getUrl(request), {
         method: request.method,
         headers: request.headers,
         body: body,
@@ -83,4 +71,20 @@ export function initContext(
       }
     },
   }
+}
+
+export function getUrl(request: Request): string {
+  let url = request.path
+  if (request.origin) {
+    url = new URL(url, request.origin).toString()
+  }
+  if (request.params) {
+    const params = new URLSearchParams(
+      request.params
+    ).toString()
+    if (params) {
+      url = `${url}?${params}`
+    }
+  }
+  return url
 }

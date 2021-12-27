@@ -9,6 +9,13 @@ export type Validator<
   check: (input: typeFest.JsonValue, path?: Path) => Value
 }
 
+export type StringValidator<
+  Value extends Record<string, string> = Record<
+    string,
+    string
+  >
+> = Validator<Value>
+
 export type Path = undefined | (() => (string | number)[])
 
 export class PayloadError extends Error {
