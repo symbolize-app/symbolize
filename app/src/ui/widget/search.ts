@@ -53,19 +53,18 @@ export const query = widget.define<
 
   async function query(event: Event) {
     event.preventDefault()
-    const okResponseData =
-      await appSubmit.retryGetJsonSubmit(
-        ctx,
-        'execute search',
-        appEndpointSearch.query,
-        {
-          params: {
-            language: appLanguage.Language.english,
-            query: queryInput.value,
-          },
-        }
-      )
-    const { results } = okResponseData
+    const okResponseData = await appSubmit.retrySubmit(
+      ctx,
+      'execute search',
+      appEndpointSearch.query,
+      {
+        params: {
+          language: appLanguage.Language.english,
+          query: queryInput.value,
+        },
+      }
+    )
+    const { results } = okResponseData.json
     resultsRange.content = results.length
       ? results.map((result) =>
           div(ctx, {

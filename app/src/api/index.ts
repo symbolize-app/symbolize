@@ -26,7 +26,7 @@ const index = route.define(['GET'], /^\/$/, () => {
     headers: {
       'content-type': 'text/html',
     },
-    body: fs.createReadStream('build/browser/index.html'),
+    stream: fs.createReadStream('build/browser/index.html'),
   }
 })
 
@@ -44,7 +44,7 @@ const ssr = route.define(['GET'], /^\/ssr$/, () => {
     headers: {
       'content-type': 'text/html',
     },
-    body: dom.serialize(),
+    text: dom.serialize(),
   }
 })
 
@@ -52,7 +52,6 @@ const notFound = route.define(undefined, /.*/, () => {
   return {
     status: 404,
     headers: {},
-    body: '',
   }
 })
 
@@ -65,7 +64,7 @@ const js = route.define(
       headers: {
         'content-type': 'application/javascript',
       },
-      body: fs.createReadStream(
+      stream: fs.createReadStream(
         `build/browser/js/${request.match.path}`
       ),
     }

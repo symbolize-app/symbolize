@@ -1,81 +1,83 @@
 import type * as endpoint from '@tiny/core/endpoint.ts'
 import * as errorModule from '@tiny/core/error.ts'
 import type * as payload from '@tiny/core/payload.ts'
-import type * as submit from '@tiny/core/submit.ts'
+import * as submit from '@tiny/core/submit.ts'
 import * as time from '@tiny/core/time.ts'
 import ms from 'ms'
+import type * as typeFest from 'type-fest'
 
-export function retryGetJsonSubmit<
-  Endpoint extends endpoint.GetEndpoint<{
-    requestParams: payload.Validator<Record<string, string>>
-    okResponseJson: payload.Validator
-  }>
+export function retrySubmit<
+  Endpoint extends endpoint.BaseEndpoint
 >(
   ctx: errorModule.Context & submit.Context,
   description: string,
   endpoint: Endpoint,
-  request: Pick<submit.Request, 'origin' | 'headers'> & {
-    params: payload.Payload<Endpoint['requestParams']>
-  }
-): Promise<payload.Payload<Endpoint['okResponseJson']>> {
-  return retryBaseSubmit(ctx, description, endpoint, {
-    origin: request.origin,
-    path: endpoint.path,
-    params: endpoint.requestParams.check(request.params),
-    method: endpoint.method,
-    headers: request.headers,
-  })
-}
-
-export function retryConflictPostSubmit<
-  Endpoint extends endpoint.PostEndpoint<{
-    requestJson: payload.Validator
-    okResponseJson: payload.Validator
-    conflictResponseJson: payload.ConflictValidator
-  }>
->(
-  ctx: errorModule.Context & submit.Context,
-  description: string,
-  endpoint: Endpoint,
-  request: Pick<submit.Request, 'origin' | 'headers'> & {
-    body: payload.Payload<Endpoint['requestJson']>
-  }
-): Promise<payload.Payload<Endpoint['okResponseJson']>> {
-  return retryConflictSubmit(ctx, description, endpoint, {
-    origin: request.origin,
-    path: endpoint.path,
-    method: endpoint.method,
-    headers: {
-      'content-type': 'application/json',
-      ...request.headers,
-    },
-    json: endpoint.requestJson.check(request.body),
-  })
-}
-
-async function retryBaseSubmit<
-  Endpoint extends {
-    okResponseJson: payload.Validator
-  }
->(
-  ctx: errorModule.Context & submit.Context,
-  description: string,
-  endpoint: Endpoint,
-  request: submit.Request,
-  onResponse?: (response: submit.Response) => Promise<void>,
-  onError?: (error: unknown) => void
-): Promise<payload.Payload<Endpoint['okResponseJson']>> {
-  return await errorModule.retry(
+  request: Pick<submit.Request, 'origin' | 'headers'> &
+    (Endpoint extends endpoint.RequestParamsEndpoint
+      ? {
+          params: payload.Payload<Endpoint['requestParams']>
+        }
+      : { params?: never }) &
+    (Endpoint extends endpoint.RequestStreamEndpoint
+      ? {
+          stream: ReadableStream
+        }
+      : { stream?: never }) &
+    (Endpoint extends endpoint.RequestJsonEndpoint
+      ? {
+          json: payload.Payload<Endpoint['requestJson']>
+        }
+      : { json?: never })
+): Promise<
+  (Endpoint extends endpoint.OkResponseStreamEndpoint
+    ? {
+        stream: ReadableStream
+      }
+    : { stream?: never }) &
+    (Endpoint extends endpoint.OkResponseJsonEndpoint
+      ? {
+          json: payload.Payload<Endpoint['okResponseJson']>
+        }
+      : { json?: never })
+> {
+  const checkedRequest = createRequest(endpoint, request)
+  return errorModule.retry(
     ctx,
     async () => {
-      const response = await ctx.submit(request)
-      if (onResponse) {
-        await onResponse(response)
+      const response = await ctx.submit(checkedRequest)
+      if (endpoint.conflictResponseJson) {
+        if (response.status === 409) {
+          const conflictResponseData =
+            endpoint.conflictResponseJson.check(
+              await response.json()
+            )
+          throw new endpoint.conflictResponseJson.error(
+            conflictResponseData.conflict as never
+          )
+        }
       }
       if (response.status === 200) {
-        return endpoint.okResponseJson.check(
-          await response.json()
-        ) as payload.Payload<Endpoint['okResponseJson']>
+        return {
+          ...(endpoint.okResponseStream !== undefined && {
+            stream: response.stream(),
+          }),
+          ...(endpoint.okResponseJson !== undefined && {
+            json: endpoint.okResponseJson.check(
+              await response.json()
+            ),
+          }),
+        } as (Endpoint extends endpoint.OkResponseStreamEndpoint
+          ? {
+              stream: ReadableStream
+            }
+          : { stream?: never }) &
+          (Endpoint extends endpoint.OkResponseJsonEndpoint
+            ? {
+                json: payload.Payload<
+                  Endpoint['okResponseJson']
+                >
+              }
+            : { json?: never })
       } else {
         throw new Error(
           `Unexpected status ${response.status} response during ${description}`
@@ -89,8 +91,13 @@ async function retryBaseSubmit<
       }),
       windowMs: time.interval({ seconds: 30 }),
       onError(error, attempt, nextDelayMs) {
-        if (onError) {
-          onError(error)
+        if (endpoint.conflictResponseJson) {
+          if (
+            error instanceof
+            endpoint.conflictResponseJson.error
+          ) {
+            throw error
+          }
         }
         console.error(
           `Retrying ${description} submit (attempt ${attempt}, delay ${ms(
@@ -103,39 +110,73 @@ async function retryBaseSubmit<
   )
 }
 
-function retryConflictSubmit<
-  Endpoint extends {
-    okResponseJson: payload.Validator
-    conflictResponseJson: payload.ConflictValidator
-  }
+export function getUrl<
+  Endpoint extends endpoint.BaseEndpoint
 >(
-  ctx: errorModule.Context & submit.Context,
-  description: string,
   endpoint: Endpoint,
-  request: submit.Request
-): Promise<payload.Payload<Endpoint['okResponseJson']>> {
-  return retryBaseSubmit(
-    ctx,
-    description,
-    endpoint,
-    request,
-    async (response) => {
-      if (response.status === 409) {
-        const conflictResponseData =
-          endpoint.conflictResponseJson.check(
-            await response.json()
-          )
-        throw new endpoint.conflictResponseJson.error(
-          conflictResponseData.conflict as never
-        )
-      }
+  request: Pick<submit.Request, 'origin' | 'headers'> &
+    (Endpoint extends endpoint.RequestParamsEndpoint
+      ? {
+          params: payload.Payload<Endpoint['requestParams']>
+        }
+      : { params?: never }) &
+    (Endpoint extends endpoint.RequestStreamEndpoint
+      ? {
+          stream: ReadableStream
+        }
+      : { stream?: never }) &
+    (Endpoint extends endpoint.RequestJsonEndpoint
+      ? {
+          json: payload.Payload<Endpoint['requestJson']>
+        }
+      : { json?: never })
+): string {
+  return submit.getUrl(createRequest(endpoint, request))
+}
+
+export function createRequest<
+  Endpoint extends endpoint.BaseEndpoint
+>(
+  endpoint: Endpoint,
+  request: Pick<submit.Request, 'origin' | 'headers'> &
+    (Endpoint extends endpoint.RequestParamsEndpoint
+      ? {
+          params: payload.Payload<Endpoint['requestParams']>
+        }
+      : { params?: never }) &
+    (Endpoint extends endpoint.RequestStreamEndpoint
+      ? {
+          stream: ReadableStream
+        }
+      : { stream?: never }) &
+    (Endpoint extends endpoint.RequestJsonEndpoint
+      ? {
+          json: payload.Payload<Endpoint['requestJson']>
+        }
+      : { json?: never })
+): submit.Request {
+  return {
+    ...(request.origin !== undefined && {origin: request.origin}),
+    path: endpoint.path,
+    method: endpoint.method,
+    headers: {
+      ...(endpoint.requestJson !== undefined && {
+        ['content-type']: 'application/json',
+      }),
+      ...request.headers,
     },
-    (error) => {
-      if (
-        error instanceof endpoint.conflictResponseJson.error
-      ) {
-        throw error
-      }
-    }
-  )
+    ...(endpoint.requestParams !== undefined && {
+      params: endpoint.requestParams.check(
+        request.params as unknown as Record<string, string>
+      ),
+    }),
+    ...(endpoint.requestStream !== undefined && {
+      stream: request.stream as unknown as ReadableStream,
+    }),
+    ...(endpoint.requestJson !== undefined && {
+      json: endpoint.requestJson.check(
+        request.json as unknown as typeFest.JsonValue
+      ),
+    }),
+  }
 }
