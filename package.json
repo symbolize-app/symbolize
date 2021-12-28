@@ -115,7 +115,10 @@
       ],
       "import/extensions": [
         "warn",
-        "always"
+        "always",
+        {
+          "ignorePackages": true
+        }
       ],
       "import/first": "warn",
       "import/newline-after-import": "warn",

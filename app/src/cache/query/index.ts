@@ -20,6 +20,7 @@ export function initContext(): Context {
   client.on('end', () => {
     console.log(chalk.magenta(`cache client disconnected`))
   })
+  client.connect().catch(console.error)
   return {
     cache: {
       query<Params extends unknown[], Result>(

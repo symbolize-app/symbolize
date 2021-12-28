@@ -27,9 +27,12 @@ export type Context = {
   submit(request: Request): Promise<Response>
 }
 
-export function initContext(
-  window: Pick<Window, 'fetch'>
-): Context {
+export function initContext(window: {
+  fetch(
+    input: Parameters<Window['fetch']>['0'] & string,
+    init?: Parameters<Window['fetch']>['1']
+  ): ReturnType<Window['fetch']>
+}): Context {
   return {
     async submit(request) {
       let body =
