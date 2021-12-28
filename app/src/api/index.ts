@@ -18,6 +18,7 @@ import * as fs from 'fs'
 import * as http from 'http'
 import jsdom from 'jsdom'
 import type * as net from 'net'
+import * as stream from 'node:stream'
 import urlModule from 'url'
 
 const index = route.define(['GET'], /^\/$/, () => {
@@ -26,7 +27,9 @@ const index = route.define(['GET'], /^\/$/, () => {
     headers: {
       'content-type': 'text/html',
     },
-    stream: fs.createReadStream('build/browser/index.html'),
+    stream: stream.Readable.toWeb(
+      fs.createReadStream('build/browser/index.html')
+    ),
   }
 })
 
@@ -64,8 +67,10 @@ const js = route.define(
       headers: {
         'content-type': 'application/javascript',
       },
-      stream: fs.createReadStream(
-        `build/browser/js/${request.match.path}`
+      stream: stream.Readable.toWeb(
+        fs.createReadStream(
+          `build/browser/js/${request.match.path}`
+        )
       ),
     }
   }

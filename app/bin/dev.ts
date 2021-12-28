@@ -9,6 +9,7 @@ import * as http from 'http'
 import HttpProxy from 'http-proxy'
 import debounce from 'lodash-es/debounce.js'
 import type * as net from 'net'
+import * as stream from 'node:stream'
 import urlModule from 'url'
 import WebSocket from 'ws'
 
@@ -36,7 +37,9 @@ const index = route.define(['GET'], /^\/$/, () => {
     headers: {
       'content-type': 'text/html',
     },
-    stream: fs.createReadStream('app/public/index.html'),
+    stream: stream.Readable.toWeb(
+      fs.createReadStream('app/public/index.html')
+    ),
   }
 })
 

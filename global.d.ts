@@ -25,6 +25,23 @@ declare module 'fast-mersenne-twister' {
   }
 }
 
+declare module 'stream' {
+  export namespace Readable {
+    function toWeb(
+      streamReadable: NodeJS.ReadableStream
+    ): ReadableStream
+    function fromWeb(
+      readableStream: ReadableStream,
+      options?: {
+        encoding: string
+        highWaterMark: number
+        objectMode: boolean
+        signal: AbortSignal
+      }
+    ): NodeJS.ReadableStream
+  }
+}
+
 interface ImportMeta {
   env: {
     [key: string]: string

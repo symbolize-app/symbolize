@@ -1,6 +1,7 @@
 import type * as endpoint from '@tiny/core/endpoint.ts'
 import * as formData from 'formdata-polyfill/esm.min.js'
 import type * as http from 'http'
+import * as stream from 'node:stream'
 import * as nodeFetch from 'node-fetch'
 import * as streamPromises from 'stream/promises'
 import type * as typeFest from 'type-fest'
@@ -12,7 +13,7 @@ export type Request = {
   params: Record<string, string>
   method: string
   headers: Record<string, string>
-  stream(): NodeJS.ReadableStream
+  stream(): ReadableStream
   buffer(): Promise<ArrayBuffer>
   text(): Promise<string>
   form(): Promise<FormData>
@@ -23,7 +24,7 @@ export type Response = typeFest.Promisable<
   | {
       status: number
       headers?: Record<string, string>
-      stream?: typeFest.Promisable<NodeJS.ReadableStream>
+      stream?: typeFest.Promisable<ReadableStream>
       buffer?: typeFest.Promisable<ArrayBuffer>
       text?: typeFest.Promisable<string>
       form?: typeFest.Promisable<FormData>
@@ -122,7 +123,7 @@ async function handleRequest<Context>(
         ) as [string, string][]
       ),
       stream() {
-        return req
+        return stream.Readable.toWeb(req)
       },
       async buffer() {
         return await new nodeFetch.BodyMixin(
@@ -166,7 +167,9 @@ async function handleRequest<Context>(
       )
       if (headResponse.stream !== undefined) {
         await streamPromises.pipeline(
-          await Promise.resolve(headResponse.stream),
+          stream.Readable.fromWeb(
+            await Promise.resolve(headResponse.stream)
+          ),
           res
         )
       } else if (headResponse.buffer !== undefined) {
