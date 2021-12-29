@@ -2,9 +2,13 @@ import type * as endpoint from '@tiny/core/endpoint.ts'
 import * as formData from 'formdata-polyfill/esm.min.js'
 import type * as http from 'http'
 import * as stream from 'node:stream'
-import * as nodeFetch from 'node-fetch'
+import nodeFetchBody from 'node-fetch/src/body.js'
 import * as streamPromises from 'stream/promises'
 import type * as typeFest from 'type-fest'
+
+export type Context = {
+  maxRequestNonStreamedBytes: number
+}
 
 export type Request = {
   origin: string
@@ -49,29 +53,29 @@ export class ResponseError extends Error {
   }
 }
 
-export type Handler<Context> = (
-  ctx: Context,
+export type Handler<CustomContext> = (
+  ctx: CustomContext,
   request: Request
 ) => Response
 
-export type Route<Context> = {
+export type Route<CustomContext> = {
   methods: string[] | undefined
   match: string | RegExp
-  handler: Handler<Context>
+  handler: Handler<CustomContext>
 }
 
-export function define<Context = unknown>(
+export function define<CustomContext = unknown>(
   methods: string[] | undefined,
   match: string | RegExp,
-  handler: Handler<Context>
-): Route<Context> {
+  handler: Handler<CustomContext>
+): Route<CustomContext> {
   return { methods, match, handler }
 }
 
-export function defineEndpoint<Context = unknown>(
+export function defineEndpoint<CustomContext = unknown>(
   endpoint: endpoint.BaseEndpoint,
-  handler: Handler<Context>
-): Route<Context> {
+  handler: Handler<CustomContext>
+): Route<CustomContext> {
   return {
     methods: [endpoint.method],
     match: endpoint.path,
@@ -79,18 +83,18 @@ export function defineEndpoint<Context = unknown>(
   }
 }
 
-export function handle<Context>(
-  ctx: Context,
-  routes: Route<Context>[]
+export function handle<CustomContext>(
+  ctx: CustomContext & Context,
+  routes: Route<CustomContext>[]
 ): http.RequestListener {
   return (req, res) => {
     void handleRequest(ctx, routes, req, res)
   }
 }
 
-async function handleRequest<Context>(
-  ctx: Context,
-  routes: Route<Context>[],
+async function handleRequest<CustomContext>(
+  ctx: CustomContext & Context,
+  routes: Route<CustomContext>[],
   req: http.IncomingMessage,
   res: http.ServerResponse
 ): Promise<void> {
@@ -109,6 +113,20 @@ async function handleRequest<Context>(
       req.url,
       `http://${req.headers.host || 'localhost'}`
     )
+    const checkContentLength = () => {
+      if (
+        !(
+          Number.parseInt(
+            req.headers['content-length'] ?? ''
+          ) <= ctx.maxRequestNonStreamedBytes
+        )
+      ) {
+        throw new ResponseError({
+          status: 400,
+          text: `invalid content length (max ${ctx.maxRequestNonStreamedBytes} bytes)`,
+        })
+      }
+    }
     const request: Request = {
       origin: url.origin,
       path: url.pathname,
@@ -126,25 +144,22 @@ async function handleRequest<Context>(
         return stream.Readable.toWeb(req)
       },
       async buffer() {
-        return await new nodeFetch.BodyMixin(
-          req
-        ).arrayBuffer()
+        checkContentLength()
+        return await new nodeFetchBody(req).arrayBuffer()
       },
       async text() {
-        return (await request.buffer()).toString()
+        checkContentLength()
+        return await new nodeFetchBody(req).text()
       },
       async form() {
-        return await new nodeFetch.BodyMixin(req).formData()
+        checkContentLength()
+        return await new nodeFetchBody(req).formData()
       },
       async json() {
-        const result: unknown = JSON.parse(
-          await request.text()
-        )
-        if (typeof result === 'object' && result !== null) {
-          return result
-        } else {
-          throw Error('Invalid type')
-        }
+        checkContentLength()
+        return (await new nodeFetchBody(
+          req
+        ).json()) as typeFest.JsonValue
       },
     }
     const response = match(ctx, request, routes)

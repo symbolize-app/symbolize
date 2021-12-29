@@ -6,6 +6,12 @@ import * as dbQuery from '@tiny/db/query.ts'
 import ms from 'ms'
 import type * as typeFest from 'type-fest'
 
+export function initContext(): route.Context {
+  return {
+    maxRequestNonStreamedBytes: 4 * 1024,
+  }
+}
+
 export function checkRequestParams<
   Value extends Record<string, string>
 >(
