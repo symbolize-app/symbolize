@@ -1,3 +1,4 @@
+import * as appRoute from '@fe/api/route/index.ts'
 import * as appBuild from '@fe-bin/build.ts'
 import * as route from '@tiny/api/route.ts'
 import * as concurrency from '@tiny/core/concurrency.ts'
@@ -19,7 +20,7 @@ type Context = {
   sourceTree: SourceTree
   proxy: HttpProxy
   server: Server
-}
+} & route.Context
 
 type SourceTree = Record<
   string,
@@ -179,6 +180,7 @@ async function main(): Promise<void> {
     sourceTree: buildDev(entryPoint),
     proxy,
     server: createServer(),
+    ...appRoute.initContext(),
   }
   const httpServer = http.createServer(
     route.handle(ctx, [index, js, api, notFound])
