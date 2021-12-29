@@ -1,4 +1,5 @@
 import * as appFts from '@fe/api/fts.ts'
+import * as appRoute from '@fe/api/route/index.ts'
 import * as appRouteMember from '@fe/api/route/member.ts'
 import * as appRouteMessage from '@fe/api/route/message.ts'
 import * as appRouteSearch from '@fe/api/route/search.ts'
@@ -7,11 +8,11 @@ import * as appCacheQuery from '@fe/cache/query/index.ts'
 import * as appDbQuery from '@fe/db/query/index.ts'
 import * as appWidgetButton from '@fe/ui/widget/button.ts'
 import * as route from '@tiny/api/route.ts'
-import type * as errorModule from '@tiny/core/error.ts'
 import * as random from '@tiny/core/random.ts'
 import * as submitNode from '@tiny/core/submit.node.ts'
 import type * as submit from '@tiny/core/submit.ts'
 import * as timeNode from '@tiny/core/time.node.ts'
+import type * as time from '@tiny/core/time.ts'
 import * as widget from '@tiny/ui/widget.ts'
 import chalk from 'chalk'
 import * as fs from 'fs'
@@ -77,12 +78,15 @@ const js = route.define(
 )
 
 function main(): void {
-  const ctx: errorModule.Context &
+  const ctx: route.Context &
+    random.Context &
+    time.Context &
     appCacheQuery.Context &
     appDbQuery.ReadContext &
     appDbQuery.WriteContext &
     submit.Context &
     appFts.Context = {
+    ...appRoute.initContext(),
     ...random.initContext(),
     ...timeNode.initContext(),
     ...appCacheQuery.initContext(),

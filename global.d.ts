@@ -42,6 +42,13 @@ declare module 'stream' {
   }
 }
 
+declare module 'node-fetch/src/body.js' {
+  import * as nodeFetch from 'node-fetch'
+
+  // eslint-disable-next-line import/no-default-export
+  export default nodeFetch.BodyMixin
+}
+
 interface ImportMeta {
   env: {
     [key: string]: string
