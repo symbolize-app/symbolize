@@ -14,6 +14,7 @@ export function mockReqeuest(
       'content-type': 'application/json',
     },
     stream: test.mock([]),
+    blob: test.mock([]),
     buffer: test.mock([]),
     text: test.mock([]),
     form: test.mock([]),

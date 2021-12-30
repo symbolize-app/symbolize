@@ -1,9 +1,9 @@
 import * as crypto from '@tiny/core/crypto.node.ts'
 import esbuild from 'esbuild'
-import * as fsPromises from 'fs/promises'
-import module from 'module'
-import * as pathModule from 'path'
-import * as urlModule from 'url'
+import * as fsPromises from 'node:fs/promises'
+import module from 'node:module'
+import * as pathModule from 'node:path'
+import * as urlModule from 'node:url'
 
 async function main(): Promise<void> {
   await fsPromises.rm('build', {

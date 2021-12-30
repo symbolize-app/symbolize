@@ -1,5 +1,6 @@
 import * as appMessage from '@fe/core/message.ts'
 import * as appWidgetButton from '@fe/ui/widget/button.ts'
+import * as appWidgetFile from '@fe/ui/widget/file.ts'
 import * as appWidgetMember from '@fe/ui/widget/member.ts'
 import * as appWidgetSearch from '@fe/ui/widget/search.ts'
 import * as appWidgetTopic from '@fe/ui/widget/topic.ts'
@@ -121,6 +122,7 @@ async function main(): Promise<void> {
       appWidgetMember.create(ctx, {}),
       appWidgetTopic.list(ctx, {}),
       appWidgetSearch.query(ctx, {}),
+      appWidgetFile.query(ctx, {}),
     ],
   })
 

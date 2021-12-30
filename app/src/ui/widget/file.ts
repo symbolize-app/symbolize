@@ -29,7 +29,6 @@ export const query = widget.define<
   submit.Context & errorModule.Context & random.Context
 >((ctx) => {
   const writeInput = input(ctx, {
-    name: 'query',
     value: '',
     type: 'file',
     required: true,
@@ -73,9 +72,9 @@ export const query = widget.define<
         params: {
           requestId: random.requestIdHex(ctx),
         },
-        stream:
+        blob:
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          writeInput.files![0].stream() as unknown as ReadableStream,
+          writeInput.files![0],
       }
     )
     const { id } = okResponseData.json

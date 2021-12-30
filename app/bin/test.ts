@@ -1,6 +1,6 @@
 import * as appApiTest from '@fe/api/index.test.node.ts'
 import * as timeNode from '@tiny/core/time.node.ts'
-import * as urlModule from 'url'
+import * as urlModule from 'node:url'
 
 if (
   process.argv[1] ===

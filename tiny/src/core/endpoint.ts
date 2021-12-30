@@ -4,8 +4,8 @@ export type RequestParamsEndpoint = {
   requestParams: payload.StringValidator
 }
 
-export type RequestStreamEndpoint = {
-  requestStream: true
+export type RequestBytesEndpoint = {
+  requestBytes: true
 }
 
 export type RequestJsonEndpoint = {
@@ -27,7 +27,7 @@ export type ConflictResponseJsonEndpoint = {
 type PartialChecks = Partial<
   RequestParamsEndpoint &
     RequestJsonEndpoint &
-    RequestStreamEndpoint &
+    RequestBytesEndpoint &
     OkResponseStreamEndpoint &
     OkResponseJsonEndpoint &
     ConflictResponseJsonEndpoint
