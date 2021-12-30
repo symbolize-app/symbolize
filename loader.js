@@ -1,10 +1,10 @@
 /* eslint-env node */
 /* eslint-disable @typescript-eslint/ban-ts-comment,@typescript-eslint/explicit-module-boundary-types,@typescript-eslint/no-unsafe-return */
 import esbuild from 'esbuild'
-import * as fsPromises from 'fs/promises'
-import * as pathModule from 'path'
+import * as fsPromises from 'node:fs/promises'
+import * as pathModule from 'node:path'
+import * as urlModule from 'node:url'
 import picomatch from 'picomatch'
-import * as urlModule from 'url'
 
 import tsconfig from './tsconfig.json' assert { type: 'json' }
 

@@ -15,12 +15,12 @@ import * as timeNode from '@tiny/core/time.node.ts'
 import type * as time from '@tiny/core/time.ts'
 import * as widget from '@tiny/ui/widget.ts'
 import chalk from 'chalk'
-import * as fs from 'fs'
-import * as http from 'http'
 import jsdom from 'jsdom'
-import type * as net from 'net'
+import * as fs from 'node:fs'
+import * as http from 'node:http'
+import type * as net from 'node:net'
 import * as stream from 'node:stream'
-import urlModule from 'url'
+import * as urlModule from 'node:url'
 
 const index = route.define(['GET'], /^\/$/, () => {
   return {

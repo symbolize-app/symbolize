@@ -8,6 +8,7 @@ export function mockResponse(
     status: 200,
     headers: {},
     stream: test.mock([]),
+    blob: test.mock([]),
     buffer: test.mock([]),
     text: test.mock([]),
     form: test.mock([]),
