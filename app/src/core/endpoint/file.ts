@@ -9,7 +9,7 @@ export const write = endpoint.definePostEndpoint(
     requestParams: payload.object({
       requestId: appPayload.id,
     }),
-    requestStream: true,
+    requestBytes: true,
     okResponseJson: payload.object({
       id: appPayload.id,
     }),

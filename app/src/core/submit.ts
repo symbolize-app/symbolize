@@ -18,11 +18,13 @@ export function retrySubmit<
           params: payload.Payload<Endpoint['requestParams']>
         }
       : { params?: never }) &
-    (Endpoint extends endpoint.RequestStreamEndpoint
+    (Endpoint extends endpoint.RequestBytesEndpoint
       ? {
-          stream: ReadableStream
+          stream?: ReadableStream
+          blob?: Blob
+          buffer?: ArrayBuffer
         }
-      : { stream?: never }) &
+      : { stream?: never; blob?: never; buffer?: never }) &
     (Endpoint extends endpoint.RequestJsonEndpoint
       ? {
           json: payload.Payload<Endpoint['requestJson']>
@@ -120,11 +122,13 @@ export function getUrl<
           params: payload.Payload<Endpoint['requestParams']>
         }
       : { params?: never }) &
-    (Endpoint extends endpoint.RequestStreamEndpoint
+    (Endpoint extends endpoint.RequestBytesEndpoint
       ? {
-          stream: ReadableStream
+          stream?: ReadableStream
+          blob?: Blob
+          buffer?: ArrayBuffer
         }
-      : { stream?: never }) &
+      : { stream?: never; blob?: never; buffer?: never }) &
     (Endpoint extends endpoint.RequestJsonEndpoint
       ? {
           json: payload.Payload<Endpoint['requestJson']>
@@ -144,11 +148,13 @@ export function createRequest<
           params: payload.Payload<Endpoint['requestParams']>
         }
       : { params?: never }) &
-    (Endpoint extends endpoint.RequestStreamEndpoint
+    (Endpoint extends endpoint.RequestBytesEndpoint
       ? {
-          stream: ReadableStream
+          stream?: ReadableStream
+          blob?: Blob
+          buffer?: ArrayBuffer
         }
-      : { stream?: never }) &
+      : { stream?: never; blob?: never; buffer?: never }) &
     (Endpoint extends endpoint.RequestJsonEndpoint
       ? {
           json: payload.Payload<Endpoint['requestJson']>
@@ -172,8 +178,10 @@ export function createRequest<
         request.params as unknown as Record<string, string>
       ),
     }),
-    ...(endpoint.requestStream !== undefined && {
-      stream: request.stream as unknown as ReadableStream,
+    ...(endpoint.requestBytes !== undefined && {
+      stream: request.stream,
+      blob: request.blob,
+      buffer: request.buffer,
     }),
     ...(endpoint.requestJson !== undefined && {
       json: endpoint.requestJson.check(

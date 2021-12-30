@@ -8,6 +8,7 @@ export type Request = {
   headers?: Record<string, string>
   stream?: ReadableStream
   buffer?: ArrayBuffer
+  blob?: Blob
   text?: string
   form?: FormData
   json?: typeFest.JsonValue
@@ -18,6 +19,7 @@ export type Response = {
   headers: Record<string, string>
   stream(): ReadableStream
   buffer(): Promise<ArrayBuffer>
+  blob(): Promise<Blob>
   text(): Promise<string>
   form(): Promise<FormData>
   json(): Promise<typeFest.JsonValue>
@@ -29,7 +31,10 @@ export type Context = {
 
 export function initContext(window: {
   fetch(
-    input: Parameters<Window['fetch']>['0'] & string,
+    input: Exclude<
+      Parameters<Window['fetch']>['0'],
+      Request
+    >,
     init?: Parameters<Window['fetch']>['1']
   ): ReturnType<Window['fetch']>
 }): Context {
@@ -37,6 +42,7 @@ export function initContext(window: {
     async submit(request) {
       let body =
         request.stream ??
+        request.blob ??
         request.buffer ??
         request.text ??
         request.form
@@ -58,6 +64,9 @@ export function initContext(window: {
             throw new Error('No response stream')
           }
           return response.body
+        },
+        blob() {
+          return response.blob()
         },
         buffer() {
           return response.arrayBuffer()
