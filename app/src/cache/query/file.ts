@@ -1,16 +1,22 @@
 import * as cacheQuery from '@tiny/cache/query.ts'
 
-// The time to upload one chunk is calibrated to take about
-// three fast Redis commands, to balance throughput & latency
-export const chunkSizeBytes = 256 * 1024
+export const maxSizeBytes = 32 * 1024 * 1024
 
-// Pull and queue one extra chunk of data if waiting to write
-export const highWaterMarkBytes = chunkSizeBytes
+export const chunkSizeBytes = 64 * 1024
+
+export const maxPipelinedChunks = 2
+
+export const highWaterMarkBytes = chunkSizeBytes / 4
 
 export const getChunk = cacheQuery.define(
-  async (client, id: string, index: number) => {
+  async (
+    client,
+    id: string,
+    index: number
+  ): Promise<Buffer | undefined> => {
+    const key = `file:${id}:${index}`
     return await client.sendCommand<Buffer | undefined>(
-      ['HGET', `file:${id}`, `${index}`],
+      ['GET', key],
       undefined,
       true
     )
@@ -22,8 +28,20 @@ export const setChunk = cacheQuery.define(
     client,
     id: string,
     index: number,
-    chunk: Buffer
-  ) => {
-    await client.hSet(`file:${id}`, `${index}`, chunk)
+    size: number,
+    parts: Uint8Array[]
+  ): Promise<void> => {
+    const key = `file:${id}:${index}`
+    let transaction = client.multi()
+    let offset = size
+    for (const part of [...parts].reverse()) {
+      offset -= part.length
+      transaction = transaction.setRange(
+        key,
+        offset,
+        Buffer.from(part) as unknown as string
+      )
+    }
+    await transaction.exec()
   }
 )
