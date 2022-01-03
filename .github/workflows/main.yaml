@@ -90,9 +90,17 @@ jobs:
       - name: Test
         run: direnv exec . pnpm test
 
+      - name: Prune
+        if: github.ref == 'refs/heads/main'
+        run: pnpm prune --prod
+        env:
+          FLY_ACCESS_TOKEN: ${{ secrets.FLY_ACCESS_TOKEN }}
+
       - name: Deploy
         if: github.ref == 'refs/heads/main'
-        run: fly deploy --build-arg NODE_OPTIONS="$(direnv exec . printenv NODE_OPTIONS_PRODUCTION)" --config app/fly.toml
+        run: |
+          echo TEST fly deploy --env NODE_OPTIONS="$(direnv exec . printenv NODE_OPTIONS_PRODUCTION)" --config app/fly.toml
+          fly deploy --env NODE_OPTIONS="$(direnv exec . printenv NODE_OPTIONS_PRODUCTION)" --config app/fly.toml
         env:
           FLY_ACCESS_TOKEN: ${{ secrets.FLY_ACCESS_TOKEN }}
 
