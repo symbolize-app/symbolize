@@ -44,6 +44,12 @@ jobs:
           sudo cp /tmp/cockroach-v21.2.0.linux-amd64/lib/libgeos.so /usr/local/lib/cockroach/
           sudo cp /tmp/cockroach-v21.2.0.linux-amd64/lib/libgeos_c.so /usr/local/lib/cockroach/
 
+      - name: Set up CockroachDB certificates
+        if: github.ref == 'refs/heads/main'
+        run: |
+          mkdir -p .crdb/certs
+          echo "${DATABASE_CA_CRT}" > .crdb/certs/cc-ca.crt
+
       - name: Set up direnv
         run: |
           curl -fsSL https://github.com/direnv/direnv/releases/latest/download/direnv.linux-amd64 | sudo tee /usr/local/bin/direnv > /dev/null
@@ -67,6 +73,9 @@ jobs:
           curl -fsSL https://pnpm.js.org/pnpm.js | node - add --global pnpm
           pnpm install --frozen-lockfile
 
+      - name: Build
+        run: direnv exec . pnpm build
+
       - name: Check formatting
         run: pnpm check-fmt
 
@@ -78,9 +87,6 @@ jobs:
 
       - name: Test
         run: direnv exec . pnpm test
-
-      - name: Build
-        run: direnv exec . pnpm build
 
       - name: Deploy
         if: github.ref == 'refs/heads/main'
@@ -102,6 +108,12 @@ jobs:
           curl -fsSL https://fly.io/install.sh | sh
           echo "$HOME/.fly/bin" >> $GITHUB_PATH
 
+      - name: Set up CockroachDB certificates
+        if: github.ref == 'refs/heads/main'
+        run: |
+          mkdir -p .crdb/certs
+          echo "${DATABASE_CA_CRT}" > .crdb/certs/cc-ca.crt
+
       - name: Cache Rust toolchain
         uses: actions/cache@v2
         with:
@@ -117,27 +129,17 @@ jobs:
       - name: Set up Cargo
         run: cargo fetch --locked
 
+      - name: Build
+        run: cargo build --release
+
       - name: Check formatting
         run: cargo fmt --all -- --check
 
       - name: Check lint
-        run: cargo check-clippy
+        run: cargo check-clippy-release
 
-      - name: Check rustc
-        if: github.ref != 'refs/heads/main'
-        run: cargo check
-
-      - name: Build
-        if: github.ref == 'refs/heads/main'
-        run: cargo build --release
-
-      - name: Test (release)
-        if: github.ref == 'refs/heads/main'
+      - name: Test
         run: cargo test --release
-
-      - name: Test (debug)
-        if: github.ref != 'refs/heads/main'
-        run: cargo test
 
       - name: Deploy
         if: github.ref == 'refs/heads/main'
@@ -162,6 +164,12 @@ jobs:
           echo > .env
           direnv allow
 
+      - name: Set up CockroachDB certificates
+        if: github.ref == 'refs/heads/main'
+        run: |
+          mkdir -p .crdb/certs
+          echo "${DATABASE_CA_CRT}" > .crdb/certs/cc-ca.crt
+
       - name: Set up Dbmate
         if: github.ref == 'refs/heads/main'
         run: |
@@ -170,10 +178,7 @@ jobs:
 
       - name: Migrate DB
         if: github.ref == 'refs/heads/main'
-        run: |
-          mkdir -p .crdb/certs
-          echo "${DATABASE_CA_CRT}" > .crdb/certs/cc-ca.crt
-          direnv exec . dbmate --url ${DATABASE_URL_ADMIN} migrate
+        run: direnv exec . dbmate --url ${DATABASE_URL_ADMIN} migrate
         env:
           DATABASE_CA_CRT: ${{ secrets.DATABASE_CA_CRT }}
           DATABASE_URL_ADMIN: ${{ secrets.DATABASE_URL_ADMIN }}
