@@ -44,12 +44,6 @@ jobs:
           sudo cp /tmp/cockroach-v21.2.0.linux-amd64/lib/libgeos.so /usr/local/lib/cockroach/
           sudo cp /tmp/cockroach-v21.2.0.linux-amd64/lib/libgeos_c.so /usr/local/lib/cockroach/
 
-      - name: Set up CockroachDB certificates
-        if: github.ref == 'refs/heads/main'
-        run: |
-          mkdir -p .crdb/certs
-          echo "${DATABASE_CA_CRT}" > .crdb/certs/cc-ca.crt
-
       - name: Set up direnv
         run: |
           curl -fsSL https://github.com/direnv/direnv/releases/latest/download/direnv.linux-amd64 | sudo tee /usr/local/bin/direnv > /dev/null
@@ -90,7 +84,10 @@ jobs:
 
       - name: Deploy
         if: github.ref == 'refs/heads/main'
-        run: fly deploy --build-arg NODE_OPTIONS="$(direnv exec . printenv NODE_OPTIONS_PRODUCTION)" --config app/fly.toml
+        run: |
+          mkdir -p .crdb/certs
+          echo "${DATABASE_CA_CRT}" > .crdb/certs/cc-ca.crt
+          fly deploy --build-arg NODE_OPTIONS="$(direnv exec . printenv NODE_OPTIONS_PRODUCTION)" --config app/fly.toml
         env:
           FLY_ACCESS_TOKEN: ${{ secrets.FLY_ACCESS_TOKEN }}
 
@@ -107,12 +104,6 @@ jobs:
         run: |
           curl -fsSL https://fly.io/install.sh | sh
           echo "$HOME/.fly/bin" >> $GITHUB_PATH
-
-      - name: Set up CockroachDB certificates
-        if: github.ref == 'refs/heads/main'
-        run: |
-          mkdir -p .crdb/certs
-          echo "${DATABASE_CA_CRT}" > .crdb/certs/cc-ca.crt
 
       - name: Cache Rust toolchain
         uses: actions/cache@v2
@@ -143,7 +134,10 @@ jobs:
 
       - name: Deploy
         if: github.ref == 'refs/heads/main'
-        run: fly deploy --config fts/fly.toml
+        run: |
+          mkdir -p .crdb/certs
+          echo "${DATABASE_CA_CRT}" > .crdb/certs/cc-ca.crt
+          fly deploy --config fts/fly.toml
         env:
           FLY_ACCESS_TOKEN: ${{ secrets.FLY_ACCESS_TOKEN }}
 
@@ -164,12 +158,6 @@ jobs:
           echo > .env
           direnv allow
 
-      - name: Set up CockroachDB certificates
-        if: github.ref == 'refs/heads/main'
-        run: |
-          mkdir -p .crdb/certs
-          echo "${DATABASE_CA_CRT}" > .crdb/certs/cc-ca.crt
-
       - name: Set up Dbmate
         if: github.ref == 'refs/heads/main'
         run: |
@@ -178,7 +166,10 @@ jobs:
 
       - name: Migrate DB
         if: github.ref == 'refs/heads/main'
-        run: direnv exec . dbmate --url ${DATABASE_URL_ADMIN} migrate
+        run: |
+          mkdir -p .crdb/certs
+          echo "${DATABASE_CA_CRT}" > .crdb/certs/cc-ca.crt
+          direnv exec . dbmate --url ${DATABASE_URL_ADMIN} migrate
         env:
           DATABASE_CA_CRT: ${{ secrets.DATABASE_CA_CRT }}
           DATABASE_URL_ADMIN: ${{ secrets.DATABASE_URL_ADMIN }}
