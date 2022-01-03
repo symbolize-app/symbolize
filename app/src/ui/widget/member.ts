@@ -1,8 +1,7 @@
 import * as appEndpointMember from '@fe/core/endpoint/member.ts'
-import * as appSubmit from '@fe/core/submit.ts'
 import type * as errorModule from '@tiny/core/error.ts'
 import * as random from '@tiny/core/random.ts'
-import type * as submit from '@tiny/core/submit.ts'
+import * as submit from '@tiny/core/submit.ts'
 import * as widget from '@tiny/ui/widget.ts'
 
 const button = widget.html.button
@@ -39,17 +38,17 @@ export const create = widget.define<
       statusDiv,
     ],
     listen: {
-      submit,
+      submit: handleSubmit,
     },
   })
   return {
     body,
   }
 
-  async function submit(event: Event) {
+  async function handleSubmit(event: Event) {
     event.preventDefault()
     try {
-      const okResponseData = await appSubmit.retrySubmit(
+      const okResponseData = await submit.retrySubmit(
         ctx,
         'create member',
         appEndpointMember.create,
