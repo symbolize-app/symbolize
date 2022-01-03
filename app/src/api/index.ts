@@ -1,4 +1,5 @@
 import * as appFts from '@fe/api/fts.ts'
+import * as appRouteFile from '@fe/api/route/file.ts'
 import * as appRoute from '@fe/api/route/index.ts'
 import * as appRouteMember from '@fe/api/route/member.ts'
 import * as appRouteMessage from '@fe/api/route/message.ts'
@@ -99,6 +100,7 @@ function main(): void {
       index,
       ssr,
       js,
+      ...appRouteFile.routes,
       ...appRouteMember.routes,
       ...appRouteMessage.routes,
       ...appRouteSearch.routes,
