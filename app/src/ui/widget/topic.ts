@@ -1,8 +1,7 @@
 import * as appEndpointTopic from '@fe/core/endpoint/topic.ts'
-import * as appSubmit from '@fe/core/submit.ts'
 import type * as errorModule from '@tiny/core/error.ts'
 import * as random from '@tiny/core/random.ts'
-import type * as submit from '@tiny/core/submit.ts'
+import * as submit from '@tiny/core/submit.ts'
 import * as style from '@tiny/ui/style.ts'
 import * as widget from '@tiny/ui/widget.ts'
 
@@ -48,7 +47,7 @@ export const list = widget.define<
 
   async function load() {
     resetEditRange()
-    const okResponseData = await appSubmit.retrySubmit(
+    const okResponseData = await submit.retrySubmit(
       ctx,
       'create topic',
       appEndpointTopic.list,
@@ -146,7 +145,7 @@ const create = widget.define<
       status,
     ],
     listen: {
-      submit,
+      submit: handleSubmit,
     },
   })
   return {
@@ -160,10 +159,10 @@ const create = widget.define<
     listen.cancel?.()
   }
 
-  async function submit(event: Event) {
+  async function handleSubmit(event: Event) {
     event.preventDefault()
     try {
-      const okResponseData = await appSubmit.retrySubmit(
+      const okResponseData = await submit.retrySubmit(
         ctx,
         'create topic',
         appEndpointTopic.create,
@@ -237,7 +236,7 @@ const update = widget.define<
       status,
     ],
     listen: {
-      submit,
+      submit: handleSubmit,
     },
   })
   return {
@@ -257,13 +256,13 @@ const update = widget.define<
     listen.cancel?.()
   }
 
-  async function submit(event: Event) {
+  async function handleSubmit(event: Event) {
     event.preventDefault()
     if (!topic) {
       return
     }
     try {
-      const okResponseData = await appSubmit.retrySubmit(
+      const okResponseData = await submit.retrySubmit(
         ctx,
         'update topic',
         appEndpointTopic.update,

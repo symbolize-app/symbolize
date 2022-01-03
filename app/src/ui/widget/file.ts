@@ -1,8 +1,7 @@
 import * as appEndpointFile from '@fe/core/endpoint/file.ts'
-import * as appSubmit from '@fe/core/submit.ts'
 import type * as errorModule from '@tiny/core/error.ts'
 import * as random from '@tiny/core/random.ts'
-import type * as submit from '@tiny/core/submit.ts'
+import * as submit from '@tiny/core/submit.ts'
 import * as style from '@tiny/ui/style.ts'
 import * as widget from '@tiny/ui/widget.ts'
 
@@ -64,7 +63,7 @@ export const query = widget.define<
 
   async function write(event: Event) {
     event.preventDefault()
-    const okResponseData = await appSubmit.retrySubmit(
+    const okResponseData = await submit.retrySubmit(
       ctx,
       'execute search',
       appEndpointFile.write,
@@ -86,7 +85,7 @@ export const query = widget.define<
   }
 
   function read() {
-    readOutput.src = appSubmit.getUrl(
+    readOutput.src = submit.getEndpointUrl(
       appEndpointFile.read,
       {
         params: {
