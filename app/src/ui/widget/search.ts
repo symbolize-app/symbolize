@@ -1,9 +1,8 @@
 import * as appEndpointSearch from '@fe/core/endpoint/search.ts'
 import * as appLanguage from '@fe/core/language.ts'
-import * as appSubmit from '@fe/core/submit.ts'
 import type * as errorModule from '@tiny/core/error.ts'
 import type * as random from '@tiny/core/random.ts'
-import type * as submit from '@tiny/core/submit.ts'
+import * as submit from '@tiny/core/submit.ts'
 import * as style from '@tiny/ui/style.ts'
 import * as widget from '@tiny/ui/widget.ts'
 
@@ -53,7 +52,7 @@ export const query = widget.define<
 
   async function query(event: Event) {
     event.preventDefault()
-    const okResponseData = await appSubmit.retrySubmit(
+    const okResponseData = await submit.retrySubmit(
       ctx,
       'execute search',
       appEndpointSearch.query,

@@ -1,10 +1,9 @@
 import * as appFts from '@fe/api/fts.ts'
 import * as appRoute from '@fe/api/route/index.ts'
 import * as appEndpointSearch from '@fe/core/endpoint/search.ts'
-import * as appSubmit from '@fe/core/submit.ts'
 import * as route from '@tiny/api/route.ts'
 import type * as errorModule from '@tiny/core/error.ts'
-import type * as submit from '@tiny/core/submit.ts'
+import * as submit from '@tiny/core/submit.ts'
 
 export const query = route.defineEndpoint<
   errorModule.Context & submit.Context & appFts.Context
@@ -14,7 +13,7 @@ export const query = route.defineEndpoint<
     request
   )
   const { results } = (
-    await appSubmit.retrySubmit(
+    await submit.retrySubmit(
       ctx,
       'search query',
       appFts.queryEndpoint,
