@@ -1,4 +1,3 @@
-ARG NODE_OPTIONS
 FROM debian:stable-slim
 WORKDIR /app
 COPY .crdb/certs .crdb/certs
