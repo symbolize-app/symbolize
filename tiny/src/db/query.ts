@@ -1,3 +1,7 @@
+import * as errorModule from '@tiny/core/error.ts'
+import type * as payload from '@tiny/core/payload.ts'
+import * as time from '@tiny/core/time.ts'
+import ms from 'ms'
 import type * as typeFest from 'type-fest'
 
 const queryNameBase = 36
@@ -210,4 +214,107 @@ export function getUniqueViolationConstraintName(
   return uniqueViolationConstraintNamePattern.exec(
     error.message
   )?.[1]
+}
+
+export async function retryDbQuery<
+  Id,
+  Values extends SupportedType[],
+  Row extends Record<string, SupportedType>,
+  Transform
+>(
+  ctx: errorModule.Context,
+  database: Database<Id>,
+  description: string,
+  query: Query<Id, Values, Row, Transform>,
+  ...values: Values
+): Promise<Transform> {
+  return await retryDbBaseQuery(
+    ctx,
+    database,
+    description,
+    query,
+    undefined,
+    ...values
+  )
+}
+
+export async function retryDbConflictQuery<
+  Id,
+  Values extends SupportedType[],
+  Row extends Record<string, SupportedType>,
+  Transform,
+  ConflictResponse extends { conflict: string }
+>(
+  ctx: errorModule.Context,
+  database: Database<Id>,
+  description: string,
+  endpoint: {
+    conflictResponseJson: payload.ConflictValidator
+  },
+  conflictMap: Record<
+    string,
+    ConflictResponse['conflict'] | undefined
+  >,
+  query: Query<Id, Values, Row, Transform>,
+  ...values: Values
+): Promise<Transform> {
+  // TODO Put conflict map into query, merge with retry DB query, move to app/db
+  return await retryDbBaseQuery(
+    ctx,
+    database,
+    description,
+    query,
+    (error) => {
+      if (
+        isQueryError(error) &&
+        error.code === errorCode.uniqueViolation
+      ) {
+        const constraintName =
+          getUniqueViolationConstraintName(error)
+        const conflictField =
+          constraintName && conflictMap[constraintName]
+        if (conflictField) {
+          throw new endpoint.conflictResponseJson.error(
+            conflictField as never
+          )
+        }
+      }
+    },
+    ...values
+  )
+}
+
+async function retryDbBaseQuery<
+  Id,
+  Values extends SupportedType[],
+  Row extends Record<string, SupportedType>,
+  Transform
+>(
+  ctx: errorModule.Context,
+  database: Database<Id>,
+  description: string,
+  query: Query<Id, Values, Row, Transform>,
+  onError: ((error: unknown) => void) | undefined,
+  ...values: Values
+): Promise<Transform> {
+  return await errorModule.retry(
+    ctx,
+    () => database.query(query, ...values),
+    {
+      maxAttempts: 15,
+      minDelayMs: time.interval({ milliseconds: 10 }),
+      windowMs: time.interval({ seconds: 30 }),
+      onError(error, attempt, nextDelayMs) {
+        if (onError) {
+          onError(error)
+        }
+        console.error(
+          `Retrying ${description} query (attempt ${attempt}, delay ${ms(
+            nextDelayMs
+          )})`,
+          error
+        )
+      },
+    }
+  )
 }
