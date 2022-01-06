@@ -5,6 +5,7 @@ import * as appDbQueryTopic from '@fe/db/query/topic.ts'
 import * as route from '@tiny/api/route.ts'
 import * as crypto from '@tiny/core/crypto.node.ts'
 import type * as errorModule from '@tiny/core/error.ts'
+import * as dbQuery from '@tiny/db/query.ts'
 
 export const create = route.defineEndpoint<
   errorModule.Context & appDbQuery.WriteContext
@@ -18,20 +19,25 @@ export const create = route.defineEndpoint<
   )
   const memberId = Buffer.from(requestData.memberId, 'hex')
   const { title, slug, content } = requestData
-  await appRoute.retryDbConflictQuery(
-    ctx,
-    ctx.databaseApiWrite,
-    'topic create',
+  await appRoute.checkConflictQuery(
     appEndpointTopic.create,
-    {
-      ['primary']: 'slug',
-    },
-    appDbQueryTopic.create,
-    id,
-    memberId,
-    title,
-    slug,
-    content
+    async () => {
+      await dbQuery.retryDbConflictQuery(
+        ctx,
+        ctx.databaseApiWrite,
+        'topic create',
+        appEndpointTopic.create,
+        {
+          ['primary']: 'slug',
+        },
+        appDbQueryTopic.create,
+        id,
+        memberId,
+        title,
+        slug,
+        content
+      )
+    }
   )
   return appRoute.checkOkResponse(appEndpointTopic.create, {
     id: id.toString('hex'),
@@ -45,7 +51,7 @@ export const list = route.defineEndpoint<
     appEndpointTopic.list,
     request
   )
-  const results = await appRoute.retryDbQuery(
+  const results = await dbQuery.retryDbQuery(
     ctx,
     ctx.databaseApiRead,
     'topic list',
@@ -72,20 +78,25 @@ export const update = route.defineEndpoint<
   const id = Buffer.from(requestData.id, 'hex')
   const updatedOld = new Date(requestData.updatedOld)
   const { title, slug, content } = requestData
-  const result = await appRoute.retryDbConflictQuery(
-    ctx,
-    ctx.databaseApiWrite,
-    'topic update',
-    appEndpointTopic.update,
-    {
-      ['primary']: 'slug',
-    },
-    appDbQueryTopic.update,
-    id,
-    updatedOld,
-    title,
-    slug,
-    content
+  const result = await appRoute.checkConflictQuery(
+    appEndpointTopic.create,
+    async () => {
+      return await dbQuery.retryDbConflictQuery(
+        ctx,
+        ctx.databaseApiWrite,
+        'topic update',
+        appEndpointTopic.update,
+        {
+          ['primary']: 'slug',
+        },
+        appDbQueryTopic.update,
+        id,
+        updatedOld,
+        title,
+        slug,
+        content
+      )
+    }
   )
   if (result) {
     return appRoute.checkOkResponse(

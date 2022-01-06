@@ -5,6 +5,7 @@ import * as appDbQueryMember from '@fe/db/query/member.ts'
 import * as route from '@tiny/api/route.ts'
 import * as crypto from '@tiny/core/crypto.node.ts'
 import type * as errorModule from '@tiny/core/error.ts'
+import * as dbQuery from '@tiny/db/query.ts'
 
 export const create = route.defineEndpoint<
   errorModule.Context & appDbQuery.WriteContext
@@ -17,19 +18,24 @@ export const create = route.defineEndpoint<
     Buffer.from(requestData.requestId, 'hex')
   )
   const { email, handle } = requestData
-  await appRoute.retryDbConflictQuery(
-    ctx,
-    ctx.databaseApiWrite,
-    'member create',
+  await appRoute.checkConflictQuery(
     appEndpointMember.create,
-    {
-      ['member_email_key']: 'email',
-      ['member_handle_key']: 'handle',
-    },
-    appDbQueryMember.create,
-    id,
-    email,
-    handle
+    async () => {
+      await dbQuery.retryDbConflictQuery(
+        ctx,
+        ctx.databaseApiWrite,
+        'member create',
+        appEndpointMember.create,
+        {
+          ['member_email_key']: 'email',
+          ['member_handle_key']: 'handle',
+        },
+        appDbQueryMember.create,
+        id,
+        email,
+        handle
+      )
+    }
   )
   return appRoute.checkOkResponse(
     appEndpointMember.create,

@@ -1,9 +1,5 @@
 import * as route from '@tiny/api/route.ts'
-import * as errorModule from '@tiny/core/error.ts'
 import * as payload from '@tiny/core/payload.ts'
-import * as time from '@tiny/core/time.ts'
-import * as dbQuery from '@tiny/db/query.ts'
-import ms from 'ms'
 import type * as typeFest from 'type-fest'
 
 export function initContext(): route.Context {
@@ -89,112 +85,7 @@ function checkRequestBase<Value>(
   }
 }
 
-export async function retryDbQuery<
-  Id,
-  Values extends dbQuery.SupportedType[],
-  Row extends Record<string, dbQuery.SupportedType>,
-  Transform
->(
-  ctx: errorModule.Context,
-  database: dbQuery.Database<Id>,
-  description: string,
-  query: dbQuery.Query<Id, Values, Row, Transform>,
-  ...values: Values
-): Promise<Transform> {
-  return await retryDbBaseQuery(
-    ctx,
-    database,
-    description,
-    query,
-    undefined,
-    ...values
-  )
-}
-
-export async function retryDbConflictQuery<
-  Id,
-  Values extends dbQuery.SupportedType[],
-  Row extends Record<string, dbQuery.SupportedType>,
-  Transform,
-  ConflictResponse extends { conflict: string }
->(
-  ctx: errorModule.Context,
-  database: dbQuery.Database<Id>,
-  description: string,
-  endpoint: {
-    conflictResponseJson: payload.ConflictValidator
-  },
-  conflictMap: Record<
-    string,
-    ConflictResponse['conflict'] | undefined
-  >,
-  query: dbQuery.Query<Id, Values, Row, Transform>,
-  ...values: Values
-): Promise<Transform> {
-  // TODO Put conflict map into query, merge with retry DB query, move to app/db
-  return await checkConflictQuery(endpoint, () =>
-    retryDbBaseQuery(
-      ctx,
-      database,
-      description,
-      query,
-      (error) => {
-        if (
-          dbQuery.isQueryError(error) &&
-          error.code === dbQuery.errorCode.uniqueViolation
-        ) {
-          const constraintName =
-            dbQuery.getUniqueViolationConstraintName(error)
-          const conflictField =
-            constraintName && conflictMap[constraintName]
-          if (conflictField) {
-            throw new endpoint.conflictResponseJson.error(
-              conflictField as never
-            )
-          }
-        }
-      },
-      ...values
-    )
-  )
-}
-
-async function retryDbBaseQuery<
-  Id,
-  Values extends dbQuery.SupportedType[],
-  Row extends Record<string, dbQuery.SupportedType>,
-  Transform
->(
-  ctx: errorModule.Context,
-  database: dbQuery.Database<Id>,
-  description: string,
-  query: dbQuery.Query<Id, Values, Row, Transform>,
-  onError: ((error: unknown) => void) | undefined,
-  ...values: Values
-): Promise<Transform> {
-  return await errorModule.retry(
-    ctx,
-    () => database.query(query, ...values),
-    {
-      maxAttempts: 15,
-      minDelayMs: time.interval({ milliseconds: 10 }),
-      windowMs: time.interval({ seconds: 30 }),
-      onError(error, attempt, nextDelayMs) {
-        if (onError) {
-          onError(error)
-        }
-        console.error(
-          `Retrying ${description} query (attempt ${attempt}, delay ${ms(
-            nextDelayMs
-          )})`,
-          error
-        )
-      },
-    }
-  )
-}
-
-async function checkConflictQuery<
+export async function checkConflictQuery<
   Value,
   Field extends string
 >(
