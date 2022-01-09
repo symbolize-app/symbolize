@@ -1,5 +1,5 @@
 import * as errorModule from '@tiny/core/error.ts'
-import type * as payload from '@tiny/core/payload.ts'
+import * as payload from '@tiny/core/payload.ts'
 import * as time from '@tiny/core/time.ts'
 import ms from 'ms'
 import type * as typeFest from 'type-fest'
@@ -60,9 +60,14 @@ export type Query<
     name: string
     text: string
     transform: (rows: Row[]) => Transform
+    conflictMap?: Record<string, string>
   },
   [DatabaseId, Values]
 >
+
+type QueryMeta = {
+  conflictMap?: Record<string, string>
+}
 
 export function createDatabase<Id>(
   database: BaseDatabase<Id>
@@ -88,6 +93,7 @@ export function defineMultiTransform<
   Transform
 >(
   text: string,
+  meta: QueryMeta,
   transform: (rows: Row[]) => Transform
 ): Query<DatabaseId, Values, Row, Transform> {
   const name = `q${globalQueryNameCount.toString(
@@ -98,6 +104,7 @@ export function defineMultiTransform<
     name,
     text,
     transform,
+    ...meta,
   })
 }
 
@@ -106,14 +113,15 @@ export function defineMulti<
   Values extends SupportedType[],
   Row extends Record<string, SupportedType>
 >(
-  queryText: string
+  text: string,
+  meta: QueryMeta
 ): Query<DatabaseId, Values, Row, Row[]> {
   return defineMultiTransform<
     DatabaseId,
     Values,
     Row,
     Row[]
-  >(queryText, (rows) => rows)
+  >(text, meta, (rows) => rows)
 }
 
 export function defineOptional<
@@ -121,14 +129,15 @@ export function defineOptional<
   Values extends SupportedType[],
   Row extends Record<string, SupportedType>
 >(
-  queryText: string
+  text: string,
+  meta: QueryMeta
 ): Query<DatabaseId, Values, Row, Row | undefined> {
   return defineMultiTransform<
     DatabaseId,
     Values,
     Row,
     Row | undefined
-  >(queryText, (rows) => {
+  >(text, meta, (rows) => {
     if (rows.length === 0) {
       return undefined
     } else if (rows.length === 1) {
@@ -145,9 +154,13 @@ export function defineSingle<
   DatabaseId,
   Values extends SupportedType[],
   Row extends Record<string, SupportedType>
->(queryText: string): Query<DatabaseId, Values, Row, Row> {
+>(
+  text: string,
+  meta: QueryMeta
+): Query<DatabaseId, Values, Row, Row> {
   return defineMultiTransform<DatabaseId, Values, Row, Row>(
-    queryText,
+    text,
+    meta,
     (rows) => {
       if (rows.length === 0) {
         throw new Error('No rows returned')
@@ -166,7 +179,8 @@ export function defineVoid<
   DatabaseId,
   Values extends SupportedType[]
 >(
-  queryText: string
+  text: string,
+  meta: QueryMeta
 ): Query<
   DatabaseId,
   Values,
@@ -178,7 +192,7 @@ export function defineVoid<
     Values,
     Record<string, SupportedType>,
     void
-  >(queryText, (rows) => {
+  >(text, meta, (rows) => {
     if (rows.length === 0) {
       return
     } else {
@@ -228,75 +242,6 @@ export async function retryDbQuery<
   query: Query<Id, Values, Row, Transform>,
   ...values: Values
 ): Promise<Transform> {
-  return await retryDbBaseQuery(
-    ctx,
-    database,
-    description,
-    query,
-    undefined,
-    ...values
-  )
-}
-
-export async function retryDbConflictQuery<
-  Id,
-  Values extends SupportedType[],
-  Row extends Record<string, SupportedType>,
-  Transform,
-  ConflictResponse extends { conflict: string }
->(
-  ctx: errorModule.Context,
-  database: Database<Id>,
-  description: string,
-  endpoint: {
-    conflictResponseJson: payload.ConflictValidator
-  },
-  conflictMap: Record<
-    string,
-    ConflictResponse['conflict'] | undefined
-  >,
-  query: Query<Id, Values, Row, Transform>,
-  ...values: Values
-): Promise<Transform> {
-  // TODO Put conflict map into query, merge with retry DB query, move to app/db
-  return await retryDbBaseQuery(
-    ctx,
-    database,
-    description,
-    query,
-    (error) => {
-      if (
-        isQueryError(error) &&
-        error.code === errorCode.uniqueViolation
-      ) {
-        const constraintName =
-          getUniqueViolationConstraintName(error)
-        const conflictField =
-          constraintName && conflictMap[constraintName]
-        if (conflictField) {
-          throw new endpoint.conflictResponseJson.error(
-            conflictField as never
-          )
-        }
-      }
-    },
-    ...values
-  )
-}
-
-async function retryDbBaseQuery<
-  Id,
-  Values extends SupportedType[],
-  Row extends Record<string, SupportedType>,
-  Transform
->(
-  ctx: errorModule.Context,
-  database: Database<Id>,
-  description: string,
-  query: Query<Id, Values, Row, Transform>,
-  onError: ((error: unknown) => void) | undefined,
-  ...values: Values
-): Promise<Transform> {
   return await errorModule.retry(
     ctx,
     () => database.query(query, ...values),
@@ -305,8 +250,21 @@ async function retryDbBaseQuery<
       minDelayMs: time.interval({ milliseconds: 10 }),
       windowMs: time.interval({ seconds: 30 }),
       onError(error, attempt, nextDelayMs) {
-        if (onError) {
-          onError(error)
+        if (
+          query.conflictMap &&
+          isQueryError(error) &&
+          error.code === errorCode.uniqueViolation
+        ) {
+          const constraintName =
+            getUniqueViolationConstraintName(error)
+          const conflictField =
+            constraintName &&
+            query.conflictMap[constraintName]
+          if (conflictField) {
+            throw new payload.ConflictError(
+              conflictField as never
+            )
+          }
         }
         console.error(
           `Retrying ${description} query (attempt ${attempt}, delay ${ms(

@@ -7,9 +7,14 @@ export const find = dbQuery.defineOptional<
   appDbQuery.Read,
   [id: Buffer],
   { email: string }
->(dbQueryMemberFind)
+>(dbQueryMemberFind, {})
 
 export const create = dbQuery.defineVoid<
   appDbQuery.Write,
   [id: Buffer, email: string, handle: string]
->(dbQueryMemberCreate)
+>(dbQueryMemberCreate, {
+  conflictMap: {
+    ['member_email_key']: 'email',
+    ['member_handle_key']: 'handle',
+  },
+})
