@@ -97,12 +97,10 @@ export async function checkConflictQuery<
   try {
     return await query()
   } catch (error) {
-    if (
-      error instanceof endpoint.conflictResponseJson.error
-    ) {
+    if (error instanceof payload.ConflictError) {
       throw createConflictResponseError(
         endpoint,
-        error.field
+        error.field as never
       )
     } else {
       throw error

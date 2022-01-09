@@ -13,7 +13,11 @@ export const create = dbQuery.defineVoid<
     slug: string,
     content: string
   ]
->(dbQueryTopicCreate)
+>(dbQueryTopicCreate, {
+  conflictMap: {
+    ['primary']: 'slug',
+  },
+})
 
 export const list = dbQuery.defineMulti<
   appDbQuery.Read,
@@ -27,7 +31,7 @@ export const list = dbQuery.defineMulti<
     content: string
   }
   /* eslint-enable @typescript-eslint/naming-convention */
->(dbQueryTopicList)
+>(dbQueryTopicList, {})
 
 export const update = dbQuery.defineOptional<
   appDbQuery.Write,
@@ -39,4 +43,8 @@ export const update = dbQuery.defineOptional<
     content: string
   ],
   { updated: Date }
->(dbQueryTopicUpdate)
+>(dbQueryTopicUpdate, {
+  conflictMap: {
+    ['primary']: 'slug',
+  },
+})

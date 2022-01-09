@@ -21,15 +21,10 @@ export const create = route.defineEndpoint<
   await appRoute.checkConflictQuery(
     appEndpointMember.create,
     async () => {
-      await dbQuery.retryDbConflictQuery(
+      await dbQuery.retryDbQuery(
         ctx,
         ctx.databaseApiWrite,
         'member create',
-        appEndpointMember.create,
-        {
-          ['member_email_key']: 'email',
-          ['member_handle_key']: 'handle',
-        },
         appDbQueryMember.create,
         id,
         email,

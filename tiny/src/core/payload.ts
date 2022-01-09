@@ -297,7 +297,7 @@ export const timestamp: Validator<number> = {
 }
 
 export class ConflictError<
-  Field extends string
+  Field extends string = string
 > extends Error {
   field: Field
   constructor(field: Field) {

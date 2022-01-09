@@ -22,14 +22,10 @@ export const create = route.defineEndpoint<
   await appRoute.checkConflictQuery(
     appEndpointTopic.create,
     async () => {
-      await dbQuery.retryDbConflictQuery(
+      await dbQuery.retryDbQuery(
         ctx,
         ctx.databaseApiWrite,
         'topic create',
-        appEndpointTopic.create,
-        {
-          ['primary']: 'slug',
-        },
         appDbQueryTopic.create,
         id,
         memberId,
@@ -81,14 +77,10 @@ export const update = route.defineEndpoint<
   const result = await appRoute.checkConflictQuery(
     appEndpointTopic.create,
     async () => {
-      return await dbQuery.retryDbConflictQuery(
+      return await dbQuery.retryDbQuery(
         ctx,
         ctx.databaseApiWrite,
         'topic update',
-        appEndpointTopic.update,
-        {
-          ['primary']: 'slug',
-        },
         appDbQueryTopic.update,
         id,
         updatedOld,
