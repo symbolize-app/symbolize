@@ -10,7 +10,6 @@ export const show = route.define<
 >(['GET'], /^\/api\/message$/, async (ctx) => {
   const row = await dbQuery.retryDbQuery(
     ctx,
-    ctx.databaseApiRead,
     'member find',
     appDbQueryMember.find,
     Buffer.from('ABCD', 'hex')

@@ -1,39 +1,37 @@
 import * as time from '@tiny/core/time.ts'
-import * as dbQuery from '@tiny/db/query.ts'
+import type * as dbQuery from '@tiny/db/query.ts'
 import chalk from 'chalk'
 import pg from 'pg'
 import pgConnectionString from 'pg-connection-string'
 
-declare const readSymbol: unique symbol
+export const read = Symbol('DB read')
 
-export type Read = typeof readSymbol
+export type Read = typeof read
 
-export type ReadContext = {
-  databaseApiRead: dbQuery.Database<Read>
-}
+export type ReadContext = dbQuery.Context<Read>
 
-declare const writeSymbol: unique symbol
+export const write = Symbol('DB write')
 
-export type Write = typeof writeSymbol
+export type Write = typeof write
 
-export type WriteContext = {
-  databaseApiWrite: dbQuery.Database<Write>
-}
+export type WriteContext = dbQuery.Context<Write>
 
 export function initContext(): ReadContext & WriteContext {
   return {
-    databaseApiRead: initDatabase<Read>(
-      process.env.DATABASE_URL_API_READ as string
-    ),
-    databaseApiWrite: initDatabase<Write>(
-      process.env.DATABASE_URL_API_WRITE as string
-    ),
+    databases: {
+      [read]: initDatabase<Read>(
+        process.env.DATABASE_URL_API_READ as string
+      ),
+      [write]: initDatabase<Write>(
+        process.env.DATABASE_URL_API_WRITE as string
+      ),
+    },
   }
 }
 
-function initDatabase<Id>(
+function initDatabase<DatabaseId extends symbol>(
   connectionString: string
-): dbQuery.Database<Id> {
+): dbQuery.Database<DatabaseId> {
   const max = 10
   const user = pgConnectionString.parse(
     connectionString
@@ -68,13 +66,18 @@ function initDatabase<Id>(
       )
     )
   })
-  return dbQuery.createDatabase({
+  return {
     async query<
       Values extends dbQuery.SupportedType[],
       Row extends Record<string, dbQuery.SupportedType>,
       Transform
     >(
-      query: dbQuery.Query<Id, Values, Row, Transform>,
+      query: dbQuery.Query<
+        DatabaseId,
+        Values,
+        Row,
+        Transform
+      >,
       ...values: Values
     ): Promise<Transform> {
       const result = await pool.query<Row, Values>(
@@ -86,5 +89,5 @@ function initDatabase<Id>(
       )
       return query.transform(result.rows)
     },
-  })
+  }
 }

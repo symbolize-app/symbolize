@@ -24,7 +24,6 @@ export const create = route.defineEndpoint<
     async () => {
       await dbQuery.retryDbQuery(
         ctx,
-        ctx.databaseApiWrite,
         'topic create',
         appDbQueryTopic.create,
         id,
@@ -49,7 +48,6 @@ export const list = route.defineEndpoint<
   )
   const results = await dbQuery.retryDbQuery(
     ctx,
-    ctx.databaseApiRead,
     'topic list',
     appDbQueryTopic.list
   )
@@ -79,7 +77,6 @@ export const update = route.defineEndpoint<
     async () => {
       return await dbQuery.retryDbQuery(
         ctx,
-        ctx.databaseApiWrite,
         'topic update',
         appDbQueryTopic.update,
         id,
