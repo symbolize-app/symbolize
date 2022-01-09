@@ -23,7 +23,6 @@ export const create = route.defineEndpoint<
     async () => {
       await dbQuery.retryDbQuery(
         ctx,
-        ctx.databaseApiWrite,
         'member create',
         appDbQueryMember.create,
         id,
