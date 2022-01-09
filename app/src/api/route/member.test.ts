@@ -1,12 +1,12 @@
 import * as appRouteMember from '@fe/api/route/member.ts'
-import type * as appDbQuery from '@fe/db/query/index.ts'
+import * as appDbQuery from '@fe/db/query/index.ts'
 import * as appDbQueryMember from '@fe/db/query/member.ts'
 import * as routeTest from '@tiny/api/route.test.ts'
 import * as route from '@tiny/api/route.ts'
 import type * as errorModule from '@tiny/core/error.ts'
 import * as random from '@tiny/core/random.ts'
 import * as dbQueryTest from '@tiny/db/query.test.ts'
-import * as dbQuery from '@tiny/db/query.ts'
+import type * as dbQuery from '@tiny/db/query.ts'
 import * as test from '@tiny/test/index.ts'
 
 export const url = import.meta.url
@@ -22,9 +22,11 @@ export const tests = {
       errorModule.Context &
       appDbQuery.WriteContext = {
       ...baseContext,
-      databaseApiWrite: dbQuery.createDatabase({
-        query: queryMethod,
-      }),
+      databases: {
+        [appDbQuery.write]: {
+          query: queryMethod,
+        },
+      },
     }
     const expectedId =
       'd2f17ea3a0e36a7c79442855ca7d0a71a4eb616e10704121b4d169b6486f3bdc'
@@ -75,9 +77,11 @@ export const tests = {
       errorModule.Context &
       appDbQuery.WriteContext = {
       ...baseContext,
-      databaseApiWrite: dbQuery.createDatabase({
-        query: queryMethod,
-      }),
+      databases: {
+        [appDbQuery.write]: {
+          query: queryMethod,
+        },
+      },
     }
     const expectedId =
       'd2f17ea3a0e36a7c79442855ca7d0a71a4eb616e10704121b4d169b6486f3bdc'
@@ -121,11 +125,13 @@ export const tests = {
       errorModule.Context &
       appDbQuery.WriteContext = {
       ...baseContext,
-      databaseApiWrite: dbQuery.createDatabase({
-        query: test.mock<
-          dbQuery.Database<appDbQuery.Write>['query']
-        >([]),
-      }),
+      databases: {
+        [appDbQuery.write]: {
+          query: test.mock<
+            dbQuery.Database<appDbQuery.Write>['query']
+          >([]),
+        },
+      },
     }
     const response = test.sync(
       appRouteMember.create.handler(

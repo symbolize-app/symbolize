@@ -8,6 +8,10 @@ const queryNameBase = 36
 
 let globalQueryNameCount = 0
 
+export type Context<DatabaseId extends symbol> = {
+  databases: { [K in DatabaseId]: Database<K> }
+}
+
 export type SupportedType =
   | string
   | Date
@@ -17,148 +21,131 @@ export type SupportedType =
   | typeFest.JsonArray
   | typeFest.JsonObject
 
-export type BaseDatabase<Id> =
-  Database<Id> extends typeFest.Opaque<infer Type, Id>
-    ? Type
-    : never
-
-export type Database<Id> = typeFest.Opaque<
-  {
-    query<
-      Values extends SupportedType[],
-      Row extends Record<string, SupportedType>,
-      Transform
-    >(
-      query: Query<Id, Values, Row, Transform>,
-      ...values: Values
-    ): Promise<Transform>
-  },
-  Id
->
-
-export type BaseQuery<
-  DatabaseId,
-  Values extends SupportedType[],
-  Row extends Record<string, SupportedType>,
-  Transform
-> = Query<
-  DatabaseId,
-  Values,
-  Row,
-  Transform
-> extends typeFest.Opaque<infer Type, [DatabaseId, Values]>
-  ? Type
-  : never
+export type Database<DatabaseId extends symbol> = {
+  query<
+    Values extends SupportedType[],
+    Row extends Record<string, SupportedType>,
+    Transform
+  >(
+    query: Query<DatabaseId, Values, Row, Transform>,
+    ...values: Values
+  ): Promise<Transform>
+}
 
 export type Query<
-  DatabaseId,
+  DatabaseId extends symbol,
   Values extends SupportedType[],
   Row extends Record<string, SupportedType>,
   Transform
-> = typeFest.Opaque<
-  {
-    name: string
-    text: string
-    transform: (rows: Row[]) => Transform
-    conflictMap?: Record<string, string>
-  },
-  [DatabaseId, Values]
->
-
-type QueryMeta = {
+> = {
+  databaseId: DatabaseId
+  name: string
+  text: string
+  transform: (rows: Row[]) => Transform
+  values?: Values
   conflictMap?: Record<string, string>
 }
 
-export function createDatabase<Id>(
-  database: BaseDatabase<Id>
-): Database<Id> {
-  return database as Database<Id>
+type QueryMeta<
+  Values extends SupportedType[],
+  Row extends Record<string, SupportedType>
+> = {
+  values?: Values
+  row?: Row
+  conflictMap?: Record<string, string>
 }
 
-export function createQuery<
-  DatabaseId,
-  Values extends SupportedType[],
-  Row extends Record<string, SupportedType>,
-  Transform
->(
-  query: BaseQuery<DatabaseId, Values, Row, Transform>
-): Query<DatabaseId, Values, Row, Transform> {
-  return query as Query<DatabaseId, Values, Row, Transform>
+export function values<Values extends SupportedType[]>():
+  | Values
+  | undefined {
+  return undefined
+}
+
+export function row<
+  Row extends Record<string, SupportedType>
+>(): Row | undefined {
+  return undefined
 }
 
 export function defineMultiTransform<
-  DatabaseId,
+  DatabaseId extends symbol,
   Values extends SupportedType[],
   Row extends Record<string, SupportedType>,
   Transform
 >(
+  databaseId: DatabaseId,
   text: string,
-  meta: QueryMeta,
+  meta: QueryMeta<Values, Row>,
   transform: (rows: Row[]) => Transform
 ): Query<DatabaseId, Values, Row, Transform> {
   const name = `q${globalQueryNameCount.toString(
     queryNameBase
   )}`
   globalQueryNameCount += 1
-  return createQuery({
+  return {
+    databaseId,
     name,
     text,
     transform,
     ...meta,
-  })
+  }
 }
 
 export function defineMulti<
-  DatabaseId,
+  DatabaseId extends symbol,
   Values extends SupportedType[],
   Row extends Record<string, SupportedType>
 >(
+  databaseId: DatabaseId,
   text: string,
-  meta: QueryMeta
+  meta: QueryMeta<Values, Row>
 ): Query<DatabaseId, Values, Row, Row[]> {
-  return defineMultiTransform<
-    DatabaseId,
-    Values,
-    Row,
-    Row[]
-  >(text, meta, (rows) => rows)
+  return defineMultiTransform(
+    databaseId,
+    text,
+    meta,
+    (rows) => rows
+  )
 }
 
 export function defineOptional<
-  DatabaseId,
+  DatabaseId extends symbol,
   Values extends SupportedType[],
   Row extends Record<string, SupportedType>
 >(
+  databaseId: DatabaseId,
   text: string,
-  meta: QueryMeta
+  meta: QueryMeta<Values, Row>
 ): Query<DatabaseId, Values, Row, Row | undefined> {
-  return defineMultiTransform<
-    DatabaseId,
-    Values,
-    Row,
-    Row | undefined
-  >(text, meta, (rows) => {
-    if (rows.length === 0) {
-      return undefined
-    } else if (rows.length === 1) {
-      return rows[0]
-    } else {
-      throw new Error(
-        `Too many rows returned (${rows.length})`
-      )
+  return defineMultiTransform(
+    databaseId,
+    text,
+    meta,
+    (rows) => {
+      if (rows.length === 0) {
+        return undefined
+      } else if (rows.length === 1) {
+        return rows[0]
+      } else {
+        throw new Error(
+          `Too many rows returned (${rows.length})`
+        )
+      }
     }
-  })
+  )
 }
 
 export function defineSingle<
-  DatabaseId,
+  DatabaseId extends symbol,
   Values extends SupportedType[],
   Row extends Record<string, SupportedType>
 >(
+  databaseId: DatabaseId,
   text: string,
-  meta: QueryMeta
+  meta: QueryMeta<Values, Row>
 ): Query<DatabaseId, Values, Row, Row> {
-  return defineMultiTransform<DatabaseId, Values, Row, Row>(
+  return defineMultiTransform(
+    databaseId,
     text,
     meta,
     (rows) => {
@@ -176,31 +163,32 @@ export function defineSingle<
 }
 
 export function defineVoid<
-  DatabaseId,
+  DatabaseId extends symbol,
   Values extends SupportedType[]
 >(
+  databaseId: DatabaseId,
   text: string,
-  meta: QueryMeta
+  meta: QueryMeta<Values, Record<string, SupportedType>>
 ): Query<
   DatabaseId,
   Values,
   Record<string, SupportedType>,
   void
 > {
-  return defineMultiTransform<
-    DatabaseId,
-    Values,
-    Record<string, SupportedType>,
-    void
-  >(text, meta, (rows) => {
-    if (rows.length === 0) {
-      return
-    } else {
-      throw new Error(
-        `Too many rows returned (${rows.length})`
-      )
+  return defineMultiTransform(
+    databaseId,
+    text,
+    meta,
+    (rows) => {
+      if (rows.length === 0) {
+        return
+      } else {
+        throw new Error(
+          `Too many rows returned (${rows.length})`
+        )
+      }
     }
-  })
+  )
 }
 
 export type QueryError = Error & { code: string }
@@ -231,20 +219,23 @@ export function getUniqueViolationConstraintName(
 }
 
 export async function retryDbQuery<
-  Id,
+  DatabaseId extends symbol,
   Values extends SupportedType[],
   Row extends Record<string, SupportedType>,
   Transform
 >(
-  ctx: errorModule.Context,
-  database: Database<Id>,
+  ctx: errorModule.Context & Context<DatabaseId>,
   description: string,
-  query: Query<Id, Values, Row, Transform>,
+  query: Query<DatabaseId, Values, Row, Transform>,
   ...values: Values
 ): Promise<Transform> {
   return await errorModule.retry(
     ctx,
-    () => database.query(query, ...values),
+    () =>
+      ctx.databases[query.databaseId].query(
+        query,
+        ...values
+      ),
     {
       maxAttempts: 15,
       minDelayMs: time.interval({ milliseconds: 10 }),
