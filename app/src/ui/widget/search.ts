@@ -21,55 +21,59 @@ const column = style.build([
   },
 ])
 
-export const query = widget.define<
-  {
+export const query = widget.define(
+  (
+    ctx: widget.Context &
+      submit.Context &
+      errorModule.Context &
+      random.Context
+  ): {
     body: widget.Widget
-  },
-  submit.Context & errorModule.Context & random.Context
->((ctx) => {
-  const queryInput = input(ctx, {
-    name: 'query',
-    value: '',
-    type: 'search',
-  })
-  const resultsRange = range(ctx, {
-    content: [],
-  })
-  const queryButton = button(ctx, {
-    content: ['Search'],
-  })
-  const queryForm = form(ctx, {
-    content: [queryInput, queryButton],
-    listen: { submit: query },
-  })
-  const body = div(ctx, {
-    styles: [column],
-    content: [queryForm, resultsRange],
-  })
-  return {
-    body,
-  }
+  } => {
+    const queryInput = input(ctx, {
+      name: 'query',
+      value: '',
+      type: 'search',
+    })
+    const resultsRange = range(ctx, {
+      content: [],
+    })
+    const queryButton = button(ctx, {
+      content: ['Search'],
+    })
+    const queryForm = form(ctx, {
+      content: [queryInput, queryButton],
+      listen: { submit: query },
+    })
+    const body = div(ctx, {
+      styles: [column],
+      content: [queryForm, resultsRange],
+    })
+    return {
+      body,
+    }
 
-  async function query(event: Event) {
-    event.preventDefault()
-    const okResponseData = await submit.retrySubmit(
-      ctx,
-      'execute search',
-      appEndpointSearch.query,
-      {
-        params: {
-          language: appLanguage.Language.english,
-          query: queryInput.value,
-        },
-      }
-    )
-    const { results } = okResponseData.json
-    resultsRange.content = results.length
-      ? results.map((result) =>
-          div(ctx, {
-            content: [JSON.stringify(result)],
-          })
-        )
-      : ['No results']
+    async function query(event: Event) {
+      event.preventDefault()
+      const okResponseData = await submit.retrySubmit(
+        ctx,
+        'execute search',
+        appEndpointSearch.query,
+        {
+          params: {
+            language: appLanguage.Language.english,
+            query: queryInput.value,
+          },
+        }
+      )
+      const { results } = okResponseData.json
+      resultsRange.content = results.length
+        ? results.map((result) =>
+            div(ctx, {
+              content: [JSON.stringify(result)],
+            })
+          )
+        : ['No results']
+    }
   }
-})
+)

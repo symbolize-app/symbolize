@@ -21,77 +21,81 @@ const column = style.build([
   },
 ])
 
-export const query = widget.define<
-  {
+export const query = widget.define(
+  (
+    ctx: widget.Context &
+      submit.Context &
+      errorModule.Context &
+      random.Context
+  ): {
     body: widget.Widget
-  },
-  submit.Context & errorModule.Context & random.Context
->((ctx) => {
-  const writeInput = input(ctx, {
-    value: '',
-    type: 'file',
-    required: true,
-    accept: 'image/*',
-  })
-  const resultsRange = range(ctx, {
-    content: [],
-  })
-  const readInput = input(ctx, {
-    placeholder: 'File ID',
-    listen: { input: read },
-  })
-  const readOutput = img(ctx, {})
-  const writeButton = button(ctx, {
-    content: ['Write'],
-  })
-  const writeForm = form(ctx, {
-    content: [writeInput, writeButton],
-    listen: { submit: write },
-  })
-  const body = div(ctx, {
-    styles: [column],
-    content: [
-      writeForm,
-      resultsRange,
-      readInput,
-      readOutput,
-    ],
-  })
-  return {
-    body,
-  }
+  } => {
+    const writeInput = input(ctx, {
+      value: '',
+      type: 'file',
+      required: true,
+      accept: 'image/*',
+    })
+    const resultsRange = range(ctx, {
+      content: [],
+    })
+    const readInput = input(ctx, {
+      placeholder: 'File ID',
+      listen: { input: read },
+    })
+    const readOutput = img(ctx, {})
+    const writeButton = button(ctx, {
+      content: ['Write'],
+    })
+    const writeForm = form(ctx, {
+      content: [writeInput, writeButton],
+      listen: { submit: write },
+    })
+    const body = div(ctx, {
+      styles: [column],
+      content: [
+        writeForm,
+        resultsRange,
+        readInput,
+        readOutput,
+      ],
+    })
+    return {
+      body,
+    }
 
-  async function write(event: Event) {
-    event.preventDefault()
-    const okResponseData = await submit.retrySubmit(
-      ctx,
-      'execute search',
-      appEndpointFile.write,
-      {
-        params: {
-          requestId: random.requestIdHex(ctx),
-        },
-        blob:
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          writeInput.files![0],
-      }
-    )
-    const { id } = okResponseData.json
-    resultsRange.content = [
-      div(ctx, {
-        content: [JSON.stringify(id)],
-      }),
-    ]
-  }
+    async function write(event: Event) {
+      event.preventDefault()
+      const okResponseData = await submit.retrySubmit(
+        ctx,
+        'execute search',
+        appEndpointFile.write,
+        {
+          params: {
+            requestId: random.requestIdHex(ctx),
+          },
+          blob:
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            writeInput.files![0],
+        }
+      )
+      const { id } = okResponseData.json
+      resultsRange.content = [
+        div(ctx, {
+          content: [JSON.stringify(id)],
+        }),
+      ]
+    }
 
-  function read() {
-    readOutput.src = submit.getEndpointUrl(
-      appEndpointFile.read,
-      {
-        params: {
-          id: readInput.value,
-        },
-      }
-    )
+    function read() {
+      readOutput.src = submit.getEndpointUrl(
+        appEndpointFile.read,
+        {
+          params: {
+            id: readInput.value,
+          },
+        }
+      )
+    }
   }
-})
+)

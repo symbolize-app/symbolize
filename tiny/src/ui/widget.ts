@@ -221,7 +221,7 @@ type WidgetFunction<
 
 export function define<
   Body extends Widget & { [Key in keyof Body]: Body[Key] },
-  CustomContext = unknown
+  CustomContext
 >(
   body: (ctx: CustomContext & Context) => Body
 ): WidgetFunction<Body, CustomContext> {
@@ -279,32 +279,36 @@ export const html: HtmlWidgetMap = new Proxy(
   }
 )
 
-export const range = define<{
-  content: Widget[]
-}>((ctx) => {
-  const start = ctx.document.createComment('')
-  const end = ctx.document.createComment('')
-  const content: Widget[] = [start, end]
+export const range = define(
+  (
+    ctx: Context
+  ): {
+    content: Widget[]
+  } => {
+    const start = ctx.document.createComment('')
+    const end = ctx.document.createComment('')
+    const content: Widget[] = [start, end]
 
-  return {
-    get content() {
-      return content
-    },
-    set content(value: Widget[]) {
-      const inner = collect(value)
-      const parent = start.parentNode
-      if (parent) {
-        const siblings: (string | Node)[] = Array.from(
-          parent.childNodes
-        )
-        siblings.splice(
-          siblings.indexOf(start) + 1,
-          content.length - 2,
-          ...inner
-        )
-        replaceChildren(ctx, parent, siblings)
-      }
-      content.splice(1, content.length - 2, ...inner)
-    },
+    return {
+      get content() {
+        return content
+      },
+      set content(value: Widget[]) {
+        const inner = collect(value)
+        const parent = start.parentNode
+        if (parent) {
+          const siblings: (string | Node)[] = Array.from(
+            parent.childNodes
+          )
+          siblings.splice(
+            siblings.indexOf(start) + 1,
+            content.length - 2,
+            ...inner
+          )
+          replaceChildren(ctx, parent, siblings)
+        }
+        content.splice(1, content.length - 2, ...inner)
+      },
+    }
   }
-})
+)
