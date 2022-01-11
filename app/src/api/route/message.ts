@@ -5,7 +5,7 @@ import * as route from '@tiny/api/route.ts'
 import type * as errorModule from '@tiny/core/error.ts'
 import * as dbQuery from '@tiny/db/query.ts'
 
-export const show = route.define<
+export const show = route.defineBase<
   errorModule.Context & appDbQuery.ReadContext
 >(['GET'], /^\/api\/message$/, async (ctx) => {
   const row = await dbQuery.retryDbQuery(

@@ -55,10 +55,14 @@ export class ResponseError extends Error {
   }
 }
 
-export type Handler<CustomContext> = (
+export type Handler<
+  CustomContext,
+  CustomRequest = Request,
+  CustomResponse = Response
+> = (
   ctx: CustomContext,
-  request: Request
-) => Response
+  request: CustomRequest
+) => CustomResponse
 
 export type Route<CustomContext> = {
   methods: string[] | undefined
@@ -66,7 +70,7 @@ export type Route<CustomContext> = {
   handler: Handler<CustomContext>
 }
 
-export function define<CustomContext = unknown>(
+export function defineBase<CustomContext = unknown>(
   methods: string[] | undefined,
   match: string | RegExp,
   handler: Handler<CustomContext>
@@ -74,15 +78,15 @@ export function define<CustomContext = unknown>(
   return { methods, match, handler }
 }
 
-export function defineEndpoint<CustomContext = unknown>(
+export function define<CustomContext = unknown>(
   endpoint: endpoint.BaseEndpoint,
   handler: Handler<CustomContext>
 ): Route<CustomContext> {
-  return {
-    methods: [endpoint.method],
-    match: endpoint.path,
-    handler,
-  }
+  return defineBase(
+    [endpoint.method],
+    endpoint.path,
+    handler
+  )
 }
 
 export function handle<CustomContext>(

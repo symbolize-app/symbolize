@@ -43,25 +43,29 @@ const span = widget.html.span
 const title = widget.html.title
 const ul = widget.html.ul
 
-const myCounter = widget.define<{
-  body: widget.Widget
-  value: number
-}>((ctx) => {
-  let value: number
-  const body = span(ctx, {})
-  const result = {
-    body,
-    get value() {
-      return value
-    },
-    set value(newValue) {
-      value = newValue
-      body.content = [value.toString()]
-    },
+const myCounter = widget.define(
+  (
+    ctx: widget.Context
+  ): {
+    body: widget.Widget
+    value: number
+  } => {
+    let value: number
+    const body = span(ctx, {})
+    const result = {
+      body,
+      get value() {
+        return value
+      },
+      set value(newValue) {
+        value = newValue
+        body.content = [value.toString()]
+      },
+    }
+    result.value = 0
+    return result
   }
-  result.value = 0
-  return result
-})
+)
 
 async function main(): Promise<void> {
   const ctx: widget.Context &

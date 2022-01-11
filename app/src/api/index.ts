@@ -23,7 +23,7 @@ import type * as net from 'node:net'
 import * as stream from 'node:stream'
 import * as urlModule from 'node:url'
 
-const index = route.define(['GET'], /^\/$/, () => {
+const index = route.defineBase(['GET'], /^\/$/, () => {
   return {
     status: 200,
     headers: {
@@ -35,7 +35,7 @@ const index = route.define(['GET'], /^\/$/, () => {
   }
 })
 
-const ssr = route.define(['GET'], /^\/ssr$/, () => {
+const ssr = route.defineBase(['GET'], /^\/ssr$/, () => {
   const dom = new jsdom.JSDOM('<!DOCTYPE html>')
   const window = dom.window
   const document = window.document
@@ -53,14 +53,14 @@ const ssr = route.define(['GET'], /^\/ssr$/, () => {
   }
 })
 
-const notFound = route.define(undefined, /.*/, () => {
+const notFound = route.defineBase(undefined, /.*/, () => {
   return {
     status: 404,
     headers: {},
   }
 })
 
-const js = route.define(
+const js = route.defineBase(
   ['GET'],
   /^\/js\/(?<path>.+\.mjs)$/,
   (_ctx, request) => {

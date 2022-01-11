@@ -32,7 +32,7 @@ type Server = {
   kill: () => Promise<void>
 }
 
-const index = route.define(['GET'], /^\/$/, () => {
+const index = route.defineBase(['GET'], /^\/$/, () => {
   return {
     status: 200,
     headers: {
@@ -44,14 +44,14 @@ const index = route.define(['GET'], /^\/$/, () => {
   }
 })
 
-const notFound = route.define(undefined, /.*/, () => {
+const notFound = route.defineBase(undefined, /.*/, () => {
   return {
     status: 404,
     headers: {},
   }
 })
 
-const js = route.define<Context>(
+const js = route.defineBase<Context>(
   ['GET'],
   /^\/js\/(?<path>.+\.mjs)$/,
   async (ctx, request) => {
@@ -74,7 +74,7 @@ const js = route.define<Context>(
   }
 )
 
-const api = route.define<{
+const api = route.defineBase<{
   server: Server
   proxy: HttpProxy
 }>(undefined, /^\/api\/.+/, async (ctx) => {
