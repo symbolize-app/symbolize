@@ -7,36 +7,40 @@ import * as crypto from '@tiny/core/crypto.node.ts'
 import type * as errorModule from '@tiny/core/error.ts'
 import * as dbQuery from '@tiny/db/query.ts'
 
-export const create = route.defineEndpoint<
-  errorModule.Context & appDbQuery.WriteContext
->(appEndpointMember.create, async (ctx, request) => {
-  const requestData = await appRoute.checkRequestJson(
-    appEndpointMember.create,
+export const create = route.define(
+  appEndpointMember.create,
+  async (
+    ctx: errorModule.Context & appDbQuery.WriteContext,
     request
-  )
-  const id = crypto.hash(
-    Buffer.from(requestData.requestId, 'hex')
-  )
-  const { email, handle } = requestData
-  await appRoute.checkConflictQuery(
-    appEndpointMember.create,
-    async () => {
-      await dbQuery.retryDbQuery(
-        ctx,
-        'member create',
-        appDbQueryMember.create,
-        id,
-        email,
-        handle
-      )
-    }
-  )
-  return appRoute.checkOkResponse(
-    appEndpointMember.create,
-    {
-      id: id.toString('hex'),
-    }
-  )
-})
+  ) => {
+    const requestData = await appRoute.checkRequestJson(
+      appEndpointMember.create,
+      request
+    )
+    const id = crypto.hash(
+      Buffer.from(requestData.requestId, 'hex')
+    )
+    const { email, handle } = requestData
+    await appRoute.checkConflictQuery(
+      appEndpointMember.create,
+      async () => {
+        await dbQuery.retryDbQuery(
+          ctx,
+          'member create',
+          appDbQueryMember.create,
+          id,
+          email,
+          handle
+        )
+      }
+    )
+    return appRoute.checkOkResponse(
+      appEndpointMember.create,
+      {
+        id: id.toString('hex'),
+      }
+    )
+  }
+)
 
 export const routes = [create]
