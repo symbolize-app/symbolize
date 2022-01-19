@@ -1,4 +1,3 @@
-import * as appRoute from '@fe/api/route/index.ts'
 import * as appEndpointMember from '@fe/core/endpoint/member.ts'
 import type * as appDbQuery from '@fe/db/query/index.ts'
 import * as appDbQueryMember from '@fe/db/query/member.ts'
@@ -13,33 +12,24 @@ export const create = route.define(
     ctx: errorModule.Context & appDbQuery.WriteContext,
     request
   ) => {
-    const requestData = await appRoute.checkRequestJson(
-      appEndpointMember.create,
-      request
-    )
     const id = crypto.hash(
-      Buffer.from(requestData.requestId, 'hex')
+      Buffer.from(request.json.requestId, 'hex')
     )
-    const { email, handle } = requestData
-    await appRoute.checkConflictQuery(
-      appEndpointMember.create,
-      async () => {
-        await dbQuery.retryDbQuery(
-          ctx,
-          'member create',
-          appDbQueryMember.create,
-          id,
-          email,
-          handle
-        )
-      }
+    const { email, handle } = request.json
+    await dbQuery.retryDbQuery(
+      ctx,
+      'member create',
+      appDbQueryMember.create,
+      id,
+      email,
+      handle
     )
-    return appRoute.checkOkResponse(
-      appEndpointMember.create,
-      {
+    return {
+      status: 200,
+      json: {
         id: id.toString('hex'),
-      }
-    )
+      },
+    }
   }
 )
 

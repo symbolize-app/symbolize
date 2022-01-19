@@ -119,11 +119,7 @@ export function retrySubmit<
         }
       : { params?: never }) &
     (Endpoint extends endpoint.RequestBytesEndpoint
-      ? {
-          stream?: ReadableStream
-          blob?: Blob
-          buffer?: ArrayBuffer
-        }
+      ? Pick<Request, 'stream' | 'blob' | 'buffer'>
       : { stream?: never; blob?: never; buffer?: never }) &
     (Endpoint extends endpoint.RequestJsonEndpoint
       ? {
@@ -168,18 +164,7 @@ export function retrySubmit<
               await response.json()
             ),
           }),
-        } as (Endpoint extends endpoint.OkResponseStreamEndpoint
-          ? {
-              stream: ReadableStream
-            }
-          : { stream?: never }) &
-          (Endpoint extends endpoint.OkResponseJsonEndpoint
-            ? {
-                json: payload.Payload<
-                  Endpoint['okResponseJson']
-                >
-              }
-            : { json?: never })
+        } as never
       } else {
         throw new Error(
           `Unexpected status ${response.status} response during ${description}`
@@ -223,11 +208,7 @@ export function getEndpointUrl<
         }
       : { params?: never }) &
     (Endpoint extends endpoint.RequestBytesEndpoint
-      ? {
-          stream?: ReadableStream
-          blob?: Blob
-          buffer?: ArrayBuffer
-        }
+      ? Pick<Request, 'stream' | 'blob' | 'buffer'>
       : { stream?: never; blob?: never; buffer?: never }) &
     (Endpoint extends endpoint.RequestJsonEndpoint
       ? {
@@ -249,11 +230,7 @@ export function createRequest<
         }
       : { params?: never }) &
     (Endpoint extends endpoint.RequestBytesEndpoint
-      ? {
-          stream?: ReadableStream
-          blob?: Blob
-          buffer?: ArrayBuffer
-        }
+      ? Pick<Request, 'stream' | 'blob' | 'buffer'>
       : { stream?: never; blob?: never; buffer?: never }) &
     (Endpoint extends endpoint.RequestJsonEndpoint
       ? {

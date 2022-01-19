@@ -1,4 +1,3 @@
-import * as appRoute from '@fe/api/route/index.ts'
 import * as appCacheQueryFile from '@fe/cache/query/file.ts'
 import type * as appCacheQuery from '@fe/cache/query/index.ts'
 import * as appEndpointFile from '@fe/core/endpoint/file.ts'
@@ -16,12 +15,8 @@ export const write = route.define(
       appCacheQuery.Context,
     request
   ) => {
-    const requestData = appRoute.checkRequestParams(
-      appEndpointFile.write,
-      request
-    )
     const id = crypto.hash(
-      Buffer.from(requestData.requestId, 'hex')
+      Buffer.from(request.params.requestId, 'hex')
     )
     const response = {
       id: id.toString('hex'),
@@ -133,10 +128,10 @@ export const write = route.define(
         })
       )
     )
-    return appRoute.checkOkResponse(
-      appEndpointFile.write,
-      response
-    )
+    return {
+      status: 200,
+      json: response,
+    }
   }
 )
 
@@ -146,10 +141,6 @@ export const read = route.define(
     ctx: errorModule.Context & appCacheQuery.Context,
     request
   ) => {
-    const requestData = appRoute.checkRequestParams(
-      appEndpointFile.read,
-      request
-    )
     // TODO Get content type & length & filename from DB
     let index = 0
     const pipeline: Promise<Buffer | undefined>[] = []
@@ -165,7 +156,7 @@ export const read = route.define(
               pipeline.push(
                 ctx.cache.query(
                   appCacheQueryFile.getChunk,
-                  requestData.id,
+                  request.params.id,
                   index
                 )
               )

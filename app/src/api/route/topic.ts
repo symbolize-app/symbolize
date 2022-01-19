@@ -1,4 +1,3 @@
-import * as appRoute from '@fe/api/route/index.ts'
 import * as appEndpointTopic from '@fe/core/endpoint/topic.ts'
 import type * as appDbQuery from '@fe/db/query/index.ts'
 import * as appDbQueryTopic from '@fe/db/query/topic.ts'
@@ -13,39 +12,33 @@ export const create = route.define(
     ctx: errorModule.Context & appDbQuery.WriteContext,
     request
   ) => {
-    const requestData = await appRoute.checkRequestJson(
-      appEndpointTopic.create,
-      request
-    )
     const id = crypto.hash(
-      Buffer.from(requestData.requestId, 'hex')
+      Buffer.from(request.json.requestId, 'hex')
     )
     const memberId = Buffer.from(
-      requestData.memberId,
+      request.json.memberId,
       'hex'
     )
-    const { title, slug, content } = requestData
-    await appRoute.checkConflictQuery(
-      appEndpointTopic.create,
-      async () => {
-        await dbQuery.retryDbQuery(
-          ctx,
-          'topic create',
-          appDbQueryTopic.create,
-          id,
-          memberId,
-          title,
-          slug,
-          content
-        )
-      }
+    const { title, slug, content } = request.json
+    await dbQuery.retryDbQuery(
+      ctx,
+      'topic create',
+      appDbQueryTopic.create,
+      id,
+      memberId,
+      title,
+      slug,
+      content
     )
-    return appRoute.checkOkResponse(
-      appEndpointTopic.create,
-      {
+    return {
+      status: 200,
+      headers: {
+        'content-type': 'application/json',
+      },
+      json: {
         id: id.toString('hex'),
-      }
-    )
+      },
+    }
   }
 )
 
@@ -53,26 +46,25 @@ export const list = route.define(
   appEndpointTopic.list,
   async (
     ctx: errorModule.Context & appDbQuery.ReadContext,
-    request
+    _request
   ) => {
-    appRoute.checkRequestParams(
-      appEndpointTopic.list,
-      request
-    )
     const results = await dbQuery.retryDbQuery(
       ctx,
       'topic list',
       appDbQueryTopic.list
     )
-    return appRoute.checkOkResponse(appEndpointTopic.list, {
-      results: results.map((row) => ({
-        id: row.id.toString('hex'),
-        updatedAt: row.updated_at.getTime(),
-        title: row.title,
-        slug: row.slug,
-        content: row.content,
-      })),
-    })
+    return {
+      status: 200,
+      json: {
+        results: results.map((row) => ({
+          id: row.id.toString('hex'),
+          updatedAt: row.updated_at.getTime(),
+          title: row.title,
+          slug: row.slug,
+          content: row.content,
+        })),
+      },
+    }
   }
 )
 
@@ -82,35 +74,26 @@ export const update = route.define(
     ctx: errorModule.Context & appDbQuery.WriteContext,
     request
   ) => {
-    const requestData = await appRoute.checkRequestJson(
-      appEndpointTopic.update,
-      request
-    )
-    const id = Buffer.from(requestData.id, 'hex')
-    const updatedOld = new Date(requestData.updatedOld)
-    const { title, slug, content } = requestData
-    const result = await appRoute.checkConflictQuery(
-      appEndpointTopic.create,
-      async () => {
-        return await dbQuery.retryDbQuery(
-          ctx,
-          'topic update',
-          appDbQueryTopic.update,
-          id,
-          updatedOld,
-          title,
-          slug,
-          content
-        )
-      }
+    const id = Buffer.from(request.json.id, 'hex')
+    const updatedOld = new Date(request.json.updatedOld)
+    const { title, slug, content } = request.json
+    const result = await dbQuery.retryDbQuery(
+      ctx,
+      'topic update',
+      appDbQueryTopic.update,
+      id,
+      updatedOld,
+      title,
+      slug,
+      content
     )
     if (result) {
-      return appRoute.checkOkResponse(
-        appEndpointTopic.update,
-        {
+      return {
+        status: 200,
+        json: {
           updated: result.updated.getTime(),
-        }
-      )
+        },
+      }
     } else {
       throw new route.ResponseError({
         status: 404,
