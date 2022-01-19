@@ -1,4 +1,5 @@
 import type * as endpoint from '@tiny/core/endpoint.ts'
+import * as payload from '@tiny/core/payload.ts'
 import * as formData from 'formdata-polyfill/esm.min.js'
 import type * as http from 'node:http'
 import * as stream from 'node:stream'
@@ -78,15 +79,248 @@ export function defineBase<CustomContext = unknown>(
   return { methods, match, handler }
 }
 
-export function define<CustomContext = unknown>(
-  endpoint: endpoint.BaseEndpoint,
-  handler: Handler<CustomContext>
+export function define<
+  Endpoint extends endpoint.BaseEndpoint,
+  CustomContext = unknown
+>(
+  endpoint: Endpoint,
+  handler: Handler<
+    CustomContext,
+    Pick<
+      Request,
+      'origin' | 'path' | 'method' | 'headers'
+    > &
+      (Endpoint extends endpoint.RequestParamsEndpoint
+        ? {
+            params: payload.Payload<
+              Endpoint['requestParams']
+            >
+          }
+        : { params?: never }) &
+      (Endpoint extends endpoint.RequestBytesEndpoint
+        ? Pick<Request, 'stream' | 'blob' | 'buffer'>
+        : {
+            stream?: never
+            blob?: never
+            buffer?: never
+          }) &
+      (Endpoint extends endpoint.RequestJsonEndpoint
+        ? {
+            json: payload.Payload<Endpoint['requestJson']>
+          }
+        : { json?: never }),
+    typeFest.Promisable<
+      {
+        status: 200
+        headers?: Record<string, string>
+      } & (Endpoint extends endpoint.OkResponseStreamEndpoint
+        ? {
+            stream?: typeFest.Promisable<ReadableStream>
+            blob?: typeFest.Promisable<Blob>
+            buffer?: typeFest.Promisable<ArrayBuffer>
+          }
+        : { stream?: never }) &
+        (Endpoint extends endpoint.OkResponseJsonEndpoint
+          ? {
+              json: typeFest.Promisable<
+                payload.Payload<Endpoint['okResponseJson']>
+              >
+            }
+          : { json?: never })
+    >
+  >
 ): Route<CustomContext> {
   return defineBase(
     [endpoint.method],
     endpoint.path,
-    handler
+    async (ctx, request) => {
+      const response = await checkConflictQuery(
+        endpoint,
+        async () =>
+          Promise.resolve(
+            handler(ctx, {
+              ...request,
+              ...(endpoint.requestParams !== undefined
+                ? {
+                    params: checkRequestParams(
+                      endpoint as endpoint.RequestParamsEndpoint,
+                      request
+                    ),
+                  }
+                : undefined),
+              ...(endpoint.requestJson !== undefined
+                ? {
+                    json: await checkRequestJson(
+                      endpoint as endpoint.RequestJsonEndpoint,
+                      request
+                    ),
+                  }
+                : undefined),
+            } as never)
+          )
+      )
+      return {
+        ...response,
+        headers: {
+          ...(endpoint.okResponseJson !== undefined && {
+            'content-type': 'application/json',
+          }),
+          ...response.headers,
+        },
+        json:
+          endpoint.okResponseJson !== undefined
+            ? checkResponseJson(
+                endpoint as endpoint.OkResponseJsonEndpoint,
+                response as never
+              )
+            : undefined,
+      }
+    }
   )
+}
+
+function checkRequestParams<
+  Value extends Record<string, string>
+>(
+  endpoint: {
+    requestParams: payload.StringValidator<Value>
+  },
+  request: Request
+): Value {
+  const input = request.params
+  return checkRequestBase(endpoint.requestParams, input)
+}
+
+export async function checkRequestJson<
+  Value extends typeFest.JsonValue
+>(
+  endpoint: {
+    requestJson: payload.Validator<Value>
+  },
+  request: Request
+): Promise<Value> {
+  if (
+    request.headers['content-type'] !== 'application/json'
+  ) {
+    throw new ResponseError({
+      status: 400,
+      headers: {
+        'content-type': 'application/json',
+      },
+      json: {
+        error: 'content-type: application/json required',
+      },
+    })
+  }
+  let input: typeFest.JsonValue
+  try {
+    input = await request.json()
+  } catch (error) {
+    if (error instanceof SyntaxError) {
+      throw new ResponseError({
+        status: 400,
+        headers: {
+          'content-type': 'application/json',
+        },
+        json: {
+          error: 'JSON syntax error',
+        },
+      })
+    } else {
+      throw error
+    }
+  }
+  return checkRequestBase(endpoint.requestJson, input)
+}
+
+function checkRequestBase<Value>(
+  validator: payload.Validator<Value>,
+  input: typeFest.JsonValue
+): Value {
+  try {
+    return validator.check(input)
+  } catch (error) {
+    if (error instanceof payload.PayloadError) {
+      throw new ResponseError({
+        status: 400,
+        headers: {
+          'content-type': 'application/json',
+        },
+        json: {
+          error: error.message,
+        },
+      })
+    } else {
+      throw error
+    }
+  }
+}
+
+async function checkConflictQuery<Value>(
+  endpoint: endpoint.BaseEndpoint,
+  query: () => Promise<Value>
+): Promise<Value> {
+  try {
+    return await query()
+  } catch (error) {
+    if (
+      endpoint.conflictResponseJson !== undefined &&
+      error instanceof payload.ConflictError
+    ) {
+      throw createConflictResponseError(
+        endpoint as never,
+        error.field as never
+      )
+    } else {
+      throw error
+    }
+  }
+}
+
+function createConflictResponseError<
+  Endpoint extends {
+    conflictResponseJson: payload.ConflictValidator
+  }
+>(
+  endpoint: Endpoint,
+  field: payload.Payload<
+    Endpoint['conflictResponseJson']
+  >['conflict']
+): ResponseError {
+  return new ResponseError({
+    status: 409,
+    headers: {
+      'content-type': 'application/json',
+    },
+    json: endpoint.conflictResponseJson.check({
+      conflict: field,
+    }),
+  })
+}
+
+function checkResponseJson<
+  Value extends typeFest.JsonValue
+>(
+  endpoint: {
+    okResponseJson: payload.Validator<Value>
+  },
+  response: {
+    json: typeFest.Promisable<Value>
+  }
+): typeFest.Promisable<Value> {
+  if (
+    (response.json as unknown as PromiseLike<Value>)[
+      'then'
+    ] instanceof Function
+  ) {
+    return (
+      response.json as unknown as PromiseLike<Value>
+    ).then(endpoint.okResponseJson.check)
+  } else {
+    return endpoint.okResponseJson.check(
+      response.json as Value
+    )
+  }
 }
 
 export function handle<CustomContext>(
