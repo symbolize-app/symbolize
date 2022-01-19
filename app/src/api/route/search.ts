@@ -1,5 +1,4 @@
 import * as appFts from '@fe/api/fts.ts'
-import * as appRoute from '@fe/api/route/index.ts'
 import * as appEndpointSearch from '@fe/core/endpoint/search.ts'
 import * as route from '@tiny/api/route.ts'
 import type * as errorModule from '@tiny/core/error.ts'
@@ -13,10 +12,6 @@ export const query = route.define(
       appFts.Context,
     request
   ) => {
-    const requestData = appRoute.checkRequestParams(
-      appEndpointSearch.query,
-      request
-    )
     const { results } = (
       await submit.retrySubmit(
         ctx,
@@ -30,15 +25,15 @@ export const query = route.define(
             ).toString('base64')}`,
           },
           params: {
-            language: requestData.language,
-            query: requestData.query,
+            language: request.params.language,
+            query: request.params.query,
           },
         }
       )
     ).json
-    return appRoute.checkOkResponse(
-      appEndpointSearch.query,
-      {
+    return {
+      status: 200,
+      json: {
         results: results.map((result) => ({
           type: result.type,
           id: result.id,
@@ -55,8 +50,8 @@ export const query = route.define(
           tags: result.tags,
           content: result.content,
         })),
-      }
-    )
+      },
+    }
   }
 )
 
