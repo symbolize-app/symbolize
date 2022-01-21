@@ -1,3 +1,4 @@
+import type * as errorModule from '@tiny/core/error.ts'
 import * as submit from '@tiny/core/submit.ts'
 import * as stream from 'node:stream'
 import * as webStream from 'node:stream/web'
@@ -58,25 +59,33 @@ class ConvertedResponse {
   }
 }
 
-export function initContext(): submit.Context {
-  return submit.initContext({
-    async fetch(
-      input: string,
-      init?: RequestInit
-    ): Promise<Response> {
-      const nodeInput = input
-      const nodeInit = init && {
-        ...init,
-        body:
-          init.body instanceof webStream.ReadableStream
-            ? stream.Readable.fromWeb(init.body)
-            : (init.body as nodeFetch.RequestInit['body']),
-      }
-      const nodeResponse = await nodeFetch.default(
-        nodeInput,
-        nodeInit
-      )
-      return new ConvertedResponse(nodeResponse)
+export function initContext(
+  submitRetryConfig: Omit<
+    errorModule.RetryConfig,
+    'onError'
+  >
+): submit.Context {
+  return submit.initContext(
+    {
+      async fetch(
+        input: string,
+        init?: RequestInit
+      ): Promise<Response> {
+        const nodeInput = input
+        const nodeInit = init && {
+          ...init,
+          body:
+            init.body instanceof webStream.ReadableStream
+              ? stream.Readable.fromWeb(init.body)
+              : (init.body as nodeFetch.RequestInit['body']),
+        }
+        const nodeResponse = await nodeFetch.default(
+          nodeInput,
+          nodeInit
+        )
+        return new ConvertedResponse(nodeResponse)
+      },
     },
-  })
+    submitRetryConfig
+  )
 }

@@ -3,6 +3,7 @@ import * as appDbQuery from '@fe/db/query/index.ts'
 import * as appDbQueryMember from '@fe/db/query/member.ts'
 import * as routeTest from '@tiny/api/route.test.ts'
 import * as route from '@tiny/api/route.ts'
+import * as errorModuleTest from '@tiny/core/error.test.ts'
 import type * as errorModule from '@tiny/core/error.ts'
 import * as random from '@tiny/core/random.ts'
 import * as dbQueryTest from '@tiny/db/query.test.ts'
@@ -27,6 +28,7 @@ export const tests = {
           query: queryMethod,
         },
       },
+      databaseRetryConfig: errorModuleTest.retryConfig,
     }
     const expectedId =
       'd2f17ea3a0e36a7c79442855ca7d0a71a4eb616e10704121b4d169b6486f3bdc'
@@ -82,6 +84,7 @@ export const tests = {
           query: queryMethod,
         },
       },
+      databaseRetryConfig: errorModuleTest.retryConfig,
     }
     const expectedId =
       'd2f17ea3a0e36a7c79442855ca7d0a71a4eb616e10704121b4d169b6486f3bdc'
@@ -132,6 +135,7 @@ export const tests = {
           >([]),
         },
       },
+      databaseRetryConfig: errorModuleTest.retryConfig,
     }
     const response = test.sync(
       appRouteMember.create.handler(

@@ -1,3 +1,4 @@
+import type * as errorModule from '@tiny/core/error.ts'
 import * as time from '@tiny/core/time.ts'
 import type * as dbQuery from '@tiny/db/query.ts'
 import chalk from 'chalk'
@@ -16,6 +17,15 @@ export type Write = typeof write
 
 export type WriteContext = dbQuery.Context<Write>
 
+export const retryConfig: Omit<
+  errorModule.RetryConfig,
+  'onError'
+> = {
+  maxAttempts: 15,
+  minDelayMs: time.interval({ milliseconds: 10 }),
+  windowMs: time.interval({ seconds: 30 }),
+}
+
 export function initContext(): ReadContext & WriteContext {
   return {
     databases: {
@@ -26,6 +36,7 @@ export function initContext(): ReadContext & WriteContext {
         process.env.DATABASE_URL_API_WRITE as string
       ),
     },
+    databaseRetryConfig: retryConfig,
   }
 }
 
@@ -68,24 +79,19 @@ function initDatabase<DatabaseId extends symbol>(
   })
   return {
     async query<
-      Values extends dbQuery.SupportedType[],
+      Params extends dbQuery.SupportedType[],
       Row extends Record<string, dbQuery.SupportedType>,
-      Transform
+      Result
     >(
-      query: dbQuery.Query<
-        DatabaseId,
-        Values,
-        Row,
-        Transform
-      >,
-      ...values: Values
-    ): Promise<Transform> {
-      const result = await pool.query<Row, Values>(
+      query: dbQuery.Query<DatabaseId, Params, Row, Result>,
+      ...params: Params
+    ): Promise<Result> {
+      const result = await pool.query<Row, Params>(
         {
           name: query.name,
           text: query.text,
         },
-        values
+        params
       )
       return query.transform(result.rows)
     },

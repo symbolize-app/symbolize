@@ -20,7 +20,7 @@ export const create = route.define(
       'hex'
     )
     const { title, slug, content } = request.json
-    await dbQuery.retryDbQuery(
+    await dbQuery.retryQuery(
       ctx,
       'topic create',
       appDbQueryTopic.create,
@@ -48,7 +48,7 @@ export const list = route.define(
     ctx: errorModule.Context & appDbQuery.ReadContext,
     _request
   ) => {
-    const results = await dbQuery.retryDbQuery(
+    const results = await dbQuery.retryQuery(
       ctx,
       'topic list',
       appDbQueryTopic.list
@@ -77,7 +77,7 @@ export const update = route.define(
     const id = Buffer.from(request.json.id, 'hex')
     const updatedOld = new Date(request.json.updatedOld)
     const { title, slug, content } = request.json
-    const result = await dbQuery.retryDbQuery(
+    const result = await dbQuery.retryQuery(
       ctx,
       'topic update',
       appDbQueryTopic.update,

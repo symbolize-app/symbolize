@@ -1,4 +1,5 @@
 import * as appWidgetMember from '@fe/ui/widget/member.ts'
+import * as errorModuleTest from '@tiny/core/error.test.ts'
 import type * as errorModule from '@tiny/core/error.ts'
 import * as submitTest from '@tiny/core/submit.test.ts'
 import type * as submit from '@tiny/core/submit.ts'
@@ -29,6 +30,7 @@ export const tests = {
         submit.Context = {
         ...baseContext,
         submit,
+        submitRetryConfig: errorModuleTest.retryConfig,
       }
       ctx.document.body.content = [
         appWidgetMember.create(ctx, {}),
@@ -101,6 +103,7 @@ export const tests = {
           submit.Context = {
           ...baseContext,
           submit,
+          submitRetryConfig: errorModuleTest.retryConfig,
         }
         ctx.document.body.content = [
           appWidgetMember.create(ctx, {}),

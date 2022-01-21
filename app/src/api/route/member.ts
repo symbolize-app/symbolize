@@ -16,7 +16,7 @@ export const create = route.define(
       Buffer.from(request.json.requestId, 'hex')
     )
     const { email, handle } = request.json
-    await dbQuery.retryDbQuery(
+    await dbQuery.retryQuery(
       ctx,
       'member create',
       appDbQueryMember.create,

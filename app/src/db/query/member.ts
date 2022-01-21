@@ -7,7 +7,7 @@ export const find = dbQuery.defineOptional(
   appDbQuery.read,
   dbQueryMemberFind,
   {
-    values: dbQuery.values<[id: Buffer]>(),
+    params: dbQuery.params<[id: Buffer]>(),
     row: dbQuery.row<{ email: string }>(),
   }
 )
@@ -16,8 +16,8 @@ export const create = dbQuery.defineVoid(
   appDbQuery.write,
   dbQueryMemberCreate,
   {
-    values:
-      dbQuery.values<
+    params:
+      dbQuery.params<
         [id: Buffer, email: string, handle: string]
       >(),
     conflictMap: {
