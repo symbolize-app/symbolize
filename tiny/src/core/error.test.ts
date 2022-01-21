@@ -2,6 +2,15 @@ import * as errorModule from '@tiny/core/error.ts'
 import * as time from '@tiny/core/time.ts'
 import * as test from '@tiny/test/index.ts'
 
+export const retryConfig: Omit<
+  errorModule.RetryConfig,
+  'onError'
+> = {
+  maxAttempts: 0,
+  minDelayMs: 0,
+  windowMs: 0,
+}
+
 export const url = import.meta.url
 
 export const tests = {

@@ -6,6 +6,7 @@ import * as appRouteMessage from '@fe/api/route/message.ts'
 import * as appRouteSearch from '@fe/api/route/search.ts'
 import * as appRouteTopic from '@fe/api/route/topic.ts'
 import * as appCacheQuery from '@fe/cache/query/index.ts'
+import * as appSubmit from '@fe/core/submit.ts'
 import * as appDbQuery from '@fe/db/query/index.ts'
 import * as appWidgetButton from '@fe/ui/widget/button.ts'
 import * as route from '@tiny/api/route.ts'
@@ -82,7 +83,7 @@ function main(): void {
   const ctx: route.Context &
     random.Context &
     time.Context &
-    appCacheQuery.Context &
+    appCacheQuery.MainContext &
     appDbQuery.ReadContext &
     appDbQuery.WriteContext &
     submit.Context &
@@ -92,7 +93,7 @@ function main(): void {
     ...timeNode.initContext(),
     ...appCacheQuery.initContext(),
     ...appDbQuery.initContext(),
-    ...submitNode.initContext(),
+    ...submitNode.initContext(appSubmit.retryConfig),
     ...appFts.initContext(),
   }
   const httpServer = http.createServer(

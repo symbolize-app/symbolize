@@ -8,7 +8,7 @@ import * as dbQuery from '@tiny/db/query.ts'
 export const show = route.defineBase<
   errorModule.Context & appDbQuery.ReadContext
 >(['GET'], /^\/api\/message$/, async (ctx) => {
-  const row = await dbQuery.retryDbQuery(
+  const row = await dbQuery.retryQuery(
     ctx,
     'member find',
     appDbQueryMember.find,
