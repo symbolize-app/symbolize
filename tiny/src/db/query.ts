@@ -1,6 +1,5 @@
 import * as errorModule from '@tiny/core/error.ts'
 import * as payload from '@tiny/core/payload.ts'
-import * as time from '@tiny/core/time.ts'
 import ms from 'ms'
 import type * as typeFest from 'type-fest'
 
@@ -10,6 +9,10 @@ let globalQueryNameCount = 0
 
 export type Context<DatabaseId extends symbol> = {
   databases: { [K in DatabaseId]: Database<K> }
+  databaseRetryConfig: Omit<
+    errorModule.RetryConfig,
+    'onError'
+  >
 }
 
 export type SupportedType =
@@ -23,40 +26,40 @@ export type SupportedType =
 
 export type Database<DatabaseId extends symbol> = {
   query<
-    Values extends SupportedType[],
+    Params extends SupportedType[],
     Row extends Record<string, SupportedType>,
-    Transform
+    Result
   >(
-    query: Query<DatabaseId, Values, Row, Transform>,
-    ...values: Values
-  ): Promise<Transform>
+    query: Query<DatabaseId, Params, Row, Result>,
+    ...params: Params
+  ): Promise<Result>
 }
 
 export type Query<
   DatabaseId extends symbol,
-  Values extends SupportedType[],
+  Params extends SupportedType[],
   Row extends Record<string, SupportedType>,
-  Transform
+  Result
 > = {
   databaseId: DatabaseId
   name: string
   text: string
-  transform: (rows: Row[]) => Transform
-  values?: Values
+  transform: (rows: Row[]) => Result
+  params?: Params
   conflictMap?: Record<string, string>
 }
 
 type QueryMeta<
-  Values extends SupportedType[],
+  Params extends SupportedType[],
   Row extends Record<string, SupportedType>
 > = {
-  values?: Values
+  params?: Params
   row?: Row
   conflictMap?: Record<string, string>
 }
 
-export function values<Values extends SupportedType[]>():
-  | Values
+export function params<Params extends SupportedType[]>():
+  | Params
   | undefined {
   return undefined
 }
@@ -69,15 +72,15 @@ export function row<
 
 export function defineMultiTransform<
   DatabaseId extends symbol,
-  Values extends SupportedType[],
+  Params extends SupportedType[],
   Row extends Record<string, SupportedType>,
-  Transform
+  Result
 >(
   databaseId: DatabaseId,
   text: string,
-  meta: QueryMeta<Values, Row>,
-  transform: (rows: Row[]) => Transform
-): Query<DatabaseId, Values, Row, Transform> {
+  meta: QueryMeta<Params, Row>,
+  transform: (rows: Row[]) => Result
+): Query<DatabaseId, Params, Row, Result> {
   const name = `q${globalQueryNameCount.toString(
     queryNameBase
   )}`
@@ -93,13 +96,13 @@ export function defineMultiTransform<
 
 export function defineMulti<
   DatabaseId extends symbol,
-  Values extends SupportedType[],
+  Params extends SupportedType[],
   Row extends Record<string, SupportedType>
 >(
   databaseId: DatabaseId,
   text: string,
-  meta: QueryMeta<Values, Row>
-): Query<DatabaseId, Values, Row, Row[]> {
+  meta: QueryMeta<Params, Row>
+): Query<DatabaseId, Params, Row, Row[]> {
   return defineMultiTransform(
     databaseId,
     text,
@@ -110,13 +113,13 @@ export function defineMulti<
 
 export function defineOptional<
   DatabaseId extends symbol,
-  Values extends SupportedType[],
+  Params extends SupportedType[],
   Row extends Record<string, SupportedType>
 >(
   databaseId: DatabaseId,
   text: string,
-  meta: QueryMeta<Values, Row>
-): Query<DatabaseId, Values, Row, Row | undefined> {
+  meta: QueryMeta<Params, Row>
+): Query<DatabaseId, Params, Row, Row | undefined> {
   return defineMultiTransform(
     databaseId,
     text,
@@ -137,13 +140,13 @@ export function defineOptional<
 
 export function defineSingle<
   DatabaseId extends symbol,
-  Values extends SupportedType[],
+  Params extends SupportedType[],
   Row extends Record<string, SupportedType>
 >(
   databaseId: DatabaseId,
   text: string,
-  meta: QueryMeta<Values, Row>
-): Query<DatabaseId, Values, Row, Row> {
+  meta: QueryMeta<Params, Row>
+): Query<DatabaseId, Params, Row, Row> {
   return defineMultiTransform(
     databaseId,
     text,
@@ -164,14 +167,14 @@ export function defineSingle<
 
 export function defineVoid<
   DatabaseId extends symbol,
-  Values extends SupportedType[]
+  Params extends SupportedType[]
 >(
   databaseId: DatabaseId,
   text: string,
-  meta: QueryMeta<Values, Record<string, SupportedType>>
+  meta: QueryMeta<Params, Record<string, SupportedType>>
 ): Query<
   DatabaseId,
-  Values,
+  Params,
   Record<string, SupportedType>,
   void
 > {
@@ -218,52 +221,59 @@ export function getUniqueViolationConstraintName(
   )?.[1]
 }
 
-export async function retryDbQuery<
+export async function retryQuery<
   DatabaseId extends symbol,
-  Values extends SupportedType[],
+  Params extends SupportedType[],
   Row extends Record<string, SupportedType>,
-  Transform
+  Result
 >(
   ctx: errorModule.Context & Context<DatabaseId>,
   description: string,
-  query: Query<DatabaseId, Values, Row, Transform>,
-  ...values: Values
-): Promise<Transform> {
-  return await errorModule.retry(
-    ctx,
-    () =>
-      ctx.databases[query.databaseId].query(
-        query,
-        ...values
-      ),
-    {
-      maxAttempts: 15,
-      minDelayMs: time.interval({ milliseconds: 10 }),
-      windowMs: time.interval({ seconds: 30 }),
-      onError(error, attempt, nextDelayMs) {
-        if (
-          query.conflictMap &&
-          isQueryError(error) &&
-          error.code === errorCode.uniqueViolation
-        ) {
-          const constraintName =
-            getUniqueViolationConstraintName(error)
-          const conflictField =
-            constraintName &&
-            query.conflictMap[constraintName]
-          if (conflictField) {
-            throw new payload.ConflictError(
-              conflictField as never
-            )
+  query: Query<DatabaseId, Params, Row, Result>,
+  ...params: Params
+): Promise<Result> {
+  try {
+    return await errorModule.retry(
+      ctx,
+      () =>
+        ctx.databases[query.databaseId].query(
+          query,
+          ...params
+        ),
+      {
+        ...ctx.databaseRetryConfig,
+        onError(error, attempt, nextDelayMs) {
+          if (
+            isQueryError(error) &&
+            error.code === errorCode.uniqueViolation
+          ) {
+            throw error
           }
-        }
-        console.error(
-          `Retrying ${description} query (attempt ${attempt}, delay ${ms(
-            nextDelayMs
-          )})`,
-          error
+          console.error(
+            `Retrying ${description} DB query (attempt ${attempt}, delay ${ms(
+              nextDelayMs
+            )})`,
+            error
+          )
+        },
+      }
+    )
+  } catch (error) {
+    if (
+      query.conflictMap &&
+      isQueryError(error) &&
+      error.code === errorCode.uniqueViolation
+    ) {
+      const constraintName =
+        getUniqueViolationConstraintName(error)
+      const conflictField =
+        constraintName && query.conflictMap[constraintName]
+      if (conflictField) {
+        throw new payload.ConflictError(
+          conflictField as never
         )
-      },
+      }
     }
-  )
+    throw error
+  }
 }

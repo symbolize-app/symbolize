@@ -1,4 +1,5 @@
 import * as appMessage from '@fe/core/message.ts'
+import * as appSubmit from '@fe/core/submit.ts'
 import * as appWidgetButton from '@fe/ui/widget/button.ts'
 import * as appWidgetFile from '@fe/ui/widget/file.ts'
 import * as appWidgetMember from '@fe/ui/widget/member.ts'
@@ -74,7 +75,7 @@ async function main(): Promise<void> {
     ...random.initContext(),
     ...timeBrowser.initContext(),
     ...widget.initContext(window.document),
-    ...submit.initContext(window),
+    ...submit.initContext(window, appSubmit.retryConfig),
   }
 
   const counter = myCounter(ctx, {})

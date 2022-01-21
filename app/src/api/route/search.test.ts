@@ -3,6 +3,7 @@ import type * as appFts from '@fe/api/fts.ts'
 import * as appRouteSearch from '@fe/api/route/search.ts'
 import * as appLanguage from '@fe/core/language.ts'
 import * as routeTest from '@tiny/api/route.test.ts'
+import * as errorModuleTest from '@tiny/core/error.test.ts'
 import type * as errorModule from '@tiny/core/error.ts'
 import * as random from '@tiny/core/random.ts'
 import * as submitTest from '@tiny/core/submit.test.ts'
@@ -106,6 +107,7 @@ export const tests = {
       appFts.Context = {
       ...baseContext,
       submit,
+      submitRetryConfig: errorModuleTest.retryConfig,
       ...appFtsTest.initContext(),
     }
     const response = test.sync(

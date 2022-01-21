@@ -3,6 +3,7 @@ import type * as appCacheQuery from '@fe/cache/query/index.ts'
 import * as appEndpointFile from '@fe/core/endpoint/file.ts'
 import type * as appDbQuery from '@fe/db/query/index.ts'
 import * as route from '@tiny/api/route.ts'
+import * as cacheQuery from '@tiny/cache/query.ts'
 import * as crypto from '@tiny/core/crypto.node.ts'
 import type * as errorModule from '@tiny/core/error.ts'
 import * as webStream from 'node:stream/web'
@@ -12,7 +13,7 @@ export const write = route.define(
   async (
     ctx: errorModule.Context &
       appDbQuery.WriteContext &
-      appCacheQuery.Context,
+      appCacheQuery.MainContext,
     request
   ) => {
     const id = crypto.hash(
@@ -85,7 +86,9 @@ export const write = route.define(
                 }
               }
               pipeline.push(
-                ctx.cache.query(
+                cacheQuery.retryQuery(
+                  ctx,
+                  'set chunk',
                   appCacheQueryFile.setChunk,
                   response.id,
                   index,
@@ -113,7 +116,9 @@ export const write = route.define(
                 text: 'content too short',
               })
             }
-            await ctx.cache.query(
+            await cacheQuery.retryQuery(
+              ctx,
+              'set chunk',
               appCacheQueryFile.setChunk,
               response.id,
               index,
@@ -138,7 +143,7 @@ export const write = route.define(
 export const read = route.define(
   appEndpointFile.read,
   (
-    ctx: errorModule.Context & appCacheQuery.Context,
+    ctx: errorModule.Context & appCacheQuery.MainContext,
     request
   ) => {
     // TODO Get content type & length & filename from DB
@@ -154,7 +159,9 @@ export const read = route.define(
               appCacheQueryFile.maxPipelinedChunks
             ) {
               pipeline.push(
-                ctx.cache.query(
+                cacheQuery.retryQuery(
+                  ctx,
+                  'get chunk',
                   appCacheQueryFile.getChunk,
                   request.params.id,
                   index

@@ -1,7 +1,6 @@
 import type * as endpoint from '@tiny/core/endpoint.ts'
 import * as errorModule from '@tiny/core/error.ts'
 import type * as payload from '@tiny/core/payload.ts'
-import * as time from '@tiny/core/time.ts'
 import ms from 'ms'
 import type * as typeFest from 'type-fest'
 
@@ -32,17 +31,27 @@ export type Response = {
 
 export type Context = {
   submit(request: Request): Promise<Response>
+  submitRetryConfig: Omit<
+    errorModule.RetryConfig,
+    'onError'
+  >
 }
 
-export function initContext(window: {
-  fetch(
-    input: Exclude<
-      Parameters<Window['fetch']>['0'],
-      Request
-    >,
-    init?: Parameters<Window['fetch']>['1']
-  ): ReturnType<Window['fetch']>
-}): Context {
+export function initContext(
+  window: {
+    fetch(
+      input: Exclude<
+        Parameters<Window['fetch']>['0'],
+        Request
+      >,
+      init?: Parameters<Window['fetch']>['1']
+    ): ReturnType<Window['fetch']>
+  },
+  submitRetryConfig: Omit<
+    errorModule.RetryConfig,
+    'onError'
+  >
+): Context {
   return {
     async submit(request) {
       let body =
@@ -87,6 +96,7 @@ export function initContext(window: {
         },
       }
     },
+    submitRetryConfig,
   }
 }
 
@@ -172,11 +182,7 @@ export function retrySubmit<
       }
     },
     {
-      maxAttempts: 15,
-      minDelayMs: time.interval({
-        milliseconds: 10,
-      }),
-      windowMs: time.interval({ seconds: 30 }),
+      ...ctx.submitRetryConfig,
       onError(error, attempt, nextDelayMs) {
         if (endpoint.conflictResponseJson) {
           if (

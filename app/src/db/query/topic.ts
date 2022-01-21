@@ -8,8 +8,8 @@ export const create = dbQuery.defineVoid(
   appDbQuery.write,
   dbQueryTopicCreate,
   {
-    values:
-      dbQuery.values<
+    params:
+      dbQuery.params<
         [
           id: Buffer,
           memberId: Buffer,
@@ -28,7 +28,7 @@ export const list = dbQuery.defineMulti(
   appDbQuery.read,
   dbQueryTopicList,
   {
-    values: dbQuery.values<[]>(),
+    params: dbQuery.params<[]>(),
     /* eslint-disable @typescript-eslint/naming-convention */
     row: dbQuery.row<{
       id: Buffer
@@ -45,8 +45,8 @@ export const update = dbQuery.defineOptional(
   appDbQuery.write,
   dbQueryTopicUpdate,
   {
-    values:
-      dbQuery.values<
+    params:
+      dbQuery.params<
         [
           id: Buffer,
           updatedOld: Date,

@@ -1,3 +1,4 @@
+import * as appCacheQuery from '@fe/cache/query/index.ts'
 import * as cacheQuery from '@tiny/cache/query.ts'
 
 export const maxSizeBytes = 32 * 1024 * 1024
@@ -9,6 +10,7 @@ export const maxPipelinedChunks = 2
 export const highWaterMarkBytes = chunkSizeBytes / 4
 
 export const getChunk = cacheQuery.define(
+  appCacheQuery.main,
   async (
     client,
     id: string,
@@ -20,10 +22,12 @@ export const getChunk = cacheQuery.define(
       undefined,
       true
     )
-  }
+  },
+  () => undefined
 )
 
 export const setChunk = cacheQuery.define(
+  appCacheQuery.main,
   async (
     client,
     id: string,
@@ -43,5 +47,6 @@ export const setChunk = cacheQuery.define(
       )
     }
     await transaction.exec()
-  }
+  },
+  () => undefined
 )
