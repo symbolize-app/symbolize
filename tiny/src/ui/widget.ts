@@ -1,4 +1,4 @@
-import * as style from '@tiny/ui/style.ts'
+import * as tinyStyle from '@tiny/ui/style.ts'
 
 const listeners = Symbol('listeners')
 
@@ -31,14 +31,14 @@ export type Context = {
     body: HtmlWidget<HTMLBodyElement>
     defaultView: NonNullable<Document['defaultView']>
   }
-} & style.Context
+} & tinyStyle.Context
 
 export function initContext(document: Document): Context {
   if (!document.defaultView) {
     throw new Error('No document default view')
   }
   const ctx = {
-    ...style.initContext(document),
+    ...tinyStyle.initContext(document),
     document,
     window: document.defaultView,
   } as Context
@@ -116,14 +116,14 @@ const elementProperties = {
   styles: {
     set(
       this: Element & { [context]: Context },
-      value: style.Style[]
+      value: tinyStyle.Style[]
     ) {
       if (this.classList.length) {
         this.classList.remove(...this.classList)
       }
       for (const styleItem of value) {
         this.classList.add(
-          ...style.render(this[context], styleItem)
+          ...tinyStyle.render(this[context], styleItem)
         )
       }
     },
@@ -231,7 +231,7 @@ export function define<
 }
 
 export type HtmlWidget<T extends HTMLElement> = T & {
-  styles: style.Style[]
+  styles: tinyStyle.Style[]
   listen: HtmlListeners<T>
   content: Widget[]
 }

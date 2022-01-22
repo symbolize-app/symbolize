@@ -1,20 +1,20 @@
-import * as widget from '@tiny/ui/widget.ts'
+import * as tinyWidget from '@tiny/ui/widget.ts'
 
-const button = widget.html.button
+const button = tinyWidget.html.button
 
-export const custom = widget.define(
+export const custom = tinyWidget.define(
   (
-    ctx: widget.Context
+    ctx: tinyWidget.Context
   ): {
-    body: widget.Widget
-    listen: widget.HtmlListeners
+    body: tinyWidget.Widget
+    listen: tinyWidget.HtmlListeners
   } => {
     const body = button(ctx, {
       content: ['OK'],
     })
     return {
       body,
-      set listen(value: widget.HtmlListeners) {
+      set listen(value: tinyWidget.HtmlListeners) {
         body.listen = value
       },
     }

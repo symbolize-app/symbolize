@@ -1,27 +1,27 @@
 import * as appEndpointMember from '@fe/core/endpoint/member.ts'
-import type * as errorModule from '@tiny/core/error.ts'
-import * as random from '@tiny/core/random.ts'
-import * as submit from '@tiny/core/submit.ts'
-import * as widget from '@tiny/ui/widget.ts'
+import type * as tinyError from '@tiny/core/error.ts'
+import * as tinyRandom from '@tiny/core/random.ts'
+import * as tinySubmit from '@tiny/core/submit.ts'
+import * as tinyWidget from '@tiny/ui/widget.ts'
 
-const button = widget.html.button
-const div = widget.html.div
-const form = widget.html.form
-const input = widget.html.input
+const button = tinyWidget.html.button
+const div = tinyWidget.html.div
+const form = tinyWidget.html.form
+const input = tinyWidget.html.input
 
-export const create = widget.define(
+export const create = tinyWidget.define(
   (
-    ctx: widget.Context &
-      submit.Context &
-      errorModule.Context &
-      random.Context
+    ctx: tinyWidget.Context &
+      tinySubmit.Context &
+      tinyError.Context &
+      tinyRandom.Context
   ): {
-    body: widget.Widget
+    body: tinyWidget.Widget
   } => {
     const requestIdInput = input(ctx, {
       name: 'requestId',
       type: 'hidden',
-      value: random.requestIdHex(ctx),
+      value: tinyRandom.requestIdHex(ctx),
     })
     const emailInput = input(ctx, {
       name: 'email',
@@ -51,7 +51,7 @@ export const create = widget.define(
     async function handleSubmit(event: Event) {
       event.preventDefault()
       try {
-        const okResponseData = await submit.retrySubmit(
+        const okResponseData = await tinySubmit.retrySubmit(
           ctx,
           'create member',
           appEndpointMember.create,

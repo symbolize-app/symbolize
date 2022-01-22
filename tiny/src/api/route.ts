@@ -1,9 +1,9 @@
-import type * as endpoint from '@tiny/core/endpoint.ts'
-import * as payload from '@tiny/core/payload.ts'
-import * as formData from 'formdata-polyfill/esm.min.js'
-import type * as http from 'node:http'
-import * as stream from 'node:stream'
-import * as streamPromises from 'node:stream/promises'
+import type * as tinyEndpoint from '@tiny/core/endpoint.ts'
+import * as tinyPayload from '@tiny/core/payload.ts'
+import * as formDataPolyfill from 'formdata-polyfill/esm.min.js'
+import type * as nodeHttp from 'node:http'
+import * as nodeStream from 'node:stream'
+import * as nodeStreamPromises from 'node:stream/promises'
 import nodeFetchBody from 'node-fetch/src/body.js'
 import type * as typeFest from 'type-fest'
 
@@ -37,7 +37,7 @@ export type Response = typeFest.Promisable<
       form?: typeFest.Promisable<FormData>
       json?: typeFest.Promisable<typeFest.JsonValue>
     }
-  | http.RequestListener
+  | nodeHttp.RequestListener
 >
 
 export class ResponseError extends Error {
@@ -80,7 +80,7 @@ export function defineBase<CustomContext = unknown>(
 }
 
 export function define<
-  Endpoint extends endpoint.BaseEndpoint,
+  Endpoint extends tinyEndpoint.BaseEndpoint,
   CustomContext = unknown
 >(
   endpoint: Endpoint,
@@ -90,40 +90,44 @@ export function define<
       Request,
       'origin' | 'path' | 'method' | 'headers'
     > &
-      (Endpoint extends endpoint.RequestParamsEndpoint
+      (Endpoint extends tinyEndpoint.RequestParamsEndpoint
         ? {
-            params: payload.Payload<
+            params: tinyPayload.Payload<
               Endpoint['requestParams']
             >
           }
         : { params?: never }) &
-      (Endpoint extends endpoint.RequestBytesEndpoint
+      (Endpoint extends tinyEndpoint.RequestBytesEndpoint
         ? Pick<Request, 'stream' | 'blob' | 'buffer'>
         : {
             stream?: never
             blob?: never
             buffer?: never
           }) &
-      (Endpoint extends endpoint.RequestJsonEndpoint
+      (Endpoint extends tinyEndpoint.RequestJsonEndpoint
         ? {
-            json: payload.Payload<Endpoint['requestJson']>
+            json: tinyPayload.Payload<
+              Endpoint['requestJson']
+            >
           }
         : { json?: never }),
     typeFest.Promisable<
       {
         status: 200
         headers?: Record<string, string>
-      } & (Endpoint extends endpoint.OkResponseStreamEndpoint
+      } & (Endpoint extends tinyEndpoint.OkResponseStreamEndpoint
         ? {
             stream?: typeFest.Promisable<ReadableStream>
             blob?: typeFest.Promisable<Blob>
             buffer?: typeFest.Promisable<ArrayBuffer>
           }
         : { stream?: never }) &
-        (Endpoint extends endpoint.OkResponseJsonEndpoint
+        (Endpoint extends tinyEndpoint.OkResponseJsonEndpoint
           ? {
               json: typeFest.Promisable<
-                payload.Payload<Endpoint['okResponseJson']>
+                tinyPayload.Payload<
+                  Endpoint['okResponseJson']
+                >
               >
             }
           : { json?: never })
@@ -143,7 +147,7 @@ export function define<
               ...(endpoint.requestParams !== undefined
                 ? {
                     params: checkRequestParams(
-                      endpoint as endpoint.RequestParamsEndpoint,
+                      endpoint as tinyEndpoint.RequestParamsEndpoint,
                       request
                     ),
                   }
@@ -151,7 +155,7 @@ export function define<
               ...(endpoint.requestJson !== undefined
                 ? {
                     json: await checkRequestJson(
-                      endpoint as endpoint.RequestJsonEndpoint,
+                      endpoint as tinyEndpoint.RequestJsonEndpoint,
                       request
                     ),
                   }
@@ -170,7 +174,7 @@ export function define<
         json:
           endpoint.okResponseJson !== undefined
             ? checkResponseJson(
-                endpoint as endpoint.OkResponseJsonEndpoint,
+                endpoint as tinyEndpoint.OkResponseJsonEndpoint,
                 response as never
               )
             : undefined,
@@ -183,7 +187,7 @@ function checkRequestParams<
   Value extends Record<string, string>
 >(
   endpoint: {
-    requestParams: payload.StringValidator<Value>
+    requestParams: tinyPayload.StringValidator<Value>
   },
   request: Request
 ): Value {
@@ -195,7 +199,7 @@ export async function checkRequestJson<
   Value extends typeFest.JsonValue
 >(
   endpoint: {
-    requestJson: payload.Validator<Value>
+    requestJson: tinyPayload.Validator<Value>
   },
   request: Request
 ): Promise<Value> {
@@ -234,13 +238,13 @@ export async function checkRequestJson<
 }
 
 function checkRequestBase<Value>(
-  validator: payload.Validator<Value>,
+  validator: tinyPayload.Validator<Value>,
   input: typeFest.JsonValue
 ): Value {
   try {
     return validator.check(input)
   } catch (error) {
-    if (error instanceof payload.PayloadError) {
+    if (error instanceof tinyPayload.PayloadError) {
       throw new ResponseError({
         status: 400,
         headers: {
@@ -257,7 +261,7 @@ function checkRequestBase<Value>(
 }
 
 async function checkConflictQuery<Value>(
-  endpoint: endpoint.BaseEndpoint,
+  endpoint: tinyEndpoint.BaseEndpoint,
   query: () => Promise<Value>
 ): Promise<Value> {
   try {
@@ -265,7 +269,7 @@ async function checkConflictQuery<Value>(
   } catch (error) {
     if (
       endpoint.conflictResponseJson !== undefined &&
-      error instanceof payload.ConflictError
+      error instanceof tinyPayload.ConflictError
     ) {
       throw createConflictResponseError(
         endpoint as never,
@@ -279,11 +283,11 @@ async function checkConflictQuery<Value>(
 
 function createConflictResponseError<
   Endpoint extends {
-    conflictResponseJson: payload.ConflictValidator
+    conflictResponseJson: tinyPayload.ConflictValidator
   }
 >(
   endpoint: Endpoint,
-  field: payload.Payload<
+  field: tinyPayload.Payload<
     Endpoint['conflictResponseJson']
   >['conflict']
 ): ResponseError {
@@ -302,7 +306,7 @@ function checkResponseJson<
   Value extends typeFest.JsonValue
 >(
   endpoint: {
-    okResponseJson: payload.Validator<Value>
+    okResponseJson: tinyPayload.Validator<Value>
   },
   response: {
     json: typeFest.Promisable<Value>
@@ -326,7 +330,7 @@ function checkResponseJson<
 export function handle<CustomContext>(
   ctx: CustomContext & Context,
   routes: Route<CustomContext>[]
-): http.RequestListener {
+): nodeHttp.RequestListener {
   return (req, res) => {
     void handleRequest(ctx, routes, req, res)
   }
@@ -335,8 +339,8 @@ export function handle<CustomContext>(
 async function handleRequest<CustomContext>(
   ctx: CustomContext & Context,
   routes: Route<CustomContext>[],
-  req: http.IncomingMessage,
-  res: http.ServerResponse
+  req: nodeHttp.IncomingMessage,
+  res: nodeHttp.ServerResponse
 ): Promise<void> {
   if (!req.method) {
     console.error('Missing method')
@@ -381,7 +385,7 @@ async function handleRequest<CustomContext>(
         ) as [string, string][]
       ),
       stream() {
-        return stream.Readable.toWeb(req)
+        return nodeStream.Readable.toWeb(req)
       },
       async blob() {
         checkContentLength()
@@ -425,14 +429,14 @@ async function handleRequest<CustomContext>(
         headResponse.headers
       )
       if (headResponse.stream !== undefined) {
-        await streamPromises.pipeline(
-          stream.Readable.fromWeb(
+        await nodeStreamPromises.pipeline(
+          nodeStream.Readable.fromWeb(
             await Promise.resolve(headResponse.stream)
           ),
           res
         )
       } else if (headResponse.blob !== undefined) {
-        await streamPromises.pipeline(
+        await nodeStreamPromises.pipeline(
           (
             await Promise.resolve(headResponse.blob)
           ).stream(),
@@ -445,7 +449,7 @@ async function handleRequest<CustomContext>(
       } else if (headResponse.text !== undefined) {
         res.write(await Promise.resolve(headResponse.text))
       } else if (headResponse.form !== undefined) {
-        const result = formData.formDataToBlob(
+        const result = formDataPolyfill.formDataToBlob(
           await Promise.resolve(headResponse.form)
         )
         res.write(result)

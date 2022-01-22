@@ -1,6 +1,6 @@
-import type * as endpoint from '@tiny/core/endpoint.ts'
-import * as errorModule from '@tiny/core/error.ts'
-import type * as payload from '@tiny/core/payload.ts'
+import type * as tinyEndpoint from '@tiny/core/endpoint.ts'
+import * as tinyError from '@tiny/core/error.ts'
+import type * as tinyPayload from '@tiny/core/payload.ts'
 import ms from 'ms'
 import type * as typeFest from 'type-fest'
 
@@ -31,10 +31,7 @@ export type Response = {
 
 export type Context = {
   submit(request: Request): Promise<Response>
-  submitRetryConfig: Omit<
-    errorModule.RetryConfig,
-    'onError'
-  >
+  submitRetryConfig: Omit<tinyError.RetryConfig, 'onError'>
 }
 
 export function initContext(
@@ -47,10 +44,7 @@ export function initContext(
       init?: Parameters<Window['fetch']>['1']
     ): ReturnType<Window['fetch']>
   },
-  submitRetryConfig: Omit<
-    errorModule.RetryConfig,
-    'onError'
-  >
+  submitRetryConfig: Omit<tinyError.RetryConfig, 'onError'>
 ): Context {
   return {
     async submit(request) {
@@ -117,39 +111,43 @@ export function getUrl(request: Request): string {
 }
 
 export function retrySubmit<
-  Endpoint extends endpoint.BaseEndpoint
+  Endpoint extends tinyEndpoint.BaseEndpoint
 >(
-  ctx: errorModule.Context & Context,
+  ctx: tinyError.Context & Context,
   description: string,
   endpoint: Endpoint,
   request: Pick<Request, 'origin' | 'headers'> &
-    (Endpoint extends endpoint.RequestParamsEndpoint
+    (Endpoint extends tinyEndpoint.RequestParamsEndpoint
       ? {
-          params: payload.Payload<Endpoint['requestParams']>
+          params: tinyPayload.Payload<
+            Endpoint['requestParams']
+          >
         }
       : { params?: never }) &
-    (Endpoint extends endpoint.RequestBytesEndpoint
+    (Endpoint extends tinyEndpoint.RequestBytesEndpoint
       ? Pick<Request, 'stream' | 'blob' | 'buffer'>
       : { stream?: never; blob?: never; buffer?: never }) &
-    (Endpoint extends endpoint.RequestJsonEndpoint
+    (Endpoint extends tinyEndpoint.RequestJsonEndpoint
       ? {
-          json: payload.Payload<Endpoint['requestJson']>
+          json: tinyPayload.Payload<Endpoint['requestJson']>
         }
       : { json?: never })
 ): Promise<
-  (Endpoint extends endpoint.OkResponseStreamEndpoint
+  (Endpoint extends tinyEndpoint.OkResponseStreamEndpoint
     ? {
         stream: ReadableStream
       }
     : { stream?: never }) &
-    (Endpoint extends endpoint.OkResponseJsonEndpoint
+    (Endpoint extends tinyEndpoint.OkResponseJsonEndpoint
       ? {
-          json: payload.Payload<Endpoint['okResponseJson']>
+          json: tinyPayload.Payload<
+            Endpoint['okResponseJson']
+          >
         }
       : { json?: never })
 > {
   const checkedRequest = createRequest(endpoint, request)
-  return errorModule.retry(
+  return tinyError.retry(
     ctx,
     async () => {
       const response = await ctx.submit(checkedRequest)
@@ -204,21 +202,23 @@ export function retrySubmit<
 }
 
 export function getEndpointUrl<
-  Endpoint extends endpoint.BaseEndpoint
+  Endpoint extends tinyEndpoint.BaseEndpoint
 >(
   endpoint: Endpoint,
   request: Pick<Request, 'origin' | 'headers'> &
-    (Endpoint extends endpoint.RequestParamsEndpoint
+    (Endpoint extends tinyEndpoint.RequestParamsEndpoint
       ? {
-          params: payload.Payload<Endpoint['requestParams']>
+          params: tinyPayload.Payload<
+            Endpoint['requestParams']
+          >
         }
       : { params?: never }) &
-    (Endpoint extends endpoint.RequestBytesEndpoint
+    (Endpoint extends tinyEndpoint.RequestBytesEndpoint
       ? Pick<Request, 'stream' | 'blob' | 'buffer'>
       : { stream?: never; blob?: never; buffer?: never }) &
-    (Endpoint extends endpoint.RequestJsonEndpoint
+    (Endpoint extends tinyEndpoint.RequestJsonEndpoint
       ? {
-          json: payload.Payload<Endpoint['requestJson']>
+          json: tinyPayload.Payload<Endpoint['requestJson']>
         }
       : { json?: never })
 ): string {
@@ -226,21 +226,23 @@ export function getEndpointUrl<
 }
 
 export function createRequest<
-  Endpoint extends endpoint.BaseEndpoint
+  Endpoint extends tinyEndpoint.BaseEndpoint
 >(
   endpoint: Endpoint,
   request: Pick<Request, 'origin' | 'headers'> &
-    (Endpoint extends endpoint.RequestParamsEndpoint
+    (Endpoint extends tinyEndpoint.RequestParamsEndpoint
       ? {
-          params: payload.Payload<Endpoint['requestParams']>
+          params: tinyPayload.Payload<
+            Endpoint['requestParams']
+          >
         }
       : { params?: never }) &
-    (Endpoint extends endpoint.RequestBytesEndpoint
+    (Endpoint extends tinyEndpoint.RequestBytesEndpoint
       ? Pick<Request, 'stream' | 'blob' | 'buffer'>
       : { stream?: never; blob?: never; buffer?: never }) &
-    (Endpoint extends endpoint.RequestJsonEndpoint
+    (Endpoint extends tinyEndpoint.RequestJsonEndpoint
       ? {
-          json: payload.Payload<Endpoint['requestJson']>
+          json: tinyPayload.Payload<Endpoint['requestJson']>
         }
       : { json?: never })
 ): Request {

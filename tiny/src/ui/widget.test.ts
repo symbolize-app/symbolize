@@ -1,4 +1,4 @@
-import * as widget from '@tiny/ui/widget.ts'
+import * as tinyWidget from '@tiny/ui/widget.ts'
 import type * as typeFest from 'type-fest'
 
 export function withTempDocument<
@@ -8,9 +8,11 @@ export function withTempDocument<
   >
 >(
   callback: (
-    ctx: CustomContext & widget.Context
+    ctx: CustomContext & tinyWidget.Context
   ) => typeFest.Promisable<void>
-): (ctx: CustomContext & widget.Context) => Promise<void> {
+): (
+  ctx: CustomContext & tinyWidget.Context
+) => Promise<void> {
   return async (baseContext) => {
     const iframe =
       baseContext.document.createElement('iframe')
@@ -23,7 +25,7 @@ export function withTempDocument<
       }
       await callback({
         ...baseContext,
-        ...widget.initContext(iframeDocument),
+        ...tinyWidget.initContext(iframeDocument),
       })
     } finally {
       iframe.remove()

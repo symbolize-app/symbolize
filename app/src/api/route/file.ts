@@ -2,21 +2,21 @@ import * as appCacheQueryFile from '@fe/cache/query/file.ts'
 import type * as appCacheQuery from '@fe/cache/query/index.ts'
 import * as appEndpointFile from '@fe/core/endpoint/file.ts'
 import type * as appDbQuery from '@fe/db/query/index.ts'
-import * as route from '@tiny/api/route.ts'
-import * as cacheQuery from '@tiny/cache/query.ts'
-import * as crypto from '@tiny/core/crypto.node.ts'
-import type * as errorModule from '@tiny/core/error.ts'
-import * as webStream from 'node:stream/web'
+import * as tinyRoute from '@tiny/api/route.ts'
+import * as tinyCacheQuery from '@tiny/cache/query.ts'
+import * as tinyCrypto from '@tiny/core/crypto.node.ts'
+import type * as tinyError from '@tiny/core/error.ts'
+import * as nodeWebStream from 'node:stream/web'
 
-export const write = route.define(
+export const write = tinyRoute.define(
   appEndpointFile.write,
   async (
-    ctx: errorModule.Context &
+    ctx: tinyError.Context &
       appDbQuery.WriteContext &
       appCacheQuery.MainContext,
     request
   ) => {
-    const id = crypto.hash(
+    const id = tinyCrypto.hash(
       Buffer.from(request.params.requestId, 'hex')
     )
     const response = {
@@ -31,7 +31,7 @@ export const write = route.define(
         contentLength < appCacheQueryFile.maxSizeBytes
       )
     ) {
-      throw new route.ResponseError({
+      throw new tinyRoute.ResponseError({
         status: 400,
         text: `invalid content length (max ${appCacheQueryFile.maxSizeBytes} bytes)`,
       })
@@ -41,7 +41,7 @@ export const write = route.define(
     let queueLength = 0
     const pipeline: Promise<void>[] = []
     await request.stream().pipeTo(
-      new webStream.WritableStream<Uint8Array>(
+      new nodeWebStream.WritableStream<Uint8Array>(
         {
           async write(chunk: unknown) {
             if (!(chunk instanceof Uint8Array)) {
@@ -54,7 +54,7 @@ export const write = route.define(
                 queueLength >
               contentLength
             ) {
-              throw new route.ResponseError({
+              throw new tinyRoute.ResponseError({
                 status: 400,
                 text: 'content too long',
               })
@@ -86,7 +86,7 @@ export const write = route.define(
                 }
               }
               pipeline.push(
-                cacheQuery.retryQuery(
+                tinyCacheQuery.retryQuery(
                   ctx,
                   'set chunk',
                   appCacheQueryFile.setChunk,
@@ -111,12 +111,12 @@ export const write = route.define(
                 queueLength <
               contentLength
             ) {
-              throw new route.ResponseError({
+              throw new tinyRoute.ResponseError({
                 status: 400,
                 text: 'content too short',
               })
             }
-            await cacheQuery.retryQuery(
+            await tinyCacheQuery.retryQuery(
               ctx,
               'set chunk',
               appCacheQueryFile.setChunk,
@@ -127,7 +127,7 @@ export const write = route.define(
             )
           },
         },
-        new webStream.ByteLengthQueuingStrategy({
+        new nodeWebStream.ByteLengthQueuingStrategy({
           highWaterMark:
             appCacheQueryFile.highWaterMarkBytes,
         })
@@ -140,10 +140,10 @@ export const write = route.define(
   }
 )
 
-export const read = route.define(
+export const read = tinyRoute.define(
   appEndpointFile.read,
   (
-    ctx: errorModule.Context & appCacheQuery.MainContext,
+    ctx: tinyError.Context & appCacheQuery.MainContext,
     request
   ) => {
     // TODO Get content type & length & filename from DB
@@ -151,7 +151,7 @@ export const read = route.define(
     const pipeline: Promise<Buffer | undefined>[] = []
     return {
       status: 200,
-      stream: new webStream.ReadableStream<Uint8Array>(
+      stream: new nodeWebStream.ReadableStream<Uint8Array>(
         {
           async pull(controller) {
             while (
@@ -159,7 +159,7 @@ export const read = route.define(
               appCacheQueryFile.maxPipelinedChunks
             ) {
               pipeline.push(
-                cacheQuery.retryQuery(
+                tinyCacheQuery.retryQuery(
                   ctx,
                   'get chunk',
                   appCacheQueryFile.getChunk,
@@ -177,7 +177,7 @@ export const read = route.define(
             }
           },
         },
-        new webStream.ByteLengthQueuingStrategy({
+        new nodeWebStream.ByteLengthQueuingStrategy({
           highWaterMark:
             appCacheQueryFile.highWaterMarkBytes,
         })
