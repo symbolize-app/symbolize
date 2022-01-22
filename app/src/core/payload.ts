@@ -1,6 +1,6 @@
-import * as appDocumentType from '@fe/core/documentType.ts'
-import * as appLanguage from '@fe/core/language.ts'
-import * as appTaxonRank from '@fe/core/taxonRank.ts'
+import * as appDocumentType from '@app/core/documentType.ts'
+import * as appLanguage from '@app/core/language.ts'
+import * as appTaxonRank from '@app/core/taxonRank.ts'
 import * as tinyPayload from '@tiny/core/payload.ts'
 
 export const content = tinyPayload.string({

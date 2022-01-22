@@ -1,5 +1,5 @@
-import * as appEndpointSearch from '@fe/core/endpoint/search.ts'
-import * as appLanguage from '@fe/core/language.ts'
+import * as appEndpointSearch from '@app/core/endpoint/search.ts'
+import * as appLanguage from '@app/core/language.ts'
 import type * as tinyError from '@tiny/core/error.ts'
 import type * as tinyRandom from '@tiny/core/random.ts'
 import * as tinySubmit from '@tiny/core/submit.ts'

@@ -1,4 +1,4 @@
-import * as appEndpointMember from '@fe/core/endpoint/member.ts'
+import * as appEndpointMember from '@app/core/endpoint/member.ts'
 import * as tinyRandom from '@tiny/core/random.ts'
 import * as tinyTest from '@tiny/test/index.ts'
 

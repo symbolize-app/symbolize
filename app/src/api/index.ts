@@ -1,14 +1,14 @@
-import * as appFts from '@fe/api/fts.ts'
-import * as appRouteFile from '@fe/api/route/file.ts'
-import * as appRoute from '@fe/api/route/index.ts'
-import * as appRouteMember from '@fe/api/route/member.ts'
-import * as appRouteMessage from '@fe/api/route/message.ts'
-import * as appRouteSearch from '@fe/api/route/search.ts'
-import * as appRouteTopic from '@fe/api/route/topic.ts'
-import * as appCacheQuery from '@fe/cache/query/index.ts'
-import * as appSubmit from '@fe/core/submit.ts'
-import * as appDbQuery from '@fe/db/query/index.ts'
-import * as appWidgetButton from '@fe/ui/widget/button.ts'
+import * as appFts from '@app/api/fts.ts'
+import * as appRouteFile from '@app/api/route/file.ts'
+import * as appRoute from '@app/api/route/index.ts'
+import * as appRouteMember from '@app/api/route/member.ts'
+import * as appRouteMessage from '@app/api/route/message.ts'
+import * as appRouteSearch from '@app/api/route/search.ts'
+import * as appRouteTopic from '@app/api/route/topic.ts'
+import * as appCacheQuery from '@app/cache/query/index.ts'
+import * as appSubmit from '@app/core/submit.ts'
+import * as appDbQuery from '@app/db/query/index.ts'
+import * as appWidgetButton from '@app/ui/widget/button.ts'
 import * as tinyRoute from '@tiny/api/route.ts'
 import * as tinyRandom from '@tiny/core/random.ts'
 import * as tinySubmitNode from '@tiny/core/submit.node.ts'
@@ -120,7 +120,7 @@ function main(): void {
     () => {
       if (process.env.NODE_ENV === 'development') {
         void (async () => {
-          const dev = await import('@fe/api/dev.ts')
+          const dev = await import('@app/api/dev.ts')
           dev.main(ctx)
         })()
       } else if (process.env.NODE_ENV !== 'development') {

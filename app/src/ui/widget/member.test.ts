@@ -1,4 +1,4 @@
-import * as appWidgetMember from '@fe/ui/widget/member.ts'
+import * as appWidgetMember from '@app/ui/widget/member.ts'
 import * as tinyErrorTest from '@tiny/core/error.test.ts'
 import type * as tinyError from '@tiny/core/error.ts'
 import * as tinySubmitTest from '@tiny/core/submit.test.ts'
