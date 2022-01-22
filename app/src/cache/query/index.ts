@@ -10,6 +10,8 @@ export type Main = typeof main
 
 export type MainContext = cacheQuery.Context<Main>
 
+const timeout = time.interval({ milliseconds: 50 })
+
 export const retryConfig: Omit<
   errorModule.RetryConfig,
   'onError'
@@ -19,18 +21,28 @@ export const retryConfig: Omit<
   windowMs: time.interval({ milliseconds: 50 }),
 }
 
-export function initContext(): MainContext {
+export function initContext(): Exclude<
+  MainContext,
+  time.Context
+> {
   const client = redisClient.createClient({
     url: process.env.CACHE_URL as string,
   })
+  let connected = false
   client.on('error', console.error)
   client.on('ready', () => {
+    connected = true
     client
       .configSet('maxmemory-policy', 'allkeys-lfu')
       .catch(console.error)
     console.log(chalk.magenta(`cache client connected`))
   })
+  client.on('reconnecting', () => {
+    connected = false
+    console.log(chalk.magenta(`cache client reconnecting`))
+  })
   client.on('end', () => {
+    connected = false
     console.log(chalk.magenta(`cache client disconnected`))
   })
   client.connect().catch(console.error)
@@ -42,10 +54,21 @@ export function initContext(): MainContext {
           Params extends unknown[],
           Result
         >(
+          ctx: time.Context,
           query: cacheQuery.Query<CacheId, Params, Result>,
           ...params: Params
         ): Promise<Result> {
-          return query.command(client, ...params)
+          if (connected) {
+            return Promise.race([
+              query.command(client, ...params),
+              (async () => {
+                await time.delay(ctx, timeout)
+                throw new Error('cache command timeout')
+              })(),
+            ])
+          } else {
+            throw new Error('cache client not connected')
+          }
         },
       },
     },
