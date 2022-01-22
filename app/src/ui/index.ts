@@ -5,50 +5,50 @@ import * as appWidgetFile from '@fe/ui/widget/file.ts'
 import * as appWidgetMember from '@fe/ui/widget/member.ts'
 import * as appWidgetSearch from '@fe/ui/widget/search.ts'
 import * as appWidgetTopic from '@fe/ui/widget/topic.ts'
-import type * as errorModule from '@tiny/core/error.ts'
-import * as random from '@tiny/core/random.ts'
-import * as submit from '@tiny/core/submit.ts'
-import * as timeBrowser from '@tiny/core/time.browser.ts'
-import * as style from '@tiny/ui/style.ts'
-import * as widget from '@tiny/ui/widget.ts'
+import type * as tinyError from '@tiny/core/error.ts'
+import * as tinyRandom from '@tiny/core/random.ts'
+import * as tinySubmit from '@tiny/core/submit.ts'
+import * as tinyTimeBrowser from '@tiny/core/time.browser.ts'
+import * as tinyStyle from '@tiny/ui/style.ts'
+import * as tinyWidget from '@tiny/ui/widget.ts'
 
 console.log(appMessage.hi)
 
-const green = style.build([
+const green = tinyStyle.build([
   {
     backgroundColor: 'green',
   },
 ])
-const blue = style.build([
+const blue = tinyStyle.build([
   {
     backgroundColor: 'blue',
   },
 ])
-const red = style.build([
+const red = tinyStyle.build([
   {
     backgroundColor: 'red',
   },
   blue,
-  style.useSelector('&:hover', [green]),
+  tinyStyle.useSelector('&:hover', [green]),
 ])
-const bold = style.build([
+const bold = tinyStyle.build([
   {
     fontWeight: 'bold',
   },
 ])
 
-const div = widget.html.div
-const li = widget.html.li
-const link = widget.html.link
-const span = widget.html.span
-const title = widget.html.title
-const ul = widget.html.ul
+const div = tinyWidget.html.div
+const li = tinyWidget.html.li
+const link = tinyWidget.html.link
+const span = tinyWidget.html.span
+const title = tinyWidget.html.title
+const ul = tinyWidget.html.ul
 
-const myCounter = widget.define(
+const myCounter = tinyWidget.define(
   (
-    ctx: widget.Context
+    ctx: tinyWidget.Context
   ): {
-    body: widget.Widget
+    body: tinyWidget.Widget
     value: number
   } => {
     let value: number
@@ -69,18 +69,21 @@ const myCounter = widget.define(
 )
 
 async function main(): Promise<void> {
-  const ctx: widget.Context &
-    errorModule.Context &
-    submit.Context = {
-    ...random.initContext(),
-    ...timeBrowser.initContext(),
-    ...widget.initContext(window.document),
-    ...submit.initContext(window, appSubmit.retryConfig),
+  const ctx: tinyWidget.Context &
+    tinyError.Context &
+    tinySubmit.Context = {
+    ...tinyRandom.initContext(),
+    ...tinyTimeBrowser.initContext(),
+    ...tinyWidget.initContext(window.document),
+    ...tinySubmit.initContext(
+      window,
+      appSubmit.retryConfig
+    ),
   }
 
   const counter = myCounter(ctx, {})
 
-  const listContents = widget.range(ctx, {
+  const listContents = tinyWidget.range(ctx, {
     content: [
       li(ctx, {
         styles: [bold],

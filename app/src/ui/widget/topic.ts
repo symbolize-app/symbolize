@@ -1,17 +1,17 @@
 import * as appEndpointTopic from '@fe/core/endpoint/topic.ts'
-import type * as errorModule from '@tiny/core/error.ts'
-import * as random from '@tiny/core/random.ts'
-import * as submit from '@tiny/core/submit.ts'
-import * as style from '@tiny/ui/style.ts'
-import * as widget from '@tiny/ui/widget.ts'
+import type * as tinyError from '@tiny/core/error.ts'
+import * as tinyRandom from '@tiny/core/random.ts'
+import * as tinySubmit from '@tiny/core/submit.ts'
+import * as tinyStyle from '@tiny/ui/style.ts'
+import * as tinyWidget from '@tiny/ui/widget.ts'
 
-const button = widget.html.button
-const div = widget.html.div
-const form = widget.html.form
-const input = widget.html.input
-const range = widget.range
+const button = tinyWidget.html.button
+const div = tinyWidget.html.div
+const form = tinyWidget.html.form
+const input = tinyWidget.html.input
+const range = tinyWidget.range
 
-const column = style.build([
+const column = tinyStyle.build([
   {
     marginTop: '20px',
     display: 'flex',
@@ -20,14 +20,14 @@ const column = style.build([
   },
 ])
 
-export const list = widget.define(
+export const list = tinyWidget.define(
   (
-    ctx: widget.Context &
-      submit.Context &
-      errorModule.Context &
-      random.Context
+    ctx: tinyWidget.Context &
+      tinySubmit.Context &
+      tinyError.Context &
+      tinyRandom.Context
   ): {
-    body: widget.Widget
+    body: tinyWidget.Widget
   } => {
     const resultsRange = range(ctx, {
       content: ['Loading...'],
@@ -50,7 +50,7 @@ export const list = widget.define(
 
     async function load() {
       resetEditRange()
-      const okResponseData = await submit.retrySubmit(
+      const okResponseData = await tinySubmit.retrySubmit(
         ctx,
         'create topic',
         appEndpointTopic.list,
@@ -102,21 +102,21 @@ type CreateListeners = {
   submit?: () => void
   cancel?: () => void
 }
-const create = widget.define(
+const create = tinyWidget.define(
   (
-    ctx: widget.Context &
-      submit.Context &
-      errorModule.Context &
-      random.Context
+    ctx: tinyWidget.Context &
+      tinySubmit.Context &
+      tinyError.Context &
+      tinyRandom.Context
   ): {
-    body: widget.Widget
+    body: tinyWidget.Widget
     listen: CreateListeners
   } => {
     let listen: CreateListeners = {}
     const requestIdInput = input(ctx, {
       name: 'requestId',
       type: 'hidden',
-      value: random.requestIdHex(ctx),
+      value: tinyRandom.requestIdHex(ctx),
     })
     const memberIdInput = input(ctx, {
       name: 'memberId',
@@ -169,7 +169,7 @@ const create = widget.define(
     async function handleSubmit(event: Event) {
       event.preventDefault()
       try {
-        const okResponseData = await submit.retrySubmit(
+        const okResponseData = await tinySubmit.retrySubmit(
           ctx,
           'create topic',
           appEndpointTopic.create,
@@ -208,14 +208,14 @@ type UpdateListeners = {
   cancel?: () => void
 }
 
-const update = widget.define(
+const update = tinyWidget.define(
   (
-    ctx: widget.Context &
-      submit.Context &
-      errorModule.Context &
-      random.Context
+    ctx: tinyWidget.Context &
+      tinySubmit.Context &
+      tinyError.Context &
+      tinyRandom.Context
   ): {
-    body: widget.Widget
+    body: tinyWidget.Widget
     topic: appEndpointTopic.ListResult
     listen: UpdateListeners
   } => {
@@ -274,7 +274,7 @@ const update = widget.define(
         return
       }
       try {
-        const okResponseData = await submit.retrySubmit(
+        const okResponseData = await tinySubmit.retrySubmit(
           ctx,
           'update topic',
           appEndpointTopic.update,

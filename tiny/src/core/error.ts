@@ -1,8 +1,8 @@
-import type * as random from '@tiny/core/random.ts'
-import * as time from '@tiny/core/time.ts'
+import type * as tinyRandom from '@tiny/core/random.ts'
+import * as tinyTime from '@tiny/core/time.ts'
 import type * as typeFest from 'type-fest'
 
-export type Context = time.Context & random.Context
+export type Context = tinyTime.Context & tinyRandom.Context
 
 export type RetryConfig = {
   minDelayMs: number
@@ -43,7 +43,7 @@ export async function retry<Result>(
       }
 
       config.onError(error, attempt, delayMs)
-      await time.delay(ctx, delayMs)
+      await tinyTime.delay(ctx, delayMs)
       attempt += 1
     }
   }

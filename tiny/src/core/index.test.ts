@@ -1,6 +1,6 @@
-import type * as test from '@tiny/test/index.ts'
+import type * as tinyTest from '@tiny/test/index.ts'
 
-export const all: test.TestCollection = () => [
+export const all: tinyTest.TestCollection = () => [
   import('@tiny/core/error.test.ts'),
   import('@tiny/core/hex.test.ts'),
   import('@tiny/core/payload.test.ts'),

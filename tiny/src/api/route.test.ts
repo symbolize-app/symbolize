@@ -1,9 +1,9 @@
-import type * as route from '@tiny/api/route.ts'
-import * as test from '@tiny/test/index.ts'
+import type * as tinyRoute from '@tiny/api/route.ts'
+import * as tinyTest from '@tiny/test/index.ts'
 
 export function mockReqeuest(
-  response: Partial<route.Request>
-): route.Request {
+  response: Partial<tinyRoute.Request>
+): tinyRoute.Request {
   return {
     origin: 'http://test',
     path: '/',
@@ -13,12 +13,12 @@ export function mockReqeuest(
     headers: {
       'content-type': 'application/json',
     },
-    stream: test.mock([]),
-    blob: test.mock([]),
-    buffer: test.mock([]),
-    text: test.mock([]),
-    form: test.mock([]),
-    json: test.mock([]),
+    stream: tinyTest.mock([]),
+    blob: tinyTest.mock([]),
+    buffer: tinyTest.mock([]),
+    text: tinyTest.mock([]),
+    form: tinyTest.mock([]),
+    json: tinyTest.mock([]),
     ...response,
   }
 }

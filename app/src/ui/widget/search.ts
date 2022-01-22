@@ -1,18 +1,18 @@
 import * as appEndpointSearch from '@fe/core/endpoint/search.ts'
 import * as appLanguage from '@fe/core/language.ts'
-import type * as errorModule from '@tiny/core/error.ts'
-import type * as random from '@tiny/core/random.ts'
-import * as submit from '@tiny/core/submit.ts'
-import * as style from '@tiny/ui/style.ts'
-import * as widget from '@tiny/ui/widget.ts'
+import type * as tinyError from '@tiny/core/error.ts'
+import type * as tinyRandom from '@tiny/core/random.ts'
+import * as tinySubmit from '@tiny/core/submit.ts'
+import * as tinyStyle from '@tiny/ui/style.ts'
+import * as tinyWidget from '@tiny/ui/widget.ts'
 
-const button = widget.html.button
-const div = widget.html.div
-const form = widget.html.form
-const input = widget.html.input
-const range = widget.range
+const button = tinyWidget.html.button
+const div = tinyWidget.html.div
+const form = tinyWidget.html.form
+const input = tinyWidget.html.input
+const range = tinyWidget.range
 
-const column = style.build([
+const column = tinyStyle.build([
   {
     marginTop: '20px',
     display: 'flex',
@@ -21,14 +21,14 @@ const column = style.build([
   },
 ])
 
-export const query = widget.define(
+export const query = tinyWidget.define(
   (
-    ctx: widget.Context &
-      submit.Context &
-      errorModule.Context &
-      random.Context
+    ctx: tinyWidget.Context &
+      tinySubmit.Context &
+      tinyError.Context &
+      tinyRandom.Context
   ): {
-    body: widget.Widget
+    body: tinyWidget.Widget
   } => {
     const queryInput = input(ctx, {
       name: 'query',
@@ -55,7 +55,7 @@ export const query = widget.define(
 
     async function query(event: Event) {
       event.preventDefault()
-      const okResponseData = await submit.retrySubmit(
+      const okResponseData = await tinySubmit.retrySubmit(
         ctx,
         'execute search',
         appEndpointSearch.query,

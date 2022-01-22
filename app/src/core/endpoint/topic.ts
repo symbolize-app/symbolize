@@ -1,39 +1,39 @@
 import * as appPayload from '@fe/core/payload.ts'
-import * as endpoint from '@tiny/core/endpoint.ts'
-import * as payload from '@tiny/core/payload.ts'
+import * as tinyEndpoint from '@tiny/core/endpoint.ts'
+import * as tinyPayload from '@tiny/core/payload.ts'
 import type * as typeFest from 'type-fest'
 
 export type Create = typeof create
-export const create = endpoint.definePostEndpoint(
+export const create = tinyEndpoint.definePostEndpoint(
   '/api/topic/create',
   {
-    requestJson: payload.object({
+    requestJson: tinyPayload.object({
       requestId: appPayload.id,
       memberId: appPayload.id,
       title: appPayload.title,
       slug: appPayload.slug,
       content: appPayload.content,
     }),
-    okResponseJson: payload.object({
+    okResponseJson: tinyPayload.object({
       id: appPayload.id,
     }),
-    conflictResponseJson: payload.conflict('slug'),
+    conflictResponseJson: tinyPayload.conflict('slug'),
   }
 )
 
 export type List = typeof list
 export type ListResult = typeFest.IterableElement<
-  payload.Payload<List['okResponseJson']>['results']
+  tinyPayload.Payload<List['okResponseJson']>['results']
 >
-export const list = endpoint.defineGetEndpoint(
+export const list = tinyEndpoint.defineGetEndpoint(
   '/api/topic/list',
   {
-    requestParams: payload.object({}),
-    okResponseJson: payload.object({
-      results: payload.array(
-        payload.object({
+    requestParams: tinyPayload.object({}),
+    okResponseJson: tinyPayload.object({
+      results: tinyPayload.array(
+        tinyPayload.object({
           id: appPayload.id,
-          updatedAt: payload.timestamp,
+          updatedAt: tinyPayload.timestamp,
           title: appPayload.title,
           slug: appPayload.slug,
           content: appPayload.content,
@@ -44,19 +44,19 @@ export const list = endpoint.defineGetEndpoint(
 )
 
 export type Update = typeof update
-export const update = endpoint.definePostEndpoint(
+export const update = tinyEndpoint.definePostEndpoint(
   '/api/topic/update',
   {
-    requestJson: payload.object({
+    requestJson: tinyPayload.object({
       id: appPayload.id,
-      updatedOld: payload.timestamp,
+      updatedOld: tinyPayload.timestamp,
       title: appPayload.title,
       slug: appPayload.slug,
       content: appPayload.content,
     }),
-    okResponseJson: payload.object({
-      updated: payload.timestamp,
+    okResponseJson: tinyPayload.object({
+      updated: tinyPayload.timestamp,
     }),
-    conflictResponseJson: payload.conflict('slug'),
+    conflictResponseJson: tinyPayload.conflict('slug'),
   }
 )

@@ -1,6 +1,6 @@
-import type * as route from '@tiny/api/route.ts'
+import type * as tinyRoute from '@tiny/api/route.ts'
 
-export function initContext(): route.Context {
+export function initContext(): tinyRoute.Context {
   return {
     maxRequestNonStreamedBytes: 4 * 1024,
   }

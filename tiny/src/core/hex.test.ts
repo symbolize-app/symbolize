@@ -1,20 +1,20 @@
-import * as hex from '@tiny/core/hex.ts'
-import * as test from '@tiny/test/index.ts'
+import * as tinyHex from '@tiny/core/hex.ts'
+import * as tinyTest from '@tiny/test/index.ts'
 
 export const url = import.meta.url
 
 export const tests = {
   ['uint8ArrayToHex']: (): void => {
-    test.assertDeepEquals(
-      hex.uint8ArrayToHex(
+    tinyTest.assertDeepEquals(
+      tinyHex.uint8ArrayToHex(
         new Uint8Array([0x00, 0x23, 0xa0, 0xff])
       ),
       '0023a0ff'
     )
   },
   ['uint8ArrayFromHex']: (): void => {
-    test.assertDeepEquals(
-      hex.uint8ArrayFromHex('0023a0ff'),
+    tinyTest.assertDeepEquals(
+      tinyHex.uint8ArrayFromHex('0023a0ff'),
       new Uint8Array([0x00, 0x23, 0xa0, 0xff])
     )
   },

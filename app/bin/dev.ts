@@ -1,26 +1,26 @@
 import * as appRoute from '@fe/api/route/index.ts'
 import * as appBuild from '@fe-bin/build.ts'
-import * as route from '@tiny/api/route.ts'
-import * as concurrency from '@tiny/core/concurrency.ts'
+import * as tinyRoute from '@tiny/api/route.ts'
+import * as tinyConcurrency from '@tiny/core/concurrency.ts'
 import chalk from 'chalk'
 import childProcess from 'child_process'
 import chokidar from 'chokidar'
 import HttpProxy from 'http-proxy'
-import debounce from 'lodash-es/debounce.js'
-import * as fs from 'node:fs'
-import * as http from 'node:http'
-import type * as net from 'node:net'
-import * as stream from 'node:stream'
-import * as urlModule from 'node:url'
+import lodashDebounce from 'lodash-es/debounce.js'
+import * as nodeFs from 'node:fs'
+import * as nodeHttp from 'node:http'
+import type * as nodeNet from 'node:net'
+import * as nodeStream from 'node:stream'
+import * as nodeUrl from 'node:url'
 import WebSocket from 'ws'
 
-import tsconfig from '../../tsconfig.json'
+import projectTsconfig from '../../tsconfig.json'
 
 type Context = {
   sourceTree: SourceTree
   proxy: HttpProxy
   server: Server
-} & route.Context
+} & tinyRoute.Context
 
 type SourceTree = Record<
   string,
@@ -28,30 +28,34 @@ type SourceTree = Record<
 >
 
 type Server = {
-  ready: concurrency.EventSemaphore
+  ready: tinyConcurrency.EventSemaphore
   kill: () => Promise<void>
 }
 
-const index = route.defineBase(['GET'], /^\/$/, () => {
+const index = tinyRoute.defineBase(['GET'], /^\/$/, () => {
   return {
     status: 200,
     headers: {
       'content-type': 'text/html',
     },
-    stream: stream.Readable.toWeb(
-      fs.createReadStream('app/public/index.html')
+    stream: nodeStream.Readable.toWeb(
+      nodeFs.createReadStream('app/public/index.html')
     ),
   }
 })
 
-const notFound = route.defineBase(undefined, /.*/, () => {
-  return {
-    status: 404,
-    headers: {},
+const notFound = tinyRoute.defineBase(
+  undefined,
+  /.*/,
+  () => {
+    return {
+      status: 404,
+      headers: {},
+    }
   }
-})
+)
 
-const js = route.defineBase<Context>(
+const js = tinyRoute.defineBase<Context>(
   ['GET'],
   /^\/js\/(?<path>.+\.mjs)$/,
   async (ctx, request) => {
@@ -69,12 +73,12 @@ const js = route.defineBase<Context>(
         buffer: sourceFile.contents,
       }
     } else {
-      return route.forward(ctx, request, {}, notFound)
+      return tinyRoute.forward(ctx, request, {}, notFound)
     }
   }
 )
 
-const api = route.defineBase<{
+const api = tinyRoute.defineBase<{
   server: Server
   proxy: HttpProxy
 }>(undefined, /^\/api\/.+/, async (ctx) => {
@@ -133,8 +137,8 @@ function buildDev(entryPoint: string): SourceTree {
 }
 
 function createServer(): Server {
-  const ready = new concurrency.EventSemaphore()
-  const exited = new concurrency.EventSemaphore()
+  const ready = new tinyConcurrency.EventSemaphore()
+  const exited = new tinyConcurrency.EventSemaphore()
   const child = childProcess.fork('app/src/api/index.ts', {
     env: {
       ...process.env,
@@ -161,12 +165,12 @@ function createServer(): Server {
 }
 
 async function main(): Promise<void> {
-  const watcher = chokidar.watch(tsconfig.include, {
+  const watcher = chokidar.watch(projectTsconfig.include, {
     ignoreInitial: true,
   })
   watcher.on(
     'all',
-    debounce(() => void reload())
+    lodashDebounce(() => void reload())
   )
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const entryPoint = await import.meta.resolve!(
@@ -182,8 +186,8 @@ async function main(): Promise<void> {
     server: createServer(),
     ...appRoute.initContext(),
   }
-  const httpServer = http.createServer(
-    route.handle(ctx, [index, js, api, notFound])
+  const httpServer = nodeHttp.createServer(
+    tinyRoute.handle(ctx, [index, js, api, notFound])
   )
   httpServer.on('error', console.error)
   const wsServer = new WebSocket.Server({
@@ -202,7 +206,7 @@ async function main(): Promise<void> {
   console.log(
     chalk.bold(
       `Ready at http://localhost:${
-        (httpServer.address() as net.AddressInfo).port
+        (httpServer.address() as nodeNet.AddressInfo).port
       }/`
     )
   )
@@ -221,8 +225,7 @@ async function main(): Promise<void> {
 }
 
 if (
-  process.argv[1] ===
-  urlModule.fileURLToPath(import.meta.url)
+  process.argv[1] === nodeUrl.fileURLToPath(import.meta.url)
 ) {
   void main()
 }

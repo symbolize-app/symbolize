@@ -1,26 +1,26 @@
 import * as appRouteMember from '@fe/api/route/member.ts'
 import * as appDbQuery from '@fe/db/query/index.ts'
 import * as appDbQueryMember from '@fe/db/query/member.ts'
-import * as routeTest from '@tiny/api/route.test.ts'
-import * as route from '@tiny/api/route.ts'
-import * as errorModuleTest from '@tiny/core/error.test.ts'
-import type * as errorModule from '@tiny/core/error.ts'
-import * as random from '@tiny/core/random.ts'
-import * as dbQueryTest from '@tiny/db/query.test.ts'
-import type * as dbQuery from '@tiny/db/query.ts'
-import * as test from '@tiny/test/index.ts'
+import * as tinyRouteTest from '@tiny/api/route.test.ts'
+import * as tinyRoute from '@tiny/api/route.ts'
+import * as tinyErrorTest from '@tiny/core/error.test.ts'
+import type * as tinyError from '@tiny/core/error.ts'
+import * as tinyRandom from '@tiny/core/random.ts'
+import * as tinyDbQueryTest from '@tiny/db/query.test.ts'
+import type * as tinyDbQuery from '@tiny/db/query.ts'
+import * as tinyTest from '@tiny/test/index.ts'
 
 export const url = import.meta.url
 
 export const tests = {
   ['member create, no error']: async (
-    baseContext: test.Context
+    baseContext: tinyTest.Context
   ): Promise<void> => {
-    const queryMethod = test.mock<
-      dbQuery.Database<appDbQuery.Write>['query']
+    const queryMethod = tinyTest.mock<
+      tinyDbQuery.Database<appDbQuery.Write>['query']
     >([() => Promise.resolve()])
-    const ctx: test.Context &
-      errorModule.Context &
+    const ctx: tinyTest.Context &
+      tinyError.Context &
       appDbQuery.WriteContext = {
       ...baseContext,
       databases: {
@@ -28,17 +28,17 @@ export const tests = {
           query: queryMethod,
         },
       },
-      databaseRetryConfig: errorModuleTest.retryConfig,
+      databaseRetryConfig: tinyErrorTest.retryConfig,
     }
     const expectedId =
       'd2f17ea3a0e36a7c79442855ca7d0a71a4eb616e10704121b4d169b6486f3bdc'
-    const response = test.sync(
+    const response = tinyTest.sync(
       appRouteMember.create.handler(
         ctx,
-        routeTest.mockReqeuest({
+        tinyRouteTest.mockReqeuest({
           json: () =>
             Promise.resolve({
-              requestId: random.requestIdHex(ctx),
+              requestId: tinyRandom.requestIdHex(ctx),
               email: 'test@example.org',
               handle: 'test',
             }),
@@ -46,37 +46,40 @@ export const tests = {
       )
     )
     await ctx.clock.tickAsync(0)
-    test.assertDeepEquals(response.resolvedValue, {
+    tinyTest.assertDeepEquals(response.resolvedValue, {
       status: 200,
       headers: { 'content-type': 'application/json' },
       json: {
         id: expectedId,
       },
     })
-    test.assertDeepEquals(queryMethod[test.mockHistory], [
+    tinyTest.assertDeepEquals(
+      queryMethod[tinyTest.mockHistory],
       [
-        appDbQueryMember.create,
-        Buffer.from(expectedId, 'hex'),
-        'test@example.org',
-        'test',
-      ],
-    ])
+        [
+          appDbQueryMember.create,
+          Buffer.from(expectedId, 'hex'),
+          'test@example.org',
+          'test',
+        ],
+      ]
+    )
   },
   ['member create, uniqueness error']: async (
-    baseContext: test.Context
+    baseContext: tinyTest.Context
   ): Promise<void> => {
-    const queryMethod = test.mock<
-      dbQuery.Database<appDbQuery.Write>['query']
+    const queryMethod = tinyTest.mock<
+      tinyDbQuery.Database<appDbQuery.Write>['query']
     >([
       () =>
         Promise.reject(
-          new dbQueryTest.MockUniqueViolationConstraintError(
+          new tinyDbQueryTest.MockUniqueViolationConstraintError(
             'member_email_key'
           )
         ),
     ])
-    const ctx: test.Context &
-      errorModule.Context &
+    const ctx: tinyTest.Context &
+      tinyError.Context &
       appDbQuery.WriteContext = {
       ...baseContext,
       databases: {
@@ -84,17 +87,17 @@ export const tests = {
           query: queryMethod,
         },
       },
-      databaseRetryConfig: errorModuleTest.retryConfig,
+      databaseRetryConfig: tinyErrorTest.retryConfig,
     }
     const expectedId =
       'd2f17ea3a0e36a7c79442855ca7d0a71a4eb616e10704121b4d169b6486f3bdc'
-    const response = test.sync(
+    const response = tinyTest.sync(
       appRouteMember.create.handler(
         ctx,
-        routeTest.mockReqeuest({
+        tinyRouteTest.mockReqeuest({
           json: () =>
             Promise.resolve({
-              requestId: random.requestIdHex(ctx),
+              requestId: tinyRandom.requestIdHex(ctx),
               email: 'test@example.org',
               handle: 'test',
             }),
@@ -102,48 +105,55 @@ export const tests = {
       )
     )
     await ctx.clock.tickAsync(0)
-    test.assert(
-      response.rejectedValue instanceof route.ResponseError
+    tinyTest.assert(
+      response.rejectedValue instanceof
+        tinyRoute.ResponseError
     )
-    test.assertDeepEquals(response.rejectedValue.response, {
-      status: 409,
-      headers: { 'content-type': 'application/json' },
-      json: {
-        conflict: 'email',
-      },
-    })
-    test.assertDeepEquals(queryMethod[test.mockHistory], [
+    tinyTest.assertDeepEquals(
+      response.rejectedValue.response,
+      {
+        status: 409,
+        headers: { 'content-type': 'application/json' },
+        json: {
+          conflict: 'email',
+        },
+      }
+    )
+    tinyTest.assertDeepEquals(
+      queryMethod[tinyTest.mockHistory],
       [
-        appDbQueryMember.create,
-        Buffer.from(expectedId, 'hex'),
-        'test@example.org',
-        'test',
-      ],
-    ])
+        [
+          appDbQueryMember.create,
+          Buffer.from(expectedId, 'hex'),
+          'test@example.org',
+          'test',
+        ],
+      ]
+    )
   },
   ['member create, bad request']: async (
-    baseContext: test.Context
+    baseContext: tinyTest.Context
   ): Promise<void> => {
-    const ctx: test.Context &
-      errorModule.Context &
+    const ctx: tinyTest.Context &
+      tinyError.Context &
       appDbQuery.WriteContext = {
       ...baseContext,
       databases: {
         [appDbQuery.write]: {
-          query: test.mock<
-            dbQuery.Database<appDbQuery.Write>['query']
+          query: tinyTest.mock<
+            tinyDbQuery.Database<appDbQuery.Write>['query']
           >([]),
         },
       },
-      databaseRetryConfig: errorModuleTest.retryConfig,
+      databaseRetryConfig: tinyErrorTest.retryConfig,
     }
-    const response = test.sync(
+    const response = tinyTest.sync(
       appRouteMember.create.handler(
         ctx,
-        routeTest.mockReqeuest({
+        tinyRouteTest.mockReqeuest({
           json: () =>
             Promise.resolve({
-              requestId: random.requestIdHex(ctx),
+              requestId: tinyRandom.requestIdHex(ctx),
               email: 'test@example.org',
               handle: 't',
             }),
@@ -151,16 +161,20 @@ export const tests = {
       )
     )
     await ctx.clock.tickAsync(0)
-    test.assert(
-      response.rejectedValue instanceof route.ResponseError
+    tinyTest.assert(
+      response.rejectedValue instanceof
+        tinyRoute.ResponseError
     )
-    test.assertDeepEquals(response.rejectedValue.response, {
-      status: 400,
-      headers: { 'content-type': 'application/json' },
-      json: {
-        error:
-          'Invalid string (too short, min 3) at (root).handle',
-      },
-    })
+    tinyTest.assertDeepEquals(
+      response.rejectedValue.response,
+      {
+        status: 400,
+        headers: { 'content-type': 'application/json' },
+        json: {
+          error:
+            'Invalid string (too short, min 3) at (root).handle',
+        },
+      }
+    )
   },
 }

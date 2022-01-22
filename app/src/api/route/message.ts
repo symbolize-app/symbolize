@@ -1,14 +1,14 @@
 import * as appMessage from '@fe/core/message.ts'
 import type * as appDbQuery from '@fe/db/query/index.ts'
 import * as appDbQueryMember from '@fe/db/query/member.ts'
-import * as route from '@tiny/api/route.ts'
-import type * as errorModule from '@tiny/core/error.ts'
-import * as dbQuery from '@tiny/db/query.ts'
+import * as tinyRoute from '@tiny/api/route.ts'
+import type * as tinyError from '@tiny/core/error.ts'
+import * as tinyDbQuery from '@tiny/db/query.ts'
 
-export const show = route.defineBase<
-  errorModule.Context & appDbQuery.ReadContext
+export const show = tinyRoute.defineBase<
+  tinyError.Context & appDbQuery.ReadContext
 >(['GET'], /^\/api\/message$/, async (ctx) => {
-  const row = await dbQuery.retryQuery(
+  const row = await tinyDbQuery.retryQuery(
     ctx,
     'member find',
     appDbQueryMember.find,

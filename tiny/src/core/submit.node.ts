@@ -1,7 +1,7 @@
-import type * as errorModule from '@tiny/core/error.ts'
-import * as submit from '@tiny/core/submit.ts'
-import * as stream from 'node:stream'
-import * as webStream from 'node:stream/web'
+import type * as tinyError from '@tiny/core/error.ts'
+import * as tinySubmit from '@tiny/core/submit.ts'
+import * as nodeStream from 'node:stream'
+import * as nodeWebStream from 'node:stream/web'
 import * as nodeFetch from 'node-fetch'
 
 class ConvertedResponse {
@@ -33,7 +33,7 @@ class ConvertedResponse {
   get body(): ReadableStream<Uint8Array> | null {
     return (
       this.#response.body &&
-      stream.Readable.toWeb(this.#response.body)
+      nodeStream.Readable.toWeb(this.#response.body)
     )
   }
   get bodyUsed(): boolean {
@@ -60,12 +60,9 @@ class ConvertedResponse {
 }
 
 export function initContext(
-  submitRetryConfig: Omit<
-    errorModule.RetryConfig,
-    'onError'
-  >
-): submit.Context {
-  return submit.initContext(
+  submitRetryConfig: Omit<tinyError.RetryConfig, 'onError'>
+): tinySubmit.Context {
+  return tinySubmit.initContext(
     {
       async fetch(
         input: string,
@@ -75,8 +72,9 @@ export function initContext(
         const nodeInit = init && {
           ...init,
           body:
-            init.body instanceof webStream.ReadableStream
-              ? stream.Readable.fromWeb(init.body)
+            init.body instanceof
+            nodeWebStream.ReadableStream
+              ? nodeStream.Readable.fromWeb(init.body)
               : (init.body as nodeFetch.RequestInit['body']),
         }
         const nodeResponse = await nodeFetch.default(
