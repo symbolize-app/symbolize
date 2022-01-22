@@ -1,23 +1,23 @@
 import dbQueryMemberCreate from '@db/query/member_create.sql'
 import dbQueryMemberFind from '@db/query/member_find.sql'
 import * as appDbQuery from '@fe/db/query/index.ts'
-import * as dbQuery from '@tiny/db/query.ts'
+import * as tinyDbQuery from '@tiny/db/query.ts'
 
-export const find = dbQuery.defineOptional(
+export const find = tinyDbQuery.defineOptional(
   appDbQuery.read,
   dbQueryMemberFind,
   {
-    params: dbQuery.params<[id: Buffer]>(),
-    row: dbQuery.row<{ email: string }>(),
+    params: tinyDbQuery.params<[id: Buffer]>(),
+    row: tinyDbQuery.row<{ email: string }>(),
   }
 )
 
-export const create = dbQuery.defineVoid(
+export const create = tinyDbQuery.defineVoid(
   appDbQuery.write,
   dbQueryMemberCreate,
   {
     params:
-      dbQuery.params<
+      tinyDbQuery.params<
         [id: Buffer, email: string, handle: string]
       >(),
     conflictMap: {

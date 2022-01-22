@@ -1,7 +1,7 @@
-import type * as payload from '@tiny/core/payload.ts'
+import type * as tinyPayload from '@tiny/core/payload.ts'
 
 export type RequestParamsEndpoint = {
-  requestParams: payload.StringValidator
+  requestParams: tinyPayload.StringValidator
 }
 
 export type RequestBytesEndpoint = {
@@ -9,7 +9,7 @@ export type RequestBytesEndpoint = {
 }
 
 export type RequestJsonEndpoint = {
-  requestJson: payload.Validator
+  requestJson: tinyPayload.Validator
 }
 
 export type OkResponseStreamEndpoint = {
@@ -17,11 +17,11 @@ export type OkResponseStreamEndpoint = {
 }
 
 export type OkResponseJsonEndpoint = {
-  okResponseJson: payload.Validator
+  okResponseJson: tinyPayload.Validator
 }
 
 export type ConflictResponseJsonEndpoint = {
-  conflictResponseJson: payload.ConflictValidator
+  conflictResponseJson: tinyPayload.ConflictValidator
 }
 
 type PartialChecks = Partial<

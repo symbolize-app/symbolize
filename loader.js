@@ -1,15 +1,15 @@
 /* eslint-env node */
 /* eslint-disable @typescript-eslint/ban-ts-comment,@typescript-eslint/explicit-module-boundary-types,@typescript-eslint/no-unsafe-return */
 import esbuild from 'esbuild'
-import * as fsPromises from 'node:fs/promises'
-import * as pathModule from 'node:path'
-import * as urlModule from 'node:url'
+import * as nodeFsPromises from 'node:fs/promises'
+import * as nodePath from 'node:path'
+import * as nodeUrl from 'node:url'
 import picomatch from 'picomatch'
 
-import tsconfig from './tsconfig.json' assert { type: 'json' }
+import projectTsconfig from './tsconfig.json' assert { type: 'json' }
 
 const aliases = Object.entries(
-  tsconfig.compilerOptions.paths
+  projectTsconfig.compilerOptions.paths
 )
   .filter(
     ([_from, to]) => !to[0].startsWith('./node_modules/')
@@ -84,11 +84,11 @@ export async function resolve(
  */
 export async function load(url, context, defaultLoad) {
   // Defer to Node.js for all other sources.
-  const ext = pathModule.extname(url)
+  const ext = nodePath.extname(url)
   const localPath = matchLocalUrl(url)
   if (localPath) {
     const source = (
-      await fsPromises.readFile(localPath)
+      await nodeFsPromises.readFile(localPath)
     ).toString('utf-8')
     if (ext === '.sql') {
       return {
@@ -130,10 +130,10 @@ export async function load(url, context, defaultLoad) {
  * @returns {string | undefined}
  */
 function toLocalPath(url) {
-  const urlObject = new urlModule.URL(url)
+  const urlObject = new nodeUrl.URL(url)
   if (urlObject.protocol === 'file:') {
-    const otherPath = urlModule.fileURLToPath(urlObject)
-    return pathModule.relative('.', otherPath)
+    const otherPath = nodeUrl.fileURLToPath(urlObject)
+    return nodePath.relative('.', otherPath)
   } else {
     return undefined
   }
@@ -144,12 +144,12 @@ function toLocalPath(url) {
  * @returns {string}
  */
 function fromLocalPath(path) {
-  return urlModule
-    .pathToFileURL(pathModule.resolve('.', path))
+  return nodeUrl
+    .pathToFileURL(nodePath.resolve('.', path))
     .toString()
 }
 
-const localMatcher = picomatch(tsconfig.include)
+const localMatcher = picomatch(projectTsconfig.include)
 
 /**
  * @param {string} url

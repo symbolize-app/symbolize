@@ -1,9 +1,9 @@
-import type * as time from '@tiny/core/time.ts'
-import * as perfHooks from 'node:perf_hooks'
+import type * as tinyTime from '@tiny/core/time.ts'
+import * as nodePerfHooks from 'node:perf_hooks'
 
-export function initContext(): time.Context {
+export function initContext(): tinyTime.Context {
   return {
-    performanceNow: () => perfHooks.performance.now(),
+    performanceNow: () => nodePerfHooks.performance.now(),
     setTimeout: (...args) => global.setTimeout(...args),
   }
 }

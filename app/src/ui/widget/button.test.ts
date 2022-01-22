@@ -1,13 +1,13 @@
 import * as appWidgetButton from '@fe/ui/widget/button.ts'
-import * as test from '@tiny/test/index.ts'
-import * as widgetTest from '@tiny/ui/widget.test.ts'
-import type * as widget from '@tiny/ui/widget.ts'
+import * as tinyTest from '@tiny/test/index.ts'
+import * as tinyWidgetTest from '@tiny/ui/widget.test.ts'
+import type * as tinyWidget from '@tiny/ui/widget.ts'
 
 export const url = import.meta.url
 
 export const tests = {
-  ['button text']: widgetTest.withTempDocument(
-    (ctx: widget.Context) => {
+  ['button text']: tinyWidgetTest.withTempDocument(
+    (ctx: tinyWidget.Context) => {
       ctx.document.body.content = [
         appWidgetButton.custom(ctx, {}),
       ]
@@ -15,7 +15,7 @@ export const tests = {
         ctx.document.body.querySelector<HTMLButtonElement>(
           ':scope > button'
         )
-      test.assertEquals(button?.textContent, 'OK')
+      tinyTest.assertEquals(button?.textContent, 'OK')
     }
   ),
 }

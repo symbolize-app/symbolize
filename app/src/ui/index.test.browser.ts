@@ -1,18 +1,18 @@
-import type * as time from '@tiny/core/time.ts'
-import * as test from '@tiny/test/index.ts'
-import type * as widget from '@tiny/ui/widget.ts'
+import type * as tinyTime from '@tiny/core/time.ts'
+import * as tinyTest from '@tiny/test/index.ts'
+import type * as tinyWidget from '@tiny/ui/widget.ts'
 
-export const all: test.TestCollection<
-  widget.Context
+export const all: tinyTest.TestCollection<
+  tinyWidget.Context
 > = () => [
   import('@fe/ui/widget/button.test.ts'),
   import('@fe/ui/widget/member.test.ts'),
 ]
 
 export async function run(
-  ctx: widget.Context & time.Context
+  ctx: tinyWidget.Context & tinyTime.Context
 ): Promise<boolean> {
-  return await test.runAll(ctx, [
+  return await tinyTest.runAll(ctx, [
     import('@fe/core/index.test.ts'),
     import('@fe/ui/index.test.browser.ts'),
     import('@tiny/core/index.test.ts'),

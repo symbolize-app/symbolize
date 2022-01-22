@@ -1,5 +1,5 @@
-import * as errorModule from '@tiny/core/error.ts'
-import * as payload from '@tiny/core/payload.ts'
+import * as tinyError from '@tiny/core/error.ts'
+import * as tinyPayload from '@tiny/core/payload.ts'
 import ms from 'ms'
 import type * as typeFest from 'type-fest'
 
@@ -10,7 +10,7 @@ let globalQueryNameCount = 0
 export type Context<DatabaseId extends symbol> = {
   databases: { [K in DatabaseId]: Database<K> }
   databaseRetryConfig: Omit<
-    errorModule.RetryConfig,
+    tinyError.RetryConfig,
     'onError'
   >
 }
@@ -227,13 +227,13 @@ export async function retryQuery<
   Row extends Record<string, SupportedType>,
   Result
 >(
-  ctx: errorModule.Context & Context<DatabaseId>,
+  ctx: tinyError.Context & Context<DatabaseId>,
   description: string,
   query: Query<DatabaseId, Params, Row, Result>,
   ...params: Params
 ): Promise<Result> {
   try {
-    return await errorModule.retry(
+    return await tinyError.retry(
       ctx,
       () =>
         ctx.databases[query.databaseId].query(
@@ -269,7 +269,7 @@ export async function retryQuery<
       const conflictField =
         constraintName && query.conflictMap[constraintName]
       if (conflictField) {
-        throw new payload.ConflictError(
+        throw new tinyPayload.ConflictError(
           conflictField as never
         )
       }

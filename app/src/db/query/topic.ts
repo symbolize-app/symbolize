@@ -2,14 +2,14 @@ import dbQueryTopicCreate from '@db/query/topic_create.sql'
 import dbQueryTopicList from '@db/query/topic_list.sql'
 import dbQueryTopicUpdate from '@db/query/topic_update.sql'
 import * as appDbQuery from '@fe/db/query/index.ts'
-import * as dbQuery from '@tiny/db/query.ts'
+import * as tinyDbQuery from '@tiny/db/query.ts'
 
-export const create = dbQuery.defineVoid(
+export const create = tinyDbQuery.defineVoid(
   appDbQuery.write,
   dbQueryTopicCreate,
   {
     params:
-      dbQuery.params<
+      tinyDbQuery.params<
         [
           id: Buffer,
           memberId: Buffer,
@@ -24,13 +24,13 @@ export const create = dbQuery.defineVoid(
   }
 )
 
-export const list = dbQuery.defineMulti(
+export const list = tinyDbQuery.defineMulti(
   appDbQuery.read,
   dbQueryTopicList,
   {
-    params: dbQuery.params<[]>(),
+    params: tinyDbQuery.params<[]>(),
     /* eslint-disable @typescript-eslint/naming-convention */
-    row: dbQuery.row<{
+    row: tinyDbQuery.row<{
       id: Buffer
       updated_at: Date
       title: string
@@ -41,12 +41,12 @@ export const list = dbQuery.defineMulti(
   }
 )
 
-export const update = dbQuery.defineOptional(
+export const update = tinyDbQuery.defineOptional(
   appDbQuery.write,
   dbQueryTopicUpdate,
   {
     params:
-      dbQuery.params<
+      tinyDbQuery.params<
         [
           id: Buffer,
           updatedOld: Date,
@@ -55,7 +55,7 @@ export const update = dbQuery.defineOptional(
           content: string
         ]
       >(),
-    row: dbQuery.row<{ updated: Date }>(),
+    row: tinyDbQuery.row<{ updated: Date }>(),
     conflictMap: {
       ['primary']: 'slug',
     },

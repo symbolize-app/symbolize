@@ -1,20 +1,20 @@
 import * as appPayload from '@fe/core/payload.ts'
-import * as endpoint from '@tiny/core/endpoint.ts'
-import * as payload from '@tiny/core/payload.ts'
+import * as tinyEndpoint from '@tiny/core/endpoint.ts'
+import * as tinyPayload from '@tiny/core/payload.ts'
 
 export type Create = typeof create
-export const create = endpoint.definePostEndpoint(
+export const create = tinyEndpoint.definePostEndpoint(
   '/api/member/create',
   {
-    requestJson: payload.object({
+    requestJson: tinyPayload.object({
       requestId: appPayload.id,
       email: appPayload.email,
       handle: appPayload.handle,
     }),
-    okResponseJson: payload.object({
+    okResponseJson: tinyPayload.object({
       id: appPayload.id,
     }),
-    conflictResponseJson: payload.conflict(
+    conflictResponseJson: tinyPayload.conflict(
       'email',
       'handle'
     ),

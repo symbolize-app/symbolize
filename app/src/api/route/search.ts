@@ -1,19 +1,19 @@
 import * as appFts from '@fe/api/fts.ts'
 import * as appEndpointSearch from '@fe/core/endpoint/search.ts'
-import * as route from '@tiny/api/route.ts'
-import type * as errorModule from '@tiny/core/error.ts'
-import * as submit from '@tiny/core/submit.ts'
+import * as tinyRoute from '@tiny/api/route.ts'
+import type * as tinyError from '@tiny/core/error.ts'
+import * as tinySubmit from '@tiny/core/submit.ts'
 
-export const query = route.define(
+export const query = tinyRoute.define(
   appEndpointSearch.query,
   async (
-    ctx: errorModule.Context &
-      submit.Context &
+    ctx: tinyError.Context &
+      tinySubmit.Context &
       appFts.Context,
     request
   ) => {
     const { results } = (
-      await submit.retrySubmit(
+      await tinySubmit.retrySubmit(
         ctx,
         'search query',
         appFts.queryEndpoint,

@@ -1,5 +1,5 @@
 import * as appCacheQuery from '@fe/cache/query/index.ts'
-import * as cacheQuery from '@tiny/cache/query.ts'
+import * as tinyCacheQuery from '@tiny/cache/query.ts'
 
 export const maxSizeBytes = 32 * 1024 * 1024
 
@@ -9,7 +9,7 @@ export const maxPipelinedChunks = 2
 
 export const highWaterMarkBytes = chunkSizeBytes / 4
 
-export const getChunk = cacheQuery.define(
+export const getChunk = tinyCacheQuery.define(
   appCacheQuery.main,
   async (
     client,
@@ -26,7 +26,7 @@ export const getChunk = cacheQuery.define(
   () => undefined
 )
 
-export const setChunk = cacheQuery.define(
+export const setChunk = tinyCacheQuery.define(
   appCacheQuery.main,
   async (
     client,

@@ -1,10 +1,10 @@
-import * as randomTest from '@tiny/core/random.test.ts'
-import type * as random from '@tiny/core/random.ts'
-import * as timeTest from '@tiny/core/time.test.ts'
-import type * as time from '@tiny/core/time.ts'
+import * as tinyRandomTest from '@tiny/core/random.test.ts'
+import type * as tinyRandom from '@tiny/core/random.ts'
+import * as tinyTimeTest from '@tiny/core/time.test.ts'
+import type * as tinyTime from '@tiny/core/time.ts'
 import * as diff from 'diff'
-import eq from 'lodash-es/eq.js'
-import isEqual from 'lodash-es/isEqual.js'
+import lodashEq from 'lodash-es/eq.js'
+import lodashIsEqual from 'lodash-es/isEqual.js'
 import ms from 'ms'
 import type * as typeFest from 'type-fest'
 
@@ -12,9 +12,10 @@ export type Test<CustomContext = unknown> = (
   ctx: CustomContext & Context
 ) => typeFest.Promisable<void>
 
-export type Context = timeTest.Context & random.Context
+export type Context = tinyTimeTest.Context &
+  tinyRandom.Context
 
-export type RunContext = time.Context
+export type RunContext = tinyTime.Context
 
 type TestModule<CustomContext = unknown> = {
   url: string
@@ -79,8 +80,8 @@ export async function runAll<
       try {
         const testContext: CustomContext & Context = {
           ...ctx,
-          ...timeTest.initContext(),
-          ...randomTest.initContext(),
+          ...tinyTimeTest.initContext(),
+          ...tinyRandomTest.initContext(),
         }
         await test(testContext)
         pass += 1
@@ -289,7 +290,7 @@ export function assertEquals<Value>(
   actual: Value,
   expected: Value
 ): void {
-  if (!eq(actual, expected)) {
+  if (!lodashEq(actual, expected)) {
     throw new AssertionError('Not equal', actual, expected)
   }
 }
@@ -316,7 +317,7 @@ export function assertDeepEquals<Value>(
   actual: Value,
   expected: Value
 ): void {
-  if (!isEqual(actual, expected)) {
+  if (!lodashIsEqual(actual, expected)) {
     throw new AssertionError(
       'Not deep equal',
       actual,

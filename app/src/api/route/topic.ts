@@ -1,18 +1,18 @@
 import * as appEndpointTopic from '@fe/core/endpoint/topic.ts'
 import type * as appDbQuery from '@fe/db/query/index.ts'
 import * as appDbQueryTopic from '@fe/db/query/topic.ts'
-import * as route from '@tiny/api/route.ts'
-import * as crypto from '@tiny/core/crypto.node.ts'
-import type * as errorModule from '@tiny/core/error.ts'
-import * as dbQuery from '@tiny/db/query.ts'
+import * as tinyRoute from '@tiny/api/route.ts'
+import * as tinyCrypto from '@tiny/core/crypto.node.ts'
+import type * as tinyError from '@tiny/core/error.ts'
+import * as tinyDbQuery from '@tiny/db/query.ts'
 
-export const create = route.define(
+export const create = tinyRoute.define(
   appEndpointTopic.create,
   async (
-    ctx: errorModule.Context & appDbQuery.WriteContext,
+    ctx: tinyError.Context & appDbQuery.WriteContext,
     request
   ) => {
-    const id = crypto.hash(
+    const id = tinyCrypto.hash(
       Buffer.from(request.json.requestId, 'hex')
     )
     const memberId = Buffer.from(
@@ -20,7 +20,7 @@ export const create = route.define(
       'hex'
     )
     const { title, slug, content } = request.json
-    await dbQuery.retryQuery(
+    await tinyDbQuery.retryQuery(
       ctx,
       'topic create',
       appDbQueryTopic.create,
@@ -42,13 +42,13 @@ export const create = route.define(
   }
 )
 
-export const list = route.define(
+export const list = tinyRoute.define(
   appEndpointTopic.list,
   async (
-    ctx: errorModule.Context & appDbQuery.ReadContext,
+    ctx: tinyError.Context & appDbQuery.ReadContext,
     _request
   ) => {
-    const results = await dbQuery.retryQuery(
+    const results = await tinyDbQuery.retryQuery(
       ctx,
       'topic list',
       appDbQueryTopic.list
@@ -68,16 +68,16 @@ export const list = route.define(
   }
 )
 
-export const update = route.define(
+export const update = tinyRoute.define(
   appEndpointTopic.update,
   async (
-    ctx: errorModule.Context & appDbQuery.WriteContext,
+    ctx: tinyError.Context & appDbQuery.WriteContext,
     request
   ) => {
     const id = Buffer.from(request.json.id, 'hex')
     const updatedOld = new Date(request.json.updatedOld)
     const { title, slug, content } = request.json
-    const result = await dbQuery.retryQuery(
+    const result = await tinyDbQuery.retryQuery(
       ctx,
       'topic update',
       appDbQueryTopic.update,
@@ -95,7 +95,7 @@ export const update = route.define(
         },
       }
     } else {
-      throw new route.ResponseError({
+      throw new tinyRoute.ResponseError({
         status: 404,
       })
     }

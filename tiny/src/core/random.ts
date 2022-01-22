@@ -1,4 +1,4 @@
-import * as hex from '@tiny/core/hex.ts'
+import * as tinyHex from '@tiny/core/hex.ts'
 
 export type Context = {
   randomNumber(): number
@@ -23,5 +23,5 @@ export function requestId(ctx: Context): Uint8Array {
 }
 
 export function requestIdHex(ctx: Context): string {
-  return hex.uint8ArrayToHex(requestId(ctx))
+  return tinyHex.uint8ArrayToHex(requestId(ctx))
 }

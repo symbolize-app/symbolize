@@ -1,51 +1,51 @@
 import * as appDocumentType from '@fe/core/documentType.ts'
 import * as appLanguage from '@fe/core/language.ts'
 import * as appTaxonRank from '@fe/core/taxonRank.ts'
-import * as payload from '@tiny/core/payload.ts'
+import * as tinyPayload from '@tiny/core/payload.ts'
 
-export const content = payload.string({
+export const content = tinyPayload.string({
   min: 1,
   max: 4096,
 })
 
-export const documentType = payload.stringEnum(
+export const documentType = tinyPayload.stringEnum(
   appDocumentType.DocumentType
 )
 
-export const email = payload.string({
+export const email = tinyPayload.string({
   min: 5,
   max: 64,
 })
 
-export const handle = payload.string({
+export const handle = tinyPayload.string({
   min: 3,
   max: 64,
 })
 
-export const id = payload.string({
+export const id = tinyPayload.string({
   min: 64,
   max: 64,
 })
 
-export const language = payload.stringEnum(
+export const language = tinyPayload.stringEnum(
   appLanguage.Language
 )
 
-export const name = payload.string({
+export const name = tinyPayload.string({
   min: 3,
   max: 128,
 })
 
-export const slug = payload.string({
+export const slug = tinyPayload.string({
   min: 3,
   max: 128,
 })
 
-export const taxonRank = payload.stringEnum(
+export const taxonRank = tinyPayload.stringEnum(
   appTaxonRank.TaxonRank
 )
 
-export const title = payload.string({
+export const title = tinyPayload.string({
   min: 3,
   max: 128,
 })

@@ -1,29 +1,29 @@
 import * as redisClient from '@node-redis/client'
-import type * as cacheQuery from '@tiny/cache/query.ts'
-import type * as errorModule from '@tiny/core/error.ts'
-import * as time from '@tiny/core/time.ts'
+import type * as tinyCacheQuery from '@tiny/cache/query.ts'
+import type * as tinyError from '@tiny/core/error.ts'
+import * as tinyTime from '@tiny/core/time.ts'
 import chalk from 'chalk'
 
 export const main = Symbol('cache')
 
 export type Main = typeof main
 
-export type MainContext = cacheQuery.Context<Main>
+export type MainContext = tinyCacheQuery.Context<Main>
 
-const timeout = time.interval({ milliseconds: 50 })
+const timeout = tinyTime.interval({ milliseconds: 50 })
 
 export const retryConfig: Omit<
-  errorModule.RetryConfig,
+  tinyError.RetryConfig,
   'onError'
 > = {
   maxAttempts: 5,
-  minDelayMs: time.interval({ milliseconds: 5 }),
-  windowMs: time.interval({ milliseconds: 50 }),
+  minDelayMs: tinyTime.interval({ milliseconds: 5 }),
+  windowMs: tinyTime.interval({ milliseconds: 50 }),
 }
 
 export function initContext(): Exclude<
   MainContext,
-  time.Context
+  tinyTime.Context
 > {
   const client = redisClient.createClient({
     url: process.env.CACHE_URL as string,
@@ -54,15 +54,19 @@ export function initContext(): Exclude<
           Params extends unknown[],
           Result
         >(
-          ctx: time.Context,
-          query: cacheQuery.Query<CacheId, Params, Result>,
+          ctx: tinyTime.Context,
+          query: tinyCacheQuery.Query<
+            CacheId,
+            Params,
+            Result
+          >,
           ...params: Params
         ): Promise<Result> {
           if (connected) {
             return Promise.race([
               query.command(client, ...params),
               (async () => {
-                await time.delay(ctx, timeout)
+                await tinyTime.delay(ctx, timeout)
                 throw new Error('cache command timeout')
               })(),
             ])

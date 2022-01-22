@@ -1,6 +1,6 @@
 import * as appPayload from '@fe/core/payload.ts'
-import * as endpoint from '@tiny/core/endpoint.ts'
-import * as payload from '@tiny/core/payload.ts'
+import * as tinyEndpoint from '@tiny/core/endpoint.ts'
+import * as tinyPayload from '@tiny/core/payload.ts'
 
 export type Context = {
   fts: {
@@ -20,33 +20,35 @@ export function initContext(): Context {
   }
 }
 
-export const queryEndpoint = endpoint.defineGetEndpoint(
+export const queryEndpoint = tinyEndpoint.defineGetEndpoint(
   '/query',
   {
-    requestParams: payload.object({
+    requestParams: tinyPayload.object({
       language: appPayload.language,
-      query: payload.string({
+      query: tinyPayload.string({
         min: 0,
         max: 256,
       }),
     }),
-    okResponseJson: payload.object({
-      results: payload.array(
+    okResponseJson: tinyPayload.object({
+      results: tinyPayload.array(
         /* eslint-disable @typescript-eslint/naming-convention */
-        payload.object({
+        tinyPayload.object({
           type: appPayload.documentType,
           id: appPayload.id,
-          created_at: payload.timestamp,
+          created_at: tinyPayload.timestamp,
           created_by: appPayload.id,
-          updated_at: payload.timestamp,
-          subforum_id: payload.nullOr(appPayload.id),
-          topic_id: payload.nullOr(appPayload.id),
-          taxon_rank: payload.nullOr(appPayload.taxonRank),
-          parents: payload.array(appPayload.id),
-          title: payload.nullOr(appPayload.title),
-          names: payload.array(appPayload.name),
+          updated_at: tinyPayload.timestamp,
+          subforum_id: tinyPayload.nullOr(appPayload.id),
+          topic_id: tinyPayload.nullOr(appPayload.id),
+          taxon_rank: tinyPayload.nullOr(
+            appPayload.taxonRank
+          ),
+          parents: tinyPayload.array(appPayload.id),
+          title: tinyPayload.nullOr(appPayload.title),
+          names: tinyPayload.array(appPayload.name),
           slug: appPayload.slug,
-          tags: payload.array(appPayload.id),
+          tags: tinyPayload.array(appPayload.id),
           content: appPayload.content,
         })
         /* eslint-enable @typescript-eslint/naming-convention */

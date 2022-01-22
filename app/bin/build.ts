@@ -1,19 +1,19 @@
-import * as crypto from '@tiny/core/crypto.node.ts'
+import * as tinyCrypto from '@tiny/core/crypto.node.ts'
 import esbuild from 'esbuild'
-import * as fsPromises from 'node:fs/promises'
-import module from 'node:module'
-import * as pathModule from 'node:path'
-import * as urlModule from 'node:url'
+import * as nodeFsPromises from 'node:fs/promises'
+import nodeModule from 'node:module'
+import * as nodePath from 'node:path'
+import * as nodeUrl from 'node:url'
 
 async function main(): Promise<void> {
-  await fsPromises.rm('build', {
+  await nodeFsPromises.rm('build', {
     recursive: true,
     force: true,
   })
-  await fsPromises.mkdir('build/browser', {
+  await nodeFsPromises.mkdir('build/browser', {
     recursive: true,
   })
-  await fsPromises.copyFile(
+  await nodeFsPromises.copyFile(
     'app/public/index.html',
     'build/browser/index.html'
   )
@@ -28,7 +28,9 @@ async function main(): Promise<void> {
         JSON.stringify('production'),
     },
   })
-  await fsPromises.mkdir('build/node', { recursive: true })
+  await nodeFsPromises.mkdir('build/node', {
+    recursive: true,
+  })
   await all({
     entryPoints: [
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -136,7 +138,7 @@ export async function oneStep(
       const contents = Buffer.from(
         result.outputFiles[0].contents
       )
-      const hash = crypto.hash(contents)
+      const hash = tinyCrypto.hash(contents)
       output = {
         path: outfile,
         contents,
@@ -159,7 +161,7 @@ export async function oneStep(
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         let url = await import.meta.resolve!(
           args.path,
-          urlModule.pathToFileURL(args.importer).toString()
+          nodeUrl.pathToFileURL(args.importer).toString()
         )
         if (
           options.platform === 'browser' &&
@@ -168,17 +170,15 @@ export async function oneStep(
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           url = await import.meta.resolve!(
             'lodash-es/stubFalse.js',
-            urlModule
-              .pathToFileURL(args.importer)
-              .toString()
+            nodeUrl.pathToFileURL(args.importer).toString()
           )
         }
         if (url.startsWith('node:')) {
           return { path: args.path, external: true }
         }
-        const fullPath = urlModule.fileURLToPath(url)
-        const localPath = pathModule.relative('.', fullPath)
-        if (localPath.startsWith(`..${pathModule.sep}`)) {
+        const fullPath = nodeUrl.fileURLToPath(url)
+        const localPath = nodePath.relative('.', fullPath)
+        if (localPath.startsWith(`..${nodePath.sep}`)) {
           throw new Error(`Invalid path ${args.path}`)
         } else if (
           options.platform === 'node' &&
@@ -186,22 +186,22 @@ export async function oneStep(
         ) {
           return { path: args.path, external: true }
         }
-        let path = `${pathModule.relative(
-          pathModule.join(args.importer, '..'),
+        let path = `${nodePath.relative(
+          nodePath.join(args.importer, '..'),
           fullPath
         )}.mjs`
-        if (!path.startsWith(`.${pathModule.sep}`)) {
-          path = `.${pathModule.sep}${path}`
+        if (!path.startsWith(`.${nodePath.sep}`)) {
+          path = `.${nodePath.sep}${path}`
         }
         nextSteps.push(url)
         return { path, external: true }
       } else if (options.platform === 'node') {
         throw new Error(`Unsupported resolve ${args.kind}`)
       } else {
-        const fullPath = module
+        const fullPath = nodeModule
           .createRequire(args.importer)
           .resolve(args.path)
-        if (!pathModule.isAbsolute(fullPath)) {
+        if (!nodePath.isAbsolute(fullPath)) {
           return { path: args.path, external: true }
         }
         return { path: fullPath, namespace: 'file' }
@@ -213,16 +213,16 @@ export async function oneStep(
 function getBuildPaths(
   options: BuildOptions
 ): [fullEntryPointPath: string, outfile: string] {
-  const fullEntryPointPath = urlModule.fileURLToPath(
+  const fullEntryPointPath = nodeUrl.fileURLToPath(
     options.entryPoint
   )
-  const localEntryPointPath = pathModule.relative(
+  const localEntryPointPath = nodePath.relative(
     '.',
     fullEntryPointPath
   )
   return [
     fullEntryPointPath,
-    `${pathModule.join(
+    `${nodePath.join(
       options.platform === 'browser'
         ? 'build/browser/js'
         : 'build/node',
@@ -238,8 +238,7 @@ export function getOutputPath(
 }
 
 if (
-  process.argv[1] ===
-  urlModule.fileURLToPath(import.meta.url)
+  process.argv[1] === nodeUrl.fileURLToPath(import.meta.url)
 ) {
   void main()
 }
