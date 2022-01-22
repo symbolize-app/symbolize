@@ -1,5 +1,6 @@
 import type * as redisClient from '@node-redis/client'
 import * as errorModule from '@tiny/core/error.ts'
+import type * as time from '@tiny/core/time.ts'
 import ms from 'ms'
 
 export type Context<CacheId extends symbol> = {
@@ -9,6 +10,7 @@ export type Context<CacheId extends symbol> = {
 
 export type Cache<CacheId extends symbol> = {
   query<Params extends unknown[], Result>(
+    ctx: time.Context,
     query: Query<CacheId, Params, Result>,
     ...params: Params
   ): Promise<Result>
@@ -56,7 +58,11 @@ export async function retryQuery<
     return await errorModule.retry(
       ctx,
       () =>
-        ctx.caches[query.cacheId].query(query, ...params),
+        ctx.caches[query.cacheId].query(
+          ctx,
+          query,
+          ...params
+        ),
       {
         ...ctx.cacheRetryConfig,
         onError(error, attempt, nextDelayMs) {
