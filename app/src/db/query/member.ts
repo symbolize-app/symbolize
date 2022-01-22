@@ -1,6 +1,6 @@
+import * as appDbQuery from '@app/db/query/index.ts'
 import dbQueryMemberCreate from '@db/query/member_create.sql'
 import dbQueryMemberFind from '@db/query/member_find.sql'
-import * as appDbQuery from '@fe/db/query/index.ts'
 import * as tinyDbQuery from '@tiny/db/query.ts'
 
 export const find = tinyDbQuery.defineOptional(

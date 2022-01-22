@@ -1,5 +1,5 @@
-import * as appFts from '@fe/api/fts.ts'
-import * as appEndpointSearch from '@fe/core/endpoint/search.ts'
+import * as appFts from '@app/api/fts.ts'
+import * as appEndpointSearch from '@app/core/endpoint/search.ts'
 import * as tinyRoute from '@tiny/api/route.ts'
 import type * as tinyError from '@tiny/core/error.ts'
 import * as tinySubmit from '@tiny/core/submit.ts'

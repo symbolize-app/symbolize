@@ -1,4 +1,4 @@
-import * as appCacheQuery from '@fe/cache/query/index.ts'
+import * as appCacheQuery from '@app/cache/query/index.ts'
 import * as tinyCacheQuery from '@tiny/cache/query.ts'
 
 export const maxSizeBytes = 32 * 1024 * 1024

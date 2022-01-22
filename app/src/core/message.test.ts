@@ -1,4 +1,4 @@
-import * as appMessage from '@fe/core/message.ts'
+import * as appMessage from '@app/core/message.ts'
 import * as tinyTest from '@tiny/test/index.ts'
 
 export const url = import.meta.url

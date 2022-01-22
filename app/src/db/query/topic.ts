@@ -1,7 +1,7 @@
+import * as appDbQuery from '@app/db/query/index.ts'
 import dbQueryTopicCreate from '@db/query/topic_create.sql'
 import dbQueryTopicList from '@db/query/topic_list.sql'
 import dbQueryTopicUpdate from '@db/query/topic_update.sql'
-import * as appDbQuery from '@fe/db/query/index.ts'
 import * as tinyDbQuery from '@tiny/db/query.ts'
 
 export const create = tinyDbQuery.defineVoid(

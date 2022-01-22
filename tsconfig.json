@@ -27,13 +27,12 @@
     "noUnusedParameters": true,
     "paths": {
       "@db/*.sql": ["./db/src/*.sql"],
-      "@fe/*.ts": ["./app/src/*.ts"],
-      "@fe-bin/*.ts": ["./app/bin/*.ts"],
+      "@app/*.ts": ["./app/src/*.ts"],
+      "@app-bin/*.ts": ["./app/bin/*.ts"],
       "@sinonjs/fake-timers": [
         "./node_modules/@types/sinonjs__fake-timers"
       ],
-      "@tiny/*.ts": ["./tiny/src/*.ts"],
-      "sinonx": ["./node_modules/@types/sinon"]
+      "@tiny/*.ts": ["./tiny/src/*.ts"]
     },
     "resolveJsonModule": true,
     "skipLibCheck": true,

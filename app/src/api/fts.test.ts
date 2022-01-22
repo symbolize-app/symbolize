@@ -1,4 +1,4 @@
-import type * as appFts from '@fe/api/fts.ts'
+import type * as appFts from '@app/api/fts.ts'
 
 export function initContext(): appFts.Context {
   return {
