@@ -1,10 +1,10 @@
-import * as appMessage from '@fe/core/message.ts'
-import * as appSubmit from '@fe/core/submit.ts'
-import * as appWidgetButton from '@fe/ui/widget/button.ts'
-import * as appWidgetFile from '@fe/ui/widget/file.ts'
-import * as appWidgetMember from '@fe/ui/widget/member.ts'
-import * as appWidgetSearch from '@fe/ui/widget/search.ts'
-import * as appWidgetTopic from '@fe/ui/widget/topic.ts'
+import * as appMessage from '@app/core/message.ts'
+import * as appSubmit from '@app/core/submit.ts'
+import * as appWidgetButton from '@app/ui/widget/button.ts'
+import * as appWidgetFile from '@app/ui/widget/file.ts'
+import * as appWidgetMember from '@app/ui/widget/member.ts'
+import * as appWidgetSearch from '@app/ui/widget/search.ts'
+import * as appWidgetTopic from '@app/ui/widget/topic.ts'
 import type * as tinyError from '@tiny/core/error.ts'
 import * as tinyRandom from '@tiny/core/random.ts'
 import * as tinySubmit from '@tiny/core/submit.ts'
@@ -154,7 +154,7 @@ async function main(): Promise<void> {
     .catch(console.error)
 
   if (import.meta.env.NODE_ENV === 'development') {
-    const dev = await import('@fe/ui/dev.ts')
+    const dev = await import('@app/ui/dev.ts')
     dev.main(ctx)
   }
 }

@@ -1,4 +1,4 @@
-import * as appPayload from '@fe/core/payload.ts'
+import * as appPayload from '@app/core/payload.ts'
 import * as tinyEndpoint from '@tiny/core/endpoint.ts'
 import * as tinyPayload from '@tiny/core/payload.ts'
 

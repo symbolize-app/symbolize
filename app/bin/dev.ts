@@ -1,5 +1,5 @@
-import * as appRoute from '@fe/api/route/index.ts'
-import * as appBuild from '@fe-bin/build.ts'
+import * as appRoute from '@app/api/route/index.ts'
+import * as appBuild from '@app-bin/build.ts'
 import * as tinyRoute from '@tiny/api/route.ts'
 import * as tinyConcurrency from '@tiny/core/concurrency.ts'
 import chalk from 'chalk'
@@ -174,7 +174,7 @@ async function main(): Promise<void> {
   )
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const entryPoint = await import.meta.resolve!(
-    '@fe/ui/index.ts'
+    '@app/ui/index.ts'
   )
   const proxy = new HttpProxy({})
   proxy.on('error', () => {

@@ -1,4 +1,4 @@
-import * as appEndpointFile from '@fe/core/endpoint/file.ts'
+import * as appEndpointFile from '@app/core/endpoint/file.ts'
 import type * as tinyError from '@tiny/core/error.ts'
 import * as tinyRandom from '@tiny/core/random.ts'
 import * as tinySubmit from '@tiny/core/submit.ts'

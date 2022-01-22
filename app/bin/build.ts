@@ -20,7 +20,7 @@ async function main(): Promise<void> {
   await all({
     entryPoints: [
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      await import.meta.resolve!('@fe/ui/index.ts'),
+      await import.meta.resolve!('@app/ui/index.ts'),
     ],
     platform: 'browser',
     define: {
@@ -34,7 +34,7 @@ async function main(): Promise<void> {
   await all({
     entryPoints: [
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      await import.meta.resolve!('@fe/api/index.ts'),
+      await import.meta.resolve!('@app/api/index.ts'),
     ],
     platform: 'node',
     define: {
