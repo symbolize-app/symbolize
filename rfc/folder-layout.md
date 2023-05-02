@@ -1,0 +1,148 @@
+# Folder layout
+
+## Tasks
+
+- [ ] Where to put services and libraries written in different languages?
+  - Language-specific workspaces might not like mixing
+- [ ] OK to mix frontend and backend?
+- [ ] How much out-of-UI code will there be? Are non-UI client services worth it?
+  - Data store, services
+  - Keep the UI as a simple shell (since it's so hard to test)
+- [ ] Flat or nested
+  - auth_db, auth_doc, auth_read, auth_write, widget_ts, schema_rs, schema_ts
+
+## Services
+
+- auth
+  - (RBAC, groups, logins, alts)
+  - read
+  - write
+  - ui
+- blog
+  - (personal, community)
+  - read
+  - write
+  - ui
+- cal
+  - (physica/virtual meetups, in-site events)
+  - read
+  - write
+  - ui
+- chat
+  - (private, group)
+  - read
+  - write
+  - ui
+- connect
+  - (integrations, ActivityPub, Git, Intertwine)
+  - read
+  - write
+  - ui
+- feed
+  - (content subscriptions)
+  - read
+  - write
+  - ui
+- forum
+  - (long-form communication, public, private)
+  - read
+  - write
+  - ui
+- gateway
+  - (event forwarder, service worker)
+  - client
+  - server
+- letter
+  - (newsletters)
+  - read
+  - write
+  - ui
+- log
+  - (dev logging)
+  - read
+  - write
+  - ui
+- media
+  - (file, photo, video, audio, animated image, console session, screen recording)
+  - read
+  - write
+  - ui
+- meet
+  - (live calls, 1:1, group)
+  - read
+  - write
+  - ui
+- mod
+  - (moderation queues, spam filters)
+  - read
+  - write
+  - ui
+- obj
+  - (structured data)
+  - read
+  - write
+  - ui
+- ping
+  - (notifications)
+  - read
+  - write
+  - ui
+- profile
+  - (name, signature, image)
+  - read
+  - write
+  - ui
+- search
+  - (full-text search)
+  - run
+  - ui
+- site
+  - (site registration, theme)
+  - read
+  - write
+  - ui
+- task
+  - (project management)
+  - read
+  - write
+  - display
+  - db
+- repo
+  - (change management, source control)
+  - read
+  - write
+  - display
+  - db
+- review
+  - (change review)
+  - read
+  - write
+  - display
+  - db
+- track
+  - (internal/external analytics)
+  - read
+  - write
+  - ui
+- vote
+  - (open votes, straw polls)
+  - read
+  - write
+  - ui
+- web
+  - (static HTML/JS/CSS, SSR)
+  - server
+
+## Libraries
+
+- lib_ts
+  - content
+    - (schema, review, scheduling, blocks)
+  - http
+  - stream
+  - style
+  - widget
+- lib_rs
+  - db
+  - http
+  - stream
