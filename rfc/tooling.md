@@ -59,6 +59,7 @@
 ## Integration
 
 - https://www.mailersend.com/
+- https://www.hcaptcha.com/
 
 ## Office
 
