@@ -4,5 +4,6 @@ node_modules
 result
 target
 .crdb
+.direnv
 .env
 .tantivy
