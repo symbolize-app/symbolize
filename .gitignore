@@ -1,6 +1,7 @@
 *.tsbuildinfo
 build
 node_modules
+result
 target
 .crdb
 .env
