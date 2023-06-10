@@ -1,6 +1,5 @@
 FROM node:17-slim
 WORKDIR /app
-COPY .crdb/certs .crdb/certs
 COPY build build
 COPY node_modules node_modules
 ENV NODE_ENV=production

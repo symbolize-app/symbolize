@@ -4,7 +4,6 @@
     "db/**/*.sql",
     "global.d.ts",
     "loader.js",
-    "prettier-plugin-cockroach.cjs",
     "suppress.cjs",
     "tiny/**/*.ts"
   ],

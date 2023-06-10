@@ -1,6 +1,5 @@
 FROM debian:stable-slim
 WORKDIR /app
-COPY .crdb/certs .crdb/certs
 COPY target/release/fertile-earth target/release/fertile-earth
 ENV FTS_HOST=::
 ENV FTS_PORT=7070
