@@ -1,9 +1,7 @@
 import * as appRoute from '@app/api/route/index.ts'
 import * as appBuild from '@app-bin/build.ts'
 import * as tinyRoute from '@tiny/api/route.ts'
-import * as tinyConcurrency from '@tiny/core/concurrency.ts'
 import chalk from 'chalk'
-import childProcess from 'child_process'
 import chokidar from 'chokidar'
 import HttpProxy from 'http-proxy'
 import lodashDebounce from 'lodash-es/debounce.js'
@@ -19,18 +17,12 @@ import projectTsconfig from '../../tsconfig.json'
 type Context = {
   sourceTree: SourceTree
   proxy: HttpProxy
-  server: Server
 } & tinyRoute.Context
 
 type SourceTree = Record<
   string,
   Promise<appBuild.SourceFile>
 >
-
-type Server = {
-  ready: tinyConcurrency.EventSemaphore
-  kill: () => Promise<void>
-}
 
 const index = tinyRoute.defineBase(['GET'], /^\/$/, () => {
   return {
@@ -78,19 +70,6 @@ const js = tinyRoute.defineBase<Context>(
   }
 )
 
-const api = tinyRoute.defineBase<{
-  server: Server
-  proxy: HttpProxy
-}>(undefined, /^\/api\/.+/, async (ctx) => {
-  await ctx.server.ready.wait()
-  return (req, res) =>
-    ctx.proxy.web(req, res, {
-      target: `http://localhost:${
-        process.env.APP_PORT as string
-      }`,
-    })
-})
-
 function buildDev(entryPoint: string): SourceTree {
   const sourceTree: SourceTree = {}
   const baseOptions = {
@@ -136,34 +115,6 @@ function buildDev(entryPoint: string): SourceTree {
   }
 }
 
-function createServer(): Server {
-  const ready = new tinyConcurrency.EventSemaphore()
-  const exited = new tinyConcurrency.EventSemaphore()
-  const child = childProcess.fork('app/src/api/index.ts', {
-    env: {
-      ...process.env,
-      ['NODE_ENV']: 'development',
-    },
-  })
-  child.on('message', (message) => {
-    if (message === 'ready') {
-      console.log(chalk.blue('dev server ready'))
-      ready.set()
-    }
-  })
-  child.on('error', console.error)
-  child.on('exit', () => {
-    ready.clear()
-    exited.set()
-  })
-  return { ready, kill }
-
-  async function kill() {
-    child.kill()
-    await exited.wait()
-  }
-}
-
 async function main(): Promise<void> {
   const watcher = chokidar.watch(projectTsconfig.include, {
     ignoreInitial: true,
@@ -183,11 +134,10 @@ async function main(): Promise<void> {
   const ctx: Context = {
     sourceTree: buildDev(entryPoint),
     proxy,
-    server: createServer(),
     ...appRoute.initContext(),
   }
   const httpServer = nodeHttp.createServer(
-    tinyRoute.handle(ctx, [index, js, api, notFound])
+    tinyRoute.handle(ctx, [index, js, notFound])
   )
   httpServer.on('error', console.error)
   const wsServer = new WebSocket.Server({
@@ -201,7 +151,7 @@ async function main(): Promise<void> {
     }
     ws.on('error', console.error)
   })
-  await reload()
+  reload()
   httpServer.listen(process.env.APP_DEV_PORT)
   console.log(
     chalk.bold(
@@ -212,10 +162,8 @@ async function main(): Promise<void> {
   )
   return
 
-  async function reload() {
+  function reload() {
     ctx.sourceTree = buildDev(entryPoint)
-    await ctx.server.kill()
-    ctx.server = createServer()
     for (const ws of wsServer.clients) {
       if (ws.readyState === WebSocket.OPEN) {
         ws.send('reload')
