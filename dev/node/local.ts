@@ -1,5 +1,5 @@
 import * as appRoute from '@app/api/route/index.ts'
-import * as appBuild from '@app-bin/build.ts'
+import * as appBuild from '@dev/build.ts'
 import * as tinyRoute from '@tiny/api/route.ts'
 import chalk from 'chalk'
 import chokidar from 'chokidar'

@@ -6,7 +6,7 @@ import * as nodePath from 'node:path'
 import * as nodeUrl from 'node:url'
 import picomatch from 'picomatch'
 
-import projectTsconfig from './tsconfig.json' assert { type: 'json' }
+import projectTsconfig from '../../tsconfig.json' assert { type: 'json' }
 
 const aliases = Object.entries(
   projectTsconfig.compilerOptions.paths

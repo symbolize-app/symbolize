@@ -3,8 +3,9 @@
     "app/**/*.ts",
     "db/**/*.sql",
     "global.d.ts",
-    "loader.js",
-    "suppress.cjs",
+    "dev/node/**/*.ts",
+    "dev/node/loader.js",
+    "dev/node/suppress.cjs",
     "tiny/**/*.ts"
   ],
   "compilerOptions": {
@@ -27,7 +28,7 @@
     "paths": {
       "@db/*.sql": ["./db/src/*.sql"],
       "@app/*.ts": ["./app/src/*.ts"],
-      "@app-bin/*.ts": ["./app/bin/*.ts"],
+      "@dev/*.ts": ["./dev/node/*.ts"],
       "@sinonjs/fake-timers": [
         "./node_modules/@types/sinonjs__fake-timers"
       ],
