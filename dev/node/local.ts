@@ -1,6 +1,5 @@
-import * as appRoute from '@app/api/route/index.ts'
-import * as appBuild from '@dev/build.ts'
-import * as tinyRoute from '@tiny/api/route.ts'
+import * as devBuild from '@dev/build.ts'
+import * as devRoute from '@dev/route.ts'
 import chalk from 'chalk'
 import chokidar from 'chokidar'
 import HttpProxy from 'http-proxy'
@@ -17,14 +16,14 @@ import projectTsconfig from '../../tsconfig.json'
 type Context = {
   sourceTree: SourceTree
   proxy: HttpProxy
-} & tinyRoute.Context
+} & devRoute.Context
 
 type SourceTree = Record<
   string,
-  Promise<appBuild.SourceFile>
+  Promise<devBuild.SourceFile>
 >
 
-const index = tinyRoute.defineBase(['GET'], /^\/$/, () => {
+const index = devRoute.define(['GET'], /^\/$/, () => {
   return {
     status: 200,
     headers: {
@@ -36,7 +35,7 @@ const index = tinyRoute.defineBase(['GET'], /^\/$/, () => {
   }
 })
 
-const notFound = tinyRoute.defineBase(
+const notFound = devRoute.define(
   undefined,
   /.*/,
   () => {
@@ -47,7 +46,7 @@ const notFound = tinyRoute.defineBase(
   }
 )
 
-const js = tinyRoute.defineBase<Context>(
+const js = devRoute.define<Context>(
   ['GET'],
   /^\/js\/(?<path>.+\.mjs)$/,
   async (ctx, request) => {
@@ -65,7 +64,7 @@ const js = tinyRoute.defineBase<Context>(
         buffer: sourceFile.contents,
       }
     } else {
-      return tinyRoute.forward(ctx, request, {}, notFound)
+      return devRoute.forward(ctx, request, {}, notFound)
     }
   }
 )
@@ -88,21 +87,21 @@ function buildDev(entryPoint: string): SourceTree {
       ...baseOptions,
       entryPoint: step,
     } as const
-    sourceTree[appBuild.getOutputPath(options)] =
+    sourceTree[devBuild.getOutputPath(options)] =
       start(step)
   }
 
   async function start(
     step: string
-  ): Promise<appBuild.SourceFile> {
-    const result = await appBuild.oneStep({
+  ): Promise<devBuild.SourceFile> {
+    const result = await devBuild.oneStep({
       ...baseOptions,
       entryPoint: step,
     })
     for (const step of result.nextSteps) {
       if (
         !(
-          appBuild.getOutputPath({
+          devBuild.getOutputPath({
             ...baseOptions,
             entryPoint: step,
           }) in sourceTree
@@ -134,10 +133,10 @@ async function main(): Promise<void> {
   const ctx: Context = {
     sourceTree: buildDev(entryPoint),
     proxy,
-    ...appRoute.initContext(),
+    maxRequestNonStreamedBytes: 4 * 1024,
   }
   const httpServer = nodeHttp.createServer(
-    tinyRoute.handle(ctx, [index, js, notFound])
+    devRoute.handle(ctx, [index, js, notFound])
   )
   httpServer.on('error', console.error)
   const wsServer = new WebSocket.Server({
