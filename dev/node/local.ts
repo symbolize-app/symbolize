@@ -2,7 +2,6 @@ import * as devBuild from '@dev/build.ts'
 import * as devRoute from '@dev/route.ts'
 import chalk from 'chalk'
 import chokidar from 'chokidar'
-import HttpProxy from 'http-proxy'
 import lodashDebounce from 'lodash-es/debounce.js'
 import * as nodeFs from 'node:fs'
 import * as nodeHttp from 'node:http'
@@ -15,7 +14,6 @@ import projectTsconfig from '../../tsconfig.json'
 
 type Context = {
   sourceTree: SourceTree
-  proxy: HttpProxy
 } & devRoute.Context
 
 type SourceTree = Record<
@@ -126,13 +124,8 @@ async function main(): Promise<void> {
   const entryPoint = await import.meta.resolve!(
     '@app/ui/index.ts'
   )
-  const proxy = new HttpProxy({})
-  proxy.on('error', () => {
-    console.error('proxy error')
-  })
   const ctx: Context = {
     sourceTree: buildDev(entryPoint),
-    proxy,
     maxRequestNonStreamedBytes: 4 * 1024,
   }
   const httpServer = nodeHttp.createServer(
