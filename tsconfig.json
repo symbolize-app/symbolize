@@ -1,12 +1,19 @@
 {
   "include": [
-    "app/**/*.ts",
-    "db/**/*.sql",
-    "global.d.ts",
     "dev/node/**/*.ts",
     "dev/node/loader.js",
     "dev/node/suppress.cjs",
-    "tiny/**/*.ts"
+    "global.d.ts",
+    "lib/crypto/**/*.ts",
+    "lib/error/**/*.ts",
+    "lib/hex/**/*.ts",
+    "lib/random/**/*.ts",
+    "lib/style/**/*.ts",
+    "lib/test/**/*.ts",
+    "lib/time/**/*.ts",
+    "lib/widget/**/*.ts",
+    "service/**/*.sql",
+    "service/**/*.ts"
   ],
   "compilerOptions": {
     "allowUnreachableCode": false,
@@ -26,13 +33,20 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "paths": {
-      "@db/*.sql": ["./db/src/*.sql"],
-      "@app/*.ts": ["./app/src/*.ts"],
-      "@dev/*.ts": ["./dev/node/*.ts"],
+      "@intertwine/crypto/*.ts": ["./lib/crypto/*.ts"],
+      "@intertwine/dev/*.ts": ["./dev/node/*.ts"],
+      "@intertwine/error*.ts": ["./lib/error/*.ts"],
+      "@intertwine/hex/*.ts": ["./lib/hex/*.ts"],
+      "@intertwine/style/*.ts": ["./lib/style/*.ts"],
+      "@intertwine/random/*.ts": ["./lib/random/*.ts"],
+      "@intertwine/test/*.ts": ["./lib/test/*.ts"],
+      "@intertwine/time/*.ts": ["./lib/time/*.ts"],
+      "@intertwine/widget/*.ts": ["./lib/widget/*.ts"],
+      "@/*.sql": ["./service/auth/guest/display/*.sql"],
+      "@/*.ts": ["./service/auth/guest/display/*.ts"],
       "@sinonjs/fake-timers": [
         "./node_modules/@types/sinonjs__fake-timers"
-      ],
-      "@tiny/*.ts": ["./tiny/src/*.ts"]
+      ]
     },
     "resolveJsonModule": true,
     "skipLibCheck": true,

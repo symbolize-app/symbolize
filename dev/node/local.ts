@@ -1,5 +1,5 @@
-import * as devBuild from '@dev/build.ts'
-import * as devRoute from '@dev/route.ts'
+import * as devBuild from '@intertwine/dev/build.ts'
+import * as devRoute from '@intertwine/dev/route.ts'
 import chalk from 'chalk'
 import chokidar from 'chokidar'
 import lodashDebounce from 'lodash-es/debounce.js'
@@ -28,21 +28,19 @@ const index = devRoute.define(['GET'], /^\/$/, () => {
       'content-type': 'text/html',
     },
     stream: nodeStream.Readable.toWeb(
-      nodeFs.createReadStream('app/public/index.html')
+      nodeFs.createReadStream(
+        'service/gateway/guest/public/index.html'
+      )
     ),
   }
 })
 
-const notFound = devRoute.define(
-  undefined,
-  /.*/,
-  () => {
-    return {
-      status: 404,
-      headers: {},
-    }
+const notFound = devRoute.define(undefined, /.*/, () => {
+  return {
+    status: 404,
+    headers: {},
   }
-)
+})
 
 const js = devRoute.define<Context>(
   ['GET'],
@@ -122,7 +120,7 @@ async function main(): Promise<void> {
   )
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const entryPoint = await import.meta.resolve!(
-    '@app/ui/index.ts'
+    '@/index.ts'
   )
   const ctx: Context = {
     sourceTree: buildDev(entryPoint),

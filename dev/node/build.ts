@@ -1,4 +1,4 @@
-import * as tinyCrypto from '@tiny/core/crypto.node.ts'
+import * as tinyCrypto from '@intertwine/crypto/crypto.node.ts'
 import esbuild from 'esbuild'
 import * as nodeFsPromises from 'node:fs/promises'
 import nodeModule from 'node:module'
@@ -14,13 +14,13 @@ async function main(): Promise<void> {
     recursive: true,
   })
   await nodeFsPromises.copyFile(
-    'app/public/index.html',
+    'service/gateway/guest/public/index.html',
     'build/browser/index.html'
   )
   await all({
     entryPoints: [
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      await import.meta.resolve!('@app/ui/index.ts'),
+      await import.meta.resolve!('@/index.ts'),
     ],
     platform: 'browser',
     define: {
@@ -34,7 +34,7 @@ async function main(): Promise<void> {
   await all({
     entryPoints: [
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      await import.meta.resolve!('@app/api/index.ts'),
+      await import.meta.resolve!('@/api/index.ts'),
     ],
     platform: 'node',
     define: {
