@@ -16,7 +16,7 @@
 - auth
   - author
 - blog
-  - thread 
+  - thread
 - cal
   - calendar
 - chat

@@ -6,50 +6,48 @@
 export const myButton = defineWidget({
   context: defineWidgetContext<TrackingContext>(),
   properties: defineWidgetProperties<{
-    text: string,
+    text: string
     primary: boolean
   }>(),
   defaults: defineWidgetDefaults({
-    primary: false
+    primary: false,
   }),
   events: defineWidgetEvents<{
     click: [modifiers: Modifier[]]
   }>(),
   init(ctx, widget) {
     const internalButton = button(ctx, {
-      style: [
-        myButtonStyle,
-      ],
+      style: [myButtonStyle],
       on: {
         click: onClick,
-      }
+      },
     })
-    
+
     widget({
       content: [internalButton],
       watch: {
         text: watchText,
-      }
+      },
     })
-    
+
     function onClick() {
       widget.emit.click([Modifier.shift])
     }
-    
+
     function watchText() {
       internalButton({
         content: [widget.text],
       })
     }
-    
+
     function focus() {
       internalButton.focus()
     }
-    
-    return { 
-      focus
+
+    return {
+      focus,
     }
-  }
+  },
 })
 ```
 
@@ -71,7 +69,8 @@ Then make helpers for common scenarios -- global `addEventListener`, `MutationOb
 
 ## SSR
 
-Try out some alternatives to jsdom: 
+Try out some alternatives to jsdom:
+
 - https://github.com/WebReflection/linkedom
 - https://github.com/capricorn86/happy-dom
 
@@ -89,4 +88,4 @@ All header usage is encouraged to be relative. The absolute level will be contro
 
 ## Non-widgets
 
-A bunch of the code (watchers, event emitters, contexts, etc.) should be defined outside of widgets and usable from non-widget services. For example, 
+A bunch of the code (watchers, event emitters, contexts, etc.) should be defined outside of widgets and usable from non-widget services. For example,

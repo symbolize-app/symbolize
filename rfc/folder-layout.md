@@ -24,7 +24,7 @@ Put in `/service`.
 - feed (content subscriptions)
 - forum (long-form communication, public, private)
 - frame (header, footer, nav)
-- gateway* (event forwarder, service worker)
+- gateway\* (event forwarder, service worker)
 - letter (newsletters)
 - log (dev logging)
 - media (file, photo, video, audio, animated image, console session, screen recording)
@@ -33,10 +33,10 @@ Put in `/service`.
 - obj (structured data)
 - ping (notifications)
 - profile (name, signature, image)
-- render* (SSR)
+- render\* (SSR)
 - repo (change management, source control)
 - review (change review)
-- search* (full-text search)
+- search\* (full-text search)
 - site (registration, theme, billing)
 - task (project management)
 - track (internal/external analytics)
@@ -56,7 +56,7 @@ Put in `/service`.
   - write
 - stream
 
-## Special*
+## Special\*
 
 Some of the above.
 
