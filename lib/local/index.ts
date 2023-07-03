@@ -1,5 +1,5 @@
-import * as devBuild from '@intertwine/dev/build.ts'
-import * as devRoute from '@intertwine/dev/route.ts'
+import * as devBuild from '@intertwine/build_/index.ts'
+import * as devRoute from '@intertwine/local/route.ts'
 import chalk from 'chalk'
 import chokidar from 'chokidar'
 import lodashDebounce from 'lodash-es/debounce.js'

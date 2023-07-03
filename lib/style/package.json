@@ -1,0 +1,14 @@
+{
+  "name": "@intertwine/style",
+  "engines": {
+    "node": "17.7.2",
+    "pnpm": "6.32.3"
+  },
+  "type": "module",
+  "dependencies": {
+    "@intertwine/prettier": "workspace:*"
+  },
+  "peerDependencies": {},
+  "prettier": "@intertwine/prettier/index.json",
+  "pnpm": {}
+}

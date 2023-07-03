@@ -5,16 +5,16 @@
   },
   "type": "module",
   "scripts": {
-    "build": "node --experimental-loader ./dev/node/loader.js dev/node/build.ts",
+    "build": "node --experimental-loader ./lib/loader/index.js lib/build_/index.ts",
     "check-fmt": "prettier --ignore-path .gitignore --check '**/*.cjs' '**/*.js' '**/*.json' '**/*.ts' '**/*.html' '**/*.md' '**/*.yaml' '!pnpm-lock.yaml' && dprint check",
     "check-lint": "eslint --ignore-path .gitignore --max-warnings 0 --ext ts,js,cjs .",
     "check-tsc": "tsc",
     "db": "dbmate --url ${DATABASE_URL_ADMIN}",
-    "dev": "node --experimental-loader ./dev/node/loader.js dev/node/local.ts",
+    "dev": "node --experimental-loader ./lib/loader/index.js lib/local/index.ts",
     "fix-lint": "eslint --ignore-path .gitignore --fix --ext ts,js,cjs .",
     "fmt": "prettier --ignore-path .gitignore --write '**/*.cjs' '**/*.js' '**/*.json' '**/*.ts' '**/*.html' '**/*.md' '**/*.yaml' '!pnpm-lock.yaml' && dprint fmt",
     "start": "pnpm build && NODE_ENV=production NODE_OPTIONS=\"${NODE_OPTIONS_RELEASE}\" APP_PORT=\"${APP_DEV_PORT}\" node build/node/app/src/api/index.ts.mjs",
-    "test": "node --experimental-loader ./dev/node/loader.js dev/node/test.ts",
+    "test": "node --experimental-loader ./lib/loader/index.js service/auth/guest/display/test.ts",
     "watch": "tsc --watch"
   },
   "dependencies": {
@@ -24,7 +24,9 @@
     "jsdom": "19.0.0",
     "ms": "2.1.3",
     "node-fetch": "3.1.0",
-    "sodium-native": "3.3.0"
+    "sodium-native": "3.3.0",
+    "@intertwine/style": "workspace:*",
+    "@intertwine/prettier": "workspace:*"
   },
   "devDependencies": {
     "@sinonjs/fake-timers": "8.1.0",
@@ -60,12 +62,7 @@
     "utf-8-validate": "5.0.7",
     "ws": "7.5.6"
   },
-  "prettier": {
-    "printWidth": 60,
-    "semi": false,
-    "singleQuote": true,
-    "trailingComma": "es5"
-  },
+  "prettier": "@intertwine/prettier/index.json",
   "pnpm": {
     "neverBuiltDependencies": [
       "fsevents"

@@ -3,89 +3,103 @@ lockfileVersion: 5.3
 neverBuiltDependencies:
   - fsevents
 
-specifiers:
-  '@sinonjs/fake-timers': 8.1.0
-  '@types/cookie': 0.4.1
-  '@types/diff': 5.0.1
-  '@types/jsdom': 16.2.13
-  '@types/lodash-es': 4.17.5
-  '@types/ms': 0.7.31
-  '@types/node': 17.0.1
-  '@types/picomatch': 2.3.0
-  '@types/prettier': 2.4.2
-  '@types/sinonjs__fake-timers': 8.1.1
-  '@types/sodium-native': 2.3.5
-  '@types/ws': 8.2.2
-  '@typescript-eslint/eslint-plugin': 5.60.1
-  '@typescript-eslint/parser': 5.60.1
-  bufferutil: 4.0.5
-  chalk: 5.0.0
-  chokidar: 3.5.2
-  cookie: 0.4.1
-  diff: 5.0.0
-  dprint: 0.19.1
-  esbuild: 0.14.5
-  eslint: 8.5.0
-  eslint-config-prettier: 8.3.0
-  eslint-plugin-import: 2.25.3
-  eslint-plugin-prettier: 4.0.0
-  eslint-plugin-simple-import-sort: 7.0.0
-  fast-mersenne-twister: 1.0.3
-  formdata-polyfill: 4.0.10
-  jsdom: 19.0.0
-  lodash-es: 4.17.21
-  ms: 2.1.3
-  node-fetch: 3.1.0
-  picomatch: 2.3.0
-  prettier: 2.5.1
-  sodium-native: 3.3.0
-  type-fest: 2.8.0
-  typescript: 5.0.4
-  utf-8-validate: 5.0.7
-  ws: 7.5.6
+importers:
 
-dependencies:
-  chalk: 5.0.0
-  cookie: 0.4.1
-  formdata-polyfill: 4.0.10
-  jsdom: 19.0.0_5971b5a749a91823f5467a6d31a2f8b3
-  ms: 2.1.3
-  node-fetch: 3.1.0
-  sodium-native: 3.3.0
+  .:
+    specifiers:
+      '@intertwine/prettier': workspace:*
+      '@intertwine/style': workspace:*
+      '@sinonjs/fake-timers': 8.1.0
+      '@types/cookie': 0.4.1
+      '@types/diff': 5.0.1
+      '@types/jsdom': 16.2.13
+      '@types/lodash-es': 4.17.5
+      '@types/ms': 0.7.31
+      '@types/node': 17.0.1
+      '@types/picomatch': 2.3.0
+      '@types/prettier': 2.4.2
+      '@types/sinonjs__fake-timers': 8.1.1
+      '@types/sodium-native': 2.3.5
+      '@types/ws': 8.2.2
+      '@typescript-eslint/eslint-plugin': 5.60.1
+      '@typescript-eslint/parser': 5.60.1
+      bufferutil: 4.0.5
+      chalk: 5.0.0
+      chokidar: 3.5.2
+      cookie: 0.4.1
+      diff: 5.0.0
+      dprint: 0.19.1
+      esbuild: 0.14.5
+      eslint: 8.5.0
+      eslint-config-prettier: 8.3.0
+      eslint-plugin-import: 2.25.3
+      eslint-plugin-prettier: 4.0.0
+      eslint-plugin-simple-import-sort: 7.0.0
+      fast-mersenne-twister: 1.0.3
+      formdata-polyfill: 4.0.10
+      jsdom: 19.0.0
+      lodash-es: 4.17.21
+      ms: 2.1.3
+      node-fetch: 3.1.0
+      picomatch: 2.3.0
+      prettier: 2.5.1
+      sodium-native: 3.3.0
+      type-fest: 2.8.0
+      typescript: 5.0.4
+      utf-8-validate: 5.0.7
+      ws: 7.5.6
+    dependencies:
+      '@intertwine/prettier': link:lib/prettier
+      '@intertwine/style': link:lib/style
+      chalk: 5.0.0
+      cookie: 0.4.1
+      formdata-polyfill: 4.0.10
+      jsdom: 19.0.0_5971b5a749a91823f5467a6d31a2f8b3
+      ms: 2.1.3
+      node-fetch: 3.1.0
+      sodium-native: 3.3.0
+    devDependencies:
+      '@sinonjs/fake-timers': 8.1.0
+      '@types/cookie': 0.4.1
+      '@types/diff': 5.0.1
+      '@types/jsdom': 16.2.13
+      '@types/lodash-es': 4.17.5
+      '@types/ms': 0.7.31
+      '@types/node': 17.0.1
+      '@types/picomatch': 2.3.0
+      '@types/prettier': 2.4.2
+      '@types/sinonjs__fake-timers': 8.1.1
+      '@types/sodium-native': 2.3.5
+      '@types/ws': 8.2.2
+      '@typescript-eslint/eslint-plugin': 5.60.1_b6bb31b807f39e80f32b51e2c74c1292
+      '@typescript-eslint/parser': 5.60.1_eslint@8.5.0+typescript@5.0.4
+      bufferutil: 4.0.5
+      chokidar: 3.5.2
+      diff: 5.0.0
+      dprint: 0.19.1
+      esbuild: 0.14.5
+      eslint: 8.5.0
+      eslint-config-prettier: 8.3.0_eslint@8.5.0
+      eslint-plugin-import: 2.25.3_eslint@8.5.0
+      eslint-plugin-prettier: 4.0.0_94e1b6d3ce6ea916847122712570e9ae
+      eslint-plugin-simple-import-sort: 7.0.0_eslint@8.5.0
+      fast-mersenne-twister: 1.0.3
+      lodash-es: 4.17.21
+      picomatch: 2.3.0
+      prettier: 2.5.1
+      type-fest: 2.8.0
+      typescript: 5.0.4
+      utf-8-validate: 5.0.7
+      ws: 7.5.6_5971b5a749a91823f5467a6d31a2f8b3
 
-devDependencies:
-  '@sinonjs/fake-timers': 8.1.0
-  '@types/cookie': 0.4.1
-  '@types/diff': 5.0.1
-  '@types/jsdom': 16.2.13
-  '@types/lodash-es': 4.17.5
-  '@types/ms': 0.7.31
-  '@types/node': 17.0.1
-  '@types/picomatch': 2.3.0
-  '@types/prettier': 2.4.2
-  '@types/sinonjs__fake-timers': 8.1.1
-  '@types/sodium-native': 2.3.5
-  '@types/ws': 8.2.2
-  '@typescript-eslint/eslint-plugin': 5.60.1_b6bb31b807f39e80f32b51e2c74c1292
-  '@typescript-eslint/parser': 5.60.1_eslint@8.5.0+typescript@5.0.4
-  bufferutil: 4.0.5
-  chokidar: 3.5.2
-  diff: 5.0.0
-  dprint: 0.19.1
-  esbuild: 0.14.5
-  eslint: 8.5.0
-  eslint-config-prettier: 8.3.0_eslint@8.5.0
-  eslint-plugin-import: 2.25.3_eslint@8.5.0
-  eslint-plugin-prettier: 4.0.0_94e1b6d3ce6ea916847122712570e9ae
-  eslint-plugin-simple-import-sort: 7.0.0_eslint@8.5.0
-  fast-mersenne-twister: 1.0.3
-  lodash-es: 4.17.21
-  picomatch: 2.3.0
-  prettier: 2.5.1
-  type-fest: 2.8.0
-  typescript: 5.0.4
-  utf-8-validate: 5.0.7
-  ws: 7.5.6_5971b5a749a91823f5467a6d31a2f8b3
+  lib/prettier:
+    specifiers: {}
+
+  lib/style:
+    specifiers:
+      '@intertwine/prettier': workspace:*
+    dependencies:
+      '@intertwine/prettier': link:../prettier
 
 packages:
 
