@@ -25,7 +25,7 @@ const index = devRoute.define(['GET'], /^\/$/, () => {
   return {
     status: 200,
     headers: {
-      'content-type': 'text/html',
+      ['content-type']: 'text/html',
     },
     stream: nodeStream.Readable.toWeb(
       nodeFs.createReadStream(
@@ -55,7 +55,7 @@ const js = devRoute.define<Context>(
       return {
         status: 200,
         headers: {
-          'content-type': 'application/javascript',
+          ['content-type']: 'application/javascript',
         },
         buffer: sourceFile.contents,
       }

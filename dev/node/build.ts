@@ -121,7 +121,7 @@ export async function oneStep(
       entryPoints: [fullEntryPointPath],
       format: 'esm',
       loader: {
-        '.sql': 'text',
+        ['.sql']: 'text',
       },
       outfile,
       platform: options.platform,

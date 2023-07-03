@@ -6,7 +6,9 @@ const context = Symbol('context')
 
 const listenerOptions = Symbol('listenerOptions')
 
-export function advancedListener<T>(
+export function advancedListener<
+  T extends Record<string, unknown>
+>(
   body: T,
   options: AddEventListenerOptions
 ): T & { [listenerOptions]: AddEventListenerOptions } {
