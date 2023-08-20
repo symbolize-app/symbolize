@@ -23,7 +23,8 @@ Put in `/service`.
 - connect (integrations, ActivityPub, Git, Intertwine)
 - feed (content subscriptions)
 - forum (long-form communication, public, private)
-- gateway* (event forwarder, service worker, site registration, theme)
+- frame (header, footer, nav)
+- gateway\* (event forwarder, service worker)
 - letter (newsletters)
 - log (dev logging)
 - media (file, photo, video, audio, animated image, console session, screen recording)
@@ -32,19 +33,21 @@ Put in `/service`.
 - obj (structured data)
 - ping (notifications)
 - profile (name, signature, image)
-- search* (full-text search)
-- task (project management)
+- render\* (SSR)
 - repo (change management, source control)
 - review (change review)
+- search\* (full-text search)
+- site (registration, theme, billing)
+- task (project management)
 - track (internal/external analytics)
 - vote (open votes, straw polls)
-- web* (static HTML/JS/CSS, SSR)
 
 ## Standard
 
 - doc
 - guest
   - db
+  - display
   - read
   - write
 - host
@@ -53,7 +56,7 @@ Put in `/service`.
   - write
 - stream
 
-## Special*
+## Special\*
 
 Some of the above.
 

@@ -1,3 +1,0 @@
-FROM flyio/redis:6.2
-WORKDIR /
-COPY README.md README.md

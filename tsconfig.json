@@ -1,16 +1,16 @@
 {
   "include": [
-    "app/**/*.ts",
-    "db/**/*.sql",
     "global.d.ts",
-    "loader.js",
-    "prettier-plugin-cockroach.cjs",
-    "suppress.cjs",
-    "tiny/**/*.ts"
+    "lib/**/*.ts",
+    "lib/loader/index.js",
+    "lib/suppress/index.cjs",
+    "service/**/*.sql",
+    "service/**/*.ts"
   ],
   "compilerOptions": {
-    "allowUnreachableCode": false,
+    "allowImportingTsExtensions": true,
     "allowJs": true,
+    "allowUnreachableCode": false,
     "alwaysStrict": true,
     "checkJs": true,
     "esModuleInterop": true,
@@ -26,13 +26,20 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "paths": {
-      "@db/*.sql": ["./db/src/*.sql"],
-      "@app/*.ts": ["./app/src/*.ts"],
-      "@app-bin/*.ts": ["./app/bin/*.ts"],
+      "@intertwine/build_/*.ts": ["./lib/build_/*.ts"],
+      "@intertwine/crypto/*.ts": ["./lib/crypto/*.ts"],
+      "@intertwine/error*.ts": ["./lib/error/*.ts"],
+      "@intertwine/hex/*.ts": ["./lib/hex/*.ts"],
+      "@intertwine/local/*.ts": ["./lib/local/*.ts"],
+      "@intertwine/random/*.ts": ["./lib/random/*.ts"],
+      "@intertwine/test/*.ts": ["./lib/test/*.ts"],
+      "@intertwine/time/*.ts": ["./lib/time/*.ts"],
+      "@intertwine/widget/*.ts": ["./lib/widget/*.ts"],
+      "@/*.sql": ["./service/auth/guest/display/*.sql"],
+      "@/*.ts": ["./service/auth/guest/display/*.ts"],
       "@sinonjs/fake-timers": [
         "./node_modules/@types/sinonjs__fake-timers"
-      ],
-      "@tiny/*.ts": ["./tiny/src/*.ts"]
+      ]
     },
     "resolveJsonModule": true,
     "skipLibCheck": true,

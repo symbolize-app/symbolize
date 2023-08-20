@@ -6,13 +6,12 @@
   - e.g. `` `spoiler`[text]``
   - e.g. `` `tag`[text](color: "red", size: "large")``
 - [ ] Shortcut for applying inline-like parameters to blocks
-  - e.g. ``> `callout`(type: info)``
+  - e.g. `` > `callout`(type: info) ``
 - [ ] Nominal typing?
 - [ ] Structural typing union & intersection?
 - [ ] Tagged unions?
 - [ ] Inheritance?
 - [ ] Punctuation for smart quotes and en/em dashes
-
 
 ## Reference
 
@@ -63,7 +62,6 @@
 `tomato.md`
 
 ```md
-
 # `plant`
 
 ## `name`
@@ -86,12 +84,12 @@ Beware of hornworm caterpillars.
 > `callout`
 >
 > #### `type`
+>
 > info
 >
 > ---
 >
 > To see the bugs at night, use a [blacklight].
-
 ```
 
 ## View
@@ -110,9 +108,11 @@ This is a $`object.name`.
 ## `for use in object.uses`
 
 > Here is a use:
+>
 > > `use_card`
 > >
 > > ### `use`
+> >
 > > $`use`
 ```
 
@@ -208,6 +208,7 @@ When a data link type restriction is used, the type can match any linked root or
 Sub-object anchor IDs are auto-generated "slugs" (same as other slugs in Intertwine). Saved to the database to preserve history to avoid broken links.
 
 ## Headers
+
 Content header levels will get translated to the view levels, and all view levels will get translated to proper HTML levels using widget context.
 
 ## Collections
