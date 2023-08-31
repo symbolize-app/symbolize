@@ -20,6 +20,7 @@
 - https://prettier.io/
 - https://eslint.org/
 - https://esbuild.github.io/
+- https://github.com/ohmjs/ohm
 
 ## Rust
 
@@ -33,21 +34,27 @@
   - https://github.com/hyperium/h3/pull/183
 - https://github.com/rusqlite/rusqlite
 - https://github.com/cberner/fuser
+- https://github.com/aembke/fred.rs
+- https://github.com/jamesmunns/postcard
+- https://github.com/awslabs/aws-sdk-rust/tree/main/sdk/s3
 
-## DB
+## Store
 
 - https://www.sqlite.org/index.html
   - https://www.sqlite.org/whentouse.html
-  - https://www.sqlite.org/swarmvtab.html
-- https://fly.io/docs/litefs/
 - https://github.com/amacneil/dbmate
 - https://sqlfluff.com/
 - https://github.com/sql-formatter-org/sql-formatter
+- https://www.dragonflydb.io/
 
 ## Hosting
 
 - https://fly.io/
 - https://ns1.com/
+- https://www.backblaze.com/cloud-storage
+- https://www.mailersend.com/
+- https://www.hcaptcha.com/
+- https://www.zoho.com/mail/
 
 ## Deploy
 
@@ -55,12 +62,3 @@
 - https://github.com/dorny/paths-filter
 - https://github.com/re-actors/alls-green
 - https://www.terraform.io/
-
-## Integration
-
-- https://www.mailersend.com/
-- https://www.hcaptcha.com/
-
-## Office
-
-- https://www.zoho.com/mail/
