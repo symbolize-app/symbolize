@@ -4,12 +4,13 @@
 
 - Completely independent from widget
   - Widget should be able to consume the basic API
-- Compose classes and apply them all without duplicating rules
+- Typed properties and fluent values
+- Use style declarations inline with widgets
 - Physics-based animations
 
 ## Objects
 
-- Style
+- Declaration
 - Variable
 - Keyframes
 - Data attribute
@@ -22,15 +23,21 @@
 - States
 - Global reset
 
+## Multi-delaration rules
+
+Compared to utility class frameworks, here all declarations used together will get compiled to a single CSS class. Even if declarations are grouped together (for reuse), this will not trigger multiple classes. Changing the set or order of declarations after initial render will also cause compilation of a new CSS class.
+
+Because declaration lists are essentially dynamic, there needs to be an efficient way to look up a matching (already compiled) CSS class. To do this, delcarations (and declaration groups) will be "interned", and the final result will be a lookup of the root declaration list as a group. A special map (that accepts tuples) will be needed for group interning.
+
 ## Layers
 
-Not sure if they'll really be helpful for resolving specificity, but they'll be good for avoiding global state. Each layer needs a symbol, which will act as the class prefix.
+CSS layers can be really be helpful for resolving specificity, and they'll be good for avoiding global state. Each layer needs a symbol, which will also act as the class prefix.
 
 Within a layer, make sure when each style gets compiled, it gets inserted into the stylesheet in the order it was found in code. This will preserve developer model of specificity (later defined styles overriding newer ones).
 
-## SSR
+## Lazy rendering
 
-Compile all of a microfrontend's referenced styles to CSS in SSR. For CSR, maybe lazily compile the styles if it's better for page performance.
+For SSR and CSR, build a unique stylesheet that includes just the classes created by the active components.
 
 ## Debugging
 

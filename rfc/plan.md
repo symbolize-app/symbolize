@@ -5,4 +5,4 @@ Guidelines for managing and organizing work:
   - Start with key outcome from high-level strategy
   - Outline a few steps to connect from this task
   - Call out any special tooling or techniques
-- Stick to PRs just small enough to have a material impact
+- Stick to PRs just small enough to have a material impact or maneuver code toward impact

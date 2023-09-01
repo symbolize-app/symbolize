@@ -2,18 +2,7 @@
 
 Like biology achieves scale through hierarchy and repetition.
 
-## Tasks
-
-## Top level
-
-- build
-- service
-- lib
-- task
-
 ## Services
-
-Put in `/service`.
 
 - auth (RBAC, groups, logins, alts)
 - blog (personal, community)
@@ -42,40 +31,36 @@ Put in `/service`.
 - track (internal/external analytics)
 - vote (open votes, straw polls)
 
-## Standard
+### Standard
 
-- doc
-- guest
-  - db
-  - display
-  - read
-  - write
-- host
-  - db
-  - read
-  - write
-- stream
+- svc-<service>-doc
+- svc-<service>-guest-store
+- svc-<service>-guest-display
+- svc-<service>-guest-read
+- svc-<service>-guest-write
+- svc-<service>-host-store
+- svc-<service>-host-read
+- svc-<service>-host-write
+- svc-<service>-stream
 
-## Special\*
+### Special\*
 
 Some of the above.
 
+## Misc
+
+- build
+- dev
+- task
+
 ## Libraries
 
-Put in `/lib`.
-
-- content (schema, review, scheduling, blocks)
-  - ts
-- db
-  - rs
-  - ts
-- http
-  - rs
-  - ts
-- stream
-  - rs
-  - ts
-- style
-  - ts
-- widget
-  - ts
+- lib-content-guest (schema, review, scheduling, blocks)
+- lib-store-guest
+- lib-store-host
+- lib-http-guest
+- lib-http-host
+- lib-stream-guest
+- lib-stream-host
+- lib-style-guest
+- lib-widget-guest
