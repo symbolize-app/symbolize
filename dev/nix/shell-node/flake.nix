@@ -1,20 +1,29 @@
 {
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/d1c3fea7ecbed758168787fe4e4a3157e52bc808";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
   outputs = { nixpkgs, flake-utils, ... }:
     flake-utils.lib.eachDefaultSystem (system:
       let
-        pkgs = import nixpkgs { inherit system; };
+        overlays = [
+          (final: prev: {
+            node-packages = prev.callPackage ./node-packages/default.nix {
+              pkgs = pkgs;
+              system = system;
+              nodejs = pkgs.nodejs_20;
+            };
+          })
+        ];
+        pkgs = import nixpkgs { inherit system overlays; };
       in
         {
           devShells.default = pkgs.mkShell {
             buildInputs = [
-              pkgs.nodejs-17_x
-              pkgs.nodejs-17_x.pkgs.pnpm
-              (pkgs.linkFarm "pnpm" [ { name = "bin/pnpm"; path = "${pkgs.nodejs-17_x.pkgs.pnpm}/lib/node_modules/pnpm/bin/pnpm.cjs"; } ] )
+              pkgs.nodejs_20
+              pkgs.nodejs_20.pkgs.node2nix
+              pkgs.node-packages.pnpm
             ];
 
             shellHook = ''
