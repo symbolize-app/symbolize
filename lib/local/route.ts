@@ -1,7 +1,10 @@
-import * as formDataPolyfill from 'formdata-polyfill/esm.min.js'
+import type * as nodeBuffer from 'node:buffer'
 import type * as nodeHttp from 'node:http'
 import * as nodeStream from 'node:stream'
 import * as nodeStreamPromises from 'node:stream/promises'
+import type * as nodeStreamWeb from 'node:stream/web';
+
+import * as formDataPolyfill from 'formdata-polyfill/esm.min.js'
 import nodeFetchBody from 'node-fetch/src/body.js'
 import type * as typeFest from 'type-fest'
 
@@ -16,8 +19,8 @@ type Request = {
   params: Record<string, string>
   method: string
   headers: Record<string, string>
-  stream(): ReadableStream
-  blob(): Promise<Blob>
+  stream(): nodeStreamWeb.ReadableStream
+  blob(): Promise<nodeBuffer.Blob>
   buffer(): Promise<ArrayBuffer>
   text(): Promise<string>
   form(): Promise<FormData>
@@ -28,8 +31,8 @@ type Response = typeFest.Promisable<
   | {
       status: number
       headers?: Record<string, string>
-      stream?: typeFest.Promisable<ReadableStream>
-      blob?: typeFest.Promisable<Blob>
+      stream?: typeFest.Promisable<nodeStreamWeb.ReadableStream>
+      blob?: typeFest.Promisable<nodeBuffer.Blob>
       buffer?: typeFest.Promisable<ArrayBuffer>
       text?: typeFest.Promisable<string>
       form?: typeFest.Promisable<FormData>
@@ -186,10 +189,9 @@ async function handleRequest<CustomContext>(
           res
         )
       } else if (headResponse.blob !== undefined) {
+        const blob = await Promise.resolve(headResponse.blob)
         await nodeStreamPromises.pipeline(
-          (
-            await Promise.resolve(headResponse.blob)
-          ).stream(),
+          nodeStream.Readable.fromWeb(blob.stream()),
           res
         )
       } else if (headResponse.buffer !== undefined) {

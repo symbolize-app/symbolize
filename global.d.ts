@@ -43,10 +43,24 @@ declare module 'stream' {
 }
 
 declare module 'node-fetch/src/body.js' {
-  import * as nodeFetch from 'node-fetch'
+  import type * as nodeBuffer from 'node:buffer'
+
+  import type * as nodeFetch from 'node-fetch'
 
   // eslint-disable-next-line import/no-default-export
-  export default nodeFetch.BodyMixin
+  export default class Body {
+    constructor(body?: nodeFetch.BodyInit, options?: {size?: number});
+
+    readonly body: NodeJS.ReadableStream | null;
+    readonly bodyUsed: boolean;
+    readonly size: number;
+
+    arrayBuffer(): Promise<ArrayBuffer>;
+    formData(): Promise<FormData>;
+    blob(): Promise<nodeBuffer.Blob>;
+    json(): Promise<unknown>;
+    text(): Promise<string>;
+  }
 }
 
 interface ImportMeta {
