@@ -8,7 +8,7 @@ import * as nodeHttp from 'node:http'
 import type * as nodeNet from 'node:net'
 import * as nodeStream from 'node:stream'
 import * as nodeUrl from 'node:url'
-import WebSocket from 'ws'
+import * as ws from 'ws'
 
 import projectTsconfig from '../../tsconfig.json'
 
@@ -130,7 +130,7 @@ async function main(): Promise<void> {
     devRoute.handle(ctx, [index, js, notFound])
   )
   httpServer.on('error', console.error)
-  const wsServer = new WebSocket.Server({
+  const wsServer = new ws.WebSocketServer({
     server: httpServer,
   })
   wsServer.on('error', console.error)
