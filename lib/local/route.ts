@@ -1,10 +1,9 @@
+import * as formDataPolyfill from 'formdata-polyfill/esm.min.js'
 import type * as nodeBuffer from 'node:buffer'
 import type * as nodeHttp from 'node:http'
 import * as nodeStream from 'node:stream'
 import * as nodeStreamPromises from 'node:stream/promises'
-import type * as nodeStreamWeb from 'node:stream/web';
-
-import * as formDataPolyfill from 'formdata-polyfill/esm.min.js'
+import type * as nodeStreamWeb from 'node:stream/web'
 import nodeFetchBody from 'node-fetch/src/body.js'
 import type * as typeFest from 'type-fest'
 
@@ -60,7 +59,7 @@ class ResponseError extends Error {
 type Handler<
   CustomContext,
   CustomRequest = Request,
-  CustomResponse = Response
+  CustomResponse = Response,
 > = (
   ctx: CustomContext,
   request: CustomRequest
@@ -189,7 +188,9 @@ async function handleRequest<CustomContext>(
           res
         )
       } else if (headResponse.blob !== undefined) {
-        const blob = await Promise.resolve(headResponse.blob)
+        const blob = await Promise.resolve(
+          headResponse.blob
+        )
         await nodeStreamPromises.pipeline(
           nodeStream.Readable.fromWeb(blob.stream()),
           res

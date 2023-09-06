@@ -97,7 +97,22 @@
       "import/newline-after-import": "warn",
       "import/no-default-export": "error",
       "import/no-duplicates": "warn",
-      "simple-import-sort/imports": "warn",
+      "simple-import-sort/imports": [
+        "warn",
+        {
+          "groups": [
+            [
+              ""
+            ],
+            [
+              "^@/"
+            ],
+            [
+              "^\\."
+            ]
+          ]
+        }
+      ],
       "@typescript-eslint/naming-convention": [
         "warn",
         {

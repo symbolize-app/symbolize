@@ -45,7 +45,7 @@ type StyleSelector = [
     nesting: StyleNesting.selector
     selector: string
   },
-  StyleBody
+  StyleBody,
 ]
 
 type StyleCombinatorSelector = [
@@ -53,7 +53,7 @@ type StyleCombinatorSelector = [
     nesting: StyleNesting.combinatorSelector
     combinatorSelector: string
   },
-  StyleBody
+  StyleBody,
 ]
 
 type StyleBody = (

@@ -6,7 +6,7 @@
   - e.g. `` `spoiler`[text]``
   - e.g. `` `tag`[text](color: "red", size: "large")``
 - [ ] Shortcut for applying inline-like parameters to blocks
-  - e.g. `` > `callout`(type: info) ``
+  - e.g. ``> `callout`(type: info)``
 - [ ] Nominal typing?
 - [ ] Structural typing union & intersection?
 - [ ] Tagged unions?
