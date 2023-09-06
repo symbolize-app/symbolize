@@ -110,7 +110,7 @@ function buildDev(entryPoint: string): SourceTree {
   }
 }
 
-async function main(): Promise<void> {
+function main(): void {
   const watcher = chokidar.watch(projectTsconfig.include, {
     ignoreInitial: true,
   })
@@ -118,10 +118,7 @@ async function main(): Promise<void> {
     'all',
     lodashDebounce(() => void reload())
   )
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const entryPoint = await import.meta.resolve!(
-    '@/index.ts'
-  )
+  const entryPoint = './service/auth/guest/display/index.ts'
   const ctx: Context = {
     sourceTree: buildDev(entryPoint),
     maxRequestNonStreamedBytes: 4 * 1024,
@@ -165,5 +162,5 @@ async function main(): Promise<void> {
 if (
   process.argv[1] === nodeUrl.fileURLToPath(import.meta.url)
 ) {
-  void main()
+  main()
 }

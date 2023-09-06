@@ -36,10 +36,7 @@
       "@intertwine/time/*.ts": ["./lib/time/*.ts"],
       "@intertwine/widget/*.ts": ["./lib/widget/*.ts"],
       "@/*.sql": ["./service/auth/guest/display/*.sql"],
-      "@/*.ts": ["./service/auth/guest/display/*.ts"],
-      "@sinonjs/fake-timers": [
-        "./node_modules/@types/sinonjs__fake-timers"
-      ]
+      "@/*.ts": ["./service/auth/guest/display/*.ts"]
     },
     "resolveJsonModule": true,
     "skipLibCheck": true,

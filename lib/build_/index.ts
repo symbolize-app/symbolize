@@ -18,10 +18,7 @@ async function main(): Promise<void> {
     'build/browser/index.html'
   )
   await all({
-    entryPoints: [
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      await import.meta.resolve!('@/index.ts'),
-    ],
+    entryPoints: ['./service/auth/guest/display/index.ts'],
     platform: 'browser',
     define: {
       ['import.meta.env.NODE_ENV']:
@@ -32,10 +29,7 @@ async function main(): Promise<void> {
     recursive: true,
   })
   await all({
-    entryPoints: [
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      await import.meta.resolve!('@/api/index.ts'),
-    ],
+    entryPoints: ['./service/auth/host/index.ts'],
     platform: 'node',
     define: {
       ['import.meta.env.NODE_ENV']:
@@ -151,50 +145,24 @@ export async function oneStep(
   }
 
   function plugin(build: esbuild.PluginBuild) {
-    build.onResolve({ filter: /.*/ }, async (args) => {
+    build.onResolve({ filter: /.*/ }, (args) => {
       if (args.kind === 'entry-point') {
         return undefined
       } else if (
         args.kind === 'import-statement' ||
         args.kind === 'dynamic-import'
       ) {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        let url = await import.meta.resolve!(
-          args.path,
-          nodeUrl.pathToFileURL(args.importer).toString()
-        )
         if (
           options.platform === 'browser' &&
-          url.endsWith('/lodash-es/isBuffer.js')
+          args.path.endsWith('/lodash-es/isBuffer.js')
         ) {
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          url = await import.meta.resolve!(
-            'lodash-es/stubFalse.js',
-            nodeUrl.pathToFileURL(args.importer).toString()
-          )
+          const path = nodeModule
+            .createRequire(args.importer)
+            .resolve(args.path)
+          return { path, external: true }
+        } else {
+          return { external: true }
         }
-        if (url.startsWith('node:')) {
-          return { path: args.path, external: true }
-        }
-        const fullPath = nodeUrl.fileURLToPath(url)
-        const localPath = nodePath.relative('.', fullPath)
-        if (localPath.startsWith(`..${nodePath.sep}`)) {
-          throw new Error(`Invalid path ${args.path}`)
-        } else if (
-          options.platform === 'node' &&
-          localPath.startsWith('node_modules/')
-        ) {
-          return { path: args.path, external: true }
-        }
-        let path = `${nodePath.relative(
-          nodePath.join(args.importer, '..'),
-          fullPath
-        )}.mjs`
-        if (!path.startsWith(`.${nodePath.sep}`)) {
-          path = `.${nodePath.sep}${path}`
-        }
-        nextSteps.push(url)
-        return { path, external: true }
       } else if (options.platform === 'node') {
         throw new Error(`Unsupported resolve ${args.kind}`)
       } else {
@@ -213,7 +181,7 @@ export async function oneStep(
 function getBuildPaths(
   options: BuildOptions
 ): [fullEntryPointPath: string, outfile: string] {
-  const fullEntryPointPath = nodeUrl.fileURLToPath(
+  const fullEntryPointPath = nodePath.resolve(
     options.entryPoint
   )
   const localEntryPointPath = nodePath.relative(

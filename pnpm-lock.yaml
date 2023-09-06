@@ -54,9 +54,6 @@ importers:
       '@types/node':
         specifier: 20.5.9
         version: 20.5.9
-      '@types/picomatch':
-        specifier: 2.3.0
-        version: 2.3.0
       '@types/sinonjs__fake-timers':
         specifier: 8.1.2
         version: 8.1.2
@@ -102,9 +99,6 @@ importers:
       lodash-es:
         specifier: 4.17.21
         version: 4.17.21
-      picomatch:
-        specifier: 2.3.1
-        version: 2.3.1
       prettier:
         specifier: 3.0.3
         version: 3.0.3
@@ -474,10 +468,6 @@ packages:
 
   /@types/node@20.5.9:
     resolution: {integrity: sha512-PcGNd//40kHAS3sTlzKB9C9XL4K0sTup8nbG5lC14kzEteTNuAFh9u5nA0o5TWnSG2r/JNPRXFVcHJIIeRlmqQ==}
-    dev: true
-
-  /@types/picomatch@2.3.0:
-    resolution: {integrity: sha512-O397rnSS9iQI4OirieAtsDqvCj4+3eY1J+EPdNTKuHuRWIfUoGyzX294o8C4KJYaLqgSrd2o60c5EqCU8Zv02g==}
     dev: true
 
   /@types/semver@7.5.1:
