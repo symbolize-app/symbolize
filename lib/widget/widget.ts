@@ -7,7 +7,7 @@ const context = Symbol('context')
 const listenerOptions = Symbol('listenerOptions')
 
 export function advancedListener<
-  T extends Record<string, unknown>
+  T extends Record<string, unknown>,
 >(
   body: T,
   options: AddEventListenerOptions
@@ -215,7 +215,7 @@ export function collect(
 
 type WidgetFunction<
   Body extends Widget & { [Key in keyof Body]: Body[Key] },
-  CustomContext = unknown
+  CustomContext = unknown,
 > = (
   ctx: CustomContext & Context,
   data: Partial<Body>
@@ -223,7 +223,7 @@ type WidgetFunction<
 
 export function define<
   Body extends Widget & { [Key in keyof Body]: Body[Key] },
-  CustomContext
+  CustomContext,
 >(
   body: (ctx: CustomContext & Context) => Body
 ): WidgetFunction<Body, CustomContext> {

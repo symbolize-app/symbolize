@@ -5,7 +5,7 @@ export function withTempDocument<
   CustomContext extends Record<string, unknown> = Record<
     string,
     unknown
-  >
+  >,
 >(
   callback: (
     ctx: CustomContext & tinyWidget.Context

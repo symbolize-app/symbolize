@@ -53,7 +53,7 @@ export async function runAll<
   CustomContext extends Record<string, unknown> = Record<
     string,
     unknown
-  >
+  >,
 >(
   ctx: CustomContext & RunContext,
   testCollectionModules: Promise<
@@ -208,7 +208,7 @@ export const mockHistory = Symbol('mockHistory')
 
 export function mock<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  Mock extends (...args: any[]) => unknown
+  Mock extends (...args: any[]) => unknown,
 >(
   returnValues: (() => ReturnType<Mock>)[]
 ): Mock & { [mockHistory]: Parameters<Mock>[] } {
@@ -297,7 +297,7 @@ export function assertEquals<Value>(
 
 export function assertInstanceOf<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  Constructor extends new (...args: any) => any
+  Constructor extends new (...args: any) => any,
 >(
   actual: unknown,
   expectedType: Constructor
