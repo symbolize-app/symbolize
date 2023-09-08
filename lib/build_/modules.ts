@@ -33,6 +33,7 @@ export async function build<T extends BuildOptions>(
     warnings: [],
     outputFiles: [],
   }
+  const allEntryPoints = new Set(options.entryPoints)
   let entryPoints = options.entryPoints.map(
     (entryPoint) => ({
       in: entryPoint,
@@ -65,13 +66,16 @@ export async function build<T extends BuildOptions>(
               args.kind
             )
           ) {
-            newEntryPoints.push({
-              in: resolveResult.path,
-              out: nodePath.relative(
-                options.outbase,
-                resolveResult.path
-              ),
-            })
+            if (!allEntryPoints.has(resolveResult.path)) {
+              newEntryPoints.push({
+                in: resolveResult.path,
+                out: nodePath.relative(
+                  options.outbase,
+                  resolveResult.path
+                ),
+              })
+              allEntryPoints.add(resolveResult.path)
+            }
             const relativePath = `${nodePath.relative(
               nodePath.dirname(args.importer),
               resolveResult.path
