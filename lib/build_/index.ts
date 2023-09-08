@@ -1,3 +1,4 @@
+import * as buildModules from '@intertwine/build_/modules.ts'
 import * as tinyCrypto from '@intertwine/crypto/crypto.node.ts'
 import esbuild from 'esbuild'
 import * as nodeFsPromises from 'node:fs/promises'
@@ -17,35 +18,25 @@ async function main(): Promise<void> {
     'service/gateway/guest/public/index.html',
     'build/browser/index.html'
   )
-  await all({
-    entryPoints: ['./service/auth/guest/display/index.ts'],
+  await buildModules.build({
+    entryPoints: [
+      nodePath.resolve(
+        './service/auth/guest/display/index.ts'
+      ),
+    ],
+    format: 'esm',
     platform: 'browser',
+    outdir: nodePath.resolve('build/browser/js'),
+    outbase: nodePath.resolve('.'),
     define: {
       ['import.meta.env.NODE_ENV']:
         JSON.stringify('production'),
     },
+    logLevel: 'info',
   })
-  await nodeFsPromises.mkdir('build/node', {
-    recursive: true,
-  })
-  await all({
-    entryPoints: ['./service/auth/host/index.ts'],
-    platform: 'node',
-    define: {
-      ['import.meta.env.NODE_ENV']:
-        JSON.stringify('production'),
-    },
-  })
-  console.log('Done build')
 }
 
 type Platform = 'browser' | 'node'
-
-type BuildAllOptions = {
-  entryPoints: string[]
-  platform: Platform
-  define: Record<string, string>
-}
 
 export type BuildAllResult = {
   tree: SourceTree
@@ -71,29 +62,6 @@ export type BuildOptions = {
 
 export type BuildResult = {
   nextSteps: string[]
-}
-
-async function all(
-  options: BuildAllOptions
-): Promise<void> {
-  const completedSteps: Set<string> = new Set()
-  const nextSteps: string[] = [...options.entryPoints]
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
-    const step = nextSteps.pop()
-    if (!step) {
-      break
-    } else if (completedSteps.has(step)) {
-      continue
-    }
-    const result = await oneStep({
-      entryPoint: step,
-      platform: options.platform,
-      define: options.define,
-    })
-    completedSteps.add(step)
-    nextSteps.push(...result.nextSteps)
-  }
 }
 
 export async function oneStep(
