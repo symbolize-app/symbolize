@@ -65,6 +65,9 @@
         "./tsconfig.json"
       ]
     },
+    "ignorePatterns": [
+      "build/**"
+    ],
     "plugins": [
       "import",
       "simple-import-sort",
