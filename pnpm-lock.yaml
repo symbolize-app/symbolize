@@ -11,6 +11,9 @@ importers:
 
   .:
     dependencies:
+      '@intertwine/eslint-config':
+        specifier: workspace:*
+        version: link:lib/eslint-config
       '@intertwine/prettier':
         specifier: workspace:*
         version: link:lib/prettier
@@ -111,6 +114,8 @@ importers:
       ws:
         specifier: 8.13.0
         version: 8.13.0
+
+  lib/eslint-config: {}
 
   lib/prettier: {}
 
