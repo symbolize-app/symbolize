@@ -4,7 +4,7 @@
     "build": "node --experimental-loader ./lib/loader/index.js lib/build_/index.ts",
     "check-fmt": "prettier --ignore-path .gitignore --check '**/*.cjs' '**/*.js' '**/*.json' '**/*.ts' '**/*.html' '**/*.md' '**/*.yaml' '!pnpm-lock.yaml' && dprint check",
     "check-lint": "eslint --ignore-path .gitignore --max-warnings 0 --ext ts,js,cjs . && syncpack lint",
-    "check-tsc": "tsc",
+    "check-tsc": "tsc --build",
     "db": "dbmate --url ${DATABASE_URL_ADMIN}",
     "dev": "node --experimental-loader ./lib/loader/index.js lib/local/index.ts",
     "fix-lint": "eslint --ignore-path .gitignore --fix --ext ts,js,cjs .",

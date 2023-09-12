@@ -1,9 +1,14 @@
 {
   "extends": "@intertwine/tsconfig/tsconfig.json",
   "include": [
+    "global.d.ts",
     "**/*.ts"
   ],
+  "exclude": [
+    "build/**"
+  ],
   "compilerOptions": {
+    "declarationDir": "./build/.d.ts",
     "paths": {
       "@/*.ts": ["./*.ts"]
     }

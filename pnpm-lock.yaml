@@ -181,6 +181,9 @@ importers:
       '@intertwine/prettier':
         specifier: workspace:*
         version: link:../prettier
+      '@intertwine/random':
+        specifier: workspace:*
+        version: link:../random
       '@intertwine/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig

@@ -1,4 +1,10 @@
 {
+  "include": [
+    "**/*.ts"
+  ],
+  "exclude": [
+    "build/**"
+  ],
   "compilerOptions": {
     "allowImportingTsExtensions": true,
     "allowJs": true,
@@ -6,7 +12,6 @@
     "alwaysStrict": true,
     "checkJs": true,
     "composite": true,
-    "declarationDir": "./build",
     "emitDeclarationOnly": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,

@@ -3,10 +3,16 @@
   "include": [
     "**/*.ts"
   ],
+  "exclude": [
+    "build/**"
+  ],
   "compilerOptions": {
-    "composite": true,
+    "declarationDir": "./build/.d.ts",
     "paths": {
       "@/*.ts": ["./*.ts"]
     }
-  }
+  },
+  "references": [
+    { "path": "../test"}
+  ]
 }

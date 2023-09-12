@@ -3,9 +3,16 @@
   "include": [
     "**/*.ts"
   ],
+  "exclude": [
+    "build/**"
+  ],
   "compilerOptions": {
+    "declarationDir": "./build/.d.ts",
     "paths": {
       "@/*.ts": ["./*.ts"]
     }
-  }
+  },
+  "references": [
+    { "path": "../random" }
+  ]
 }

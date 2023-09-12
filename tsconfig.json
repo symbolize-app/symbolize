@@ -9,23 +9,28 @@
     "service/**/*.ts"
   ],
   "exclude": [
-    "lib/hex/**"
+    "lib/tsconfig/**",
+    "lib/hex/**",
+    "lib/time/**",
+    "lib/test/**",
+    "lib/random/**"
   ],
   "compilerOptions": {
+    "declarationDir": "./build/.d.ts",
     "paths": {
       "@intertwine/build_/*.ts": ["./lib/build_/*.ts"],
       "@intertwine/crypto/*.ts": ["./lib/crypto/*.ts"],
       "@intertwine/error*.ts": ["./lib/error/*.ts"],
       "@intertwine/local/*.ts": ["./lib/local/*.ts"],
-      "@intertwine/random/*.ts": ["./lib/random/*.ts"],
-      "@intertwine/test/*.ts": ["./lib/test/*.ts"],
-      "@intertwine/time/*.ts": ["./lib/time/*.ts"],
       "@intertwine/widget/*.ts": ["./lib/widget/*.ts"],
       "@/*.sql": ["./service/auth/guest/display/*.sql"],
       "@/*.ts": ["./service/auth/guest/display/*.ts"]
     }
   },
   "references": [
-    { "path": "./lib/hex" }
+    { "path": "./lib/hex" },
+    { "path": "./lib/time" },
+    { "path": "./lib/test" },
+    { "path": "./lib/random" }
   ]
 }
