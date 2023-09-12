@@ -1,0 +1,12 @@
+{
+  "extends": "@intertwine/tsconfig/tsconfig.json",
+  "include": [
+    "**/*.ts"
+  ],
+  "compilerOptions": {
+    "composite": true,
+    "paths": {
+      "@/*.ts": ["./*.ts"]
+    }
+  }
+}

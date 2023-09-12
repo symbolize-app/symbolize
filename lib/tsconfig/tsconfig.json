@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "allowJs": true,
+    "allowUnreachableCode": false,
+    "alwaysStrict": true,
+    "checkJs": true,
+    "composite": true,
+    "declarationDir": "./build",
+    "emitDeclarationOnly": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "incremental": true,
+    "isolatedModules": true,
+    "lib": ["dom", "dom.iterable", "es2020", "scripthost"],
+    "module": "esnext",
+    "moduleResolution": "node",
+    "noEmit": false,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "target": "esnext",
+    "types": ["node"],
+    "useUnknownInCatchVariables": true
+  }
+}

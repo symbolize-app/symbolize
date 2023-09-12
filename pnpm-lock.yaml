@@ -14,17 +14,32 @@ importers:
       '@intertwine/eslint-config':
         specifier: workspace:*
         version: link:lib/eslint-config
+      '@intertwine/hex':
+        specifier: workspace:*
+        version: link:lib/hex
       '@intertwine/prettier':
         specifier: workspace:*
         version: link:lib/prettier
+      '@intertwine/random':
+        specifier: workspace:*
+        version: link:lib/random
       '@intertwine/style':
         specifier: workspace:*
         version: link:lib/style
+      '@intertwine/test':
+        specifier: workspace:*
+        version: link:lib/test
+      '@intertwine/time':
+        specifier: workspace:*
+        version: link:lib/time
+      '@intertwine/tsconfig':
+        specifier: workspace:*
+        version: link:lib/tsconfig
       chalk:
         specifier: 5.3.0
         version: 5.3.0
       formdata-polyfill:
-        specifier: ^4.0.10
+        specifier: 4.0.10
         version: 4.0.10
       jsdom:
         specifier: 22.1.0
@@ -118,15 +133,79 @@ importers:
         specifier: 8.13.0
         version: 8.13.0
 
-  lib/eslint-config: {}
+  lib/eslint-config:
+    devDependencies:
+      prettier:
+        specifier: 3.0.3
+        version: 3.0.3
 
-  lib/prettier: {}
+  lib/hex:
+    dependencies:
+      '@intertwine/prettier':
+        specifier: workspace:*
+        version: link:../prettier
+      '@intertwine/test':
+        specifier: workspace:*
+        version: link:../test
+      '@intertwine/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+
+  lib/prettier:
+    devDependencies:
+      prettier:
+        specifier: 3.0.3
+        version: 3.0.3
+
+  lib/random:
+    dependencies:
+      '@intertwine/prettier':
+        specifier: workspace:*
+        version: link:../prettier
+      '@intertwine/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+    devDependencies:
+      fast-mersenne-twister:
+        specifier: 1.0.3
+        version: 1.0.3
 
   lib/style:
     dependencies:
       '@intertwine/prettier':
         specifier: workspace:*
         version: link:../prettier
+
+  lib/test:
+    dependencies:
+      '@intertwine/prettier':
+        specifier: workspace:*
+        version: link:../prettier
+      '@intertwine/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+
+  lib/time:
+    dependencies:
+      '@intertwine/prettier':
+        specifier: workspace:*
+        version: link:../prettier
+      '@intertwine/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+    devDependencies:
+      '@sinonjs/fake-timers':
+        specifier: 11.1.0
+        version: 11.1.0
+      '@types/sinonjs__fake-timers':
+        specifier: 8.1.2
+        version: 8.1.2
+
+  lib/tsconfig:
+    devDependencies:
+      prettier:
+        specifier: 3.0.3
+        version: 3.0.3
 
 packages:
 

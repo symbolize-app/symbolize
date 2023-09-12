@@ -15,8 +15,13 @@
   },
   "dependencies": {
     "@intertwine/eslint-config": "workspace:*",
+    "@intertwine/hex": "workspace:*",
     "@intertwine/prettier": "workspace:*",
+    "@intertwine/random": "workspace:*",
     "@intertwine/style": "workspace:*",
+    "@intertwine/test": "workspace:*",
+    "@intertwine/time": "workspace:*",
+    "@intertwine/tsconfig": "workspace:*",
     "chalk": "5.3.0",
     "formdata-polyfill": "4.0.10",
     "jsdom": "22.1.0",

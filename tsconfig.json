@@ -1,4 +1,5 @@
 {
+  "extends": "@intertwine/tsconfig/tsconfig.json",
   "include": [
     "global.d.ts",
     "lib/**/*.ts",
@@ -7,29 +8,14 @@
     "service/**/*.sql",
     "service/**/*.ts"
   ],
+  "exclude": [
+    "lib/hex/**"
+  ],
   "compilerOptions": {
-    "allowImportingTsExtensions": true,
-    "allowJs": true,
-    "allowUnreachableCode": false,
-    "alwaysStrict": true,
-    "checkJs": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "incremental": true,
-    "isolatedModules": true,
-    "lib": ["dom", "dom.iterable", "es2020", "scripthost"],
-    "module": "esnext",
-    "moduleResolution": "node",
-    "noEmit": true,
-    "noImplicitAny": true,
-    "noImplicitReturns": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
     "paths": {
       "@intertwine/build_/*.ts": ["./lib/build_/*.ts"],
       "@intertwine/crypto/*.ts": ["./lib/crypto/*.ts"],
       "@intertwine/error*.ts": ["./lib/error/*.ts"],
-      "@intertwine/hex/*.ts": ["./lib/hex/*.ts"],
       "@intertwine/local/*.ts": ["./lib/local/*.ts"],
       "@intertwine/random/*.ts": ["./lib/random/*.ts"],
       "@intertwine/test/*.ts": ["./lib/test/*.ts"],
@@ -37,12 +23,9 @@
       "@intertwine/widget/*.ts": ["./lib/widget/*.ts"],
       "@/*.sql": ["./service/auth/guest/display/*.sql"],
       "@/*.ts": ["./service/auth/guest/display/*.ts"]
-    },
-    "resolveJsonModule": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "target": "esnext",
-    "types": ["node"],
-    "useUnknownInCatchVariables": true
-  }
+    }
+  },
+  "references": [
+    { "path": "./lib/hex" }
+  ]
 }

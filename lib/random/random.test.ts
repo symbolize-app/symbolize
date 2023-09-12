@@ -1,4 +1,4 @@
-import * as tinyRandom from '@intertwine/random/random.ts'
+import * as tinyRandom from '@/random.ts'
 import * as tinyTest from '@intertwine/test/index.ts'
 import * as fastMersenneTwister from 'fast-mersenne-twister'
 
