@@ -1,7 +1,8 @@
 {
   "name": "@intertwine/eslint-config",
   "type": "module",
-  "dependencies": {},
-  "peerDependencies": {},
-  "prettier": "./index.json"
+  "devDependencies": {
+    "prettier": "3.0.3"
+  },
+  "prettier": "@intertwine/prettier/index.json"
 }

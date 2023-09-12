@@ -1,120 +1,92 @@
 {
-    "root": true,
-    "parser": "@typescript-eslint/parser",
-    "parserOptions": {
-      "tsconfigRootDir": ".",
-      "project": [
-        "./tsconfig.json"
-      ]
-    },
-    "ignorePatterns": [
-      "build/**"
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "tsconfigRootDir": ".",
+    "project": ["./tsconfig.json"]
+  },
+  "ignorePatterns": ["build/**"],
+  "plugins": [
+    "import",
+    "simple-import-sort",
+    "@typescript-eslint"
+  ],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/recommended-requiring-type-checking",
+    "prettier"
+  ],
+  "rules": {
+    "no-constant-condition": [
+      "error",
+      {
+        "checkLoops": false
+      }
     ],
-    "plugins": [
-      "import",
-      "simple-import-sort",
-      "@typescript-eslint"
+    "import/extensions": [
+      "warn",
+      "always",
+      {
+        "ignorePackages": true
+      }
     ],
-    "extends": [
-      "eslint:recommended",
-      "plugin:@typescript-eslint/eslint-recommended",
-      "plugin:@typescript-eslint/recommended",
-      "plugin:@typescript-eslint/recommended-requiring-type-checking",
-      "prettier"
+    "import/first": "warn",
+    "import/newline-after-import": "warn",
+    "import/no-default-export": "error",
+    "import/no-duplicates": "warn",
+    "simple-import-sort/imports": [
+      "warn",
+      {
+        "groups": [[""], ["^@/"], ["^\\."]]
+      }
     ],
-    "rules": {
-      "no-constant-condition": [
-        "error",
-        {
-          "checkLoops": false
+    "@typescript-eslint/naming-convention": [
+      "warn",
+      {
+        "selector": "default",
+        "format": ["strictCamelCase"],
+        "leadingUnderscore": "forbid",
+        "trailingUnderscore": "allow"
+      },
+      {
+        "selector": "parameter",
+        "modifiers": ["unused"],
+        "format": ["strictCamelCase"],
+        "leadingUnderscore": "require",
+        "trailingUnderscore": "allow"
+      },
+      {
+        "selector": "typeLike",
+        "format": ["StrictPascalCase"],
+        "leadingUnderscore": "forbid",
+        "trailingUnderscore": "allow"
+      }
+    ],
+    "@typescript-eslint/member-delimiter-style": [
+      "error",
+      {
+        "multiline": {
+          "delimiter": "none"
         }
-      ],
-      "import/extensions": [
-        "warn",
-        "always",
-        {
-          "ignorePackages": true
-        }
-      ],
-      "import/first": "warn",
-      "import/newline-after-import": "warn",
-      "import/no-default-export": "error",
-      "import/no-duplicates": "warn",
-      "simple-import-sort/imports": [
-        "warn",
-        {
-          "groups": [
-            [
-              ""
-            ],
-            [
-              "^@/"
-            ],
-            [
-              "^\\."
-            ]
-          ]
-        }
-      ],
-      "@typescript-eslint/naming-convention": [
-        "warn",
-        {
-          "selector": "default",
-          "format": [
-            "strictCamelCase"
-          ],
-          "leadingUnderscore": "forbid",
-          "trailingUnderscore": "allow"
-        },
-        {
-          "selector": "parameter",
-          "modifiers": [
-            "unused"
-          ],
-          "format": [
-            "strictCamelCase"
-          ],
-          "leadingUnderscore": "require",
-          "trailingUnderscore": "allow"
-        },
-        {
-          "selector": "typeLike",
-          "format": [
-            "StrictPascalCase"
-          ],
-          "leadingUnderscore": "forbid",
-          "trailingUnderscore": "allow"
-        }
-      ],
-      "@typescript-eslint/member-delimiter-style": [
-        "error",
-        {
-          "multiline": {
-            "delimiter": "none"
-          }
-        }
-      ],
-      "@typescript-eslint/no-implicit-any-catch": [
-        "off"
-      ],
-      "@typescript-eslint/no-implied-eval": [
-        "off"
-      ],
-      "@typescript-eslint/no-use-before-define": [
-        "warn",
-        {
-          "functions": false,
-          "variables": false
-        }
-      ],
-      "@typescript-eslint/no-unused-vars": [
-        "error",
-        {
-          "argsIgnorePattern": "^_"
-        }
-      ],
-      "@typescript-eslint/consistent-type-imports": [
-        "warn"
-      ]
-    }
+      }
+    ],
+    "@typescript-eslint/no-implicit-any-catch": ["off"],
+    "@typescript-eslint/no-implied-eval": ["off"],
+    "@typescript-eslint/no-use-before-define": [
+      "warn",
+      {
+        "functions": false,
+        "variables": false
+      }
+    ],
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      {
+        "argsIgnorePattern": "^_"
+      }
+    ],
+    "@typescript-eslint/consistent-type-imports": ["warn"]
   }
+}
