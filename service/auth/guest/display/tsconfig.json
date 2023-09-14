@@ -8,5 +8,8 @@
       "@/*.ts": ["./*.ts"]
     }
   },
-  "references": [{ "path": "../test" }]
+  "references": [
+    { "path": "../../../../lib/hex" },
+    { "path": "../../../../lib/random" }
+  ]
 }

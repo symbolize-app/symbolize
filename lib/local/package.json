@@ -1,0 +1,11 @@
+{
+  "name": "@intertwine/local",
+  "type": "module",
+  "dependencies": {
+    "@intertwine/prettier": "workspace:*",
+    "@intertwine/test": "workspace:*",
+    "@intertwine/tsconfig": "workspace:*",
+    "node-fetch": "3.3.2"
+  },
+  "prettier": "@intertwine/prettier/index.json"
+}

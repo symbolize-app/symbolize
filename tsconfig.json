@@ -1,36 +1,25 @@
 {
   "extends": "@intertwine/tsconfig/tsconfig.json",
-  "include": [
-    "global.d.ts",
-    "lib/**/*.ts",
-    "lib/loader/index.js",
-    "lib/suppress/index.cjs",
-    "service/**/*.sql",
-    "service/**/*.ts"
-  ],
-  "exclude": [
-    "lib/tsconfig/**",
-    "lib/hex/**",
-    "lib/time/**",
-    "lib/test/**",
-    "lib/random/**"
-  ],
+  "include": [],
+  "exclude": [],
   "compilerOptions": {
-    "declarationDir": "./build/.d.ts",
-    "paths": {
-      "@intertwine/build_/*.ts": ["./lib/build_/*.ts"],
-      "@intertwine/crypto/*.ts": ["./lib/crypto/*.ts"],
-      "@intertwine/error*.ts": ["./lib/error/*.ts"],
-      "@intertwine/local/*.ts": ["./lib/local/*.ts"],
-      "@intertwine/widget/*.ts": ["./lib/widget/*.ts"],
-      "@/*.sql": ["./service/auth/guest/display/*.sql"],
-      "@/*.ts": ["./service/auth/guest/display/*.ts"]
-    }
+    "declarationDir": "./build/.d.ts"
   },
   "references": [
+    { "path": "./lib/build_" },
+    { "path": "./lib/concurrency" },
+    { "path": "./lib/crypto" },
+    { "path": "./lib/error" },
     { "path": "./lib/hex" },
-    { "path": "./lib/time" },
+    { "path": "./lib/loader" },
+    { "path": "./lib/local" },
+    { "path": "./lib/random" },
+    { "path": "./lib/stream" },
+    { "path": "./lib/style" },
+    { "path": "./lib/suppress" },
     { "path": "./lib/test" },
-    { "path": "./lib/random" }
+    { "path": "./lib/time" },
+    { "path": "./lib/widget" },
+    { "path": "./service/auth/guest/display" }
   ]
 }
