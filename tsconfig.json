@@ -1,48 +1,25 @@
 {
-  "include": [
-    "global.d.ts",
-    "lib/**/*.ts",
-    "lib/loader/index.js",
-    "lib/suppress/index.cjs",
-    "service/**/*.sql",
-    "service/**/*.ts"
-  ],
+  "extends": "@intertwine/tsconfig/tsconfig.json",
+  "include": [],
+  "exclude": [],
   "compilerOptions": {
-    "allowImportingTsExtensions": true,
-    "allowJs": true,
-    "allowUnreachableCode": false,
-    "alwaysStrict": true,
-    "checkJs": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "incremental": true,
-    "isolatedModules": true,
-    "lib": ["dom", "dom.iterable", "es2020", "scripthost"],
-    "module": "esnext",
-    "moduleResolution": "node",
-    "noEmit": true,
-    "noImplicitAny": true,
-    "noImplicitReturns": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "paths": {
-      "@intertwine/build_/*.ts": ["./lib/build_/*.ts"],
-      "@intertwine/crypto/*.ts": ["./lib/crypto/*.ts"],
-      "@intertwine/error*.ts": ["./lib/error/*.ts"],
-      "@intertwine/hex/*.ts": ["./lib/hex/*.ts"],
-      "@intertwine/local/*.ts": ["./lib/local/*.ts"],
-      "@intertwine/random/*.ts": ["./lib/random/*.ts"],
-      "@intertwine/test/*.ts": ["./lib/test/*.ts"],
-      "@intertwine/time/*.ts": ["./lib/time/*.ts"],
-      "@intertwine/widget/*.ts": ["./lib/widget/*.ts"],
-      "@/*.sql": ["./service/auth/guest/display/*.sql"],
-      "@/*.ts": ["./service/auth/guest/display/*.ts"]
-    },
-    "resolveJsonModule": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "target": "esnext",
-    "types": ["node"],
-    "useUnknownInCatchVariables": true
-  }
+    "declarationDir": "./build/.d.ts"
+  },
+  "references": [
+    { "path": "./lib/build_" },
+    { "path": "./lib/concurrency" },
+    { "path": "./lib/crypto" },
+    { "path": "./lib/error" },
+    { "path": "./lib/hex" },
+    { "path": "./lib/loader" },
+    { "path": "./lib/local" },
+    { "path": "./lib/random" },
+    { "path": "./lib/stream" },
+    { "path": "./lib/style" },
+    { "path": "./lib/suppress" },
+    { "path": "./lib/test" },
+    { "path": "./lib/time" },
+    { "path": "./lib/widget" },
+    { "path": "./service/auth/guest/display" }
+  ]
 }

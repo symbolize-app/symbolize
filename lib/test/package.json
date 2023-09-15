@@ -1,0 +1,10 @@
+{
+  "name": "@intertwine/test",
+  "type": "module",
+  "dependencies": {
+    "@intertwine/prettier": "workspace:*",
+    "@intertwine/random": "workspace:*",
+    "@intertwine/tsconfig": "workspace:*"
+  },
+  "prettier": "@intertwine/prettier/index.json"
+}

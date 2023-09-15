@@ -4,6 +4,5 @@
   "dependencies": {
     "@intertwine/prettier": "workspace:*"
   },
-  "peerDependencies": {},
   "prettier": "@intertwine/prettier/index.json"
 }

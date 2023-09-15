@@ -1,4 +1,4 @@
-import * as tinyHex from '@intertwine/hex/hex.ts'
+import * as tinyHex from '@/hex.ts'
 import * as tinyTest from '@intertwine/test/index.ts'
 
 export const url = import.meta.url
