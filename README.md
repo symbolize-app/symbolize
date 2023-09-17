@@ -7,7 +7,7 @@
 
 ```
 curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix/tag/v0.9.1 | sh -s -- install
-nix profile install ./dev/nix/init
+nix profile install ./dev-nix-init
 ```
 
 ### Upgrade
@@ -16,8 +16,8 @@ nix profile install ./dev/nix/init
 1. Init profile flake: find and upgrade the profile
 
 ```
-flake profile list
-flake profile upgrade <YOUR_PROFILE_ENTRY_INDEX>
+nix profile list
+nix profile upgrade <YOUR_PROFILE_ENTRY_INDEX>
 ```
 
 ## direnv
