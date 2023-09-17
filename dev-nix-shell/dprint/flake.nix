@@ -10,14 +10,11 @@
         pkgs = import nixpkgs { inherit system; };
       in
         {
-          devShells.default = pkgs.mkShell {
-            buildInputs = [
+          packages.default = pkgs.buildEnv {
+            name = "intertwine-dprint";
+            paths = [
               pkgs.dprint
             ];
-
-            shellHook = ''
-              dprint --version
-            '';
           };
         }
     );

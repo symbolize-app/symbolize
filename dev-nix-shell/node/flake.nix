@@ -19,17 +19,13 @@
         pkgs = import nixpkgs { inherit system overlays; };
       in
         {
-          devShells.default = pkgs.mkShell {
-            buildInputs = [
+          packages.default = pkgs.buildEnv {
+            name = "intertwine-node";
+            paths = [
               pkgs.nodejs_20
               pkgs.nodejs_20.pkgs.node2nix
               pkgs.node-packages.pnpm
             ];
-
-            shellHook = ''
-              echo "node $(node --version)"
-              echo "pnpm v$(pnpm --version)"
-            '';
           };
         }
     );

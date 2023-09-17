@@ -12,15 +12,11 @@
         pkgs = import nixpkgs { inherit system overlays; };
       in
         {
-          devShells.default = pkgs.mkShell {
-            buildInputs = [
+          packages.default = pkgs.buildEnv {
+            name = "intertwine-rust";
+            paths = [
               pkgs.rust-bin.stable."1.57.0".default
             ];
-
-            shellHook = ''
-              rustc --version
-              cargo --version
-            '';
           };
         }
     );
