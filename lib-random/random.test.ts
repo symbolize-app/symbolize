@@ -1,5 +1,5 @@
 import * as tinyRandom from '@/random.ts'
-import * as tinyTest from '@intertwine/test/index.ts'
+import * as tinyTest from '@intertwine/lib-test/index.ts'
 import * as fastMersenneTwister from 'fast-mersenne-twister'
 
 export function initContext(): tinyRandom.Context {

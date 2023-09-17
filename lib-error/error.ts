@@ -1,5 +1,5 @@
-import type * as tinyRandom from '@intertwine/random/random.ts'
-import * as tinyTime from '@intertwine/time/time.ts'
+import type * as tinyRandom from '@intertwine/lib-random/random.ts'
+import * as tinyTime from '@intertwine/lib-time/time.ts'
 import type * as typeFest from 'type-fest'
 
 export type Context = tinyTime.Context & tinyRandom.Context

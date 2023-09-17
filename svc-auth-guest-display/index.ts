@@ -1,8 +1,8 @@
-import type * as tinyError from '@intertwine/error/error.ts'
-import * as tinyRandom from '@intertwine/random/random.ts'
-import * as tinyStyle from '@intertwine/style/style.ts'
-import * as tinyTimeBrowser from '@intertwine/time/time.browser.ts'
-import * as tinyWidget from '@intertwine/widget/widget.ts'
+import type * as tinyError from '@intertwine/lib-error/error.ts'
+import * as tinyRandom from '@intertwine/lib-random/random.ts'
+import * as tinyStyle from '@intertwine/lib-style/style.ts'
+import * as tinyTimeBrowser from '@intertwine/lib-time/time.browser.ts'
+import * as tinyWidget from '@intertwine/lib-widget/widget.ts'
 
 import * as appWidgetButton from '@/widget/button.ts'
 import * as appWidgetFile from '@/widget/file.ts'

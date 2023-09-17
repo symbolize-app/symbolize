@@ -1,5 +1,5 @@
-import type * as tinyTest from '@intertwine/test/index.ts'
-import type * as tinyWidget from '@intertwine/widget/widget.ts'
+import type * as tinyTest from '@intertwine/lib-test/index.ts'
+import type * as tinyWidget from '@intertwine/lib-widget/widget.ts'
 
 export const all: tinyTest.TestCollection<
   tinyWidget.Context

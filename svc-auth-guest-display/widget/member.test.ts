@@ -1,4 +1,4 @@
-import * as tinyWidgetTest from '@intertwine/widget/widget.test.ts'
+import * as tinyWidgetTest from '@intertwine/lib-widget/widget.test.ts'
 
 export const url = import.meta.url
 

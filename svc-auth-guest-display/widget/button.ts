@@ -1,4 +1,4 @@
-import * as tinyWidget from '@intertwine/widget/widget.ts'
+import * as tinyWidget from '@intertwine/lib-widget/widget.ts'
 
 const button = tinyWidget.html.button
 

@@ -1,5 +1,5 @@
-import * as tinyTest from '@intertwine/test/index.ts'
-import * as tinyTime from '@intertwine/time/time.ts'
+import * as tinyTest from '@intertwine/lib-test/index.ts'
+import * as tinyTime from '@intertwine/lib-time/time.ts'
 import fakeTimers from '@sinonjs/fake-timers'
 
 export type Context = tinyTime.Context & {

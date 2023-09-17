@@ -1,11 +1,11 @@
 {
-  "name": "@intertwine/local",
+  "name": "@intertwine/dev-local",
   "type": "module",
   "dependencies": {
-    "@intertwine/prettier": "workspace:*",
-    "@intertwine/test": "workspace:*",
-    "@intertwine/tsconfig": "workspace:*",
+    "@intertwine/dev-prettier": "workspace:*",
+    "@intertwine/lib-test": "workspace:*",
+    "@intertwine/dev-tsconfig": "workspace:*",
     "node-fetch": "3.3.2"
   },
-  "prettier": "@intertwine/prettier/index.json"
+  "prettier": "@intertwine/dev-prettier/index.json"
 }

@@ -1,4 +1,4 @@
-import * as tinyStyle from '@intertwine/style/style.ts'
+import * as tinyStyle from '@intertwine/lib-style/style.ts'
 
 const listeners = Symbol('listeners')
 

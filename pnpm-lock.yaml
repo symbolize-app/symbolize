@@ -11,60 +11,60 @@ importers:
 
   .:
     dependencies:
-      '@intertwine/build_':
+      '@intertwine/dev-build':
         specifier: workspace:*
-        version: link:lib/build_
-      '@intertwine/concurrency':
+        version: link:dev-build
+      '@intertwine/dev-eslint':
         specifier: workspace:*
-        version: link:lib/concurrency
-      '@intertwine/crypto':
+        version: link:dev-eslint
+      '@intertwine/dev-loader':
         specifier: workspace:*
-        version: link:lib/crypto
-      '@intertwine/error':
+        version: link:dev-loader
+      '@intertwine/dev-local':
         specifier: workspace:*
-        version: link:lib/error
-      '@intertwine/eslint-config':
+        version: link:dev-local
+      '@intertwine/dev-prettier':
         specifier: workspace:*
-        version: link:lib/eslint-config
-      '@intertwine/hex':
+        version: link:dev-prettier
+      '@intertwine/dev-suppress':
         specifier: workspace:*
-        version: link:lib/hex
-      '@intertwine/loader':
+        version: link:dev-suppress
+      '@intertwine/dev-tsconfig':
         specifier: workspace:*
-        version: link:lib/loader
-      '@intertwine/local':
+        version: link:dev-tsconfig
+      '@intertwine/lib-concurrency':
         specifier: workspace:*
-        version: link:lib/local
-      '@intertwine/prettier':
+        version: link:lib-concurrency
+      '@intertwine/lib-crypto':
         specifier: workspace:*
-        version: link:lib/prettier
-      '@intertwine/random':
+        version: link:lib-crypto
+      '@intertwine/lib-error':
         specifier: workspace:*
-        version: link:lib/random
-      '@intertwine/service-auth-guest-display':
+        version: link:lib-error
+      '@intertwine/lib-hex':
         specifier: workspace:*
-        version: link:service/auth/guest/display
-      '@intertwine/stream':
+        version: link:lib-hex
+      '@intertwine/lib-random':
         specifier: workspace:*
-        version: link:lib/stream
-      '@intertwine/style':
+        version: link:lib-random
+      '@intertwine/lib-service-auth-guest-display':
         specifier: workspace:*
-        version: link:lib/style
-      '@intertwine/suppress':
+        version: link:svc-auth-guest-display
+      '@intertwine/lib-stream':
         specifier: workspace:*
-        version: link:lib/suppress
-      '@intertwine/test':
+        version: link:lib-stream
+      '@intertwine/lib-style':
         specifier: workspace:*
-        version: link:lib/test
-      '@intertwine/time':
+        version: link:lib-style
+      '@intertwine/lib-test':
         specifier: workspace:*
-        version: link:lib/time
-      '@intertwine/tsconfig':
+        version: link:lib-test
+      '@intertwine/lib-time':
         specifier: workspace:*
-        version: link:lib/tsconfig
-      '@intertwine/widget':
+        version: link:lib-time
+      '@intertwine/lib-widget':
         specifier: workspace:*
-        version: link:lib/widget
+        version: link:lib-widget
       chalk:
         specifier: 5.3.0
         version: 5.3.0
@@ -163,168 +163,174 @@ importers:
         specifier: 8.13.0
         version: 8.13.0
 
-  lib/build_:
+  dev-build:
     dependencies:
-      '@intertwine/prettier':
+      '@intertwine/dev-prettier':
         specifier: workspace:*
-        version: link:../prettier
-      '@intertwine/test':
+        version: link:../dev-prettier
+      '@intertwine/dev-tsconfig':
         specifier: workspace:*
-        version: link:../test
-      '@intertwine/tsconfig':
+        version: link:../dev-tsconfig
+      '@intertwine/lib-test':
         specifier: workspace:*
-        version: link:../tsconfig
+        version: link:../lib-test
 
-  lib/concurrency:
-    dependencies:
-      '@intertwine/prettier':
-        specifier: workspace:*
-        version: link:../prettier
-      '@intertwine/test':
-        specifier: workspace:*
-        version: link:../test
-      '@intertwine/tsconfig':
-        specifier: workspace:*
-        version: link:../tsconfig
-
-  lib/crypto:
-    dependencies:
-      '@intertwine/prettier':
-        specifier: workspace:*
-        version: link:../prettier
-      '@intertwine/test':
-        specifier: workspace:*
-        version: link:../test
-      '@intertwine/tsconfig':
-        specifier: workspace:*
-        version: link:../tsconfig
-
-  lib/error:
-    dependencies:
-      '@intertwine/prettier':
-        specifier: workspace:*
-        version: link:../prettier
-      '@intertwine/test':
-        specifier: workspace:*
-        version: link:../test
-      '@intertwine/tsconfig':
-        specifier: workspace:*
-        version: link:../tsconfig
-
-  lib/eslint-config:
+  dev-eslint:
     devDependencies:
       prettier:
         specifier: 3.0.3
         version: 3.0.3
 
-  lib/hex:
+  dev-loader:
     dependencies:
-      '@intertwine/prettier':
+      '@intertwine/dev-prettier':
         specifier: workspace:*
-        version: link:../prettier
-      '@intertwine/test':
+        version: link:../dev-prettier
+      '@intertwine/dev-tsconfig':
         specifier: workspace:*
-        version: link:../test
-      '@intertwine/tsconfig':
+        version: link:../dev-tsconfig
+      '@intertwine/lib-test':
         specifier: workspace:*
-        version: link:../tsconfig
+        version: link:../lib-test
 
-  lib/loader:
+  dev-local:
     dependencies:
-      '@intertwine/prettier':
+      '@intertwine/dev-prettier':
         specifier: workspace:*
-        version: link:../prettier
-      '@intertwine/test':
+        version: link:../dev-prettier
+      '@intertwine/dev-tsconfig':
         specifier: workspace:*
-        version: link:../test
-      '@intertwine/tsconfig':
+        version: link:../dev-tsconfig
+      '@intertwine/lib-test':
         specifier: workspace:*
-        version: link:../tsconfig
-
-  lib/local:
-    dependencies:
-      '@intertwine/prettier':
-        specifier: workspace:*
-        version: link:../prettier
-      '@intertwine/test':
-        specifier: workspace:*
-        version: link:../test
-      '@intertwine/tsconfig':
-        specifier: workspace:*
-        version: link:../tsconfig
+        version: link:../lib-test
       node-fetch:
         specifier: 3.3.2
         version: 3.3.2
 
-  lib/prettier:
+  dev-prettier:
     devDependencies:
       prettier:
         specifier: 3.0.3
         version: 3.0.3
 
-  lib/random:
+  dev-suppress:
     dependencies:
-      '@intertwine/prettier':
+      '@intertwine/dev-prettier':
         specifier: workspace:*
-        version: link:../prettier
-      '@intertwine/tsconfig':
+        version: link:../dev-prettier
+      '@intertwine/dev-tsconfig':
         specifier: workspace:*
-        version: link:../tsconfig
+        version: link:../dev-tsconfig
+      '@intertwine/lib-test':
+        specifier: workspace:*
+        version: link:../lib-test
+
+  dev-tsconfig:
+    devDependencies:
+      prettier:
+        specifier: 3.0.3
+        version: 3.0.3
+
+  lib-concurrency:
+    dependencies:
+      '@intertwine/dev-prettier':
+        specifier: workspace:*
+        version: link:../dev-prettier
+      '@intertwine/dev-tsconfig':
+        specifier: workspace:*
+        version: link:../dev-tsconfig
+      '@intertwine/lib-test':
+        specifier: workspace:*
+        version: link:../lib-test
+
+  lib-crypto:
+    dependencies:
+      '@intertwine/dev-prettier':
+        specifier: workspace:*
+        version: link:../dev-prettier
+      '@intertwine/dev-tsconfig':
+        specifier: workspace:*
+        version: link:../dev-tsconfig
+      '@intertwine/lib-test':
+        specifier: workspace:*
+        version: link:../lib-test
+
+  lib-error:
+    dependencies:
+      '@intertwine/dev-prettier':
+        specifier: workspace:*
+        version: link:../dev-prettier
+      '@intertwine/dev-tsconfig':
+        specifier: workspace:*
+        version: link:../dev-tsconfig
+      '@intertwine/lib-test':
+        specifier: workspace:*
+        version: link:../lib-test
+
+  lib-hex:
+    dependencies:
+      '@intertwine/dev-prettier':
+        specifier: workspace:*
+        version: link:../dev-prettier
+      '@intertwine/dev-tsconfig':
+        specifier: workspace:*
+        version: link:../dev-tsconfig
+      '@intertwine/lib-test':
+        specifier: workspace:*
+        version: link:../lib-test
+
+  lib-random:
+    dependencies:
+      '@intertwine/dev-prettier':
+        specifier: workspace:*
+        version: link:../dev-prettier
+      '@intertwine/dev-tsconfig':
+        specifier: workspace:*
+        version: link:../dev-tsconfig
     devDependencies:
       fast-mersenne-twister:
         specifier: 1.0.3
         version: 1.0.3
 
-  lib/stream:
+  lib-stream:
     dependencies:
-      '@intertwine/prettier':
+      '@intertwine/dev-prettier':
         specifier: workspace:*
-        version: link:../prettier
-      '@intertwine/test':
+        version: link:../dev-prettier
+      '@intertwine/dev-tsconfig':
         specifier: workspace:*
-        version: link:../test
-      '@intertwine/tsconfig':
+        version: link:../dev-tsconfig
+      '@intertwine/lib-test':
         specifier: workspace:*
-        version: link:../tsconfig
+        version: link:../lib-test
 
-  lib/style:
+  lib-style:
     dependencies:
-      '@intertwine/prettier':
+      '@intertwine/dev-prettier':
         specifier: workspace:*
-        version: link:../prettier
+        version: link:../dev-prettier
 
-  lib/suppress:
+  lib-test:
     dependencies:
-      '@intertwine/prettier':
+      '@intertwine/dev-prettier':
         specifier: workspace:*
-        version: link:../prettier
-      '@intertwine/test':
+        version: link:../dev-prettier
+      '@intertwine/dev-tsconfig':
         specifier: workspace:*
-        version: link:../test
-      '@intertwine/tsconfig':
+        version: link:../dev-tsconfig
+      '@intertwine/lib-random':
         specifier: workspace:*
-        version: link:../tsconfig
+        version: link:../lib-random
 
-  lib/test:
+  lib-time:
     dependencies:
-      '@intertwine/prettier':
+      '@intertwine/dev-prettier':
         specifier: workspace:*
-        version: link:../prettier
-      '@intertwine/random':
+        version: link:../dev-prettier
+      '@intertwine/dev-tsconfig':
         specifier: workspace:*
-        version: link:../random
-      '@intertwine/tsconfig':
-        specifier: workspace:*
-        version: link:../tsconfig
-
-  lib/time:
-    dependencies:
-      '@intertwine/prettier':
-        specifier: workspace:*
-        version: link:../prettier
-      '@intertwine/tsconfig':
-        specifier: workspace:*
-        version: link:../tsconfig
+        version: link:../dev-tsconfig
     devDependencies:
       '@sinonjs/fake-timers':
         specifier: 11.1.0
@@ -333,35 +339,29 @@ importers:
         specifier: 8.1.2
         version: 8.1.2
 
-  lib/tsconfig:
-    devDependencies:
-      prettier:
-        specifier: 3.0.3
-        version: 3.0.3
-
-  lib/widget:
+  lib-widget:
     dependencies:
-      '@intertwine/prettier':
+      '@intertwine/dev-prettier':
         specifier: workspace:*
-        version: link:../prettier
-      '@intertwine/test':
+        version: link:../dev-prettier
+      '@intertwine/dev-tsconfig':
         specifier: workspace:*
-        version: link:../test
-      '@intertwine/tsconfig':
+        version: link:../dev-tsconfig
+      '@intertwine/lib-test':
         specifier: workspace:*
-        version: link:../tsconfig
+        version: link:../lib-test
 
-  service/auth/guest/display:
+  svc-auth-guest-display:
     dependencies:
-      '@intertwine/prettier':
+      '@intertwine/dev-prettier':
         specifier: workspace:*
-        version: link:../../../../lib/prettier
-      '@intertwine/random':
+        version: link:../dev-prettier
+      '@intertwine/dev-tsconfig':
         specifier: workspace:*
-        version: link:../../../../lib/random
-      '@intertwine/tsconfig':
+        version: link:../dev-tsconfig
+      '@intertwine/lib-random':
         specifier: workspace:*
-        version: link:../../../../lib/tsconfig
+        version: link:../lib-random
 
 packages:
 

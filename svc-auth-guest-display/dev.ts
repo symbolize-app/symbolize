@@ -1,5 +1,5 @@
-import type * as tinyTime from '@intertwine/time/time.ts'
-import type * as tinyWidget from '@intertwine/widget/widget.ts'
+import type * as tinyTime from '@intertwine/lib-time/time.ts'
+import type * as tinyWidget from '@intertwine/lib-widget/widget.ts'
 
 import * as appUiTest from '@/index.test.browser.ts'
 

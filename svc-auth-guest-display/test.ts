@@ -1,7 +1,7 @@
-import * as tinyTest from '@intertwine/test/index.ts'
-import * as tinyTimeNode from '@intertwine/time/time.node.ts'
-import type * as tinyTime from '@intertwine/time/time.ts'
-import * as tinyWidget from '@intertwine/widget/widget.ts'
+import * as tinyTest from '@intertwine/lib-test/index.ts'
+import * as tinyTimeNode from '@intertwine/lib-time/time.node.ts'
+import type * as tinyTime from '@intertwine/lib-time/time.ts'
+import * as tinyWidget from '@intertwine/lib-widget/widget.ts'
 import jsdom from 'jsdom'
 import * as nodeUrl from 'node:url'
 

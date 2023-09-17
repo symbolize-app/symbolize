@@ -1,6 +1,6 @@
-import type * as tinyError from '@intertwine/error/error.ts'
-import * as tinyRandom from '@intertwine/random/random.ts'
-import * as tinyWidget from '@intertwine/widget/widget.ts'
+import type * as tinyError from '@intertwine/lib-error/error.ts'
+import * as tinyRandom from '@intertwine/lib-random/random.ts'
+import * as tinyWidget from '@intertwine/lib-widget/widget.ts'
 
 const button = tinyWidget.html.button
 const div = tinyWidget.html.div

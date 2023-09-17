@@ -1,5 +1,5 @@
 {
-  "extends": "@intertwine/tsconfig/tsconfig.json",
+  "extends": "@intertwine/dev-tsconfig/tsconfig.json",
   "include": ["index.js"],
   "exclude": ["build/**"],
   "compilerOptions": {

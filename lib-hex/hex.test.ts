@@ -1,5 +1,5 @@
 import * as tinyHex from '@/hex.ts'
-import * as tinyTest from '@intertwine/test/index.ts'
+import * as tinyTest from '@intertwine/lib-test/index.ts'
 
 export const url = import.meta.url
 

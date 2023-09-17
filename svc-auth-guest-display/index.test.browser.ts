@@ -1,13 +1,13 @@
-import * as tinyTest from '@intertwine/test/index.ts'
-import type * as tinyTime from '@intertwine/time/time.ts'
-import type * as tinyWidget from '@intertwine/widget/widget.ts'
+import * as tinyTest from '@intertwine/lib-test/index.ts'
+import type * as tinyTime from '@intertwine/lib-time/time.ts'
+import type * as tinyWidget from '@intertwine/lib-widget/widget.ts'
 
 export const all: tinyTest.TestCollection<
   tinyWidget.Context
 > = () => [
   import('@/widget/button.test.ts'),
   import('@/widget/member.test.ts'),
-  import('@intertwine/hex/hex.test.ts'),
+  import('@intertwine/lib-hex/hex.test.ts'),
 ]
 
 export async function run(

@@ -1,4 +1,4 @@
-import * as buildModules from '@intertwine/build_/modules.ts'
+import * as buildModules from '@intertwine/dev-build/modules.ts'
 import * as nodeFsPromises from 'node:fs/promises'
 import * as nodePath from 'node:path'
 import * as nodeUrl from 'node:url'

@@ -1,3 +1,19 @@
 packages:
-  - 'lib/*'
-  - 'service/*/guest/*'
+  - dev-build
+  - dev-eslint
+  - dev-loader
+  - dev-local
+  - dev-prettier
+  - dev-suppress
+  - dev-tsconfig
+  - lib-concurrency
+  - lib-crypto
+  - lib-error
+  - lib-hex
+  - lib-random
+  - lib-stream
+  - lib-style
+  - lib-test
+  - lib-time
+  - lib-widget
+  - svc-auth-guest-display
