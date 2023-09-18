@@ -49,7 +49,7 @@ Some of the above.
 
 ## Misc
 
-- dev-*
+- dev-\*
 - rfc
 
 ## Libraries

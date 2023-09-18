@@ -3,8 +3,8 @@
   "type": "module",
   "dependencies": {
     "@intertwine/dev-prettier": "workspace:*",
-    "@intertwine/lib-test": "workspace:*",
     "@intertwine/dev-tsconfig": "workspace:*",
+    "@intertwine/lib-test": "workspace:*",
     "node-fetch": "3.3.2"
   },
   "prettier": "@intertwine/dev-prettier/index.json"

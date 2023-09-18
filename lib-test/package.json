@@ -3,8 +3,8 @@
   "type": "module",
   "dependencies": {
     "@intertwine/dev-prettier": "workspace:*",
-    "@intertwine/lib-random": "workspace:*",
-    "@intertwine/dev-tsconfig": "workspace:*"
+    "@intertwine/dev-tsconfig": "workspace:*",
+    "@intertwine/lib-random": "workspace:*"
   },
   "prettier": "@intertwine/dev-prettier/index.json"
 }
