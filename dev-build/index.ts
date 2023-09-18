@@ -12,14 +12,12 @@ async function main(): Promise<void> {
     recursive: true,
   })
   await nodeFsPromises.copyFile(
-    'service/gateway/guest/public/index.html',
+    'svc-gateway-guest/public/index.html',
     'build/browser/index.html'
   )
   await buildModules.build({
     entryPoints: [
-      nodePath.resolve(
-        './service/auth/guest/display/index.ts'
-      ),
+      nodePath.resolve('./svc-auth-guest-display/index.ts'),
     ],
     format: 'esm',
     platform: 'browser',

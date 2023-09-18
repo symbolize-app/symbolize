@@ -24,7 +24,7 @@ const index = devRoute.define(['GET'], /^\/$/, () => {
     },
     stream: nodeStream.Readable.toWeb(
       nodeFs.createReadStream(
-        'service/gateway/guest/public/index.html'
+        'svc-gateway-guest/public/index.html'
       )
     ),
   }
@@ -81,7 +81,7 @@ async function buildDev(
 
 function main(): void {
   const watcher = chokidar.watch(
-    ['./service/auth/guest/display'],
+    ['./svc-auth-guest-display'],
     {
       ignoreInitial: true,
     }
@@ -90,7 +90,7 @@ function main(): void {
     'all',
     lodashDebounce(() => void reload())
   )
-  const entryPoint = './service/auth/guest/display/index.ts'
+  const entryPoint = './svc-auth-guest-display/index.ts'
   const ctx: Context = {
     buildResult: buildDev(entryPoint),
     maxRequestNonStreamedBytes: 4 * 1024,
