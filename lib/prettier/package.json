@@ -1,8 +1,0 @@
-{
-  "name": "@intertwine/prettier",
-  "type": "module",
-  "devDependencies": {
-    "prettier": "3.0.3"
-  },
-  "prettier": "./index.json"
-}

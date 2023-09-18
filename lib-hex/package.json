@@ -1,0 +1,10 @@
+{
+  "name": "@intertwine/lib-hex",
+  "type": "module",
+  "dependencies": {
+    "@intertwine/dev-prettier": "workspace:*",
+    "@intertwine/dev-tsconfig": "workspace:*",
+    "@intertwine/lib-test": "workspace:*"
+  },
+  "prettier": "@intertwine/dev-prettier/index.json"
+}

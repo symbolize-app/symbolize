@@ -1,0 +1,8 @@
+{
+  "name": "@intertwine/lib-style",
+  "type": "module",
+  "dependencies": {
+    "@intertwine/dev-prettier": "workspace:*"
+  },
+  "prettier": "@intertwine/dev-prettier/index.json"
+}

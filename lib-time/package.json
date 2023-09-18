@@ -1,0 +1,13 @@
+{
+  "name": "@intertwine/lib-time",
+  "type": "module",
+  "dependencies": {
+    "@intertwine/dev-prettier": "workspace:*",
+    "@intertwine/dev-tsconfig": "workspace:*"
+  },
+  "devDependencies": {
+    "@sinonjs/fake-timers": "11.1.0",
+    "@types/sinonjs__fake-timers": "8.1.2"
+  },
+  "prettier": "@intertwine/dev-prettier/index.json"
+}

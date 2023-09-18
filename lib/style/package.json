@@ -1,8 +1,0 @@
-{
-  "name": "@intertwine/style",
-  "type": "module",
-  "dependencies": {
-    "@intertwine/prettier": "workspace:*"
-  },
-  "prettier": "@intertwine/prettier/index.json"
-}

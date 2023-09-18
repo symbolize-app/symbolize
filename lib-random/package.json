@@ -1,0 +1,12 @@
+{
+  "name": "@intertwine/lib-random",
+  "type": "module",
+  "dependencies": {
+    "@intertwine/dev-prettier": "workspace:*",
+    "@intertwine/dev-tsconfig": "workspace:*"
+  },
+  "devDependencies": {
+    "fast-mersenne-twister": "1.0.3"
+  },
+  "prettier": "@intertwine/dev-prettier/index.json"
+}
