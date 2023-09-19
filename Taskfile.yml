@@ -1,0 +1,5 @@
+version: '3'
+
+tasks:
+  hello:
+    cmd: echo hi
