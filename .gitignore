@@ -1,8 +1,9 @@
 *.tsbuildinfo
+.direnv
+.env
+.stack-work
+.tantivy
 build
 node_modules
 result
 target
-.direnv
-.env
-.tantivy

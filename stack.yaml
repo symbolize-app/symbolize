@@ -1,0 +1,12 @@
+resolver: lts-21.11
+
+system-ghc: true
+
+install-ghc: false
+  
+nix:
+  enable: false
+
+packages:
+  - dev-gen
+
