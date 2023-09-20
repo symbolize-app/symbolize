@@ -18,6 +18,7 @@
             paths = [
               pkgs.haskell.compiler.ghc946
               hPkgs.stack
+              hPkgs.haskell-language-server
             ];
           };
         }

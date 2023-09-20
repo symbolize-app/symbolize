@@ -1,4 +1,9 @@
 version: '3'
+  
+includes:
+  dev-nix-shell:
+    taskfile: dev-nix-shell
+    dir: dev-nix-shell
 
 tasks:
   hello:

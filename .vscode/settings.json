@@ -11,5 +11,6 @@
   "eslint.validate": ["javascript", "typescript"],
   "rust-analyzer.assist.importGranularity": "item",
   "rust-analyzer.assist.importGroup": false,
-  "rust-analyzer.assist.importPrefix": "crate"
+  "rust-analyzer.assist.importPrefix": "crate",
+  "haskell.manageHLS": "PATH"
 }
