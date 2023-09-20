@@ -1,2 +1,2 @@
 [workspace]
-members = ["fts"]
+members = ["svc-search-host-read"]

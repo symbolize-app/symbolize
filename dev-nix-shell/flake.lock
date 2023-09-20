@@ -305,7 +305,7 @@
       },
       "locked": {
         "lastModified": 1,
-        "narHash": "sha256-HVYC4Q9RKmnS+ZxeIrbNOBalORpy7veKJPh4NhKC3WM=",
+        "narHash": "sha256-lhRo/Kq41uBBosO87jp8YkYLsJb/DvMLFVymVRmcQI8=",
         "path": "./rust",
         "type": "path"
       },

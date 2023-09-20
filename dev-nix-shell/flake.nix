@@ -16,6 +16,14 @@
       in
         {
           devShells.default = pkgs.mkShell {
+            buildInputs = [
+              pkgs.openssl
+            ];
+
+            nativeBuildInputs = [
+              pkgs.pkg-config
+            ];
+
             packages = [
               dprint.packages.${system}.default
               haskell.packages.${system}.default
