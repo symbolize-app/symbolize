@@ -14,7 +14,8 @@
         {
           packages.default = pkgs.buildEnv {
             name = "intertwine-rust";
-            paths = [
+            buildInputs = [
+              pkgs.openssl
               (pkgs.rust-bin.stable."1.72.0".default.override {
                 extensions = [
                   "rust-src"
@@ -22,6 +23,7 @@
                 ];
               })
             ];
+            paths = [];
           };
         }
     );

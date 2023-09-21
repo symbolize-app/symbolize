@@ -12,9 +12,10 @@
         {
           packages.default = pkgs.buildEnv {
             name = "intertwine-dprint";
-            paths = [
+            buildInputs = [
               pkgs.dprint
             ];
+            paths = [];
           };
         }
     );

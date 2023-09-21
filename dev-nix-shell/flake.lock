@@ -7,7 +7,7 @@
       },
       "locked": {
         "lastModified": 1,
-        "narHash": "sha256-BM5ISmz31kXQaru1kJ2kLHUqcE4Z8g3361tsFls1gCk=",
+        "narHash": "sha256-t5tnTd4hXTz+7lHbe9Dj/91NpZZe/TAnRAyOzKngAlk=",
         "path": "./dprint",
         "type": "path"
       },
@@ -149,7 +149,7 @@
       },
       "locked": {
         "lastModified": 1,
-        "narHash": "sha256-Se6kT9xFDYea6cSpJigPDnVdTA1cx0tlUacuErFWO2M=",
+        "narHash": "sha256-s7z6SQA2QCuut1j0hzEaG19TGBkcPLq56Js0iuwAWWM=",
         "path": "./haskell",
         "type": "path"
       },
@@ -277,7 +277,7 @@
       },
       "locked": {
         "lastModified": 1,
-        "narHash": "sha256-3lVkbUuwsf95Ukd92UIuVjND4Her3ViieXB/OZrcZvI=",
+        "narHash": "sha256-R1BRGOedFHQwUIZpszSOWPjCWev4rF9t0sRrXaHY9ek=",
         "path": "./node",
         "type": "path"
       },
@@ -305,7 +305,7 @@
       },
       "locked": {
         "lastModified": 1,
-        "narHash": "sha256-lhRo/Kq41uBBosO87jp8YkYLsJb/DvMLFVymVRmcQI8=",
+        "narHash": "sha256-47iAht67Ph7pia3vXCeeB+Y/6OOYdprIwVuL2DleCM8=",
         "path": "./rust",
         "type": "path"
       },
@@ -445,7 +445,7 @@
       },
       "locked": {
         "lastModified": 1,
-        "narHash": "sha256-iDO3ryu3YHf+sJaGmkoJ/UefbzFvvZpiRvvMpSi6HPM=",
+        "narHash": "sha256-lB63usYljyHpY+xnNnqPxCCq6dx02u/qREHkLsRWUdo=",
         "path": "./task",
         "type": "path"
       },

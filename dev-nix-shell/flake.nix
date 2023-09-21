@@ -16,20 +16,16 @@
       in
         {
           devShells.default = pkgs.mkShell {
-            buildInputs = [
-              pkgs.openssl
-            ];
-
-            nativeBuildInputs = [
-              pkgs.pkg-config
-            ];
-
-            packages = [
+            inputsFrom = [
               dprint.packages.${system}.default
               haskell.packages.${system}.default
               node.packages.${system}.default
               rust.packages.${system}.default
               task.packages.${system}.default
+            ];
+
+            nativeBuildInputs = [
+              pkgs.pkg-config
             ];
 
             shellHook = ''
