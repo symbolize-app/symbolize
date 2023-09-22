@@ -1,0 +1,10 @@
+version: '3'
+  
+run: when_changed
+  
+tasks:
+  run:
+    cmd: stack exec intertwine-dev-gen-exe
+
+  run:watch:
+    cmd: stack exec -- watchexec --no-vcs-ignore --watch $(stack exec -- which intertwine-dev-gen-exe) -- intertwine-dev-gen-exe
