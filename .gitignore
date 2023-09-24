@@ -1,4 +1,5 @@
 *.tsbuildinfo
+.cargo
 .direnv
 .env
 .stack-work

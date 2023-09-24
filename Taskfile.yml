@@ -1,6 +1,10 @@
 version: '3'
   
 includes:
+  dev-cargo-bin:
+    taskfile: dev-cargo-bin
+    dir: dev-cargo-bin
+
   dev-nix-shell:
     taskfile: dev-nix-shell
     dir: dev-nix-shell
@@ -8,3 +12,9 @@ includes:
 tasks:
   hello:
     cmd: echo hi
+      
+  cargo:lock:
+    cargo metadata --format-version=1 >/dev/null
+      
+  cargo:lock:check:
+    cargo metadata --frozen --format-version=1 >/dev/null

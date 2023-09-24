@@ -1,0 +1,8 @@
+[package]
+name = "dev-cargo-bin"
+version = "0.0.0"
+edition = "2021"
+
+[dependencies]
+tantivy-cli.workspace = true
+watchexec-cli.workspace = true

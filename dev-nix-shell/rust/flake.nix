@@ -16,7 +16,7 @@
             name = "intertwine-rust";
             buildInputs = [
               pkgs.openssl
-              (pkgs.rust-bin.stable."1.72.0".default.override {
+              (pkgs.rust-bin.nightly."2023-09-22".default.override {
                 extensions = [
                   "rust-src"
                   "rust-analyzer"

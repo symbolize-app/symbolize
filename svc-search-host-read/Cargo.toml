@@ -4,27 +4,28 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-base64 = "0.13.0"
-cargo-watch = "8.1.1"
-hyper = { version = "0.14.16", features = ["full"] }
-itertools = "0.10.3"
-lindera = "0.8.1"
-lindera-core = "0.8.1"
-lindera-tantivy = "0.8.1"
-num_cpus = "1.13.0"
-openssl = "0.10.38"
-percent-encoding = "2.1.0"
-rand = "0.8.4"
-serde = "1.0.132"
-serde_derive = "1.0.132"
-serde_json = "1.0.73"
-serde_urlencoded = "0.7.0"
-strum = "0.23.0"
-strum_macros = "0.23.1"
-tantivy = "0.16.1"
-tantivy-cli = "0.15.0"
-time = { version = "0.3.5", features = ["formatting"] }
-tokio = { version = "1.25.0", features = ["full"] }
-tower = { version = "0.4.11", features = ["make"] }
-tower-service = "0.3.1"
-url = "2.2.2"
+base64.workspace = true
+hyper.workspace = true
+itertools.workspace = true
+lindera.workspace = true
+lindera-core.workspace = true
+lindera-tantivy.workspace = true
+num_cpus.workspace = true
+openssl.workspace = true
+percent-encoding.workspace = true
+postgres-openssl.workspace = true
+postgres-types.workspace = true
+rand.workspace = true
+serde.workspace = true
+serde_derive.workspace = true
+serde_json.workspace = true
+serde_urlencoded.workspace = true
+strum.workspace = true
+strum_macros.workspace = true
+tantivy.workspace = true
+time.workspace = true
+tokio.workspace = true
+tokio-postgres.workspace = true
+tower.workspace = true
+tower-service.workspace = true
+url.workspace = true

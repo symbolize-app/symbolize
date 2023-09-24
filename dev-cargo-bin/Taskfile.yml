@@ -1,0 +1,33 @@
+version: '3'
+  
+run: when_changed
+
+tasks:
+  install:
+    vars:
+      PACKAGES:
+        sh: dasel -f Cargo.toml -r toml -w - '.dependencies.keys().all()'
+    cmds:
+      - for: { var: PACKAGES }
+        task: install_package
+        vars:
+          PACKAGE: '{{.ITEM}}'
+          VERSION:
+            # Use a lockfile search because cargo install isn't reliable for this: https://github.com/rust-lang/cargo/issues/9289
+            sh: dasel -f {{.ROOT_DIR}}/Cargo.lock -r toml -w - '.package.all().filter(equal(name,{{.ITEM}})).version'
+      # Don't use lockfile for cargo-watch because it casues a conflict
+      - task: install_package
+        vars:
+          PACKAGE: cargo-watch
+          VERSION: 8.4.1
+  
+  install_package:
+    internal: true
+    requires:
+      vars:
+        - PACKAGE
+        - VERSION
+    preconditions:
+      - '[[ ! -z "{{.VERSION}}" ]]'
+    cmds:
+      - cargo install {{.PACKAGE}} --version {{.VERSION}}
