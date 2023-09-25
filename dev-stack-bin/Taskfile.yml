@@ -1,0 +1,8 @@
+version: '3'
+  
+run: when_changed
+  
+tasks:
+  install:
+    # Skip "base" (first index)
+    cmd: stack install $(dasel -f package.yaml -r yaml -w - '.dependencies.all().filter(not(equal(.key(),0)))')

@@ -2,6 +2,7 @@
 .cargo
 .direnv
 .env
+.stack-bin
 .stack-work
 .tantivy
 build

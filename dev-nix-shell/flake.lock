@@ -183,7 +183,7 @@
       },
       "locked": {
         "lastModified": 1,
-        "narHash": "sha256-s7z6SQA2QCuut1j0hzEaG19TGBkcPLq56Js0iuwAWWM=",
+        "narHash": "sha256-EbG+9MvtyrpxXdKA0wFvP7WUTQ3bUvgaKWnh6YJlBgo=",
         "path": "./haskell",
         "type": "path"
       },

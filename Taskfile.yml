@@ -15,13 +15,22 @@ includes:
     taskfile: dev-nix-shell
     dir: dev-nix-shell
 
+  dev-stack-bin:
+    taskfile: dev-stack-bin
+    dir: dev-stack-bin
+
 tasks:
   build:
     deps:
-      - build:stack
+      - stack:build
+  
+  install:
+    deps:
+      - dev-stack-bin:install
+      - dev-cargo-bin:install
 
-  build:stack:
-    cmd: stack build
+  stack:build:
+    cmd: stack build --test --no-run-tests
 
   stack:build:watch:
     cmd: stack build --test --no-run-tests --file-watch

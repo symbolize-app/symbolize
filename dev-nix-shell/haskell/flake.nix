@@ -16,9 +16,9 @@
           packages.default = pkgs.buildEnv {
             name = "intertwine-haskell";
             buildInputs = [
+              pkgs.zlib
               pkgs.haskell.compiler.ghc946
               hPkgs.stack
-              hPkgs.haskell-language-server
             ];
             paths = [];
           };

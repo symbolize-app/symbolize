@@ -1,0 +1,13 @@
+name:                intertwine-dev-stack-bin
+
+dependencies:
+- base >= 4.7 && < 5
+- haskell-language-server
+
+flags:
+  haskell-langauge-server:
+    manual: true
+    default: false
+
+library:
+  source-dirs: src
