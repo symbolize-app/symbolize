@@ -4,7 +4,43 @@ run: when_changed
   
 tasks:
   run:
-    cmd: stack exec intertwine-dev-gen-exe
+    cmd:
+      task: execute-target
+      vars:
+        TARGET: intertwine-dev-gen-exe
 
   run:watch:
-    cmd: stack exec -- watchexec --no-vcs-ignore --watch $(stack exec -- which intertwine-dev-gen-exe) -- intertwine-dev-gen-exe
+    cmd:
+      task: execute-target:watch
+      vars:
+        TARGET: intertwine-dev-gen-exe
+
+  test:
+    cmd:
+      task: execute-target
+      vars:
+        TARGET: intertwine-dev-gen-test
+
+  test:watch:
+    cmd:
+      task: execute-target:watch
+      vars:
+        TARGET: intertwine-dev-gen-test
+  
+  execute-target:
+    requires:
+      vars:
+        - TARGET
+    vars:
+      DIST_DIR:
+        sh: realpath --relative-to . $(sh -c "$(stack config env) echo \$HASKELL_DIST_DIR")
+    cmd: "{{.DIST_DIR}}/build/{{.TARGET}}/{{.TARGET}}"
+  
+  execute-target:watch:
+    requires:
+      vars:
+        - TARGET
+    vars:
+      DIST_DIR:
+        sh: realpath --relative-to . $(sh -c "$(stack config env) echo \$HASKELL_DIST_DIR")
+    cmd: watchexec --no-vcs-ignore --watch {{.DIST_DIR}}/build/{{.TARGET}}/{{.TARGET}} -- {{.DIST_DIR}}/build/{{.TARGET}}/{{.TARGET}}

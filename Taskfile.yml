@@ -24,7 +24,7 @@ tasks:
     cmd: stack build
 
   stack:build:watch:
-    cmd: stack build --file-watch
+    cmd: stack build --test --no-run-tests --file-watch
       
   cargo:lock:
     cargo metadata --format-version=1 >/dev/null
