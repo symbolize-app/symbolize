@@ -15,10 +15,13 @@ library
       Paths_intertwine_dev_gen
   hs-source-dirs:
       src
+  default-extensions:
+      ExplicitNamespaces
+      TypeFamilies
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
       base >=4.7 && <5
-  default-language: Haskell2010
+  default-language: GHC2021
 
 executable intertwine-dev-gen-exe
   main-is: Main.hs
@@ -26,11 +29,14 @@ executable intertwine-dev-gen-exe
       Paths_intertwine_dev_gen
   hs-source-dirs:
       app
+  default-extensions:
+      ExplicitNamespaces
+      TypeFamilies
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
     , intertwine-dev-gen
-  default-language: Haskell2010
+  default-language: GHC2021
 
 test-suite intertwine-dev-gen-test
   type: exitcode-stdio-1.0
@@ -39,8 +45,11 @@ test-suite intertwine-dev-gen-test
       Paths_intertwine_dev_gen
   hs-source-dirs:
       test
+  default-extensions:
+      ExplicitNamespaces
+      TypeFamilies
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
     , intertwine-dev-gen
-  default-language: Haskell2010
+  default-language: GHC2021

@@ -3,6 +3,12 @@ name:                intertwine-dev-gen
 dependencies:
 - base >= 4.7 && < 5
 
+language: GHC2021
+
+default-extensions:
+- ExplicitNamespaces
+- TypeFamilies
+
 ghc-options:
 - -Wall
 - -Wcompat

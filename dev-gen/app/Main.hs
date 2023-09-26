@@ -3,4 +3,11 @@ module Main (main) where
 import Lib
 
 main :: IO ()
-main = someFunc
+main = do
+  putStrLn "hello"
+  r <- interpretIO (test)
+  putStrLn (show r)
+  r' <- interpretIO (test')
+  putStrLn (show r')
+  return ()
+
