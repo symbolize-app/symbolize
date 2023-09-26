@@ -14,31 +14,38 @@ data Command a where
   Pure :: a -> Command a
   ReadFile :: String -> Command String
 
-data CommandM m a = CommandM (m (Command a))
+newtype CommandM m a = CommandM (m (Command a))
 
 unwrap (CommandM x) = x
 
-instance Functor (CommandM IO) where
+instance Unlift m => Functor (CommandM m) where
     fmap = liftM
 
-instance Applicative (CommandM IO) where 
+instance Unlift m => Applicative (CommandM m) where 
     pure = CommandM . pure . Pure
     (<*>) = ap
 
-instance Monad (CommandM IO) where
+instance Unlift m => Monad (CommandM m) where
   (CommandM x') >>= f' =
     CommandM (x' >>= bind)
     where
     f x = unwrap (f' x)
-    bind (Pure x) =
-      f x
-    bind (ReadFile x)  =
-      f (x ++ "y")
+    bind x =
+      unlift x >>= f
+
+class Monad m => Unlift m where
+  unlift :: Command a -> m a
+
+instance Unlift IO where
+  unlift (Pure x) =
+    return x
+  unlift (ReadFile x)  =
+    return (x ++ "y")
 
 class Monad m => CommandMM m where
   wrap :: Command a -> m a
 
-instance CommandMM (CommandM IO) where
+instance Unlift m => CommandMM (CommandM m) where
   wrap x = CommandM (pure x)
 
 test :: CommandMM m => m Int
@@ -52,6 +59,4 @@ test' = do
   return $ a ++ "/" ++ b
 
 interpretIO :: CommandM IO a -> IO a
-interpretIO (CommandM x) = do
-  (Pure x') <- x
-  return x'
+interpretIO (CommandM x) = x >>= unlift
