@@ -1,62 +1,42 @@
 module Lib
-    ( someFunc,
-    test,
-    test',
-    interpretIO
+    ( test
+    , test'
+    , interpretIO
     ) where
 
 import Control.Monad (liftM, ap)
 
-someFunc :: IO ()
-someFunc = putStrLn "Hello world"
-
 data Command a where
-  Pure :: a -> Command a
   ReadFile :: String -> Command String
+  WriteFile :: String -> String -> Command ()
 
-newtype CommandM m a = CommandM (m (Command a))
+data Exec a where
+  Pure :: a -> Exec a
+  Bind :: Exec b -> (b -> Exec a) -> Exec a
+  ExecCommand :: Command a -> Exec a
 
-unwrap (CommandM x) = x
-
-instance Unlift m => Functor (CommandM m) where
+instance Functor Exec where
     fmap = liftM
 
-instance Unlift m => Applicative (CommandM m) where 
-    pure = CommandM . pure . Pure
+instance Applicative Exec where 
+    pure = Pure
     (<*>) = ap
 
-instance Unlift m => Monad (CommandM m) where
-  (CommandM x') >>= f' =
-    CommandM (x' >>= bind)
-    where
-    f x = unwrap (f' x)
-    bind x =
-      unlift x >>= f
+instance Monad Exec where
+  (>>=) = Bind
 
-class Monad m => Unlift m where
-  unlift :: Command a -> m a
-
-instance Unlift IO where
-  unlift (Pure x) =
-    return x
-  unlift (ReadFile x)  =
-    return (x ++ "y")
-
-class Monad m => CommandMM m where
-  wrap :: Command a -> m a
-
-instance Unlift m => CommandMM (CommandM m) where
-  wrap x = CommandM (pure x)
-
-test :: CommandMM m => m Int
+test :: Exec Int
 test = do
-  wrap (Pure 3)
+  return 3
 
-test' :: CommandMM m => m String
+test' :: Exec String
 test' = do
-  a <- wrap (ReadFile "a")
-  b <- wrap (ReadFile "b")
+  a <- ExecCommand $ ReadFile "a"
+  b <- ExecCommand $ ReadFile "b"
   return $ a ++ "/" ++ b
 
-interpretIO :: CommandM IO a -> IO a
-interpretIO (CommandM x) = x >>= unlift
+interpretIO :: Exec a -> IO a
+interpretIO (Pure x) = return x
+interpretIO (Bind x f) = interpretIO x >>= (interpretIO . f)
+interpretIO (ExecCommand (ReadFile x)) = return $ x ++ "x"
+interpretIO (ExecCommand (WriteFile _ _)) = return ()
