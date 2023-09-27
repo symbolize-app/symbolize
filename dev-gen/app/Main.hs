@@ -6,8 +6,13 @@ main :: IO ()
 main = do
   putStrLn "hello"
   r <- interpretIO (test)
-  putStrLn (show r)
+  print r
   r' <- interpretIO (test')
-  putStrLn (show r')
+  print r'
+  print $ interpretTest [] test
+  print $ interpretTest [TestCommand (ReadFile "a") "q", TestCommand (ReadFile "b") "0"] test'
+  print $ interpretTest [TestCommand (ReadFile "a") "q", TestCommand (ReadFile "b") "0", TestCommand (ReadFile "b") "1"] test'
+  print $ interpretTest [TestCommand (ReadFile "a") "q", TestCommand (ReadFile "c") "0"] test'
+  print $ interpretTest [] test'
   return ()
 

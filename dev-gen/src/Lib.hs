@@ -1,7 +1,10 @@
 module Lib
     ( test
     , test'
+    , TestCommand(..)
     , interpretIO
+    , interpretTest
+    , Command(..)
     ) where
 
 import Control.Monad (liftM, ap)
@@ -9,6 +12,18 @@ import Control.Monad (liftM, ap)
 data Command a where
   ReadFile :: String -> Command String
   WriteFile :: String -> String -> Command ()
+
+deriving instance Eq (Command a)
+deriving instance Show (Command a)
+
+data TestCommand where
+  TestCommand :: (Show a) => Command a -> a -> TestCommand
+
+deriving instance Show TestCommand
+
+evalTestCommand' :: Command a -> TestCommand -> Maybe a
+evalTestCommand' x@(ReadFile _) (TestCommand y@(ReadFile _) r) = if x == y then Just r else Nothing
+evalTestCommand' _ _ = Nothing
 
 data Exec a where
   Pure :: a -> Exec a
@@ -40,3 +55,13 @@ interpretIO (Pure x) = return x
 interpretIO (Bind x f) = interpretIO x >>= (interpretIO . f)
 interpretIO (ExecCommand (ReadFile x)) = return $ x ++ "x"
 interpretIO (ExecCommand (WriteFile _ _)) = return ()
+
+interpretTest :: [TestCommand] -> Exec a -> Maybe ([TestCommand], a)
+interpretTest s (Pure x) = return (s, x)
+interpretTest s (Bind x f) = do
+  (s', x') <- interpretTest s x
+  interpretTest s' (f x')
+interpretTest (s:s') (ExecCommand x) = do
+  x' <- evalTestCommand' x s
+  return (s', x')
+interpretTest [] (ExecCommand _) = Nothing
