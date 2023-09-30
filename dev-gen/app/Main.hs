@@ -1,5 +1,9 @@
 module Main (main) where
 
+import Relude.Base
+import Relude.Function
+import Relude.Monad
+import Relude.Lifted
 import Lib
 
 main :: IO ()

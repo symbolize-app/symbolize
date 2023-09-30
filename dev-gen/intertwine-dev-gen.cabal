@@ -19,9 +19,11 @@ library
       ExplicitNamespaces
       TypeFamilies
       DataKinds
+      NoImplicitPrelude
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
       base >=4.7 && <5
+    , relude
   default-language: GHC2021
 
 executable intertwine-dev-gen-exe
@@ -34,10 +36,12 @@ executable intertwine-dev-gen-exe
       ExplicitNamespaces
       TypeFamilies
       DataKinds
+      NoImplicitPrelude
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
     , intertwine-dev-gen
+    , relude
   default-language: GHC2021
 
 test-suite intertwine-dev-gen-test
@@ -51,8 +55,10 @@ test-suite intertwine-dev-gen-test
       ExplicitNamespaces
       TypeFamilies
       DataKinds
+      NoImplicitPrelude
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
     , intertwine-dev-gen
+    , relude
   default-language: GHC2021

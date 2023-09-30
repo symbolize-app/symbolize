@@ -8,33 +8,36 @@ includes:
     taskfile: ../dev-task/Stack.yml
     dir: .
 
+vars:
+  NAME: dev-gen
+
 tasks:
   repl:
     cmd:
       task: stack:repl-target
       vars:
-        TARGET: intertwine-dev-gen
+        TARGET: intertwine-{{.NAME}}
 
   run:
     cmd:
       task: stack:execute-target
       vars:
-        TARGET: intertwine-dev-gen-exe
+        TARGET: intertwine-{{.NAME}}-exe
 
   run:watch:
     cmd:
       task: stack:execute-target:watch
       vars:
-        TARGET: intertwine-dev-gen-exe
+        TARGET: intertwine-{{.NAME}}-exe
 
   test:
     cmd:
       task: stack:execute-target
       vars:
-        TARGET: intertwine-dev-gen-test
+        TARGET: intertwine-{{.NAME}}-test
 
   test:watch:
     cmd:
       task: stack:execute-target:watch
       vars:
-        TARGET: intertwine-dev-gen-test
+        TARGET: intertwine-{{.NAME}}-test

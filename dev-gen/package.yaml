@@ -2,6 +2,7 @@ name:                intertwine-dev-gen
 
 dependencies:
 - base >= 4.7 && < 5
+- relude
 
 language: GHC2021
 
@@ -9,6 +10,8 @@ default-extensions:
 - ExplicitNamespaces
 - TypeFamilies
 - DataKinds
+- NoImplicitPrelude
+
 
 ghc-options:
 - -Wall

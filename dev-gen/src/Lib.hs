@@ -7,6 +7,14 @@ module Lib
     , Command(..)
     ) where
 
+import Relude.Base
+import Relude.Monad
+import Relude.String
+import Relude.Numeric
+import Relude.Functor
+import Relude.Applicative
+import Relude.Function
+import Relude.List
 import Control.Monad (liftM, ap)
 
 data Command a where
