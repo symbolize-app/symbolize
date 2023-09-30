@@ -11,7 +11,7 @@ default-extensions:
 - TypeFamilies
 - DataKinds
 - NoImplicitPrelude
-
+- OverloadedStrings
 
 ghc-options:
 - -Wall

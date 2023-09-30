@@ -9,17 +9,17 @@ module Lib
 
 import Relude.Base
 import Relude.Monad
-import Relude.String
 import Relude.Numeric
 import Relude.Functor
 import Relude.Applicative
 import Relude.Function
-import Relude.List
+import Relude.String
+import Relude.Monoid
 import Control.Monad (liftM, ap)
 
 data Command a where
-  ReadFile :: String -> Command String
-  WriteFile :: String -> String -> Command ()
+  ReadFile :: Text -> Command Text
+  WriteFile :: Text -> Text -> Command ()
 
 deriving instance Eq (Command a)
 deriving instance Show (Command a)
@@ -52,16 +52,16 @@ test :: Exec Int
 test = do
   return 3
 
-test' :: Exec String
+test' :: Exec Text
 test' = do
   a <- ExecCommand $ ReadFile "a"
   b <- ExecCommand $ ReadFile "b"
-  return $ a ++ "/" ++ b
+  return $ a <> "/" <> b
 
 interpretIO :: MonadIO m => Exec a -> m a
 interpretIO (Pure x) = return x
 interpretIO (Bind x f) = interpretIO x >>= (interpretIO . f)
-interpretIO (ExecCommand (ReadFile x)) = return $ x ++ "x"
+interpretIO (ExecCommand (ReadFile x)) = return $ x <> "x"
 interpretIO (ExecCommand (WriteFile _ _)) = return ()
 
 interpretTest :: [TestCommand] -> Exec a -> Maybe ([TestCommand], a)
