@@ -1,0 +1,8 @@
+version: '3'
+  
+run: when_changed
+  
+tasks:
+  update:
+    deps:
+      - :dev-nix-shell:update

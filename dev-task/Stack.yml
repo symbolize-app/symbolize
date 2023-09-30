@@ -1,0 +1,41 @@
+version: '3'
+  
+run: when_changed
+  
+tasks:
+  install:
+    deps:
+      - :dev-stack-bin:install
+
+  build:
+    cmd: stack build --test --no-run-tests
+
+  build:watch:
+    cmd: stack build --test --no-run-tests --file-watch
+
+  repl-target:
+    internal: true
+    requires:
+      vars:
+        - TARGET
+    cmd: stack ghci {{.TARGET}}
+  
+  execute-target:
+    internal: true
+    requires:
+      vars:
+        - TARGET
+    vars:
+      DIST_DIR:
+        sh: realpath --relative-to . $(sh -c "$(stack config env) echo \$HASKELL_DIST_DIR")
+    cmd: "{{.DIST_DIR}}/build/{{.TARGET}}/{{.TARGET}}"
+  
+  execute-target:watch:
+    internal: true
+    requires:
+      vars:
+        - TARGET
+    vars:
+      DIST_DIR:
+        sh: realpath --relative-to . $(sh -c "$(stack config env) echo \$HASKELL_DIST_DIR")
+    cmd: watchexec --no-vcs-ignore --watch {{.DIST_DIR}}/build/{{.TARGET}}/{{.TARGET}} -- {{.DIST_DIR}}/build/{{.TARGET}}/{{.TARGET}}
