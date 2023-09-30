@@ -1,5 +1,5 @@
-import Relude.Base
+import Relude.Monad
 import Relude.Lifted
 
-main :: IO ()
+main :: MonadIO m => m ()
 main = putStrLn "Test suite not yet implemented"

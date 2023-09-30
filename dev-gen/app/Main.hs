@@ -6,7 +6,7 @@ import Relude.Monad
 import Relude.Lifted
 import Lib
 
-main :: IO ()
+main :: MonadIO m => m ()
 main = do
   putStrLn "hello"
   r <- interpretIO (test)

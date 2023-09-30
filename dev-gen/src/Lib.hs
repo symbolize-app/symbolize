@@ -58,7 +58,7 @@ test' = do
   b <- ExecCommand $ ReadFile "b"
   return $ a ++ "/" ++ b
 
-interpretIO :: Exec a -> IO a
+interpretIO :: MonadIO m => Exec a -> m a
 interpretIO (Pure x) = return x
 interpretIO (Bind x f) = interpretIO x >>= (interpretIO . f)
 interpretIO (ExecCommand (ReadFile x)) = return $ x ++ "x"
