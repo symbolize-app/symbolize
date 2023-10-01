@@ -1,4 +1,6 @@
-resolver: lts-21.11
+resolver:
+  # https://www.stackage.org/lts-21.11
+  lts-21.11
 
 packages:
   - dev-gen

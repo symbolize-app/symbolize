@@ -3,6 +3,7 @@ name:                intertwine-dev-gen
 dependencies:
 - base >= 4.7 && < 5
 - relude
+- named
 
 language: GHC2021
 
@@ -12,6 +13,7 @@ default-extensions:
 - DataKinds
 - NoImplicitPrelude
 - OverloadedStrings
+- OverloadedLabels
 
 ghc-options:
 - -Wall
@@ -23,6 +25,7 @@ ghc-options:
 - -Wmissing-home-modules
 - -Wpartial-fields
 - -Wredundant-constraints
+- -Wno-orphans
 
 library:
   source-dirs: src

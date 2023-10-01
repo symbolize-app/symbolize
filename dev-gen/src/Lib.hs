@@ -16,16 +16,29 @@ import Relude.Function
 import Relude.String
 import Relude.Monoid
 import Control.Monad (liftM, ap)
+import Named
+import Text.Show (showsPrec, showString, showParen)
+import GHC.TypeLits (symbolVal, KnownSymbol)
 
 data Command a where
-  ReadFile :: Text -> Command Text
+  ReadFile :: "path" :! Text -> Command Text
   WriteFile :: Text -> Text -> Command ()
+
+deriving instance (Eq a) => Eq (NamedF Identity a name)
+
+instance (KnownSymbol name, Show a) => Show (NamedF Identity a name) where
+  showsPrec d (ArgF (Identity a)) = 
+    showString "! #" .
+    showString (symbolVal (Proxy :: Proxy name)) .
+    showString " "      .
+    showsPrec (up_prec+1) a
+    where up_prec = 9
 
 deriving instance Eq (Command a)
 deriving instance Show (Command a)
 
 data TestCommand where
-  TestCommand :: (Show a) => Command a -> a -> TestCommand
+  TestCommand :: (Show a) => { command :: Command a, result :: a } -> TestCommand
 
 deriving instance Show TestCommand
 
@@ -54,14 +67,14 @@ test = do
 
 test' :: Exec Text
 test' = do
-  a <- ExecCommand $ ReadFile "a"
-  b <- ExecCommand $ ReadFile "b"
+  a <- ExecCommand $ ReadFile ! #path "a"
+  b <- ExecCommand $ ReadFile ! #path "b"
   return $ a <> "/" <> b
 
 interpretIO :: MonadIO m => Exec a -> m a
 interpretIO (Pure x) = return x
 interpretIO (Bind x f) = interpretIO x >>= (interpretIO . f)
-interpretIO (ExecCommand (ReadFile x)) = return $ x <> "x"
+interpretIO (ExecCommand (ReadFile (Arg x))) = return $ x <> "x"
 interpretIO (ExecCommand (WriteFile _ _)) = return ()
 
 interpretTest :: [TestCommand] -> Exec a -> Maybe ([TestCommand], a)

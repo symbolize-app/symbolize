@@ -21,9 +21,11 @@ library
       DataKinds
       NoImplicitPrelude
       OverloadedStrings
-  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
+      OverloadedLabels
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -Wno-orphans
   build-depends:
       base >=4.7 && <5
+    , named
     , relude
   default-language: GHC2021
 
@@ -39,10 +41,12 @@ executable intertwine-dev-gen-exe
       DataKinds
       NoImplicitPrelude
       OverloadedStrings
-  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+      OverloadedLabels
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -Wno-orphans -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
     , intertwine-dev-gen
+    , named
     , relude
   default-language: GHC2021
 
@@ -59,9 +63,11 @@ test-suite intertwine-dev-gen-test
       DataKinds
       NoImplicitPrelude
       OverloadedStrings
-  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+      OverloadedLabels
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -Wno-orphans -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
     , intertwine-dev-gen
+    , named
     , relude
   default-language: GHC2021
