@@ -5,7 +5,7 @@
     {
       "label": "pnpm watch",
       "type": "shell",
-      "command": "pnpm watch",
+      "command": "echo pnpm watch",
       "isBackground": true,
       "problemMatcher": ["$tsc-watch"],
       "group": "build",

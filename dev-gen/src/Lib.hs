@@ -27,7 +27,7 @@ data Command a where
 deriving instance (Eq a) => Eq (NamedF Identity a name)
 
 instance (KnownSymbol name, Show a) => Show (NamedF Identity a name) where
-  showsPrec d (ArgF (Identity a)) = 
+  showsPrec d (ArgF (Identity a)) =
     showString "! #" .
     showString (symbolVal (Proxy :: Proxy name)) .
     showString " "      .
@@ -54,7 +54,7 @@ data Exec a where
 instance Functor Exec where
     fmap = liftM
 
-instance Applicative Exec where 
+instance Applicative Exec where
     pure = Pure
     (<*>) = ap
 
@@ -62,27 +62,26 @@ instance Monad Exec where
   (>>=) = Bind
 
 test :: Exec Int
-test = do
-  return 3
+test = pure 3
 
 test' :: Exec Text
 test' = do
   a <- ExecCommand $ ReadFile ! #path "a"
   b <- ExecCommand $ ReadFile ! #path "b"
-  return $ a <> "/" <> b
+  pure $ a <> "/" <> b
 
 interpretIO :: MonadIO m => Exec a -> m a
-interpretIO (Pure x) = return x
-interpretIO (Bind x f) = interpretIO x >>= (interpretIO . f)
-interpretIO (ExecCommand (ReadFile (Arg x))) = return $ x <> "x"
-interpretIO (ExecCommand (WriteFile _ _)) = return ()
+interpretIO (Pure x) = pure x
+interpretIO (Bind x f) = interpretIO x >>= interpretIO . f
+interpretIO (ExecCommand (ReadFile (Arg x))) = pure $ x <> "x"
+interpretIO (ExecCommand (WriteFile _ _)) = pass
 
 interpretTest :: [TestCommand] -> Exec a -> Maybe ([TestCommand], a)
-interpretTest s (Pure x) = return (s, x)
+interpretTest s (Pure x) = pure (s, x)
 interpretTest s (Bind x f) = do
   (s', x') <- interpretTest s x
   interpretTest s' (f x')
 interpretTest (s:s') (ExecCommand x) = do
   x' <- evalTestCommand' x s
-  return (s', x')
+  pure (s', x')
 interpretTest [] (ExecCommand _) = Nothing

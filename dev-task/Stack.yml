@@ -3,6 +3,12 @@ version: '3'
 run: when_changed
   
 tasks:
+  lock:
+    cmd: gen-hie > hie.yaml
+
+  lock:check:
+    cmd: diff <(gen-hie) hie.yaml
+
   install:
     deps:
       - :dev-stack-bin:install
@@ -12,6 +18,10 @@ tasks:
 
   build:watch:
     cmd: stack build --test --no-run-tests --file-watch
+
+  lint:
+    internal: true
+    cmd: hlint --hint $(realpath --relative-to . {{.STACK_LOCAL_BIN_PATH}}/relude-hlint.yaml) --hint ../dev-hlint/base.yaml --threads app src test
 
   repl-target:
     internal: true

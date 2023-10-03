@@ -12,6 +12,14 @@ vars:
   NAME: dev-gen
 
 tasks:
+  lint:
+    cmd:
+      task: stack:lint
+
+  lint:fix:
+    cmd:
+      task: stack:lint:fix
+
   repl:
     cmd:
       task: stack:repl-target

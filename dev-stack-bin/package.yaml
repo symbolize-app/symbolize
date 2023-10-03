@@ -3,6 +3,8 @@ name:                intertwine-dev-stack-bin
 dependencies:
 - base >= 4.7 && < 5
 - haskell-language-server
+- hlint
+- implicit-hie
 
 flags:
   haskell-langauge-server:

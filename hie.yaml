@@ -1,0 +1,16 @@
+cradle:
+  stack:
+    - path: "dev-gen/src"
+      component: "intertwine-dev-gen:lib"
+
+    - path: "dev-gen/app/Main.hs"
+      component: "intertwine-dev-gen:exe:intertwine-dev-gen-exe"
+
+    - path: "dev-gen/app/Paths_intertwine_dev_gen.hs"
+      component: "intertwine-dev-gen:exe:intertwine-dev-gen-exe"
+
+    - path: "dev-gen/test"
+      component: "intertwine-dev-gen:test:intertwine-dev-gen-test"
+
+    - path: "dev-stack-bin/src"
+      component: "intertwine-dev-stack-bin:lib"
