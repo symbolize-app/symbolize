@@ -56,6 +56,22 @@ flags:
 
 local-bin-path: ./.stack-bin
 
+ghc-options:
+  "$everything": >
+    -O2
+  "$targets": >
+    -O0
+    -g2
+    -threaded
+    -Weverything
+    -Wno-missing-safe-haskell-mode
+    -Wno-orphans
+    -Wno-unsafe
+    -Wno-unused-packages
+    -Wno-all-missed-specialisations
+
+rebuild-ghc-options: true
+
 system-ghc: true
 
 install-ghc: false

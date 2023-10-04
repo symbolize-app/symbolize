@@ -1,11 +1,17 @@
 module Main (main) where
 
-import Relude.Function
-import Relude.Applicative
-import Relude.Monad
-import Relude.Lifted
+import Relude.Function ( ($) )
+import Relude.Applicative ( pass )
+import Relude.Monad ( MonadIO )
+import Relude.Lifted ( print, putStrLn )
 import Lib
-import Named
+    ( interpretIO,
+      interpretTest,
+      test,
+      test',
+      Command(ReadFile),
+      TestCommand(TestCommand) )
+import Named ( (!) )
 
 main :: MonadIO m => m ()
 main = do

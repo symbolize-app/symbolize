@@ -15,6 +15,14 @@ tasks:
         sh: dasel -f package.yaml -r yaml -w - '.dependencies.all().filter(not(equal(.key(),0))).join( )'
     cmds:
       - stack install {{.PACKAGES}}
+  
+  install-packages:
+    vars:
+      PACKAGES:
+        # Skip "base" (first index)
+        sh: dasel -f package.yaml -r yaml -w - '.dependencies.all().filter(not(equal(.key(),0))).join( )'
+    cmds:
+      - stack install {{.PACKAGES}}
 
 
   install-relude-hlint:

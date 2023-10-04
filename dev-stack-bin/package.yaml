@@ -6,10 +6,10 @@ dependencies:
 - hlint
 - implicit-hie
 
-flags:
-  haskell-langauge-server:
-    manual: true
-    default: false
+language: GHC2021
+
+default-extensions:
+- NoImplicitPrelude
 
 library:
   source-dirs: src

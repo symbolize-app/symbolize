@@ -7,58 +7,67 @@ module Lib
     , Command(..)
     ) where
 
-import Relude.Base
-import Relude.Monad
-import Relude.Numeric
-import Relude.Functor
-import Relude.Applicative
-import Relude.Function
-import Relude.String
-import Relude.Monoid
+import Relude.Base ( Eq((==)), Show, Proxy(Proxy), Type)
+import Relude.Monad ( Monad((>>=)), Maybe(Nothing, Just), MonadIO )
+import Relude.Numeric ( Num((+)), Int )
+import Relude.Functor ( Functor(fmap), Identity(Identity) )
+import Relude.Applicative ( Applicative(pure, (<*>)), pass )
+import Relude.Function ( ($), (.) )
+import Relude.String ( Text )
+import Relude.Monoid ( Semigroup((<>)) )
 import Control.Monad (liftM, ap)
-import Named
-import Text.Show (showsPrec, showString, showParen)
+import Named ( type (:!), NamedF(ArgF, Arg), (!) )
+import Text.Show (showsPrec, showString, ShowS)
 import GHC.TypeLits (symbolVal, KnownSymbol)
 
+type Command :: Type -> Type
 data Command a where
   ReadFile :: "path" :! Text -> Command Text
   WriteFile :: Text -> Text -> Command ()
 
-deriving instance (Eq a) => Eq (NamedF Identity a name)
+deriving newtype instance (Eq a) => Eq (NamedF Identity a name)
 
 instance (KnownSymbol name, Show a) => Show (NamedF Identity a name) where
-  showsPrec d (ArgF (Identity a)) =
+  showsPrec :: Int -> NamedF Identity a name -> ShowS
+  showsPrec _ (ArgF (Identity a)) =
     showString "! #" .
     showString (symbolVal (Proxy :: Proxy name)) .
     showString " "      .
-    showsPrec (up_prec+1) a
-    where up_prec = 9
+    showsPrec (up_prec + 1) a
+    where up_prec = 9 :: Int
 
-deriving instance Eq (Command a)
-deriving instance Show (Command a)
+deriving stock instance Eq (Command a)
+deriving stock instance Show (Command a)
 
+type TestCommand :: Type
 data TestCommand where
-  TestCommand :: (Show a) => { command :: Command a, result :: a } -> TestCommand
+  TestCommand :: (Show a) => Command a -> a -> TestCommand
 
-deriving instance Show TestCommand
+deriving stock instance Show TestCommand
 
 evalTestCommand' :: Command a -> TestCommand -> Maybe a
 evalTestCommand' x@(ReadFile _) (TestCommand y@(ReadFile _) r) = if x == y then Just r else Nothing
 evalTestCommand' _ _ = Nothing
 
+type Exec :: Type -> Type
 data Exec a where
   Pure :: a -> Exec a
   Bind :: Exec b -> (b -> Exec a) -> Exec a
   ExecCommand :: Command a -> Exec a
 
 instance Functor Exec where
+    fmap :: (a -> b) -> Exec a -> Exec b
     fmap = liftM
 
 instance Applicative Exec where
+    pure :: a -> Exec a
     pure = Pure
+
+    (<*>) :: Exec (a -> b) -> Exec a -> Exec b
     (<*>) = ap
 
 instance Monad Exec where
+  (>>=) :: Exec a -> (a -> Exec b) -> Exec b
   (>>=) = Bind
 
 test :: Exec Int

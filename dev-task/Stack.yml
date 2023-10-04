@@ -3,20 +3,28 @@ version: '3'
 run: when_changed
   
 tasks:
-  lock:
-    cmd: gen-hie > hie.yaml
-
-  lock:check:
-    cmd: diff <(gen-hie) hie.yaml
+  clean:
+    cmd: stack clean --full
 
   install:
     deps:
       - :dev-stack-bin:install
 
-  build:
+  build:debug:
+    aliases:
+      - build
+      - b
     cmd: stack build --test --no-run-tests
 
-  build:watch:
+  build:release:
+    aliases:
+      - br
+    cmd: stack build --test --no-run-tests --ghc-options "-O2 -g0 -Werror"
+
+  build:debug:watch:
+    aliases:
+      - build:watch
+      - bw
     cmd: stack build --test --no-run-tests --file-watch
 
   lint:

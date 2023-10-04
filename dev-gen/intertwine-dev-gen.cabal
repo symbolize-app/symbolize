@@ -22,7 +22,7 @@ library
       NoImplicitPrelude
       OverloadedStrings
       OverloadedLabels
-  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -Wno-orphans
+      DerivingStrategies
   build-depends:
       base >=4.7 && <5
     , named
@@ -42,7 +42,8 @@ executable intertwine-dev-gen-exe
       NoImplicitPrelude
       OverloadedStrings
       OverloadedLabels
-  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -Wno-orphans -threaded -rtsopts -with-rtsopts=-N
+      DerivingStrategies
+  ghc-options: -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
     , intertwine-dev-gen
@@ -64,7 +65,8 @@ test-suite intertwine-dev-gen-test
       NoImplicitPrelude
       OverloadedStrings
       OverloadedLabels
-  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -Wno-orphans -threaded -rtsopts -with-rtsopts=-N
+      DerivingStrategies
+  ghc-options: -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
     , intertwine-dev-gen

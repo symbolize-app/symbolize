@@ -8,10 +8,6 @@ name:           intertwine-dev-stack-bin
 version:        0.0.0
 build-type:     Simple
 
-flag haskell-langauge-server
-  manual: True
-  default: False
-
 library
   exposed-modules:
       Lib
@@ -19,9 +15,11 @@ library
       Paths_intertwine_dev_stack_bin
   hs-source-dirs:
       src
+  default-extensions:
+      NoImplicitPrelude
   build-depends:
       base >=4.7 && <5
     , haskell-language-server
     , hlint
     , implicit-hie
-  default-language: Haskell2010
+  default-language: GHC2021
