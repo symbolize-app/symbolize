@@ -6,6 +6,10 @@
   "editor.rulers": [60],
   "editor.minimap.maxColumn": 60,
   "editor.tabSize": 2,
+  "editor.formatOnSaveMode": "file",
+  "[haskell]": {
+    "editor.formatOnSave": true
+  },
   "files.autoSave": "onFocusChange",
   "typescript.tsdk": "node_modules/typescript/lib",
   "eslint.validate": ["javascript", "typescript"],

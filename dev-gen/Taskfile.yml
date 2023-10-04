@@ -12,13 +12,17 @@ vars:
   NAME: dev-gen
 
 tasks:
+  format:
+    cmd:
+      task: stack:format
+
+  format:check:
+    cmd:
+      task: stack:format:check
+
   lint:
     cmd:
       task: stack:lint
-
-  lint:fix:
-    cmd:
-      task: stack:lint:fix
 
   repl:
     cmd:

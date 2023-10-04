@@ -43,7 +43,7 @@ executable intertwine-dev-gen-exe
       OverloadedStrings
       OverloadedLabels
       DerivingStrategies
-  ghc-options: -rtsopts -with-rtsopts=-N
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
     , intertwine-dev-gen
@@ -66,7 +66,7 @@ test-suite intertwine-dev-gen-test
       OverloadedStrings
       OverloadedLabels
       DerivingStrategies
-  ghc-options: -rtsopts -with-rtsopts=-N
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
     , intertwine-dev-gen

@@ -19,13 +19,6 @@ packages:
   original:
     hackage: ansi-terminal-0.11.5
 - completed:
-    hackage: floskell-0.10.8@sha256:3b485dc1749df10347739f91c6a86a994e1d1f3f0f1fd3e724cee5596c1a2ecf,3822
-    pantry-tree:
-      sha256: eb96ee6a90cdc0dbf9510dfb8e8cffc05f11c40783b6b5a2c15afc49f2e336a4
-      size: 1901
-  original:
-    hackage: floskell-0.10.8
-- completed:
     hackage: ghcide-2.2.0.0@sha256:18c5bc1fe6634f61068755e9fb9bbefc68a1f0142634e5ddbf7686151c4f738e,13267
     pantry-tree:
       sha256: b8dad8391f5e4af8c409a9a39b0b121812145521eea25e2f4b14733f72a54beb
@@ -131,13 +124,6 @@ packages:
   original:
     hackage: hls-explicit-record-fields-plugin-2.2.0.0
 - completed:
-    hackage: hls-floskell-plugin-2.2.0.0@sha256:76d2c7febc3a335a64c6d1498dd5d072ab6d29f28f9ff752d734a9707c2a53c1,1391
-    pantry-tree:
-      sha256: 724b95cf1328009e4662a7be215310f5c67df9664a92ada7d0090e861de0bda8
-      size: 468
-  original:
-    hackage: hls-floskell-plugin-2.2.0.0
-- completed:
     hackage: hls-fourmolu-plugin-2.2.0.0@sha256:43637086eca3e445537d1279d4fb5cdce8f2a725f773f6bf285da940376c19b9,2001
     pantry-tree:
       sha256: 57cff31ce08811c7700a79e2ff533fc843b193853b67e4f52b07a39820911a28
@@ -228,13 +214,6 @@ packages:
       size: 235
   original:
     hackage: hls-retrie-plugin-2.2.0.0
-- completed:
-    hackage: hls-splice-plugin-2.2.0.0@sha256:441e4b0f4b19aa3980ea3656238db6d28024fd1ab49a01f37ec611acc3b46828,1703
-    pantry-tree:
-      sha256: 2ddb894646f91b61be47f6cfb77ba51187ef24075429a50fd354803fe6fb682e
-      size: 3105
-  original:
-    hackage: hls-splice-plugin-2.2.0.0
 - completed:
     hackage: hw-fingertree-0.1.2.1@sha256:e3426c3da4ad22f4356df2a7788601ab3de12b734ebf3c81529e3b66ffdf0202,4147
     pantry-tree:

@@ -5,6 +5,7 @@ dependencies:
 - haskell-language-server
 - hlint
 - implicit-hie
+- ormolu
 
 language: GHC2021
 

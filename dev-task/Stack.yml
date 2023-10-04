@@ -27,6 +27,14 @@ tasks:
       - bw
     cmd: stack build --test --no-run-tests --file-watch
 
+  format:
+    internal: true
+    cmd: ormolu --mode inplace $(find app src test -name '*.hs')
+
+  format:check:
+    internal: true
+    cmd: ormolu --mode check $(find app src test -name '*.hs')
+
   lint:
     internal: true
     cmd: hlint --hint $(realpath --relative-to . {{.STACK_LOCAL_BIN_PATH}}/relude-hlint.yaml) --hint ../dev-hlint/base.yaml --threads app src test

@@ -22,4 +22,5 @@ library
     , haskell-language-server
     , hlint
     , implicit-hie
+    , ormolu
   default-language: GHC2021

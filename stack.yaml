@@ -9,7 +9,6 @@ packages:
 extra-deps:
   - algebraic-graphs-0.6.1
   - ansi-terminal-0.11.5
-  - floskell-0.10.8
   - ghcide-2.2.0.0
   - haskell-language-server-2.2.0.0
   - hie-compat-0.3.1.1
@@ -25,7 +24,6 @@ extra-deps:
   - hls-explicit-fixity-plugin-2.2.0.0
   - hls-explicit-imports-plugin-2.2.0.0
   - hls-explicit-record-fields-plugin-2.2.0.0
-  - hls-floskell-plugin-2.2.0.0
   - hls-fourmolu-plugin-2.2.0.0
   - hls-gadt-plugin-2.2.0.0
   - hls-graph-2.2.0.0
@@ -39,7 +37,6 @@ extra-deps:
   - hls-refactor-plugin-2.2.0.0
   - hls-rename-plugin-2.2.0.0
   - hls-retrie-plugin-2.2.0.0
-  - hls-splice-plugin-2.2.0.0
   - hw-fingertree-0.1.2.1
   - hw-prim-0.6.3.2
   - implicit-hie-0.1.2.7
@@ -52,6 +49,10 @@ extra-deps:
 
 flags:
   haskell-language-server:
+    floskell: false
+    fourmolu: false
+    retrie: false
+    splice: false
     stylishHaskell: false
 
 local-bin-path: ./.stack-bin
@@ -62,7 +63,6 @@ ghc-options:
   "$targets": >
     -O0
     -g2
-    -threaded
     -Weverything
     -Wno-missing-safe-haskell-mode
     -Wno-orphans

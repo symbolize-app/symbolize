@@ -32,5 +32,6 @@ tasks:
       BIN_DIR:
         sh: realpath --relative-to . {{.STACK_LOCAL_BIN_PATH}}
     cmds:
+      - mkdir -p {{.BIN_DIR}}
       - curl --fail --silent --show-error "https://raw.githubusercontent.com/kowainik/relude/v{{.VERSION}}/.hlint.yaml" -o {{.BIN_DIR}}/relude-hlint.yaml
       
