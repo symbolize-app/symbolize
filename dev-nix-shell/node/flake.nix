@@ -21,11 +21,12 @@
         {
           packages.default = pkgs.buildEnv {
             name = "intertwine-node";
-            paths = [
+            buildInputs = [
               pkgs.nodejs_20
               pkgs.nodejs_20.pkgs.node2nix
               pkgs.node-packages.pnpm
             ];
+            paths = [];
           };
         }
     );

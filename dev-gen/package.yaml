@@ -1,0 +1,43 @@
+name:                intertwine-dev-gen
+version: 0.0.0
+
+dependencies:
+- base >= 4.7 && < 5
+- relude
+- named
+
+language: GHC2021
+
+default-extensions:
+- ExplicitNamespaces
+- TypeFamilies
+- DataKinds
+- NoImplicitPrelude
+- OverloadedStrings
+- OverloadedLabels
+- DerivingStrategies
+
+library:
+  source-dirs: src
+
+executables:
+  intertwine-dev-gen-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - intertwine-dev-gen
+
+tests:
+  intertwine-dev-gen-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - intertwine-dev-gen

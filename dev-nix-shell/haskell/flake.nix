@@ -8,12 +8,17 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs { inherit system; };
+
+        # Align with GHC version from stack.yaml resolver
+        hPkgs = pkgs.haskell.packages.ghc946;
       in
         {
           packages.default = pkgs.buildEnv {
-            name = "intertwine-dprint";
+            name = "intertwine-haskell";
             buildInputs = [
-              pkgs.dprint
+              pkgs.zlib
+              pkgs.haskell.compiler.ghc946
+              hPkgs.stack
             ];
             paths = [];
           };

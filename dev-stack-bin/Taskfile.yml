@@ -1,0 +1,37 @@
+version: '3'
+  
+run: when_changed
+  
+tasks:
+  install:
+    deps:
+      - install-packages
+      - install-relude-hlint
+  
+  install-packages:
+    vars:
+      PACKAGES:
+        # Skip "base" (first index)
+        sh: dasel -f package.yaml -r yaml -w - '.dependencies.all().filter(not(equal(.key(),0))).join( )'
+    cmds:
+      - stack install {{.PACKAGES}}
+  
+  install-packages:
+    vars:
+      PACKAGES:
+        # Skip "base" (first index)
+        sh: dasel -f package.yaml -r yaml -w - '.dependencies.all().filter(not(equal(.key(),0))).join( )'
+    cmds:
+      - stack install {{.PACKAGES}}
+
+
+  install-relude-hlint:
+    vars:
+      VERSION:
+        sh: stack ls dependencies json | dasel -r json -w - 'all().filter(equal(.name,relude)).version'
+      BIN_DIR:
+        sh: realpath --relative-to . {{.STACK_LOCAL_BIN_PATH}}
+    cmds:
+      - mkdir -p {{.BIN_DIR}}
+      - curl --fail --silent --show-error "https://raw.githubusercontent.com/kowainik/relude/v{{.VERSION}}/.hlint.yaml" -o {{.BIN_DIR}}/relude-hlint.yaml
+      

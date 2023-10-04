@@ -6,10 +6,16 @@
   "editor.rulers": [60],
   "editor.minimap.maxColumn": 60,
   "editor.tabSize": 2,
+  "editor.formatOnSaveMode": "file",
+  "[haskell]": {
+    "editor.formatOnSave": true
+  },
   "files.autoSave": "onFocusChange",
   "typescript.tsdk": "node_modules/typescript/lib",
   "eslint.validate": ["javascript", "typescript"],
   "rust-analyzer.assist.importGranularity": "item",
   "rust-analyzer.assist.importGroup": false,
-  "rust-analyzer.assist.importPrefix": "crate"
+  "rust-analyzer.assist.importPrefix": "crate",
+  "haskell.manageHLS": "PATH",
+  "haskell.plugin.hlint.config.flags": ["--hint", ".stack-bin/relude-hlint.yaml", "--hint", "dev-hlint/base.yaml"]
 }

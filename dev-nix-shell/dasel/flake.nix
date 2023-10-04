@@ -11,9 +11,9 @@
       in
         {
           packages.default = pkgs.buildEnv {
-            name = "intertwine-dprint";
+            name = "intertwine-dasel";
             buildInputs = [
-              pkgs.dprint
+              pkgs.dasel
             ];
             paths = [];
           };

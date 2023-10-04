@@ -1,0 +1,55 @@
+version: '3'
+  
+run: when_changed
+  
+includes:
+  stack:
+    internal: true
+    taskfile: ../dev-task/Stack.yml
+    dir: .
+
+vars:
+  NAME: dev-gen
+
+tasks:
+  format:
+    cmd:
+      task: stack:format
+
+  format:check:
+    cmd:
+      task: stack:format:check
+
+  lint:
+    cmd:
+      task: stack:lint
+
+  repl:
+    cmd:
+      task: stack:repl-target
+      vars:
+        TARGET: intertwine-{{.NAME}}
+
+  run:
+    cmd:
+      task: stack:execute-target
+      vars:
+        TARGET: intertwine-{{.NAME}}-exe
+
+  run:watch:
+    cmd:
+      task: stack:execute-target:watch
+      vars:
+        TARGET: intertwine-{{.NAME}}-exe
+
+  test:
+    cmd:
+      task: stack:execute-target
+      vars:
+        TARGET: intertwine-{{.NAME}}-test
+
+  test:watch:
+    cmd:
+      task: stack:execute-target:watch
+      vars:
+        TARGET: intertwine-{{.NAME}}-test

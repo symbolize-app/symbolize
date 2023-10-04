@@ -11,9 +11,9 @@
       in
         {
           packages.default = pkgs.buildEnv {
-            name = "intertwine-dprint";
+            name = "intertwine-curl";
             buildInputs = [
-              pkgs.dprint
+              pkgs.curl
             ];
             paths = [];
           };

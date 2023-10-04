@@ -14,9 +14,16 @@
         {
           packages.default = pkgs.buildEnv {
             name = "intertwine-rust";
-            paths = [
-              pkgs.rust-bin.stable."1.57.0".default
+            buildInputs = [
+              pkgs.openssl
+              (pkgs.rust-bin.nightly."2023-09-22".default.override {
+                extensions = [
+                  "rust-src"
+                  "rust-analyzer"
+                ];
+              })
             ];
+            paths = [];
           };
         }
     );

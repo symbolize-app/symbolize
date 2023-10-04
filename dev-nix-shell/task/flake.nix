@@ -13,7 +13,7 @@
           packages.default = pkgs.buildEnv {
             name = "intertwine-dprint";
             buildInputs = [
-              pkgs.dprint
+              pkgs.go-task
             ];
             paths = [];
           };
