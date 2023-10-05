@@ -10,7 +10,10 @@ build-type:     Simple
 
 library
   exposed-modules:
-      Lib
+      Dev.Gen
+      Dev.Gen.Command
+      Dev.Gen.Exec
+      Dev.Gen.Interpret
   other-modules:
       Paths_intertwine_dev_gen
   hs-source-dirs:
@@ -55,6 +58,8 @@ test-suite intertwine-dev-gen-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      Dev.Gen.ExecSpec
+      Dev.Gen.InterpretSpec
       Paths_intertwine_dev_gen
   hs-source-dirs:
       test

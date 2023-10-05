@@ -14,18 +14,18 @@ tasks:
     aliases:
       - build
       - b
-    cmd: stack build --test --no-run-tests
+    cmd: stack build --test --no-run-tests --keep-going
 
   build:release:
     aliases:
       - br
-    cmd: stack build --test --no-run-tests --ghc-options "-O2 -g0 -Werror"
+    cmd: stack build --test --no-run-tests --keep-going --ghc-options "-O2 -g0 -Werror"
 
   build:debug:watch:
     aliases:
       - build:watch
       - bw
-    cmd: stack build --test --no-run-tests --file-watch
+    cmd: stack build --test --no-run-tests --keep-going --file-watch
 
   format:
     internal: true
