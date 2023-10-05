@@ -6,14 +6,13 @@ module Dev.Gen.Exec
 where
 
 import Control.Monad (ap, liftM)
+import Data.Aeson qualified as Aeson
 import Dev.Gen.Command qualified as Command
-import Named (type (:!))
+import Dev.Gen.FileFormat qualified as FileFormat
 import Relude.Applicative (Applicative (pure, (<*>)))
 import Relude.Base (FilePath, Type)
-import Relude.Function (($))
 import Relude.Functor (Functor (fmap))
 import Relude.Monad (Monad ((>>=)))
-import Relude.String (Text)
 
 type Exec :: Type -> Type
 data Exec a where
@@ -36,8 +35,14 @@ instance Monad Exec where
   (>>=) :: Exec a -> (a -> Exec b) -> Exec b
   (>>=) = Bind
 
-readFile :: "path" :! FilePath -> Exec Text
-readFile path = Command $ Command.ReadFile path
+readFile :: FilePath -> FileFormat.FileFormat -> Exec Aeson.Value
+readFile = _command2 Command.ReadFile
 
-writeFile :: FilePath -> Text -> Exec ()
-writeFile path content = Command $ Command.WriteFile path content
+writeFile :: FilePath -> FileFormat.FileFormat -> Aeson.Value -> Exec ()
+writeFile = _command3 Command.WriteFile
+
+_command2 :: (t1 -> t2 -> Command.Command a) -> t1 -> t2 -> Exec a
+_command2 command b c = Command (command b c)
+
+_command3 :: (t1 -> t2 -> t3 -> Command.Command a) -> t1 -> t2 -> t3 -> Exec a
+_command3 command b c d = Command (command b c d)

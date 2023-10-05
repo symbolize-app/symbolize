@@ -21,6 +21,6 @@ interpret (s : s') (Exec.Command x) = do
 interpret [] (Exec.Command _) = Nothing
 
 interpretExec :: Command.Command a -> ExecSpec.Result -> Maybe a
-interpretExec x@(Command.ReadFile _) (ExecSpec.Result y@(Command.ReadFile _) r) =
+interpretExec x@(Command.ReadFile {}) (ExecSpec.Result y@(Command.ReadFile {}) r) =
   if x == y then Just r else Nothing
 interpretExec _ _ = Nothing
