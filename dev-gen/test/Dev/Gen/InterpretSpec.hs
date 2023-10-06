@@ -15,6 +15,8 @@ interpret s (Exec.Pure x) = pure (s, x)
 interpret s (Exec.Bind x f) = do
   (s', x') <- interpret s x
   interpret s' (f x')
+interpret _ (Exec.Fail _) = do
+  Nothing
 interpret (s : s') (Exec.Command x) = do
   x' <- interpretExec x s
   pure (s', x')

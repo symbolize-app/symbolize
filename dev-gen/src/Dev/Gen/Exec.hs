@@ -5,19 +5,21 @@ module Dev.Gen.Exec
   )
 where
 
-import Control.Monad (ap, liftM)
+import Control.Monad (MonadFail, ap, liftM)
 import Data.Aeson qualified as Aeson
 import Dev.Gen.Command qualified as Command
 import Dev.Gen.FileFormat qualified as FileFormat
 import Relude.Applicative (Applicative (pure, (<*>)))
 import Relude.Base (FilePath, Type)
 import Relude.Functor (Functor (fmap))
-import Relude.Monad (Monad ((>>=)))
+import Relude.Monad (Monad ((>>=)), MonadFail (fail))
+import Relude.String (String)
 
 type Exec :: Type -> Type
 data Exec a where
   Pure :: a -> Exec a
   Bind :: Exec b -> (b -> Exec a) -> Exec a
+  Fail :: String -> Exec a
   Command :: Command.Command a -> Exec a
 
 instance Functor Exec where
@@ -34,6 +36,10 @@ instance Applicative Exec where
 instance Monad Exec where
   (>>=) :: Exec a -> (a -> Exec b) -> Exec b
   (>>=) = Bind
+
+instance MonadFail Exec where
+  fail :: String -> Exec a
+  fail = Fail
 
 readFile :: FilePath -> FileFormat.FileFormat -> Exec Aeson.Value
 readFile = _command2 Command.ReadFile

@@ -1,5 +1,5 @@
-import Dev.Gen (test, test')
-import Dev.Gen.Interpret (interpret)
+import Dev.Gen (gen)
+import Dev.Gen.Interpret qualified as Interpret
 import Relude.Applicative (pass)
 import Relude.Lifted (print, putStrLn)
 import Relude.Monad (MonadIO)
@@ -7,8 +7,6 @@ import Relude.Monad (MonadIO)
 main :: (MonadIO m) => m ()
 main = do
   putStrLn "hello"
-  r <- interpret test
+  r <- Interpret.interpret gen
   print r
-  r' <- interpret test'
-  print r'
   pass

@@ -31,24 +31,32 @@ tasks:
         TARGET: intertwine-{{.NAME}}
 
   run:
+    aliases:
+      - r
     cmd:
       task: stack:execute-target
       vars:
         TARGET: intertwine-{{.NAME}}-exe
 
   run:watch:
+    aliases:
+      - rw
     cmd:
       task: stack:execute-target:watch
       vars:
         TARGET: intertwine-{{.NAME}}-exe
 
   test:
+    aliases:
+      - t
     cmd:
       task: stack:execute-target
       vars:
         TARGET: intertwine-{{.NAME}}-test
 
   test:watch:
+    aliases:
+      - tw
     cmd:
       task: stack:execute-target:watch
       vars:

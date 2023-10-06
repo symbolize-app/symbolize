@@ -1,4 +1,4 @@
-import Dev.Gen (test, test')
+import Dev.Gen (gen)
 import Dev.Gen.ExecSpec qualified as ExecSpec
 import Dev.Gen.FileFormat qualified as FileFormat
 import Dev.Gen.InterpretSpec (interpret)
@@ -9,25 +9,24 @@ import Relude.Monad (MonadIO)
 
 main :: (MonadIO m) => m ()
 main = do
-  print $ interpret [] test
   print $
     interpret
       [ ExecSpec.readFile "a" FileFormat.YAML "q",
         ExecSpec.readFile "b" FileFormat.YAML "0"
       ]
-      test'
+      gen
   print $
     interpret
       [ ExecSpec.readFile "a" FileFormat.YAML "q",
         ExecSpec.readFile "b" FileFormat.YAML "0",
         ExecSpec.readFile "b" FileFormat.YAML "1"
       ]
-      test'
+      gen
   print $
     interpret
       [ ExecSpec.readFile "a" FileFormat.YAML "q",
         ExecSpec.readFile "c" FileFormat.YAML "0"
       ]
-      test'
-  print $ interpret [] test'
+      gen
+  print $ interpret [] gen
   pass

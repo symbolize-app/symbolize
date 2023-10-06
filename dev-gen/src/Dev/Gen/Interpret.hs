@@ -19,6 +19,8 @@ interpret (Exec.Pure x) =
   pure x
 interpret (Exec.Bind x f) =
   interpret x >>= interpret . f
+interpret (Exec.Fail s) =
+  liftIO $ fail s
 interpret (Exec.Command (Command.ReadFile filePath FileFormat.YAML)) = do
   bytes <- readFileBS filePath
   case Yaml.decodeEither' bytes of
