@@ -4,15 +4,27 @@ module Dev.Gen.Command
 where
 
 import Data.Aeson qualified as Aeson
+import Data.Typeable (cast)
 import Dev.Gen.FileFormat qualified as FileFormat
 import Dev.Gen.FilePath (FilePath)
-import Relude.Base (Eq, Show, Type)
+import Relude (Bool (False))
+import Relude.Base (Eq ((==)), Show, Type, Typeable)
+import Relude.Monad (maybe)
 
 type Command :: Type -> Type
 data Command a where
-  ReadFile :: FilePath -> FileFormat.FileFormat -> Command Aeson.Value
-  WriteFile :: FilePath -> FileFormat.FileFormat -> Aeson.Value -> Command ()
+  ReadFile :: (Aeson.FromJSON a, Eq a, Show a, Typeable a) => FilePath -> FileFormat.FileFormat -> Command a
+  WriteFile :: (Aeson.ToJSON b, Eq b, Show b, Typeable b) => FilePath -> FileFormat.FileFormat -> b -> Command ()
 
-deriving stock instance Eq (Command a)
+instance Eq (Command a) where
+  (==) :: Command a -> Command a -> Bool
+  (ReadFile filePathX fileFormatX) == (ReadFile filePathY fileFormatY) =
+    (filePathX, fileFormatX) == (filePathY, fileFormatY)
+  (WriteFile filePathX fileFormatX valueX) == (WriteFile filePathY fileFormatY valueY) =
+    maybe
+      False
+      (\valueY' -> (filePathX, fileFormatX, valueX) == (filePathY, fileFormatY, valueY'))
+      (cast valueY)
+  _ == _ = False
 
 deriving stock instance Show (Command a)

@@ -1,4 +1,5 @@
-import Dev.Gen (gen)
+import Data.Vector (fromList)
+import Dev.Gen (PNPMWorkspace (PNPMWorkspace, packages), gen)
 import Dev.Gen.ExecSpec qualified as ExecSpec
 import Dev.Gen.FileFormat qualified as FileFormat
 import Dev.Gen.InterpretSpec (interpret)
@@ -11,22 +12,7 @@ main :: (MonadIO m) => m ()
 main = do
   print $
     interpret
-      [ ExecSpec.readFile "a" FileFormat.YAML "q",
-        ExecSpec.readFile "b" FileFormat.YAML "0"
+      [ ExecSpec.readFile "../pnpm-workspace.yaml" FileFormat.YAML (PNPMWorkspace {packages = fromList ["a"]})
       ]
       gen
-  print $
-    interpret
-      [ ExecSpec.readFile "a" FileFormat.YAML "q",
-        ExecSpec.readFile "b" FileFormat.YAML "0",
-        ExecSpec.readFile "b" FileFormat.YAML "1"
-      ]
-      gen
-  print $
-    interpret
-      [ ExecSpec.readFile "a" FileFormat.YAML "q",
-        ExecSpec.readFile "c" FileFormat.YAML "0"
-      ]
-      gen
-  print $ interpret [] gen
   pass

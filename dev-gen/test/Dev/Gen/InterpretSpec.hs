@@ -3,12 +3,14 @@ module Dev.Gen.InterpretSpec
   )
 where
 
+import Data.Typeable (cast)
 import Dev.Gen.Command qualified as Command
 import Dev.Gen.Exec qualified as Exec
 import Dev.Gen.ExecSpec qualified as ExecSpec
-import Relude.Applicative (Applicative (pure))
-import Relude.Base (Eq ((==)))
-import Relude.Monad (Maybe (Just, Nothing))
+import Relude (Monad ((>>=)))
+import Relude.Applicative (Alternative (empty), Applicative (pure))
+import Relude.Base (Eq ((==)), Typeable)
+import Relude.Monad (Maybe (Nothing))
 
 interpret :: [ExecSpec.Result] -> Exec.Exec a -> Maybe ([ExecSpec.Result], a)
 interpret s (Exec.Pure x) = pure (s, x)
@@ -22,7 +24,6 @@ interpret (s : s') (Exec.Command x) = do
   pure (s', x')
 interpret [] (Exec.Command _) = Nothing
 
-interpretExec :: Command.Command a -> ExecSpec.Result -> Maybe a
-interpretExec x@(Command.ReadFile {}) (ExecSpec.Result y@(Command.ReadFile {}) r) =
-  if x == y then Just r else Nothing
-interpretExec _ _ = Nothing
+interpretExec :: (Typeable a) => Command.Command a -> ExecSpec.Result -> Maybe a
+interpretExec x (ExecSpec.Result y r) =
+  cast (y, r) >>= \(y', r') -> if x == y' then pure r' else empty

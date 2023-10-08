@@ -1,25 +1,22 @@
 module Dev.Gen
   ( gen,
+    PNPMWorkspace (..),
   )
 where
 
 import Data.Aeson qualified as Aeson
-import Data.Aeson.Types qualified as Aeson.Types
-import Data.Vector (Vector)
+import Data.Vector (Vector, length)
 import Dev.Gen.Exec qualified as Exec
 import Dev.Gen.FileFormat qualified as FileFormat
-import Relude.Applicative (Applicative (pure))
+import Relude (Applicative (pure))
 import Relude.Base (Eq, Generic, Show, Type)
-import Relude.Monad (Either (Left, Right), fail)
-import Relude.Numeric (Integer)
+import Relude.Numeric (Int, Integer)
 import Relude.String (Text)
 
-gen :: Exec.Exec PNPMWorkspace
+gen :: Exec.Exec (Int, PNPMWorkspace)
 gen = do
-  pnpmWorkspaceDoc <- Exec.readFile "../pnpm-workspace.yaml" FileFormat.YAML
-  case Aeson.Types.parseEither Aeson.parseJSON pnpmWorkspaceDoc of
-    (Left error) -> fail error
-    (Right pnpmWorkspace) -> pure pnpmWorkspace
+  pnpmWorkspace <- Exec.readFile "../pnpm-workspace.yaml" FileFormat.YAML
+  pure (length (packages pnpmWorkspace), pnpmWorkspace)
 
 type PNPMWorkspace :: Type
 newtype PNPMWorkspace = PNPMWorkspace
