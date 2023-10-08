@@ -14,6 +14,7 @@ library
       Dev.Gen.Command
       Dev.Gen.Exec
       Dev.Gen.FileFormat
+      Dev.Gen.FilePath
       Dev.Gen.Interpret
   other-modules:
       Paths_intertwine_dev_gen
@@ -27,6 +28,7 @@ library
       OverloadedStrings
       OverloadedLabels
       DerivingStrategies
+      DeriveGeneric
   build-depends:
       aeson
     , base >=4.7 && <5
@@ -49,6 +51,7 @@ executable intertwine-dev-gen-exe
       OverloadedStrings
       OverloadedLabels
       DerivingStrategies
+      DeriveGeneric
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aeson
@@ -76,6 +79,7 @@ test-suite intertwine-dev-gen-test
       OverloadedStrings
       OverloadedLabels
       DerivingStrategies
+      DeriveGeneric
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aeson

@@ -5,7 +5,8 @@ where
 
 import Data.Aeson qualified as Aeson
 import Dev.Gen.FileFormat qualified as FileFormat
-import Relude.Base (Eq, FilePath, Show, Type)
+import Dev.Gen.FilePath (FilePath)
+import Relude.Base (Eq, Show, Type)
 
 type Command :: Type -> Type
 data Command a where

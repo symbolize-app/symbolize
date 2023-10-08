@@ -18,6 +18,7 @@ default-extensions:
 - OverloadedStrings
 - OverloadedLabels
 - DerivingStrategies
+- DeriveGeneric
 
 library:
   source-dirs: src

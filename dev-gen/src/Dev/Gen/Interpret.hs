@@ -12,7 +12,7 @@ import Relude.Applicative (Applicative (pure))
 import Relude.File (readFileBS, readFileLBS, writeFileBS, writeFileLBS)
 import Relude.Function (($), (.))
 import Relude.Monad (Either (Left, Right), Monad ((>>=)), MonadFail (fail), MonadIO (liftIO))
-import Relude.String (show)
+import Relude.String (show, toString)
 
 interpret :: (MonadIO m) => Exec.Exec a -> m a
 interpret (Exec.Pure x) =
@@ -22,16 +22,16 @@ interpret (Exec.Bind x f) =
 interpret (Exec.Fail s) =
   liftIO $ fail s
 interpret (Exec.Command (Command.ReadFile filePath FileFormat.YAML)) = do
-  bytes <- readFileBS filePath
+  bytes <- readFileBS (toString filePath)
   case Yaml.decodeEither' bytes of
     (Left exception) -> liftIO (fail (show exception))
     (Right value) -> pure value
 interpret (Exec.Command (Command.ReadFile filePath FileFormat.JSON)) = do
-  bytes <- readFileLBS filePath
+  bytes <- readFileLBS (toString filePath)
   case Aeson.eitherDecode bytes of
     (Left error) -> liftIO (fail error)
     (Right value) -> pure value
 interpret (Exec.Command (Command.WriteFile filePath FileFormat.YAML value)) =
-  writeFileBS filePath $ Yaml.encode value
+  writeFileBS (toString filePath) $ Yaml.encode value
 interpret (Exec.Command (Command.WriteFile filePath FileFormat.JSON value)) =
-  writeFileLBS filePath $ Aeson.encode value
+  writeFileLBS (toString filePath) $ Aeson.encode value

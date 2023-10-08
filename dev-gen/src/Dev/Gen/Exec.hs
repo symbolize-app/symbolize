@@ -9,8 +9,9 @@ import Control.Monad (MonadFail, ap, liftM)
 import Data.Aeson qualified as Aeson
 import Dev.Gen.Command qualified as Command
 import Dev.Gen.FileFormat qualified as FileFormat
+import Dev.Gen.FilePath (FilePath)
 import Relude.Applicative (Applicative (pure, (<*>)))
-import Relude.Base (FilePath, Type)
+import Relude.Base (Type)
 import Relude.Functor (Functor (fmap))
 import Relude.Monad (Monad ((>>=)), MonadFail (fail))
 import Relude.String (String)

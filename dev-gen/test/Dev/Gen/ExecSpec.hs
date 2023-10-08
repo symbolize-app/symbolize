@@ -8,7 +8,8 @@ where
 import Data.Aeson qualified as Aeson
 import Dev.Gen.Command qualified as Command
 import Dev.Gen.FileFormat qualified as FileFormat
-import Relude.Base (FilePath, Show, Type)
+import Dev.Gen.FilePath (FilePath)
+import Relude.Base (Show, Type)
 
 type Result :: Type
 data Result where
