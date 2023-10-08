@@ -16,7 +16,7 @@ import Relude.String (Text)
 gen :: Exec.Exec (Int, PNPMWorkspace)
 gen = do
   pnpmWorkspace <- Exec.readFile "../pnpm-workspace.yaml" FileFormat.YAML
-  pure (length (packages pnpmWorkspace), pnpmWorkspace)
+  pure (length pnpmWorkspace.packages, pnpmWorkspace)
 
 type PNPMWorkspace :: Type
 newtype PNPMWorkspace = PNPMWorkspace
