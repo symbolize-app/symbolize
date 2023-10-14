@@ -99,6 +99,7 @@ test-suite intertwine-dev-gen-test
   build-depends:
       aeson
     , base >=4.7 && <5
+    , hspec
     , intertwine-dev-gen
     , relude
     , vector

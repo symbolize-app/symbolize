@@ -2,6 +2,9 @@ version: '3'
   
 run: when_changed
   
+vars:
+  NAME: dev-nix-shell
+
 tasks:
   update:
-    cmd: nix flake update
+    cmd: cd {{.NAME}} && nix flake update

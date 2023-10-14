@@ -29,39 +29,97 @@ tasks:
 
   format:
     internal: true
-    cmd: ormolu --mode inplace $(find app src test -name '*.hs')
+    requires:
+      vars:
+        - NAME
+    cmd: ormolu --mode inplace $(find {{.NAME}}/{app,src,test} -name '*.hs')
 
   format:check:
     internal: true
-    cmd: ormolu --mode check $(find app src test -name '*.hs')
+    requires:
+      vars:
+        - NAME
+    cmd: ormolu --mode check $(find {{.NAME}}/{app,src,test} -name '*.hs')
 
   lint:
     internal: true
-    cmd: hlint --hint $(realpath --relative-to . {{.STACK_LOCAL_BIN_PATH}}/relude-hlint.yaml) --hint ../dev-hlint/base.yaml --threads app src test
+    requires:
+      vars:
+        - NAME
+    vars:
+      STACK_LOCAL_BIN_PATH:
+        sh: realpath --relative-to . {{.STACK_LOCAL_BIN_PATH}}
+    cmd: hlint --hint {{.STACK_LOCAL_BIN_PATH}}/relude-hlint.yaml --hint dev-hlint/base.yaml --threads {{.NAME}}/{app,src,test}
 
   repl-target:
     internal: true
     requires:
       vars:
-        - TARGET
-    cmd: stack ghci {{.TARGET}}
+        - NAME
+    cmd: stack ghci intertwine-{{.NAME}}
+  
+  run:
+    internal: true
+    requires:
+      vars:
+        - NAME
+    cmd:
+      task: execute-target
+      vars:
+        NAME: "{{.NAME}}"
+        TARGET: intertwine-{{.NAME}}-exe
+  
+  run:watch:
+    internal: true
+    requires:
+      vars:
+        - NAME
+    cmd:
+      task: execute-target:watch
+      vars:
+        NAME: "{{.NAME}}"
+        TARGET: intertwine-{{.NAME}}-exe
+  
+  test:
+    internal: true
+    requires:
+      vars:
+        - NAME
+    cmd:
+      task: execute-target
+      vars:
+        NAME: "{{.NAME}}"
+        TARGET: intertwine-{{.NAME}}-test
+  
+  test:watch:
+    internal: true
+    requires:
+      vars:
+        - NAME
+    cmd:
+      task: execute-target:watch
+      vars:
+        NAME: "{{.NAME}}"
+        TARGET: intertwine-{{.NAME}}-test
   
   execute-target:
     internal: true
     requires:
       vars:
+        - NAME
         - TARGET
     vars:
       DIST_DIR:
-        sh: realpath --relative-to . $(sh -c "$(stack config env) echo \$HASKELL_DIST_DIR")
+        sh: realpath --relative-to . $(sh -c "$(cd {{.NAME}} && stack config env) echo \$HASKELL_DIST_DIR")
     cmd: "{{.DIST_DIR}}/build/{{.TARGET}}/{{.TARGET}}"
   
   execute-target:watch:
     internal: true
     requires:
       vars:
+        - NAME
         - TARGET
     vars:
       DIST_DIR:
-        sh: realpath --relative-to . $(sh -c "$(stack config env) echo \$HASKELL_DIST_DIR")
+        sh: realpath --relative-to . $(sh -c "$(cd {{.NAME}} && stack config env) echo \$HASKELL_DIST_DIR")
     cmd: watchexec --no-vcs-ignore --watch {{.DIST_DIR}}/build/{{.TARGET}}/{{.TARGET}} -- {{.DIST_DIR}}/build/{{.TARGET}}/{{.TARGET}}

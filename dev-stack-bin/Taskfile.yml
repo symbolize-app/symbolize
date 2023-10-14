@@ -1,7 +1,10 @@
 version: '3'
   
 run: when_changed
-  
+
+vars:
+  NAME: dev-stack-bin
+
 tasks:
   install:
     deps:
@@ -12,19 +15,10 @@ tasks:
     vars:
       PACKAGES:
         # Skip "base" (first index)
-        sh: dasel -f package.yaml -r yaml -w - '.dependencies.all().filter(not(equal(.key(),0))).join( )'
+        sh: dasel -f {{.NAME}}/package.yaml -r yaml -w - '.dependencies.all().filter(not(equal(.key(),0))).join( )'
     cmds:
       - stack install {{.PACKAGES}}
   
-  install-packages:
-    vars:
-      PACKAGES:
-        # Skip "base" (first index)
-        sh: dasel -f package.yaml -r yaml -w - '.dependencies.all().filter(not(equal(.key(),0))).join( )'
-    cmds:
-      - stack install {{.PACKAGES}}
-
-
   install-relude-hlint:
     vars:
       VERSION:

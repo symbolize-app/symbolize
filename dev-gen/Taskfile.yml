@@ -1,12 +1,6 @@
 version: '3'
   
 run: when_changed
-  
-includes:
-  stack:
-    internal: true
-    taskfile: ../dev-task/Stack.yml
-    dir: .
 
 vars:
   NAME: dev-gen
@@ -14,50 +8,56 @@ vars:
 tasks:
   format:
     cmd:
-      task: stack:format
+      task: :stack:format
+      vars:
+        NAME: "{{.NAME}}"
 
   format:check:
     cmd:
-      task: stack:format:check
+      task: :stack:format:check
+      vars:
+        NAME: "{{.NAME}}"
 
   lint:
     cmd:
-      task: stack:lint
+      task: :stack:lint
+      vars:
+        NAME: "{{.NAME}}"
 
   repl:
     cmd:
-      task: stack:repl-target
+      task: :stack:repl
       vars:
-        TARGET: intertwine-{{.NAME}}
+        NAME: "{{.NAME}}"
 
   run:
     aliases:
       - r
     cmd:
-      task: stack:execute-target
+      task: :stack:run
       vars:
-        TARGET: intertwine-{{.NAME}}-exe
+        NAME: "{{.NAME}}"
 
   run:watch:
     aliases:
       - rw
     cmd:
-      task: stack:execute-target:watch
+      task: :stack:run:watch
       vars:
-        TARGET: intertwine-{{.NAME}}-exe
+        NAME: "{{.NAME}}"
 
   test:
     aliases:
       - t
     cmd:
-      task: stack:execute-target
+      task: :stack:test
       vars:
-        TARGET: intertwine-{{.NAME}}-test
+        NAME: "{{.NAME}}"
 
   test:watch:
     aliases:
       - tw
     cmd:
-      task: stack:execute-target:watch
+      task: :stack:test:watch
       vars:
-        TARGET: intertwine-{{.NAME}}-test
+        NAME: "{{.NAME}}"
