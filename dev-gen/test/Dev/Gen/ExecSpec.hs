@@ -17,10 +17,10 @@ data Result where
 
 deriving stock instance Show Result
 
-readFile :: (Aeson.FromJSON a, Eq a, Show a, Typeable a) => FilePath -> FileFormat.FileFormat -> a -> Result
+readFile :: (Aeson.FromJSON a, Eq a, Show a, Typeable a) => FilePath -> FileFormat.Storage -> a -> Result
 readFile = _result2 Command.ReadFile
 
-writeFile :: (Aeson.ToJSON b, Eq b, Show b, Typeable b) => FilePath -> FileFormat.FileFormat -> b -> Result
+writeFile :: (Aeson.ToJSON b, Eq b, Show b, Typeable b) => FilePath -> FileFormat.Storage -> b -> Result
 writeFile = _result3' Command.WriteFile
 
 _result2 :: (Typeable a, Eq a, Show a) => (t1 -> t2 -> Command.Command a) -> t1 -> t2 -> a -> Result

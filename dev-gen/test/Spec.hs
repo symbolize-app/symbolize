@@ -1,25 +1,85 @@
-import Data.Vector (fromList)
-import Dev.Gen (PNPMWorkspace (PNPMWorkspace, packages), gen)
+import Dev.Gen (gen)
 import Dev.Gen.ExecSpec qualified as ExecSpec
 import Dev.Gen.FileFormat qualified as FileFormat
-import Dev.Gen.InterpretSpec (interpret)
-import Relude.Applicative (pass, pure)
-import Relude.Foldable (sequenceA_)
+import Dev.Gen.InterpretSpec qualified as InterpretSpec
+import Relude.Bool (Bool (True))
+import Relude.Container (fromList)
 import Relude.Function (($), (.))
-import Relude.Lifted (print)
-import Relude.Monad (MonadIO, either, fail, liftIO, (>=>))
-import Test.Hspec (context, hspec, shouldBe, specify)
+import Relude.Monad (Maybe (Just, Nothing), MonadIO, liftIO)
+import Test.Hspec (Spec, context, hspec, specify)
 
 main :: (MonadIO m) => m ()
-main = do
-  either (liftIO . fail) pure >=> print $
-    interpret
-      [ ExecSpec.readFile "pnpm-workspace.yaml" FileFormat.YAML (PNPMWorkspace {packages = fromList ["a"]})
-      ]
-      gen
-  liftIO . hspec . sequenceA_ $
-    [ context "Prelude.head" . sequenceA_ $
-        [ specify "returns the first element of a list" $
-            PNPMWorkspace {packages = fromList ["a"]} `shouldBe` PNPMWorkspace {packages = fromList ["a", "b"]}
+main = liftIO . hspec $ do
+  spec
+
+spec :: Spec
+spec = do
+  context "gen" $ do
+    specify "OK" $
+      InterpretSpec.interpret
+        gen
+        [ ExecSpec.readFile
+            "pnpm-workspace.yaml"
+            FileFormat.YAML
+            ( FileFormat.PNPMWorkspace
+                { packages = fromList ["a"]
+                }
+            ),
+          ExecSpec.readFile
+            "Taskfile.yml"
+            FileFormat.YAML
+            ( FileFormat.Taskfile
+                { version = "3",
+                  run = "when_changed",
+                  includes =
+                    fromList
+                      [ ( "b",
+                          FileFormat.TaskfileInclude
+                            { internal = Just True,
+                              taskfile = "b"
+                            }
+                        )
+                      ],
+                  tasks =
+                    fromList
+                      [ ( "c",
+                          FileFormat.TaskfileTask
+                            { deps = fromList ["c"]
+                            }
+                        )
+                      ]
+                }
+            ),
+          ExecSpec.writeFile
+            "Taskfile.out.yml"
+            FileFormat.YAML
+            ( FileFormat.Taskfile
+                { version = "3",
+                  run = "when_changed",
+                  includes =
+                    fromList
+                      [ ( "a",
+                          FileFormat.TaskfileInclude
+                            { internal = Nothing,
+                              taskfile = "a"
+                            }
+                        ),
+                        ( "b",
+                          FileFormat.TaskfileInclude
+                            { internal = Just True,
+                              taskfile = "b"
+                            }
+                        )
+                      ],
+                  tasks =
+                    fromList
+                      [ ( "c",
+                          FileFormat.TaskfileTask
+                            { deps = fromList ["c"]
+                            }
+                        )
+                      ]
+                }
+            )
         ]
-    ]
+        ()

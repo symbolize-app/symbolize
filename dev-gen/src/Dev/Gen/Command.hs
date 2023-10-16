@@ -13,8 +13,8 @@ import Relude.Monad (maybe)
 
 type Command :: Type -> Type
 data Command a where
-  ReadFile :: (Aeson.FromJSON a, Eq a, Show a, Typeable a) => FilePath -> FileFormat.FileFormat -> Command a
-  WriteFile :: (Aeson.ToJSON b, Eq b, Show b, Typeable b) => FilePath -> FileFormat.FileFormat -> b -> Command ()
+  ReadFile :: (Aeson.FromJSON a, Eq a, Show a, Typeable a) => FilePath -> FileFormat.Storage -> Command a
+  WriteFile :: (Aeson.ToJSON b, Eq b, Show b, Typeable b) => FilePath -> FileFormat.Storage -> b -> Command ()
 
 instance Eq (Command a) where
   (==) :: Command a -> Command a -> Bool

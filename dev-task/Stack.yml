@@ -111,7 +111,7 @@ tasks:
     vars:
       DIST_DIR:
         sh: realpath --relative-to . $(sh -c "$(cd {{.NAME}} && stack config env) echo \$HASKELL_DIST_DIR")
-    cmd: "{{.DIST_DIR}}/build/{{.TARGET}}/{{.TARGET}}"
+    cmd: "{{.DIST_DIR}}/build/{{.TARGET}}/{{.TARGET}} {{.CLI_ARGS}}"
   
   execute-target:watch:
     internal: true
@@ -122,4 +122,4 @@ tasks:
     vars:
       DIST_DIR:
         sh: realpath --relative-to . $(sh -c "$(cd {{.NAME}} && stack config env) echo \$HASKELL_DIST_DIR")
-    cmd: watchexec --no-vcs-ignore --watch {{.DIST_DIR}}/build/{{.TARGET}}/{{.TARGET}} -- {{.DIST_DIR}}/build/{{.TARGET}}/{{.TARGET}}
+    cmd: watchexec --fs-events create,rename,modify --debounce 150ms --no-vcs-ignore --watch {{.DIST_DIR}}/build/{{.TARGET}} --filter {{.TARGET}} -- {{.DIST_DIR}}/build/{{.TARGET}}/{{.TARGET}} {{.CLI_ARGS}}

@@ -1,46 +1,35 @@
 module Dev.Gen
   ( gen,
-    PNPMWorkspace (..),
   )
 where
 
-import Data.Aeson qualified as Aeson
-import Data.Vector (Vector, length)
 import Dev.Gen.Exec qualified as Exec
 import Dev.Gen.FileFormat qualified as FileFormat
-import Relude (Applicative (pure))
-import Relude.Base (Eq, Generic, Show, Type)
-import Relude.Numeric (Int, Integer)
-import Relude.String (Text)
+import Relude.Container.One (one)
+import Relude.Foldable (foldMap)
+import Relude.Function (($))
+import Relude.Monad (Maybe (Nothing))
+import Relude.Monoid ((<>))
 
-gen :: Exec.Exec (Int, PNPMWorkspace)
+gen :: Exec.Exec ()
 gen = do
   pnpmWorkspace <- Exec.readFile "pnpm-workspace.yaml" FileFormat.YAML
-  pure (length pnpmWorkspace.packages, pnpmWorkspace)
+  rootTaskfileInput <- Exec.readFile "Taskfile.yml" FileFormat.YAML
+  Exec.writeFile "Taskfile.out.yml" FileFormat.YAML $
+    genRootTaskfile
+      pnpmWorkspace
+      rootTaskfileInput
 
-type PNPMWorkspace :: Type
-newtype PNPMWorkspace = PNPMWorkspace
-  { packages :: Vector Text
-  }
-  deriving stock (Show, Eq, Generic)
-
-instance Aeson.FromJSON PNPMWorkspace
-
-type WorkspaceTaskfile :: Type
-newtype WorkspaceTaskfile = WorkspaceTaskfile
-  { tasks :: Vector Task
-  }
-  deriving newtype (Show, Eq)
-
-type Task :: Type
-newtype Task = Task
-  { dependencies :: Vector TaskReference
-  }
-  deriving newtype (Show, Eq)
-
-type TaskReference :: Type
-data TaskReference = Dependency
-  { pop :: Integer,
-    push :: Vector Text
-  }
-  deriving stock (Show, Eq)
+genRootTaskfile :: FileFormat.PNPMWorkspace -> FileFormat.Taskfile -> FileFormat.Taskfile
+genRootTaskfile pnpmWorkspace rootTaskfileInput =
+  FileFormat.Taskfile
+    { version = FileFormat.taskfileVersion,
+      run = FileFormat.taskfileRun,
+      includes =
+        rootTaskfileInput.includes
+          <> ( \package ->
+                 one (package, FileFormat.TaskfileInclude {internal = Nothing, taskfile = package})
+             )
+            `foldMap` pnpmWorkspace.packages,
+      tasks = rootTaskfileInput.tasks
+    }

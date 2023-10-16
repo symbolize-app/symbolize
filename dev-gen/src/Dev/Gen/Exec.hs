@@ -42,10 +42,10 @@ instance MonadFail Exec where
   fail :: String -> Exec a
   fail = Fail
 
-readFile :: (Aeson.FromJSON a, Eq a, Show a, Typeable a) => FilePath -> FileFormat.FileFormat -> Exec a
+readFile :: (Aeson.FromJSON a, Eq a, Show a, Typeable a) => FilePath -> FileFormat.Storage -> Exec a
 readFile = _command2 Command.ReadFile
 
-writeFile :: (Aeson.ToJSON b, Eq b, Show b, Typeable b) => FilePath -> FileFormat.FileFormat -> b -> Exec ()
+writeFile :: (Aeson.ToJSON b, Eq b, Show b, Typeable b) => FilePath -> FileFormat.Storage -> b -> Exec ()
 writeFile = _command3 Command.WriteFile
 
 _command2 :: (Typeable a) => (t1 -> t2 -> Command.Command a) -> t1 -> t2 -> Exec a
