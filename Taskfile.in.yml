@@ -1,0 +1,38 @@
+version: '3'
+  
+run: when_changed
+  
+includes:
+  cargo:
+    taskfile: dev-task/Cargo.yml
+
+  nix:
+    taskfile: dev-task/Nix.yml
+
+  stack:
+    taskfile: dev-task/Stack.yml
+
+  dev-gen:
+    taskfile: dev-gen
+
+  dev-cargo-bin:
+    internal: true
+    taskfile: dev-cargo-bin
+
+  dev-nix-shell:
+    internal: true
+    taskfile: dev-nix-shell
+
+  dev-stack-bin:
+    internal: true
+    taskfile: dev-stack-bin
+
+tasks:
+  build:
+    deps:
+      - stack:build
+  
+  install:
+    deps:
+      - stack:install
+      - cargo:install

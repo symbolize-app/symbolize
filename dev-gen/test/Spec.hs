@@ -26,20 +26,22 @@ spec = do
                 }
             ),
           ExecSpec.readFile
-            "Taskfile.yml"
+            "Taskfile.in.yml"
             FileFormat.YAML
             ( FileFormat.Taskfile
-                { version = "3",
-                  run = "when_changed",
+                { version = FileFormat.taskfileVersion,
+                  run = FileFormat.taskfileRun,
                   includes =
-                    fromList
-                      [ ( "b",
-                          FileFormat.TaskfileInclude
-                            { internal = Just True,
-                              taskfile = "b"
-                            }
-                        )
-                      ],
+                    Just
+                      ( fromList
+                          [ ( "b",
+                              FileFormat.TaskfileInclude
+                                { internal = Just True,
+                                  taskfile = "b"
+                                }
+                            )
+                          ]
+                      ),
                   tasks =
                     fromList
                       [ ( "c",
@@ -51,26 +53,38 @@ spec = do
                 }
             ),
           ExecSpec.writeFile
-            "Taskfile.out.yml"
+            "a/Taskfile.yml"
             FileFormat.YAML
             ( FileFormat.Taskfile
-                { version = "3",
-                  run = "when_changed",
+                { version = FileFormat.taskfileVersion,
+                  run = FileFormat.taskfileRun,
+                  includes = Nothing,
+                  tasks = fromList []
+                }
+            ),
+          ExecSpec.writeFile
+            "Taskfile.yml"
+            FileFormat.YAML
+            ( FileFormat.Taskfile
+                { version = FileFormat.taskfileVersion,
+                  run = FileFormat.taskfileRun,
                   includes =
-                    fromList
-                      [ ( "a",
-                          FileFormat.TaskfileInclude
-                            { internal = Nothing,
-                              taskfile = "a"
-                            }
-                        ),
-                        ( "b",
-                          FileFormat.TaskfileInclude
-                            { internal = Just True,
-                              taskfile = "b"
-                            }
-                        )
-                      ],
+                    Just
+                      ( fromList
+                          [ ( "a",
+                              FileFormat.TaskfileInclude
+                                { internal = Nothing,
+                                  taskfile = "a"
+                                }
+                            ),
+                            ( "b",
+                              FileFormat.TaskfileInclude
+                                { internal = Just True,
+                                  taskfile = "b"
+                                }
+                            )
+                          ]
+                      ),
                   tasks =
                     fromList
                       [ ( "c",

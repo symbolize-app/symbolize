@@ -44,7 +44,7 @@ type Taskfile :: Type
 data Taskfile = Taskfile
   { version :: Text,
     run :: Text,
-    includes :: Map Text TaskfileInclude,
+    includes :: Maybe (Map Text TaskfileInclude),
     tasks :: Map Text TaskfileTask
   }
   deriving stock (Show, Eq, Generic)

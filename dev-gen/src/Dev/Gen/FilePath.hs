@@ -1,5 +1,5 @@
 module Dev.Gen.FilePath
-  ( FilePath,
+  ( FilePath (..),
   )
 where
 

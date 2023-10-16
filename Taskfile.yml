@@ -1,38 +1,64 @@
-version: '3'
-  
-run: when_changed
-  
 includes:
   cargo:
     taskfile: dev-task/Cargo.yml
-
-  nix:
-    taskfile: dev-task/Nix.yml
-
-  stack:
-    taskfile: dev-task/Stack.yml
-
-  dev-gen:
-    taskfile: dev-gen
-
+  dev-build:
+    taskfile: dev-build
   dev-cargo-bin:
     internal: true
     taskfile: dev-cargo-bin
-
+  dev-eslint:
+    taskfile: dev-eslint
+  dev-gen:
+    taskfile: dev-gen
+  dev-loader:
+    taskfile: dev-loader
+  dev-local:
+    taskfile: dev-local
   dev-nix-shell:
     internal: true
     taskfile: dev-nix-shell
-
+  dev-prettier:
+    taskfile: dev-prettier
   dev-stack-bin:
     internal: true
     taskfile: dev-stack-bin
-
+  dev-suppress:
+    taskfile: dev-suppress
+  dev-tsconfig:
+    taskfile: dev-tsconfig
+  lib-concurrency:
+    taskfile: lib-concurrency
+  lib-crypto:
+    taskfile: lib-crypto
+  lib-error:
+    taskfile: lib-error
+  lib-hex:
+    taskfile: lib-hex
+  lib-random:
+    taskfile: lib-random
+  lib-stream:
+    taskfile: lib-stream
+  lib-style:
+    taskfile: lib-style
+  lib-test:
+    taskfile: lib-test
+  lib-time:
+    taskfile: lib-time
+  lib-widget:
+    taskfile: lib-widget
+  nix:
+    taskfile: dev-task/Nix.yml
+  stack:
+    taskfile: dev-task/Stack.yml
+  svc-auth-guest-display:
+    taskfile: svc-auth-guest-display
+run: when_changed
 tasks:
   build:
     deps:
-      - stack:build
-  
+    - stack:build
   install:
     deps:
-      - stack:install
-      - cargo:install
+    - stack:install
+    - cargo:install
+version: '3'

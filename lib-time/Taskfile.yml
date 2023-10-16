@@ -1,0 +1,3 @@
+run: when_changed
+tasks: {}
+version: '3'
