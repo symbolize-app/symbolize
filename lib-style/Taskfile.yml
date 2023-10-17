@@ -1,3 +1,6 @@
 run: when_changed
-tasks: {}
+tasks:
+  build:
+    deps:
+    - :dev-prettier:build
 version: '3'

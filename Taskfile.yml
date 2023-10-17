@@ -61,4 +61,24 @@ tasks:
     deps:
     - stack:install
     - cargo:install
+  pnpm:build:
+    deps:
+    - dev-build:build
+    - dev-eslint:build
+    - dev-loader:build
+    - dev-local:build
+    - dev-prettier:build
+    - dev-suppress:build
+    - dev-tsconfig:build
+    - lib-concurrency:build
+    - lib-crypto:build
+    - lib-error:build
+    - lib-hex:build
+    - lib-random:build
+    - lib-stream:build
+    - lib-style:build
+    - lib-test:build
+    - lib-time:build
+    - lib-widget:build
+    - svc-auth-guest-display:build
 version: '3'

@@ -1,3 +1,8 @@
 run: when_changed
-tasks: {}
+tasks:
+  build:
+    deps:
+    - :dev-prettier:build
+    - :dev-tsconfig:build
+    - :lib-test:build
 version: '3'

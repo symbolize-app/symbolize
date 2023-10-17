@@ -1,6 +1,7 @@
 module Dev.Gen.FileFormat
   ( Storage (..),
     PNPMWorkspace (..),
+    PNPMPackage (..),
     Taskfile (..),
     TaskfileTask (..),
     TaskfileInclude (..),
@@ -33,6 +34,15 @@ newtype PNPMWorkspace = PNPMWorkspace
   deriving stock (Show, Eq, Generic)
 
 instance Aeson.FromJSON PNPMWorkspace
+
+type PNPMPackage :: Type
+data PNPMPackage = PNPMPackage
+  { dependencies :: Maybe (Map Text Text),
+    devDependencies :: Maybe (Map Text Text)
+  }
+  deriving stock (Show, Eq, Generic)
+
+instance Aeson.FromJSON PNPMPackage
 
 taskfileOptions :: Aeson.Options
 taskfileOptions =
