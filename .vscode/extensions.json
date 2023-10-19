@@ -1,16 +1,19 @@
 {
   "recommendations": [
-    "esbenp.prettier-vscode",
     "dbaeumer.vscode-eslint",
-    "ms-azuretools.vscode-docker",
-    "mikestead.dotenv",
-    "tamasfe.even-better-toml",
+    "dprint.dprint",
+    "esbenp.prettier-vscode",
+    "haskell.haskell",
     "matklad.rust-analyzer",
+    "mikestead.dotenv",
     "mkhl.direnv",
-    "haskell.haskell"
+    "ms-azuretools.vscode-docker",
+    "redhat.vscode-yaml",
+    "tamasfe.even-better-toml",
+    "task.vscode-task"
   ],
   "unwantedRecommendations": [
-    "hookyqr.beautify",
-    "christian-kohler.npm-intellisense"
+    "christian-kohler.npm-intellisense",
+    "hookyqr.beautify"
   ]
 }

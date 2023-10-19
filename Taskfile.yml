@@ -48,6 +48,8 @@ includes:
     taskfile: lib-widget
   nix:
     taskfile: dev-task/Nix.yml
+  pnpm:
+    taskfile: dev-task/Pnpm.yml
   stack:
     taskfile: dev-task/Stack.yml
   svc-auth-guest-display:
@@ -55,30 +57,74 @@ includes:
 run: when_changed
 tasks:
   build:
+    aliases:
+    - b
     deps:
+    - pnpm:build
     - stack:build
+  format:
+    aliases:
+    - f
+    deps:
+    - stack:format
+  format:check:
+    aliases:
+    - fc
+    deps:
+    - stack:format:check
+  gen:
+    aliases:
+    - g
+    deps:
+    - dev-gen:run
   install:
+    aliases:
+    - i
     deps:
-    - stack:install
     - cargo:install
-  pnpm:build:
+    - stack:install
+  lint:
+    aliases:
+    - l
     deps:
-    - dev-build:build
-    - dev-eslint:build
-    - dev-loader:build
-    - dev-local:build
-    - dev-prettier:build
-    - dev-suppress:build
-    - dev-tsconfig:build
-    - lib-concurrency:build
-    - lib-crypto:build
-    - lib-error:build
-    - lib-hex:build
-    - lib-random:build
-    - lib-stream:build
-    - lib-style:build
-    - lib-test:build
-    - lib-time:build
-    - lib-widget:build
-    - svc-auth-guest-display:build
+    - pnpm:lint
+    - stack:lint
+  lint:fix:
+    aliases:
+    - lf
+    deps:
+    - pnpm:lint:fix
+    - stack:lint
+  pnpm:lint:
+    cmd:
+      task: pnpm:lint-folders
+      vars:
+        NAMES: '{{.PNPM_TYPESCRIPT_PACKAGES}}'
+    deps:
+    - pnpm:build
+  pnpm:lint:fix:
+    cmd:
+      task: pnpm:lint-folders:fix
+      vars:
+        NAMES: '{{.PNPM_TYPESCRIPT_PACKAGES}}'
+  stack:format:
+    cmd:
+      task: stack:format-folders
+      vars:
+        NAMES: '{{.STACK_PACKAGES}}'
+  stack:format:check:
+    cmd:
+      task: stack:format-folders:check
+      vars:
+        NAMES: '{{.STACK_PACKAGES}}'
+  stack:lint:
+    cmd:
+      task: stack:lint-folders
+      vars:
+        NAMES: '{{.STACK_PACKAGES}}'
+vars:
+  PNPM_TYPESCRIPT_PACKAGES: dev-build dev-loader dev-local dev-suppress lib-concurrency
+    lib-crypto lib-error lib-hex lib-random lib-stream lib-style lib-test lib-time
+    lib-widget svc-auth-guest-display
+  STACK_PACKAGES: dev-gen
 version: '3'

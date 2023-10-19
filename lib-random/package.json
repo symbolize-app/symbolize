@@ -3,10 +3,11 @@
   "type": "module",
   "dependencies": {
     "@intertwine/dev-prettier": "workspace:*",
-    "@intertwine/dev-tsconfig": "workspace:*"
+    "@intertwine/dev-tsconfig": "workspace:*",
+    "@intertwine/lib-hex": "workspace:*"
   },
   "devDependencies": {
-    "fast-mersenne-twister": "1.0.3"
+    "typescript": "5.2.2"
   },
   "prettier": "@intertwine/dev-prettier/index.json"
 }

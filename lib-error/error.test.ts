@@ -1,6 +1,7 @@
-import * as tinyError from '@intertwine/lib-error/error.ts'
 import * as tinyTest from '@intertwine/lib-test/index.ts'
 import * as tinyTime from '@intertwine/lib-time/time.ts'
+
+import * as tinyError from '@/error.ts'
 
 export const retryConfig: Omit<
   tinyError.RetryConfig,

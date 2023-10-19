@@ -1,13 +1,19 @@
 version: '3'
-  
+
 run: when_changed
-  
+
+vars:
+  STACK_PACKAGES: dev-gen
+
 includes:
   cargo:
     taskfile: dev-task/Cargo.yml
 
   nix:
     taskfile: dev-task/Nix.yml
+
+  pnpm:
+    taskfile: dev-task/Pnpm.yml
 
   stack:
     taskfile: dev-task/Stack.yml
@@ -28,11 +34,80 @@ includes:
     taskfile: dev-stack-bin
 
 tasks:
+  gen:
+    aliases:
+      - g
+    deps:
+      - dev-gen:run
+
   build:
+    aliases:
+      - b
     deps:
+      - pnpm:build
       - stack:build
-  
+
   install:
+    aliases:
+      - i
     deps:
-      - stack:install
       - cargo:install
+      - stack:install
+
+  format:
+    aliases:
+      - f
+    deps:
+      - stack:format
+
+  format:check:
+    aliases:
+      - fc
+    deps:
+      - stack:format:check
+
+  lint:
+    aliases:
+      - l
+    deps:
+      - pnpm:lint
+      - stack:lint
+
+  lint:fix:
+    aliases:
+      - lf
+    deps:
+      - pnpm:lint:fix
+      - stack:lint
+
+  pnpm:lint:
+    deps:
+      - pnpm:build
+    cmd:
+      task: pnpm:lint-folders
+      vars:
+        NAMES: '{{.PNPM_TYPESCRIPT_PACKAGES}}'
+
+  pnpm:lint:fix:
+    cmd:
+      task: pnpm:lint-folders:fix
+      vars:
+        NAMES: '{{.PNPM_TYPESCRIPT_PACKAGES}}'
+
+  stack:format:
+    cmd:
+      task: stack:format-folders
+      vars:
+        NAMES: '{{.STACK_PACKAGES}}'
+
+  stack:format:check:
+    cmd:
+      task: stack:format-folders:check
+      vars:
+        NAMES: '{{.STACK_PACKAGES}}'
+
+  stack:lint:
+    cmd:
+      task: stack:lint-folders
+      vars:
+        NAMES: '{{.STACK_PACKAGES}}'

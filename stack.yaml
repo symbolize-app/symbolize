@@ -58,9 +58,9 @@ flags:
 local-bin-path: ./.stack-bin
 
 ghc-options:
-  "$everything": >
+  '$everything': >
     -O2
-  "$targets": >
+  '$targets': >
     -O0
     -g2
     -Weverything
@@ -75,6 +75,6 @@ rebuild-ghc-options: true
 system-ghc: true
 
 install-ghc: false
-  
+
 nix:
   enable: false

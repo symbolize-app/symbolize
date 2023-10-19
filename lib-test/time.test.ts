@@ -1,19 +1,6 @@
-import * as tinyTest from '@intertwine/lib-test/index.ts'
 import * as tinyTime from '@intertwine/lib-time/time.ts'
-import fakeTimers from '@sinonjs/fake-timers'
 
-export type Context = tinyTime.Context & {
-  clock: fakeTimers.Clock
-}
-
-export function initContext(): Context {
-  const clock = fakeTimers.createClock(1616952581493)
-  return {
-    performanceNow: () => clock.now,
-    setTimeout: (...args) => clock.setTimeout(...args),
-    clock,
-  }
-}
+import * as tinyTest from '@/index.ts'
 
 export const url = import.meta.url
 

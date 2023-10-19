@@ -5,13 +5,14 @@
     curl.url = "path:./curl";
     dasel.url = "path:./dasel";
     dprint.url = "path:./dprint";
+    fd.url = "path:./fd";
     haskell.url = "path:./haskell";
     node.url = "path:./node";
     rust.url = "path:./rust";
     task.url = "path:./task";
   };
 
-  outputs = { nixpkgs, flake-utils, curl, dasel, dprint, haskell, node, rust, task, ... }:
+  outputs = { nixpkgs, flake-utils, curl, dasel, dprint, fd, haskell, node, rust, task, ... }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs { inherit system; };
@@ -22,6 +23,7 @@
               curl.packages.${system}.default
               dasel.packages.${system}.default
               dprint.packages.${system}.default
+              fd.packages.${system}.default
               haskell.packages.${system}.default
               node.packages.${system}.default
               rust.packages.${system}.default
@@ -34,7 +36,9 @@
 
             shellHook = ''
               curl --version | head -n 1
+              dasel --version
               dprint --version
+              fd --version
               ghc --version
               echo "stack $(stack --version)"
               echo "node $(node --version)"

@@ -1,52 +1,56 @@
-name:                intertwine-dev-gen
+name: intertwine-dev-gen
 version: 0.0.0
 
 dependencies:
-- base >= 4.7 && < 5
-- aeson
-- relude
-- vector
-- yaml
+  - base >= 4.7 && < 5
+  - aeson
+  - filepath
+  - relude
+  - typed-process
+  - unliftio
+  - vector
+  - yaml
 
 language: GHC2021
 
 default-extensions:
-- ExplicitNamespaces
-- TypeFamilies
-- DataKinds
-- NoImplicitPrelude
-- OverloadedStrings
-- OverloadedLabels
-- DerivingStrategies
-- DeriveGeneric
-- DuplicateRecordFields
-- NoFieldSelectors
-- NamedFieldPuns
-- OverloadedRecordDot
-- DisambiguateRecordFields
+  - ExplicitNamespaces
+  - TypeFamilies
+  - DataKinds
+  - NoImplicitPrelude
+  - OverloadedStrings
+  - OverloadedLabels
+  - DerivingStrategies
+  - DeriveGeneric
+  - DuplicateRecordFields
+  - NoFieldSelectors
+  - NamedFieldPuns
+  - OverloadedRecordDot
+  - DisambiguateRecordFields
+  - OverloadedLists
 
 library:
   source-dirs: src
 
 executables:
   intertwine-dev-gen-exe:
-    main:                Main.hs
-    source-dirs:         app
+    main: Main.hs
+    source-dirs: app
     ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
     dependencies:
-    - intertwine-dev-gen
+      - intertwine-dev-gen
 
 tests:
   intertwine-dev-gen-test:
-    main:                Spec.hs
-    source-dirs:         test
+    main: Spec.hs
+    source-dirs: test
     ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
     dependencies:
-    - intertwine-dev-gen
-    - hspec
+      - intertwine-dev-gen
+      - hspec

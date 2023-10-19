@@ -1,34 +1,16 @@
 version: '3'
-  
+
 run: when_changed
 
 vars:
   NAME: dev-gen
 
 tasks:
-  format:
-    cmd:
-      task: :stack:format
-      vars:
-        NAME: "{{.NAME}}"
-
-  format:check:
-    cmd:
-      task: :stack:format:check
-      vars:
-        NAME: "{{.NAME}}"
-
-  lint:
-    cmd:
-      task: :stack:lint
-      vars:
-        NAME: "{{.NAME}}"
-
   repl:
     cmd:
       task: :stack:repl
       vars:
-        NAME: "{{.NAME}}"
+        NAME: '{{.NAME}}'
 
   run:
     aliases:
@@ -36,7 +18,7 @@ tasks:
     cmd:
       task: :stack:run
       vars:
-        NAME: "{{.NAME}}"
+        NAME: '{{.NAME}}'
 
   run:watch:
     aliases:
@@ -44,7 +26,7 @@ tasks:
     cmd:
       task: :stack:run:watch
       vars:
-        NAME: "{{.NAME}}"
+        NAME: '{{.NAME}}'
 
   test:
     aliases:
@@ -52,7 +34,7 @@ tasks:
     cmd:
       task: :stack:test
       vars:
-        NAME: "{{.NAME}}"
+        NAME: '{{.NAME}}'
 
   test:watch:
     aliases:
@@ -60,4 +42,4 @@ tasks:
     cmd:
       task: :stack:test:watch
       vars:
-        NAME: "{{.NAME}}"
+        NAME: '{{.NAME}}'

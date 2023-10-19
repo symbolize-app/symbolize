@@ -7,8 +7,8 @@ import Data.Aeson qualified as Aeson
 import Data.Typeable (cast)
 import Dev.Gen.FileFormat qualified as FileFormat
 import Dev.Gen.FilePath (FilePath)
-import Relude (Bool (False))
 import Relude.Base (Eq ((==)), Show, Type, Typeable)
+import Relude.Bool (Bool (False))
 import Relude.Monad (maybe)
 
 type Command :: Type -> Type

@@ -3,9 +3,8 @@ module Dev.Gen.FilePath
   )
 where
 
-import Relude (ToString)
 import Relude.Base (Eq, Show, Type)
-import Relude.String (IsString, Text, ToText)
+import Relude.String (IsString, Text, ToString, ToText)
 
 type FilePath :: Type
 newtype FilePath = FilePath Text

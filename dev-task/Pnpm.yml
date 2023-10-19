@@ -1,0 +1,34 @@
+version: '3'
+
+run: when_changed
+
+vars:
+  ESLINT_ARGS: --ignore-path .gitignore --max-warnings 0 --ext ts,js,cjs
+
+tasks:
+  clean:
+    cmd: tsc --build --clean
+
+  build:
+    aliases:
+      - b
+    cmd: tsc --build --verbose
+
+  build:watch:
+    aliases:
+      - bw
+    cmd: tsc --build --verbose --watch
+
+  lint-folders:
+    internal: true
+    requires:
+      vars:
+        - NAMES
+    cmd: eslint {{.ESLINT_ARGS}} {{.NAMES}}
+
+  lint-folders:fix:
+    internal: true
+    requires:
+      vars:
+        - NAMES
+    cmd: eslint {{.ESLINT_ARGS}} {{.NAMES}} --fix

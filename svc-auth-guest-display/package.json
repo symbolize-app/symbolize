@@ -4,7 +4,16 @@
   "dependencies": {
     "@intertwine/dev-prettier": "workspace:*",
     "@intertwine/dev-tsconfig": "workspace:*",
-    "@intertwine/lib-random": "workspace:*"
+    "@intertwine/lib-random": "workspace:*",
+    "@intertwine/lib-hex": "workspace:*",
+    "@intertwine/lib-style": "workspace:*",
+    "@intertwine/lib-widget": "workspace:*",
+    "@intertwine/lib-time": "workspace:*",
+    "@intertwine/lib-test": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "5.2.2",
+    "jsdom": "22.1.0"
   },
   "prettier": "@intertwine/dev-prettier/index.json"
 }

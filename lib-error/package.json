@@ -4,6 +4,10 @@
   "dependencies": {
     "@intertwine/dev-prettier": "workspace:*",
     "@intertwine/dev-tsconfig": "workspace:*",
+    "@intertwine/lib-time": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "5.2.2",
     "@intertwine/lib-test": "workspace:*"
   },
   "prettier": "@intertwine/dev-prettier/index.json"

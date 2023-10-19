@@ -1,5 +1,6 @@
-import * as tinyWidget from '@intertwine/lib-widget/widget.ts'
 import type * as typeFest from 'type-fest'
+
+import * as tinyWidget from '@/widget.ts'
 
 export function withTempDocument<
   CustomContext extends Record<string, unknown> = Record<

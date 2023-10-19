@@ -2,18 +2,20 @@ import Dev.Gen (gen)
 import Dev.Gen.ExecSpec qualified as ExecSpec
 import Dev.Gen.FileFormat qualified as FileFormat
 import Dev.Gen.InterpretSpec qualified as InterpretSpec
+import Dev.Gen.PackageSpec qualified as PackageSpec
 import Relude.Bool (Bool (True))
-import Relude.Container (fromList)
 import Relude.Function (($), (.))
-import Relude.Monad (Maybe (Just, Nothing), MonadIO, liftIO)
+import Relude.Monad (Maybe (Just, Nothing), liftIO)
 import Test.Hspec (Spec, context, hspec, specify)
+import UnliftIO (MonadUnliftIO)
 
-main :: (MonadIO m) => m ()
+main :: (MonadUnliftIO m) => m ()
 main = liftIO . hspec $ do
   spec
+  PackageSpec.spec
 
 spec :: Spec
-spec = do
+spec = context "Gen" $ do
   context "gen" $ do
     specify "OK" $
       InterpretSpec.interpret
@@ -22,13 +24,13 @@ spec = do
             "pnpm-workspace.yaml"
             FileFormat.YAML
             ( FileFormat.PNPMWorkspace
-                { packages = fromList ["a", "b"]
+                { packages = ["a", "b"]
                 }
             ),
           ExecSpec.readFile
             "a/package.json"
             FileFormat.JSON
-            ( FileFormat.PNPMPackage
+            ( FileFormat.PNPMPackageFile
                 { dependencies = Nothing,
                   devDependencies = Nothing
                 }
@@ -36,13 +38,11 @@ spec = do
           ExecSpec.readFile
             "b/package.json"
             FileFormat.JSON
-            ( FileFormat.PNPMPackage
+            ( FileFormat.PNPMPackageFile
                 { dependencies =
                     Just
-                      ( fromList
-                          [ ("@intertwine/a", "*")
-                          ]
-                      ),
+                      [ ("@intertwine/a", "*")
+                      ],
                   devDependencies = Nothing
                 }
             ),
@@ -54,23 +54,20 @@ spec = do
                   run = FileFormat.taskfileRun,
                   includes =
                     Just
-                      ( fromList
-                          [ ( "z",
-                              FileFormat.TaskfileInclude
-                                { internal = Just True,
-                                  taskfile = "z"
-                                }
-                            )
-                          ]
-                      ),
-                  tasks =
-                    fromList
-                      [ ( "y",
-                          FileFormat.TaskfileTask
-                            { deps = fromList ["y"]
+                      [ ( "z",
+                          FileFormat.TaskfileInclude
+                            { internal = Just True,
+                              taskfile = "z"
                             }
                         )
-                      ]
+                      ],
+                  tasks =
+                    [ ( "y",
+                        FileFormat.TaskfileTask
+                          { deps = Just ["y"]
+                          }
+                      )
+                    ]
                 }
             ),
           ExecSpec.writeFile
@@ -81,13 +78,12 @@ spec = do
                   run = FileFormat.taskfileRun,
                   includes = Nothing,
                   tasks =
-                    fromList
-                      [ ( "build",
-                          FileFormat.TaskfileTask
-                            { deps = fromList []
-                            }
-                        )
-                      ]
+                    [ ( "build",
+                        FileFormat.TaskfileTask
+                          { deps = Just []
+                          }
+                      )
+                    ]
                 }
             ),
           ExecSpec.writeFile
@@ -98,13 +94,12 @@ spec = do
                   run = FileFormat.taskfileRun,
                   includes = Nothing,
                   tasks =
-                    fromList
-                      [ ( "build",
-                          FileFormat.TaskfileTask
-                            { deps = fromList [":a:build"]
-                            }
-                        )
-                      ]
+                    [ ( "build",
+                        FileFormat.TaskfileTask
+                          { deps = Just [":a:build"]
+                          }
+                      )
+                    ]
                 }
             ),
           ExecSpec.writeFile
@@ -115,40 +110,37 @@ spec = do
                   run = FileFormat.taskfileRun,
                   includes =
                     Just
-                      ( fromList
-                          [ ( "a",
-                              FileFormat.TaskfileInclude
-                                { internal = Nothing,
-                                  taskfile = "a"
-                                }
-                            ),
-                            ( "b",
-                              FileFormat.TaskfileInclude
-                                { internal = Nothing,
-                                  taskfile = "b"
-                                }
-                            ),
-                            ( "z",
-                              FileFormat.TaskfileInclude
-                                { internal = Just True,
-                                  taskfile = "z"
-                                }
-                            )
-                          ]
-                      ),
-                  tasks =
-                    fromList
-                      [ ( "pnpm:build",
-                          FileFormat.TaskfileTask
-                            { deps = fromList ["a:build", "b:build"]
+                      [ ( "a",
+                          FileFormat.TaskfileInclude
+                            { internal = Nothing,
+                              taskfile = "a"
                             }
                         ),
-                        ( "y",
-                          FileFormat.TaskfileTask
-                            { deps = fromList ["y"]
+                        ( "b",
+                          FileFormat.TaskfileInclude
+                            { internal = Nothing,
+                              taskfile = "b"
+                            }
+                        ),
+                        ( "z",
+                          FileFormat.TaskfileInclude
+                            { internal = Just True,
+                              taskfile = "z"
                             }
                         )
-                      ]
+                      ],
+                  tasks =
+                    [ ( "pnpm:build",
+                        FileFormat.TaskfileTask
+                          { deps = Just ["a:build", "b:build"]
+                          }
+                      ),
+                      ( "y",
+                        FileFormat.TaskfileTask
+                          { deps = Just ["y"]
+                          }
+                      )
+                    ]
                 }
             )
         ]

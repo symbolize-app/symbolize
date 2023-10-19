@@ -1,25 +1,26 @@
 {
+  "compilerOptions": {
+    "declarationDir": "./build/.d.ts",
+    "paths": { "@/*.ts": ["./*.ts"] }
+  },
+  "exclude": [],
   "extends": "@intertwine/dev-tsconfig/tsconfig.json",
   "include": [],
-  "exclude": [],
-  "compilerOptions": {
-    "declarationDir": "./build/.d.ts"
-  },
   "references": [
-    { "path": "./lib/build_" },
-    { "path": "./lib/concurrency" },
-    { "path": "./lib/crypto" },
-    { "path": "./lib/error" },
-    { "path": "./lib/hex" },
-    { "path": "./lib/loader" },
-    { "path": "./lib/local" },
-    { "path": "./lib/random" },
-    { "path": "./lib/stream" },
-    { "path": "./lib/style" },
-    { "path": "./lib/suppress" },
-    { "path": "./lib/test" },
-    { "path": "./lib/time" },
-    { "path": "./lib/widget" },
-    { "path": "./service/auth/guest/display" }
+    { "path": "./dev-build" },
+    { "path": "./dev-loader" },
+    { "path": "./dev-local" },
+    { "path": "./dev-suppress" },
+    { "path": "./lib-concurrency" },
+    { "path": "./lib-crypto" },
+    { "path": "./lib-error" },
+    { "path": "./lib-hex" },
+    { "path": "./lib-random" },
+    { "path": "./lib-stream" },
+    { "path": "./lib-style" },
+    { "path": "./lib-test" },
+    { "path": "./lib-time" },
+    { "path": "./lib-widget" },
+    { "path": "./svc-auth-guest-display" }
   ]
 }

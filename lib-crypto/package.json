@@ -4,7 +4,11 @@
   "dependencies": {
     "@intertwine/dev-prettier": "workspace:*",
     "@intertwine/dev-tsconfig": "workspace:*",
+    "sodium-native": "4.0.4",
     "@intertwine/lib-test": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "5.2.2"
   },
   "prettier": "@intertwine/dev-prettier/index.json"
 }
