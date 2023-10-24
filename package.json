@@ -5,8 +5,7 @@
     "check-fmt": "prettier --ignore-path .gitignore --check '**/*.cjs' '**/*.js' '**/*.json' '**/*.ts' '**/*.html' '**/*.md' '**/*.yaml' '!pnpm-lock.yaml'",
     "dev": "node --experimental-loader @intertwine/dev-loader/index.js dev-local/index.ts",
     "fmt": "prettier --ignore-path .gitignore --write '**/*.cjs' '**/*.js' '**/*.json' '**/*.ts' '**/*.html' '**/*.md' '**/*.yaml' '!pnpm-lock.yaml'",
-    "start": "pnpm build && NODE_ENV=production NODE_OPTIONS=\"${NODE_OPTIONS_RELEASE}\" APP_PORT=\"${APP_DEV_PORT}\" node build/node/app/src/api/index.ts.mjs",
-    "test": "node --experimental-loader @intertwine/dev-loader/index.js svc-auth-guest-display/test.ts"
+    "start": "pnpm build && NODE_ENV=production NODE_OPTIONS=\"${NODE_OPTIONS_RELEASE}\" APP_PORT=\"${APP_DEV_PORT}\" node build/node/app/src/api/index.ts.mjs"
   },
   "devDependencies": {
     "@intertwine/dev-build": "workspace:*",

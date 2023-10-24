@@ -42,3 +42,10 @@ tasks:
       vars:
         - NAMES
     cmd: eslint {{.ESLINT_ARGS}} {{.NAMES}} --fix
+
+  execute-script:
+    internal: true
+    requires:
+      vars:
+        - SCRIPT
+    cmd: node --experimental-loader @intertwine/dev-loader/index.js {{.SCRIPT}}

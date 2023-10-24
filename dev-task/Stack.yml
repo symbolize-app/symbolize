@@ -2,6 +2,9 @@ version: '3'
 
 run: when_changed
 
+vars:
+  RELEASE_OPTIONS: "--ghc-options '-O2 -g0 -Werror'"
+
 tasks:
   clean:
     deps:
@@ -32,13 +35,20 @@ tasks:
   build:release:
     aliases:
       - br
-    cmd: stack build --work-dir .stack-work-release --test --no-run-tests --keep-going --ghc-options "-O2 -g0 -Werror"
+    cmd: stack build --work-dir .stack-work-release --test --no-run-tests --keep-going {{.RELEASE_OPTIONS}}
 
   build:debug:watch:
     aliases:
       - build:watch
       - bw
     cmd: stack build --test --no-run-tests --keep-going --file-watch
+
+  test:release:
+    aliases:
+      - tr
+    deps:
+      - build:release
+    cmd: stack build --work-dir .stack-work-release --test --keep-going {{.RELEASE_OPTIONS}}
 
   format-folders:
     internal: true

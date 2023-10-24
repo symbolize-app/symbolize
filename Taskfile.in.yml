@@ -39,6 +39,7 @@ tasks:
       - c
     deps:
       - build:release
+      - test:release
       - format:check
       - lint
 
@@ -64,6 +65,19 @@ tasks:
     deps:
       - pnpm:build
       - stack:build:release
+
+  test:release:
+    aliases:
+      - tr
+    deps:
+      - pnpm:test
+      - stack:test:release
+
+  pnpm:test:
+    cmd:
+      task: pnpm:execute-script
+      vars:
+        SCRIPT: svc-auth-guest-display/test.ts
 
   install:
     aliases:
