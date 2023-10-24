@@ -12,34 +12,66 @@ tasks:
       vars:
         NAME: '{{.NAME}}'
 
-  run:
+  run:debug:
     aliases:
+      - run
       - r
     cmd:
-      task: :stack:run
+      task: :stack:execute-target
       vars:
+        MODE: debug
         NAME: '{{.NAME}}'
+        TARGET: exe
 
-  run:watch:
+  run:release:
     aliases:
+      - rr
+    cmd:
+      task: :stack:execute-target
+      vars:
+        MODE: debug
+        NAME: '{{.NAME}}'
+        TARGET: exe
+
+  run:debug:watch:
+    aliases:
+      - run:watch
       - rw
     cmd:
-      task: :stack:run:watch
+      task: :stack:execute-target:watch
       vars:
+        MODE: debug
         NAME: '{{.NAME}}'
+        TARGET: exe
 
-  test:
+  test:debug:
     aliases:
+      - test
       - t
     cmd:
-      task: :stack:test
+      task: :stack:execute-target
       vars:
+        MODE: debug
         NAME: '{{.NAME}}'
+        TARGET: test
 
-  test:watch:
+  test:release:
     aliases:
+      - tr
+    cmd:
+      task: :stack:execute-target
+      vars:
+        MODE: release
+        NAME: '{{.NAME}}'
+        TARGET: test
+
+  test:debug:watch:
+    aliases:
+      - test:watch
       - tw
     cmd:
-      task: :stack:test:watch
+      task: :stack:execute-target:watch
       vars:
+        MODE: debug
         NAME: '{{.NAME}}'
+        TARGET: test

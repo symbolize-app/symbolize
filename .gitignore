@@ -3,7 +3,8 @@
 .direnv
 .env
 .stack-bin
-.stack-work
+.stack-work-debug
+.stack-work-release
 .tantivy
 build
 node_modules

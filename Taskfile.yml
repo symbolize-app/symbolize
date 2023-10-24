@@ -56,12 +56,26 @@ includes:
     taskfile: svc-auth-guest-display
 run: when_changed
 tasks:
-  build:
+  build:debug:
     aliases:
+    - build
     - b
     deps:
     - pnpm:build
-    - stack:build
+    - stack:build:debug
+  build:release:
+    aliases:
+    - br
+    deps:
+    - pnpm:build
+    - stack:build:release
+  check:
+    aliases:
+    - c
+    deps:
+    - build:release
+    - format:check
+    - lint
   format:
     aliases:
     - f

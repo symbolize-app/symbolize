@@ -55,6 +55,8 @@ flags:
     splice: false
     stylishHaskell: false
 
+work-dir: .stack-work-debug
+
 local-bin-path: ./.stack-bin
 
 ghc-options:

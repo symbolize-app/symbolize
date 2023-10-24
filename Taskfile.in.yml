@@ -34,6 +34,14 @@ includes:
     taskfile: dev-stack-bin
 
 tasks:
+  check:
+    aliases:
+      - c
+    deps:
+      - build:release
+      - format:check
+      - lint
+
   gen:
     aliases:
       - g
@@ -42,12 +50,20 @@ tasks:
     cmd:
       task: dev-gen:run
 
-  build:
+  build:debug:
     aliases:
+      - build
       - b
     deps:
       - pnpm:build
-      - stack:build
+      - stack:build:debug
+
+  build:release:
+    aliases:
+      - br
+    deps:
+      - pnpm:build
+      - stack:build:release
 
   install:
     aliases:

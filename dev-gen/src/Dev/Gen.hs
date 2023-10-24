@@ -3,7 +3,6 @@ module Dev.Gen
   )
 where
 
-import Data.Aeson qualified as Aeson
 import Data.Text qualified as Text
 import Data.Vector (Vector)
 import Data.Vector qualified as Vector
@@ -16,7 +15,7 @@ import Relude.Container (fromList)
 import Relude.Foldable (forM, forM_, toList)
 import Relude.Function (($), (.))
 import Relude.Functor (fmap)
-import Relude.Monad (Maybe (Just, Nothing), isJust)
+import Relude.Monad (Maybe (Just, Nothing))
 import Relude.Monoid (maybeToMonoid, (<>))
 
 gen :: Exec.Exec ()

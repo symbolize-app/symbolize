@@ -1,7 +1,6 @@
 {
   "recommendations": [
     "dbaeumer.vscode-eslint",
-    "dprint.dprint",
     "esbenp.prettier-vscode",
     "haskell.haskell",
     "matklad.rust-analyzer",

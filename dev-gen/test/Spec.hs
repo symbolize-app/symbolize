@@ -32,7 +32,10 @@ spec = context "Gen" $ do
             FileFormat.JSON
             ( FileFormat.PNPMPackageFile
                 { dependencies = Nothing,
-                  devDependencies = Nothing
+                  devDependencies =
+                    Just
+                      [ ("typescript", "*")
+                      ]
                 }
             ),
           ExecSpec.readFile
@@ -43,7 +46,10 @@ spec = context "Gen" $ do
                     Just
                       [ ("@intertwine/a", "*")
                       ],
-                  devDependencies = Nothing
+                  devDependencies =
+                    Just
+                      [ ("typescript", "*")
+                      ]
                 }
             ),
           ExecSpec.readFile
@@ -61,13 +67,66 @@ spec = context "Gen" $ do
                             }
                         )
                       ],
+                  vars = Just [("v1", "v2")],
                   tasks =
                     [ ( "y",
                         FileFormat.TaskfileTask
-                          { deps = Just ["y"]
+                          { aliases = Nothing,
+                            deps = Just ["y"],
+                            cmd = Nothing
                           }
                       )
                     ]
+                }
+            ),
+          ExecSpec.writeFile
+            "a/tsconfig.json"
+            FileFormat.JSON
+            ( FileFormat.TypeScriptConfig
+                { extends = FileFormat.typeScriptConfigExtends,
+                  include = FileFormat.typeScriptConfigInclude,
+                  exclude = FileFormat.typeScriptConfigExclude,
+                  compilerOptions = FileFormat.typeScriptConfigCompilerOptions,
+                  references = []
+                }
+            ),
+          ExecSpec.writeFile
+            "b/tsconfig.json"
+            FileFormat.JSON
+            ( FileFormat.TypeScriptConfig
+                { extends = FileFormat.typeScriptConfigExtends,
+                  include = FileFormat.typeScriptConfigInclude,
+                  exclude = FileFormat.typeScriptConfigExclude,
+                  compilerOptions = FileFormat.typeScriptConfigCompilerOptions,
+                  references =
+                    [ FileFormat.TypeScriptConfigReference {path = "../a"}
+                    ]
+                }
+            ),
+          ExecSpec.writeFile
+            "tsconfig.json"
+            FileFormat.JSON
+            ( FileFormat.TypeScriptConfig
+                { extends = FileFormat.typeScriptConfigExtends,
+                  include = [],
+                  exclude = [],
+                  compilerOptions = FileFormat.typeScriptConfigCompilerOptions,
+                  references =
+                    [ FileFormat.TypeScriptConfigReference {path = "./a"},
+                      FileFormat.TypeScriptConfigReference {path = "./b"}
+                    ]
+                }
+            ),
+          ExecSpec.writeFile
+            ".eslintrc.json"
+            FileFormat.JSON
+            ( FileFormat.ESLintConfig
+                { extends = FileFormat.esLintConfigExtends,
+                  parserOptions =
+                    FileFormat.ESLintConfigParserOptions
+                      { tsconfigRootDir = FileFormat.esLintConfigParserOptionsTsconfigRootDir,
+                        project = ["a/tsconfig.json", "b/tsconfig.json"]
+                      }
                 }
             ),
           ExecSpec.writeFile
@@ -77,13 +136,8 @@ spec = context "Gen" $ do
                 { version = FileFormat.taskfileVersion,
                   run = FileFormat.taskfileRun,
                   includes = Nothing,
-                  tasks =
-                    [ ( "build",
-                        FileFormat.TaskfileTask
-                          { deps = Just []
-                          }
-                      )
-                    ]
+                  vars = Nothing,
+                  tasks = []
                 }
             ),
           ExecSpec.writeFile
@@ -93,13 +147,8 @@ spec = context "Gen" $ do
                 { version = FileFormat.taskfileVersion,
                   run = FileFormat.taskfileRun,
                   includes = Nothing,
-                  tasks =
-                    [ ( "build",
-                        FileFormat.TaskfileTask
-                          { deps = Just [":a:build"]
-                          }
-                      )
-                    ]
+                  vars = Nothing,
+                  tasks = []
                 }
             ),
           ExecSpec.writeFile
@@ -129,15 +178,17 @@ spec = context "Gen" $ do
                             }
                         )
                       ],
+                  vars =
+                    Just
+                      [ ("PNPM_TYPESCRIPT_PACKAGES", "a b"),
+                        ("v1", "v2")
+                      ],
                   tasks =
-                    [ ( "pnpm:build",
+                    [ ( "y",
                         FileFormat.TaskfileTask
-                          { deps = Just ["a:build", "b:build"]
-                          }
-                      ),
-                      ( "y",
-                        FileFormat.TaskfileTask
-                          { deps = Just ["y"]
+                          { aliases = Nothing,
+                            deps = Just ["y"],
+                            cmd = Nothing
                           }
                       )
                     ]

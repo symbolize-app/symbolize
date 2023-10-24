@@ -4,7 +4,20 @@ run: when_changed
 
 tasks:
   clean:
-    cmd: stack clean --full
+    deps:
+      - task: clean:mode
+        vars:
+          MODE: debug
+      - task: clean:mode
+        vars:
+          MODE: release
+
+  clean:mode:
+    internal: true
+    requires:
+      vars:
+        - MODE
+    cmd: stack clean --work-dir .stack-work-{{.MODE}} --full
 
   install:
     deps:
@@ -19,7 +32,7 @@ tasks:
   build:release:
     aliases:
       - br
-    cmd: stack build --test --no-run-tests --keep-going --ghc-options "-O2 -g0 -Werror"
+    cmd: stack build --work-dir .stack-work-release --test --no-run-tests --keep-going --ghc-options "-O2 -g0 -Werror"
 
   build:debug:watch:
     aliases:
@@ -55,71 +68,32 @@ tasks:
     internal: true
     requires:
       vars:
+        - MODE
         - NAME
-    cmd: stack ghci intertwine-{{.NAME}}
-
-  run:
-    internal: true
-    requires:
-      vars:
-        - NAME
-    cmd:
-      task: execute-target
-      vars:
-        NAME: '{{.NAME}}'
-        TARGET: intertwine-{{.NAME}}-exe
-
-  run:watch:
-    internal: true
-    requires:
-      vars:
-        - NAME
-    cmd:
-      task: execute-target:watch
-      vars:
-        NAME: '{{.NAME}}'
-        TARGET: intertwine-{{.NAME}}-exe
-
-  test:
-    internal: true
-    requires:
-      vars:
-        - NAME
-    cmd:
-      task: execute-target
-      vars:
-        NAME: '{{.NAME}}'
-        TARGET: intertwine-{{.NAME}}-test
-
-  test:watch:
-    internal: true
-    requires:
-      vars:
-        - NAME
-    cmd:
-      task: execute-target:watch
-      vars:
-        NAME: '{{.NAME}}'
-        TARGET: intertwine-{{.NAME}}-test
+    cmd: stack ghci --work-dir .stack-work-{{.MODE}} intertwine-{{.NAME}}
 
   execute-target:
     internal: true
     requires:
       vars:
+        - MODE
         - NAME
         - TARGET
     vars:
       DIST_DIR:
-        sh: realpath --relative-to . $(sh -c "$(cd {{.NAME}} && stack config env) echo \$HASKELL_DIST_DIR")
-    cmd: '{{.DIST_DIR}}/build/{{.TARGET}}/{{.TARGET}} {{.CLI_ARGS}}'
+        sh: realpath --relative-to . $(sh -c "$(cd {{.NAME}} && stack config env --work-dir .stack-work-{{.MODE}}) echo \$HASKELL_DIST_DIR")
+      FULL_TARGET: intertwine-{{.NAME}}-{{.TARGET}}
+    cmd: '{{.DIST_DIR}}/build/{{.FULL_TARGET}}/{{.FULL_TARGET}} {{.CLI_ARGS}}'
 
   execute-target:watch:
     internal: true
     requires:
       vars:
+        - MODE
         - NAME
         - TARGET
     vars:
       DIST_DIR:
-        sh: realpath --relative-to . $(sh -c "$(cd {{.NAME}} && stack config env) echo \$HASKELL_DIST_DIR")
-    cmd: watchexec --fs-events create,rename,modify --debounce 150ms --no-vcs-ignore --watch {{.DIST_DIR}}/build/{{.TARGET}} --filter {{.TARGET}} -- {{.DIST_DIR}}/build/{{.TARGET}}/{{.TARGET}} {{.CLI_ARGS}}
+        sh: realpath --relative-to . $(sh -c "$(cd {{.NAME}} && stack config env --work-dir .stack-work-{{.MODE}}) echo \$HASKELL_DIST_DIR")
+      FULL_TARGET: intertwine-{{.NAME}}-{{.TARGET}}
+    cmd: watchexec --fs-events create,rename,modify --debounce 150ms --no-vcs-ignore --watch {{.DIST_DIR}}/build/{{.FULL_TARGET}} --filter {{.FULL_TARGET}} -- {{.DIST_DIR}}/build/{{.FULL_TARGET}}/{{.FULL_TARGET}} {{.CLI_ARGS}}
