@@ -3,14 +3,10 @@
   "scripts": {
     "build": "node --experimental-loader @intertwine/dev-loader/index.js dev-build/index.ts",
     "check-fmt": "prettier --ignore-path .gitignore --check '**/*.cjs' '**/*.js' '**/*.json' '**/*.ts' '**/*.html' '**/*.md' '**/*.yaml' '!pnpm-lock.yaml' && dprint check",
-    "check-lint": "syncpack lint",
-    "check-tsc": "tsc --build --verbose",
-    "db": "dbmate --url ${DATABASE_URL_ADMIN}",
     "dev": "node --experimental-loader @intertwine/dev-loader/index.js dev-local/index.ts",
-    "fmt": "syncpack format && prettier --ignore-path .gitignore --write '**/*.cjs' '**/*.js' '**/*.json' '**/*.ts' '**/*.html' '**/*.md' '**/*.yaml' '!pnpm-lock.yaml' && dprint fmt",
+    "fmt": "prettier --ignore-path .gitignore --write '**/*.cjs' '**/*.js' '**/*.json' '**/*.ts' '**/*.html' '**/*.md' '**/*.yaml' '!pnpm-lock.yaml' && dprint fmt",
     "start": "pnpm build && NODE_ENV=production NODE_OPTIONS=\"${NODE_OPTIONS_RELEASE}\" APP_PORT=\"${APP_DEV_PORT}\" node build/node/app/src/api/index.ts.mjs",
-    "test": "node --experimental-loader @intertwine/dev-loader/index.js svc-auth-guest-display/test.ts",
-    "watch": "tsc --watch"
+    "test": "node --experimental-loader @intertwine/dev-loader/index.js svc-auth-guest-display/test.ts"
   },
   "devDependencies": {
     "@intertwine/dev-build": "workspace:*",
@@ -71,13 +67,6 @@
   },
   "prettier": "@intertwine/dev-prettier/index.json",
   "syncpack": {
-    "sortFirst": [
-      "name",
-      "type",
-      "scripts",
-      "dependencies",
-      "devDependencies"
-    ],
     "versionGroups": [
       {
         "label": "Please use dev or prod dependencies",

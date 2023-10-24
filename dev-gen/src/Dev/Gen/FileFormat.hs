@@ -198,7 +198,7 @@ instance Aeson.FromJSON TaskfileTask
 type TaskfileCommand :: Type
 data TaskfileCommand = TaskfileCommand
   { task :: Text,
-    vars :: Map Text Text
+    vars :: Maybe (Map Text Text)
   }
   deriving stock (Show, Eq, Generic)
 

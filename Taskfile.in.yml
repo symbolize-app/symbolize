@@ -38,7 +38,9 @@ tasks:
     aliases:
       - g
     deps:
-      - dev-gen:run
+      - stack:build:debug
+    cmd:
+      task: dev-gen:run
 
   build:
     aliases:
@@ -58,6 +60,7 @@ tasks:
     aliases:
       - f
     deps:
+      - pnpm:format
       - stack:format
 
   format:check:
@@ -82,15 +85,25 @@ tasks:
 
   pnpm:lint:
     deps:
+      - pnpm:syncpack:lint
+      - pnpm:eslint:lint
+
+  pnpm:lint:fix:
+    deps:
+      - pnpm:syncpack:lint
+      - pnpm:eslint:lint:fix
+
+  pnpm:eslint:lint:
+    deps:
       - pnpm:build
     cmd:
-      task: pnpm:lint-folders
+      task: pnpm:eslint:lint-folders
       vars:
         NAMES: '{{.PNPM_TYPESCRIPT_PACKAGES}}'
 
-  pnpm:lint:fix:
+  pnpm:eslint:lint:fix:
     cmd:
-      task: pnpm:lint-folders:fix
+      task: pnpm:eslint:lint-folders:fix
       vars:
         NAMES: '{{.PNPM_TYPESCRIPT_PACKAGES}}'
 

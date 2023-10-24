@@ -19,14 +19,24 @@ tasks:
       - bw
     cmd: tsc --build --verbose --watch
 
-  lint-folders:
+  format:
+    deps:
+      - syncpack:format
+
+  syncpack:format:
+    cmd: syncpack format
+
+  syncpack:lint:
+    cmd: syncpack lint
+
+  eslint:lint-folders:
     internal: true
     requires:
       vars:
         - NAMES
     cmd: eslint {{.ESLINT_ARGS}} {{.NAMES}}
 
-  lint-folders:fix:
+  eslint:lint-folders:fix:
     internal: true
     requires:
       vars:
