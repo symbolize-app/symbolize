@@ -50,13 +50,6 @@ tasks:
       - build:release
     cmd: stack build --work-dir .stack-work-release --test --keep-going {{.RELEASE_OPTIONS}}
 
-  format-folders:
-    internal: true
-    requires:
-      vars:
-        - NAMES
-    cmd: ormolu --mode inplace $(fd -g '*.hs' $(fd -d 1 -g '{app,src,test}' {{.NAMES}}))
-
   format-folders:check:
     internal: true
     requires:
@@ -64,7 +57,14 @@ tasks:
         - NAMES
     cmd: ormolu --mode check $(fd -g '*.hs' $(fd -d 1 -g '{app,src,test}' {{.NAMES}}))
 
-  lint-folders:
+  format-folders:fix:
+    internal: true
+    requires:
+      vars:
+        - NAMES
+    cmd: ormolu --mode inplace $(fd -g '*.hs' $(fd -d 1 -g '{app,src,test}' {{.NAMES}}))
+
+  lint-folders:check:
     internal: true
     requires:
       vars:

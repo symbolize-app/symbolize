@@ -76,18 +76,19 @@ tasks:
     - build:release
     - test:release
     - format:check
-    - lint
-  format:
-    aliases:
-    - f
-    deps:
-    - pnpm:format
-    - stack:format
+    - lint:check
   format:check:
     aliases:
     - fc
     deps:
     - stack:format:check
+  format:fix:
+    aliases:
+    - format
+    - f
+    deps:
+    - pnpm:format:fix
+    - stack:format:fix
   gen:
     aliases:
     - g
@@ -101,21 +102,22 @@ tasks:
     deps:
     - cargo:install
     - stack:install
-  lint:
+  lint:check:
     aliases:
+    - lint
     - l
     deps:
-    - pnpm:lint
-    - stack:lint
+    - pnpm:lint:check
+    - stack:lint:check
   lint:fix:
     aliases:
     - lf
     deps:
     - pnpm:lint:fix
     - stack:lint
-  pnpm:eslint:lint:
+  pnpm:eslint:lint:check:
     cmd:
-      task: pnpm:eslint:lint-folders
+      task: pnpm:eslint:lint-folders:check
       vars:
         NAMES: '{{.PNPM_TYPESCRIPT_PACKAGES}}'
     deps:
@@ -125,32 +127,34 @@ tasks:
       task: pnpm:eslint:lint-folders:fix
       vars:
         NAMES: '{{.PNPM_TYPESCRIPT_PACKAGES}}'
+    deps:
+    - pnpm:build
   pnpm:lint:
     deps:
-    - pnpm:syncpack:lint
-    - pnpm:eslint:lint
+    - pnpm:syncpack:lint:check
+    - pnpm:eslint:lint:check
   pnpm:lint:fix:
     deps:
-    - pnpm:syncpack:lint
+    - pnpm:syncpack:lint:check
     - pnpm:eslint:lint:fix
   pnpm:test:
     cmd:
       task: pnpm:execute-script
       vars:
         SCRIPT: svc-auth-guest-display/test.ts
-  stack:format:
-    cmd:
-      task: stack:format-folders
-      vars:
-        NAMES: '{{.STACK_PACKAGES}}'
   stack:format:check:
     cmd:
       task: stack:format-folders:check
       vars:
         NAMES: '{{.STACK_PACKAGES}}'
-  stack:lint:
+  stack:format:fix:
     cmd:
-      task: stack:lint-folders
+      task: stack:format-folders:fix
+      vars:
+        NAMES: '{{.STACK_PACKAGES}}'
+  stack:lint:check:
+    cmd:
+      task: stack:lint-folders:check
       vars:
         NAMES: '{{.STACK_PACKAGES}}'
   test:release:

@@ -80,3 +80,5 @@ install-ghc: false
 
 nix:
   enable: false
+
+recommend-stack-upgrade: false

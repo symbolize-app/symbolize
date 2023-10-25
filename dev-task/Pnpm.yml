@@ -3,6 +3,7 @@ version: '3'
 run: when_changed
 
 vars:
+  PRETTIER_ARGS: --ignore-path .gitignore --check '**/*'.{cjs,js,json,ts,html,md,yaml} '!pnpm-lock.yaml'
   ESLINT_ARGS: --ignore-path .gitignore --max-warnings 0 --ext ts,js,cjs
 
 tasks:
@@ -19,17 +20,13 @@ tasks:
       - bw
     cmd: tsc --build --verbose --watch
 
-  format:
-    deps:
-      - syncpack:format
+  format:check:
+    cmd: prettier {{.PRETTIER_ARGS}}
 
-  syncpack:format:
-    cmd: syncpack format
+  format:fix:
+    cmd: prettier {{.PRETTIER_ARGS}} --write
 
-  syncpack:lint:
-    cmd: syncpack lint
-
-  eslint:lint-folders:
+  eslint:lint-folders:check:
     internal: true
     requires:
       vars:

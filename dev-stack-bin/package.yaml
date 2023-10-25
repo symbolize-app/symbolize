@@ -1,16 +1,16 @@
-name:                intertwine-dev-stack-bin
+name: intertwine-dev-stack-bin
 
 dependencies:
-- base >= 4.7 && < 5
-- haskell-language-server
-- hlint
-- implicit-hie
-- ormolu
+  - base >= 4.7 && < 5
+  - haskell-language-server
+  - hlint
+  - implicit-hie
+  - ormolu
 
 language: GHC2021
 
 default-extensions:
-- NoImplicitPrelude
+  - NoImplicitPrelude
 
 library:
   source-dirs: src
