@@ -30,6 +30,10 @@ _interpret (Exec.Pure x) s = pure (s, x)
 _interpret (Exec.Bind x f) s = do
   (s', x') <- _interpret x s
   _interpret (f x') s'
+_interpret (Exec.Concurrently x y) s = do
+  (s', x') <- _interpret x s
+  (s'', y') <- _interpret y s'
+  pure (s'', (x', y'))
 _interpret (Exec.Fail e) _ =
   fail e
 _interpret (Exec.Command x) ((ExecSpec.Result y r) : s') = do

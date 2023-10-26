@@ -21,6 +21,33 @@ spec = context "Gen" $ do
       InterpretSpec.interpret
         gen
         [ ExecSpec.readFile
+            "Taskfile.in.yml"
+            FileFormat.YAML
+            ( FileFormat.Taskfile
+                { version = FileFormat.taskfileVersion,
+                  run = FileFormat.taskfileRun,
+                  includes =
+                    Just
+                      [ ( "z",
+                          FileFormat.TaskfileInclude
+                            { internal = Just True,
+                              taskfile = "z"
+                            }
+                        )
+                      ],
+                  vars = Just [("v1", "v2")],
+                  tasks =
+                    [ ( "y",
+                        FileFormat.TaskfileTask
+                          { aliases = Nothing,
+                            deps = Just ["y"],
+                            cmd = Nothing
+                          }
+                      )
+                    ]
+                }
+            ),
+          ExecSpec.readFile
             "pnpm-workspace.yaml"
             FileFormat.YAML
             ( FileFormat.PNPMWorkspace
@@ -50,33 +77,6 @@ spec = context "Gen" $ do
                     Just
                       [ ("typescript", "*")
                       ]
-                }
-            ),
-          ExecSpec.readFile
-            "Taskfile.in.yml"
-            FileFormat.YAML
-            ( FileFormat.Taskfile
-                { version = FileFormat.taskfileVersion,
-                  run = FileFormat.taskfileRun,
-                  includes =
-                    Just
-                      [ ( "z",
-                          FileFormat.TaskfileInclude
-                            { internal = Just True,
-                              taskfile = "z"
-                            }
-                        )
-                      ],
-                  vars = Just [("v1", "v2")],
-                  tasks =
-                    [ ( "y",
-                        FileFormat.TaskfileTask
-                          { aliases = Nothing,
-                            deps = Just ["y"],
-                            cmd = Nothing
-                          }
-                      )
-                    ]
                 }
             ),
           ExecSpec.writeFile

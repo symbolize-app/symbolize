@@ -131,7 +131,7 @@ tasks:
         NAMES: '{{.PNPM_TYPESCRIPT_PACKAGES}}'
     deps:
     - pnpm:build
-  pnpm:lint:
+  pnpm:lint:check:
     deps:
     - pnpm:syncpack:lint:check
     - pnpm:eslint:lint:check

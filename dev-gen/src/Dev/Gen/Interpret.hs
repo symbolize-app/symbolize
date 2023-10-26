@@ -15,12 +15,13 @@ import Relude.Function (($), (.))
 import Relude.Functor (first)
 import Relude.Monad (Either, either, fail, liftIO, (>>=))
 import Relude.Monoid ((<>))
-import Relude.Print (putTextLn)
+import Relude.Print (putText)
 import Relude.String (LByteString, String, fromString, show, toStrict, toString, toText)
 import System.FilePath qualified as FilePath
 import System.IO (openTempFile)
 import System.Process.Typed qualified as Process
 import UnliftIO (Handle, MonadUnliftIO, bracketOnError, hClose)
+import UnliftIO.Async (concurrently)
 import UnliftIO.Directory (removeFile, renameFile)
 import UnliftIO.Exception (tryIO)
 
@@ -29,6 +30,8 @@ interpret (Exec.Pure x) =
   pure x
 interpret (Exec.Bind x f) =
   interpret x >>= interpret . f
+interpret (Exec.Concurrently x y) =
+  concurrently (interpret x) (interpret y)
 interpret (Exec.Fail s) =
   liftIO $ fail s
 interpret (Exec.Command (Command.ReadFile filePath FileFormat.YAML)) = do
@@ -48,7 +51,7 @@ _loadFromFile filePath load = do
 _dumpToFile :: (MonadUnliftIO m) => FilePath -> (a -> LByteString) -> a -> m ()
 _dumpToFile filePath dump value = do
   -- TODO Read and compare `Value` to skip writing
-  putTextLn ("Writing to " <> toText filePath <> "...")
+  putText ("Writing to " <> toText filePath <> "...\n")
   let bytes = dump value
   _withReplaceFile filePath $ \_filePath handle -> do
     Process.runProcess_

@@ -25,6 +25,7 @@
         - System.IO
         - Test.Hspec
         - UnliftIO
+        - UnliftIO.Async
         - UnliftIO.Directory
         - UnliftIO.Exception
       importStyle: explicit

@@ -26,6 +26,14 @@ tasks:
   format:fix:
     cmd: prettier {{.PRETTIER_ARGS}} --write
 
+  syncpack:lint:check:
+    cmd: syncpack lint
+
+  syncpack:lint:fix:
+    cmds:
+      - syncpack fix-mismatches
+      - syncpack lint
+
   eslint:lint-folders:check:
     internal: true
     requires:

@@ -118,7 +118,7 @@ tasks:
       - pnpm:lint:fix
       - stack:lint
 
-  pnpm:lint:
+  pnpm:lint:check:
     deps:
       - pnpm:syncpack:lint:check
       - pnpm:eslint:lint:check

@@ -10,21 +10,29 @@ import Dev.Gen.Exec qualified as Exec
 import Dev.Gen.FileFormat qualified as FileFormat
 import Dev.Gen.FilePath (FilePath (FilePath))
 import Dev.Gen.Package qualified as Package
-import Relude.Applicative (pure)
+import Relude.Applicative (pure, (<*>))
 import Relude.Container (fromList)
-import Relude.Foldable (forM, forM_, toList)
+import Relude.Foldable (for_, toList, traverse)
 import Relude.Function (($), (.))
-import Relude.Functor (fmap)
+import Relude.Functor (fmap, (<$>))
 import Relude.Monad (Maybe (Just, Nothing))
 import Relude.Monoid (maybeToMonoid, (<>))
 
 gen :: Exec.Exec ()
 gen = do
-  pnpmWorkspace <- Exec.readFile "pnpm-workspace.yaml" FileFormat.YAML :: Exec.Exec FileFormat.PNPMWorkspace
-  pnpmPackageFiles <- forM pnpmWorkspace.packages $ \package -> do
-    pnpmPackageFile <- Exec.readFile (FilePath (package <> "/package.json")) FileFormat.JSON
-    pure (package, pnpmPackageFile)
-  rootTaskfileInput <- Exec.readFile "Taskfile.in.yml" FileFormat.YAML
+  (rootTaskfileInput, pnpmPackageFiles) <-
+    Exec.await $
+      (,)
+        <$> Exec.async (Exec.readFile "Taskfile.in.yml" FileFormat.YAML)
+        <*> Exec.async
+          ( do
+              pnpmWorkspace <- Exec.readFile "pnpm-workspace.yaml" FileFormat.YAML :: Exec.Exec FileFormat.PNPMWorkspace
+              Exec.await
+                ( traverse
+                    (\package -> (package,) <$> Exec.async (Exec.readFile (FilePath (package <> "/package.json")) FileFormat.JSON))
+                    pnpmWorkspace.packages
+                )
+          )
 
   let pnpmPackages = Package.transformPNPM (fromList (toList pnpmPackageFiles))
   let packageTypeScriptConfigs = Vector.mapMaybe genPackageTypeScriptConfig pnpmPackages
@@ -33,13 +41,21 @@ gen = do
   let packageTaskfiles = fmap genPNPMTaskfile pnpmPackages
   let rootTaskfile = genRootTaskfile pnpmPackages rootTaskfileInput
 
-  forM_ packageTypeScriptConfigs $ \(filePath, packageTypeScriptConfig) ->
-    Exec.writeFile filePath FileFormat.JSON packageTypeScriptConfig
-  Exec.writeFile "tsconfig.json" FileFormat.JSON rootTypeScriptConfig
-  Exec.writeFile ".eslintrc.json" FileFormat.JSON esLintConfig
-  forM_ packageTaskfiles $ \(filePath, packageTaskfile) ->
-    Exec.writeFile filePath FileFormat.YAML packageTaskfile
-  Exec.writeFile "Taskfile.yml" FileFormat.YAML rootTaskfile
+  Exec.await_ $
+    (,,,,)
+      <$> for_
+        packageTypeScriptConfigs
+        ( \(filePath, packageTypeScriptConfig) ->
+            Exec.async (Exec.writeFile filePath FileFormat.JSON packageTypeScriptConfig)
+        )
+      <*> Exec.async (Exec.writeFile "tsconfig.json" FileFormat.JSON rootTypeScriptConfig)
+      <*> Exec.async (Exec.writeFile ".eslintrc.json" FileFormat.JSON esLintConfig)
+      <*> for_
+        packageTaskfiles
+        ( \(filePath, packageTaskfile) ->
+            Exec.async (Exec.writeFile filePath FileFormat.YAML packageTaskfile)
+        )
+      <*> Exec.async (Exec.writeFile "Taskfile.yml" FileFormat.YAML rootTaskfile)
 
 genPackageTypeScriptConfig :: Package.PNPM -> Maybe (FilePath, FileFormat.TypeScriptConfig)
 genPackageTypeScriptConfig pnpmPackage = do
