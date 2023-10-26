@@ -21,6 +21,9 @@ includes:
   dev-gen:
     taskfile: dev-gen
 
+  svc-gateway-guest:
+    taskfile: svc-gateway-guest
+
   dev-cargo-bin:
     internal: true
     taskfile: dev-cargo-bin

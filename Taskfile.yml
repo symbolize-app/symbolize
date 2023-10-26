@@ -54,6 +54,8 @@ includes:
     taskfile: dev-task/Stack.yml
   svc-auth-guest-display:
     taskfile: svc-auth-guest-display
+  svc-gateway-guest:
+    taskfile: svc-gateway-guest
 run: when_changed
 tasks:
   build:debug:

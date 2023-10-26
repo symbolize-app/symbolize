@@ -1,10 +1,5 @@
 {
   "type": "module",
-  "scripts": {
-    "build": "node --experimental-loader @intertwine/dev-loader/index.js dev-build/index.ts",
-    "dev": "node --experimental-loader @intertwine/dev-loader/index.js dev-local/index.ts",
-    "start": "pnpm build && NODE_ENV=production NODE_OPTIONS=\"${NODE_OPTIONS_RELEASE}\" APP_PORT=\"${APP_DEV_PORT}\" node build/node/app/src/api/index.ts.mjs"
-  },
   "devDependencies": {
     "@intertwine/dev-build": "workspace:*",
     "@intertwine/eslint-config": "workspace:@intertwine/dev-eslint@*",
