@@ -10,13 +10,14 @@ import Dev.Gen.Exec qualified as Exec
 import Dev.Gen.FileFormat qualified as FileFormat
 import Dev.Gen.FilePath (FilePath (FilePath))
 import Relude.Applicative (pure)
-import Relude.File (readFileLBS, writeFileBS)
+import Relude.File (readFileLBS)
 import Relude.Function (($), (.))
-import Relude.Functor (first)
-import Relude.Monad (Either, either, fail, liftIO, (>>=))
-import Relude.Monoid ((<>))
+import Relude.Functor (first, (<$>))
+import Relude.Monad (Either, either, fail, liftIO)
+import Relude.Monoid (Sum, mempty, (<>))
+import Relude.Numeric (Integer)
 import Relude.Print (putText)
-import Relude.String (LByteString, String, fromString, show, toStrict, toString, toText)
+import Relude.String (LByteString, String, fromString, show, toLazy, toStrict, toString, toText)
 import System.FilePath qualified as FilePath
 import System.IO (openTempFile)
 import System.Process.Typed qualified as Process
@@ -25,21 +26,24 @@ import UnliftIO.Async (concurrently)
 import UnliftIO.Directory (removeFile, renameFile)
 import UnliftIO.Exception (tryIO)
 
-interpret :: (MonadUnliftIO m) => Exec.Exec a -> m a
+interpret :: (MonadUnliftIO m) => Exec.Exec a -> m (Sum Integer, a)
 interpret (Exec.Pure x) =
-  pure x
-interpret (Exec.Bind x f) =
-  interpret x >>= interpret . f
-interpret (Exec.Concurrently x y) =
-  concurrently (interpret x) (interpret y)
+  pure (mempty, x)
+interpret (Exec.Bind x f) = do
+  (t, x') <- interpret x
+  (t', y) <- interpret (f x')
+  pure (t <> t', y)
+interpret (Exec.Concurrently x y) = do
+  ((t, x'), (t', y')) <- concurrently (interpret x) (interpret y)
+  pure (t <> t', (x', y'))
 interpret (Exec.Fail s) =
   liftIO $ fail s
-interpret (Exec.Command (Command.ReadFile filePath FileFormat.YAML)) = do
-  _loadFromFile filePath (first show . Yaml.decodeEither' . toStrict)
+interpret (Exec.Command (Command.ReadFile filePath FileFormat.YAML)) =
+  (0,) <$> _loadFromFile filePath (first show . Yaml.decodeEither' . toStrict)
 interpret (Exec.Command (Command.ReadFile filePath FileFormat.JSON)) =
-  _loadFromFile filePath Aeson.eitherDecode
+  (0,) <$> _loadFromFile filePath Aeson.eitherDecode
 interpret (Exec.Command (Command.WriteFile filePath FileFormat.YAML value)) = do
-  writeFileBS (toString filePath) $ Yaml.encode value
+  _dumpToFile filePath (toLazy . Yaml.encode) value
 interpret (Exec.Command (Command.WriteFile filePath FileFormat.JSON value)) = do
   _dumpToFile filePath Aeson.encode value
 
@@ -48,7 +52,7 @@ _loadFromFile filePath load = do
   bytes <- readFileLBS (toString filePath)
   either (liftIO . fail) pure (load bytes)
 
-_dumpToFile :: (MonadUnliftIO m) => FilePath -> (a -> LByteString) -> a -> m ()
+_dumpToFile :: (MonadUnliftIO m) => FilePath -> (a -> LByteString) -> a -> m (Sum Integer, ())
 _dumpToFile filePath dump value = do
   -- TODO Read and compare `Value` to skip writing
   putText ("Writing to " <> toText filePath <> "...\n")
@@ -58,6 +62,7 @@ _dumpToFile filePath dump value = do
       . Process.setStdin (Process.byteStringInput bytes)
       . Process.setStdout (Process.useHandleClose handle)
       $ Process.proc "prettier" ["--stdin-filepath", toString filePath]
+  pure (1, ())
 
 _withReplaceFile :: (MonadUnliftIO m) => FilePath -> (FilePath -> Handle -> m a) -> m a
 _withReplaceFile filePath action =

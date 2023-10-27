@@ -10,6 +10,7 @@
         - Dev.Gen
         - Dev.Gen.FilePath
         - GHC.IO.Exception
+        - Numeric
         - Relude.Applicative
         - Relude.Base
         - Relude.Bool
@@ -20,6 +21,7 @@
         - Relude.Functor
         - Relude.Monad
         - Relude.Monoid
+        - Relude.Numeric
         - Relude.Print
         - Relude.String
         - System.IO

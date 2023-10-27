@@ -60,85 +60,85 @@ run: when_changed
 tasks:
   build:debug:
     aliases:
-    - build
-    - b
+      - build
+      - b
     deps:
-    - pnpm:build
-    - stack:build:debug
+      - pnpm:build
+      - stack:build:debug
   build:release:
     aliases:
-    - br
+      - br
     deps:
-    - pnpm:build
-    - stack:build:release
+      - pnpm:build
+      - stack:build:release
   check:
     aliases:
-    - c
+      - c
     deps:
-    - build:release
-    - test:release
-    - format:check
-    - lint:check
+      - build:release
+      - test:release
+      - format:check
+      - lint:check
   format:check:
     aliases:
-    - fc
+      - fc
     deps:
-    - stack:format:check
+      - stack:format:check
   format:fix:
     aliases:
-    - format
-    - f
+      - format
+      - f
     deps:
-    - pnpm:format:fix
-    - stack:format:fix
+      - pnpm:format:fix
+      - stack:format:fix
   gen:
     aliases:
-    - g
+      - g
     cmd:
       task: dev-gen:run
     deps:
-    - stack:build:debug
+      - stack:build:debug
   install:
     aliases:
-    - i
+      - i
     deps:
-    - cargo:install
-    - stack:install
+      - cargo:install
+      - stack:install
   lint:check:
     aliases:
-    - lint
-    - l
+      - lint
+      - l
     deps:
-    - pnpm:lint:check
-    - stack:lint:check
+      - pnpm:lint:check
+      - stack:lint:check
   lint:fix:
     aliases:
-    - lf
+      - lf
     deps:
-    - pnpm:lint:fix
-    - stack:lint
+      - pnpm:lint:fix
+      - stack:lint
   pnpm:eslint:lint:check:
     cmd:
       task: pnpm:eslint:lint-folders:check
       vars:
         NAMES: '{{.PNPM_TYPESCRIPT_PACKAGES}}'
     deps:
-    - pnpm:build
+      - pnpm:build
   pnpm:eslint:lint:fix:
     cmd:
       task: pnpm:eslint:lint-folders:fix
       vars:
         NAMES: '{{.PNPM_TYPESCRIPT_PACKAGES}}'
     deps:
-    - pnpm:build
+      - pnpm:build
   pnpm:lint:check:
     deps:
-    - pnpm:syncpack:lint:check
-    - pnpm:eslint:lint:check
+      - pnpm:syncpack:lint:check
+      - pnpm:eslint:lint:check
   pnpm:lint:fix:
     deps:
-    - pnpm:syncpack:lint:check
-    - pnpm:eslint:lint:fix
+      - pnpm:syncpack:lint:check
+      - pnpm:eslint:lint:fix
   pnpm:test:
     cmd:
       task: pnpm:execute-script
@@ -161,12 +161,13 @@ tasks:
         NAMES: '{{.STACK_PACKAGES}}'
   test:release:
     aliases:
-    - tr
+      - tr
     deps:
-    - pnpm:test
-    - stack:test:release
+      - pnpm:test
+      - stack:test:release
 vars:
-  PNPM_TYPESCRIPT_PACKAGES: dev-build dev-loader dev-local dev-suppress lib-concurrency
+  PNPM_TYPESCRIPT_PACKAGES:
+    dev-build dev-loader dev-local dev-suppress lib-concurrency
     lib-crypto lib-error lib-hex lib-random lib-stream lib-style lib-test lib-time
     lib-widget svc-auth-guest-display
   STACK_PACKAGES: dev-gen
