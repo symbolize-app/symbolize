@@ -6,6 +6,7 @@
     - { name: '**', within: [] }
     - name:
         - Control.Monad
+        - Control.Monad.IO.Unlift
         - Data.Typeable
         - Dev.Gen
         - Dev.Gen.FilePath
@@ -26,10 +27,10 @@
         - Relude.String
         - System.IO
         - Test.Hspec
-        - UnliftIO
         - UnliftIO.Async
         - UnliftIO.Directory
         - UnliftIO.Exception
+        - UnliftIO.IO
       importStyle: explicit
     - { name: Data.Aeson, as: Aeson }
     - { name: Data.Map.Strict, as: Map }

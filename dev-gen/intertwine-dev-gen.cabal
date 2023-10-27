@@ -43,6 +43,7 @@ library
     , relude
     , typed-process
     , unliftio
+    , unliftio-core
     , vector
     , yaml
   default-language: GHC2021
@@ -77,6 +78,7 @@ executable intertwine-dev-gen-exe
     , relude
     , typed-process
     , unliftio
+    , unliftio-core
     , vector
     , yaml
   default-language: GHC2021
@@ -116,6 +118,7 @@ test-suite intertwine-dev-gen-test
     , relude
     , typed-process
     , unliftio
+    , unliftio-core
     , vector
     , yaml
   default-language: GHC2021

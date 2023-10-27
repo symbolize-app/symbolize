@@ -8,6 +8,7 @@ dependencies:
   - relude
   - typed-process
   - unliftio
+  - unliftio-core
   - vector
   - yaml
 

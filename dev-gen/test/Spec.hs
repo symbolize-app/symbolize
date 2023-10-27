@@ -1,3 +1,4 @@
+import Control.Monad.IO.Unlift (MonadUnliftIO)
 import Dev.Gen (gen)
 import Dev.Gen.ExecSpec qualified as ExecSpec
 import Dev.Gen.FileFormat qualified as FileFormat
@@ -7,7 +8,6 @@ import Relude.Bool (Bool (True))
 import Relude.Function (($), (.))
 import Relude.Monad (Maybe (Just, Nothing), liftIO)
 import Test.Hspec (Spec, context, hspec, specify)
-import UnliftIO (MonadUnliftIO)
 
 main :: (MonadUnliftIO m) => m ()
 main = liftIO . hspec $ do
