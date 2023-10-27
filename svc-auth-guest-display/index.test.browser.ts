@@ -7,7 +7,7 @@ export const all: tinyTest.TestCollection<
 > = () => [
   import('@/widget/button.test.ts'),
   import('@/widget/member.test.ts'),
-  import('@intertwine/lib-hex/hex.test.ts'),
+  import('@intertwine/lib-test/hex.test.ts'),
 ]
 
 export async function run(

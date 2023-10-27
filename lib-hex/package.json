@@ -3,8 +3,10 @@
   "type": "module",
   "dependencies": {
     "@intertwine/dev-prettier": "workspace:*",
-    "@intertwine/dev-tsconfig": "workspace:*",
-    "@intertwine/lib-test": "workspace:*"
+    "@intertwine/dev-tsconfig": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "5.2.2"
   },
   "prettier": "@intertwine/dev-prettier/index.json"
 }

@@ -1,5 +1,5 @@
 import type * as tinyError from '@intertwine/lib-error/error.ts'
-import * as tinyRandom from '@intertwine/lib-random/random.ts'
+import * as tinyRandom from '@intertwine/lib-random'
 import * as tinyWidget from '@intertwine/lib-widget/widget.ts'
 
 const button = tinyWidget.html.button

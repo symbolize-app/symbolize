@@ -11,9 +11,9 @@
       in
         {
           packages.default = pkgs.buildEnv {
-            name = "intertwine-dprint";
+            name = "intertwine-darkhttpd";
             buildInputs = [
-              pkgs.dprint
+              pkgs.darkhttpd
             ];
             paths = [];
           };

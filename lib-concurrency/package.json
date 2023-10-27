@@ -6,5 +6,8 @@
     "@intertwine/dev-tsconfig": "workspace:*",
     "@intertwine/lib-test": "workspace:*"
   },
+  "devDependencies": {
+    "typescript": "5.2.2"
+  },
   "prettier": "@intertwine/dev-prettier/index.json"
 }

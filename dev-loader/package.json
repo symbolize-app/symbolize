@@ -4,7 +4,11 @@
   "dependencies": {
     "@intertwine/dev-prettier": "workspace:*",
     "@intertwine/dev-tsconfig": "workspace:*",
+    "esbuild": "0.19.2",
     "@intertwine/lib-test": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "5.2.2"
   },
   "prettier": "@intertwine/dev-prettier/index.json"
 }

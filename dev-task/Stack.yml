@@ -1,10 +1,26 @@
 version: '3'
-  
+
 run: when_changed
-  
+
+vars:
+  RELEASE_OPTIONS: "--ghc-options '-O2 -g0 -Werror'"
+
 tasks:
   clean:
-    cmd: stack clean --full
+    deps:
+      - task: clean:mode
+        vars:
+          MODE: debug
+      - task: clean:mode
+        vars:
+          MODE: release
+
+  clean:mode:
+    internal: true
+    requires:
+      vars:
+        - MODE
+    cmd: stack clean --work-dir .stack-work-{{.MODE}} --full
 
   install:
     deps:
@@ -14,54 +30,80 @@ tasks:
     aliases:
       - build
       - b
-    cmd: stack build --test --no-run-tests
+    cmd: stack build --test --no-run-tests --keep-going
 
   build:release:
     aliases:
       - br
-    cmd: stack build --test --no-run-tests --ghc-options "-O2 -g0 -Werror"
+    cmd: stack build --work-dir .stack-work-release --test --no-run-tests --keep-going {{.RELEASE_OPTIONS}}
 
   build:debug:watch:
     aliases:
       - build:watch
       - bw
-    cmd: stack build --test --no-run-tests --file-watch
+    cmd: stack build --test --no-run-tests --keep-going --file-watch
 
-  format:
-    internal: true
-    cmd: ormolu --mode inplace $(find app src test -name '*.hs')
+  test:release:
+    aliases:
+      - tr
+    deps:
+      - build:release
+    cmd: stack build --work-dir .stack-work-release --test --keep-going {{.RELEASE_OPTIONS}}
 
-  format:check:
+  format-folders:check:
     internal: true
-    cmd: ormolu --mode check $(find app src test -name '*.hs')
+    requires:
+      vars:
+        - NAMES
+    cmd: ormolu --mode check $(fd -g '*.hs' $(fd -d 1 -g '{app,src,test}' {{.NAMES}}))
 
-  lint:
+  format-folders:fix:
     internal: true
-    cmd: hlint --hint $(realpath --relative-to . {{.STACK_LOCAL_BIN_PATH}}/relude-hlint.yaml) --hint ../dev-hlint/base.yaml --threads app src test
+    requires:
+      vars:
+        - NAMES
+    cmd: ormolu --mode inplace $(fd -g '*.hs' $(fd -d 1 -g '{app,src,test}' {{.NAMES}}))
+
+  lint-folders:check:
+    internal: true
+    requires:
+      vars:
+        - NAMES
+    vars:
+      STACK_LOCAL_BIN_PATH:
+        sh: realpath --relative-to . {{.STACK_LOCAL_BIN_PATH}}
+    cmd: hlint --hint {{.STACK_LOCAL_BIN_PATH}}/relude-hlint.yaml --hint dev-hlint/base.yaml --threads $(fd -g '*.hs' $(fd -d 1 -g '{app,src,test}' {{.NAMES}}))
 
   repl-target:
     internal: true
     requires:
       vars:
-        - TARGET
-    cmd: stack ghci {{.TARGET}}
-  
+        - MODE
+        - NAME
+    cmd: stack ghci --work-dir .stack-work-{{.MODE}} intertwine-{{.NAME}}
+
   execute-target:
     internal: true
     requires:
       vars:
+        - MODE
+        - NAME
         - TARGET
     vars:
       DIST_DIR:
-        sh: realpath --relative-to . $(sh -c "$(stack config env) echo \$HASKELL_DIST_DIR")
-    cmd: "{{.DIST_DIR}}/build/{{.TARGET}}/{{.TARGET}}"
-  
+        sh: realpath --relative-to . $(sh -c "$(cd {{.NAME}} && stack config env --work-dir .stack-work-{{.MODE}}) echo \$HASKELL_DIST_DIR")
+      FULL_TARGET: intertwine-{{.NAME}}-{{.TARGET}}
+    cmd: '{{.DIST_DIR}}/build/{{.FULL_TARGET}}/{{.FULL_TARGET}} {{.ARGS}} {{.CLI_ARGS}}'
+
   execute-target:watch:
     internal: true
     requires:
       vars:
+        - MODE
+        - NAME
         - TARGET
     vars:
       DIST_DIR:
-        sh: realpath --relative-to . $(sh -c "$(stack config env) echo \$HASKELL_DIST_DIR")
-    cmd: watchexec --no-vcs-ignore --watch {{.DIST_DIR}}/build/{{.TARGET}}/{{.TARGET}} -- {{.DIST_DIR}}/build/{{.TARGET}}/{{.TARGET}}
+        sh: realpath --relative-to . $(sh -c "$(cd {{.NAME}} && stack config env --work-dir .stack-work-{{.MODE}}) echo \$HASKELL_DIST_DIR")
+      FULL_TARGET: intertwine-{{.NAME}}-{{.TARGET}}
+    cmd: watchexec --fs-events create,rename,modify --debounce 150ms --no-vcs-ignore --watch {{.DIST_DIR}}/build/{{.FULL_TARGET}} --filter {{.FULL_TARGET}} -- {{.DIST_DIR}}/build/{{.FULL_TARGET}}/{{.FULL_TARGET}} {{.CLI_ARGS}}

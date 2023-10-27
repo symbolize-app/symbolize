@@ -1,55 +1,77 @@
 version: '3'
-  
+
 run: when_changed
-  
-includes:
-  stack:
-    internal: true
-    taskfile: ../dev-task/Stack.yml
-    dir: .
 
 vars:
   NAME: dev-gen
 
 tasks:
-  format:
-    cmd:
-      task: stack:format
-
-  format:check:
-    cmd:
-      task: stack:format:check
-
-  lint:
-    cmd:
-      task: stack:lint
-
   repl:
     cmd:
-      task: stack:repl-target
+      task: :stack:repl
       vars:
-        TARGET: intertwine-{{.NAME}}
+        NAME: '{{.NAME}}'
 
-  run:
+  run:debug:
+    aliases:
+      - run
+      - r
     cmd:
-      task: stack:execute-target
+      task: :stack:execute-target
       vars:
-        TARGET: intertwine-{{.NAME}}-exe
+        MODE: debug
+        NAME: '{{.NAME}}'
+        TARGET: exe
 
-  run:watch:
+  run:release:
+    aliases:
+      - rr
     cmd:
-      task: stack:execute-target:watch
+      task: :stack:execute-target
       vars:
-        TARGET: intertwine-{{.NAME}}-exe
+        MODE: debug
+        NAME: '{{.NAME}}'
+        TARGET: exe
 
-  test:
+  run:debug:watch:
+    aliases:
+      - run:watch
+      - rw
     cmd:
-      task: stack:execute-target
+      task: :stack:execute-target:watch
       vars:
-        TARGET: intertwine-{{.NAME}}-test
+        MODE: debug
+        NAME: '{{.NAME}}'
+        TARGET: exe
 
-  test:watch:
+  test:debug:
+    aliases:
+      - test
+      - t
     cmd:
-      task: stack:execute-target:watch
+      task: :stack:execute-target
       vars:
-        TARGET: intertwine-{{.NAME}}-test
+        MODE: debug
+        NAME: '{{.NAME}}'
+        TARGET: test
+
+  test:release:
+    aliases:
+      - tr
+    cmd:
+      task: :stack:execute-target
+      vars:
+        MODE: release
+        NAME: '{{.NAME}}'
+        TARGET: test
+
+  test:debug:watch:
+    aliases:
+      - test:watch
+      - tw
+    cmd:
+      task: :stack:execute-target:watch
+      vars:
+        MODE: debug
+        NAME: '{{.NAME}}'
+        TARGET: test

@@ -1,4 +1,51 @@
-- group: {name: generalise, enabled: true}
-- group: {name: future, enabled: true}
-- group: {name: teaching, enabled: true}
-- group: {name: dollar, enabled: true}
+- group: { name: generalise, enabled: true }
+- group: { name: future, enabled: true }
+- group: { name: teaching, enabled: true }
+- group: { name: dollar, enabled: true }
+- modules:
+    - { name: '**', within: [] }
+    - name:
+        - Control.Monad
+        - Control.Monad.IO.Unlift
+        - Data.Typeable
+        - Dev.Gen
+        - Dev.Gen.FilePath
+        - GHC.IO.Exception
+        - Numeric
+        - Relude.Applicative
+        - Relude.Base
+        - Relude.Bool
+        - Relude.Container
+        - Relude.File
+        - Relude.Foldable
+        - Relude.Function
+        - Relude.Functor
+        - Relude.Lifted
+        - Relude.Monad
+        - Relude.Monoid
+        - Relude.Numeric
+        - Relude.Print
+        - Relude.String
+        - System.IO
+        - Test.Hspec
+        - UnliftIO.Async
+        - UnliftIO.Directory
+        - UnliftIO.Exception
+        - UnliftIO.IO
+      importStyle: explicit
+    - { name: Data.Aeson, as: Aeson }
+    - { name: Data.Map.Strict, as: Map }
+    - { name: Data.Text, as: Text }
+    - { name: Data.Vector, only: [Vector] }
+    - { name: Data.Yaml, as: Yaml }
+    - { name: Dev.Gen.Command, as: Command }
+    - { name: Dev.Gen.Exec, as: Exec }
+    - { name: Dev.Gen.ExecSpec, as: ExecSpec }
+    - { name: Dev.Gen.FileFormat, as: FileFormat }
+    - { name: Dev.Gen.Interpret, as: Interpret }
+    - { name: Dev.Gen.InterpretSpec, as: InterpretSpec }
+    - { name: Dev.Gen.Package, as: Package }
+    - { name: Dev.Gen.PackageSpec, as: PackageSpec }
+    - { name: Options.Applicative, as: Options }
+    - { name: System.FilePath, as: FilePath }
+    - { name: System.Process.Typed, as: Process }

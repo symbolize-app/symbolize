@@ -1,12 +1,10 @@
 {
-  "extends": "@intertwine/dev-tsconfig/tsconfig.json",
-  "include": ["index.js"],
-  "exclude": ["build/**"],
   "compilerOptions": {
     "declarationDir": "./build/.d.ts",
-    "paths": {
-      "@/*.ts": ["./*.ts"]
-    }
+    "paths": { "@/*.ts": ["./*.ts"] }
   },
-  "references": [{ "path": "../test" }]
+  "exclude": ["build/**"],
+  "extends": "@intertwine/dev-tsconfig/tsconfig.json",
+  "include": ["./**/*.ts", "./**/*.js", "./**/*.cjs"],
+  "references": [{ "path": "../lib-test" }]
 }

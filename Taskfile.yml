@@ -1,45 +1,189 @@
-version: '3'
-  
-run: when_changed
-  
 includes:
   cargo:
     taskfile: dev-task/Cargo.yml
-    dir: .
-
-  nix:
-    taskfile: dev-task/Nix.yml
-    dir: .
-
-  stack:
-    taskfile: dev-task/Stack.yml
-    dir: .
-
-  dev-gen:
-    taskfile: dev-gen
-    dir: dev-gen
-
+  dev-build:
+    taskfile: dev-build
   dev-cargo-bin:
     internal: true
     taskfile: dev-cargo-bin
-    dir: dev-cargo-bin
-
+  dev-eslint:
+    taskfile: dev-eslint
+  dev-gen:
+    taskfile: dev-gen
+  dev-loader:
+    taskfile: dev-loader
+  dev-local:
+    taskfile: dev-local
   dev-nix-shell:
     internal: true
     taskfile: dev-nix-shell
-    dir: dev-nix-shell
-
+  dev-prettier:
+    taskfile: dev-prettier
   dev-stack-bin:
     internal: true
     taskfile: dev-stack-bin
-    dir: dev-stack-bin
-
+  dev-suppress:
+    taskfile: dev-suppress
+  dev-tsconfig:
+    taskfile: dev-tsconfig
+  lib-concurrency:
+    taskfile: lib-concurrency
+  lib-crypto:
+    taskfile: lib-crypto
+  lib-error:
+    taskfile: lib-error
+  lib-hex:
+    taskfile: lib-hex
+  lib-random:
+    taskfile: lib-random
+  lib-stream:
+    taskfile: lib-stream
+  lib-style:
+    taskfile: lib-style
+  lib-test:
+    taskfile: lib-test
+  lib-time:
+    taskfile: lib-time
+  lib-widget:
+    taskfile: lib-widget
+  nix:
+    taskfile: dev-task/Nix.yml
+  pnpm:
+    taskfile: dev-task/Pnpm.yml
+  stack:
+    taskfile: dev-task/Stack.yml
+  svc-auth-guest-display:
+    taskfile: svc-auth-guest-display
+  svc-gateway-guest:
+    taskfile: svc-gateway-guest
+run: when_changed
 tasks:
-  build:
+  build:debug:
+    aliases:
+      - build
+      - b
     deps:
-      - stack:build
-  
+      - pnpm:build
+      - stack:build:debug
+  build:release:
+    aliases:
+      - br
+    deps:
+      - pnpm:build
+      - stack:build:release
+  check:
+    aliases:
+      - c
+    deps:
+      - build:release
+      - gen:check
+      - test:release
+      - format:check
+      - lint:check
+  format:check:
+    aliases:
+      - fc
+    deps:
+      - stack:format:check
+  format:fix:
+    aliases:
+      - format
+      - f
+    deps:
+      - pnpm:format:fix
+      - stack:format:fix
+  gen:
+    aliases:
+      - g
+    cmd:
+      task: stack:execute-target
+      vars:
+        MODE: release
+        NAME: dev-gen
+        TARGET: exe
+    deps:
+      - stack:build:release
+  gen:check:
+    cmd:
+      task: stack:execute-target
+      vars:
+        ARGS: --check
+        MODE: release
+        NAME: dev-gen
+        TARGET: exe
+    deps:
+      - stack:build:release
   install:
+    aliases:
+      - i
     deps:
-      - stack:install
       - cargo:install
+      - stack:install
+  lint:check:
+    aliases:
+      - lint
+      - l
+    deps:
+      - pnpm:lint:check
+      - stack:lint:check
+  lint:fix:
+    aliases:
+      - lf
+    deps:
+      - pnpm:lint:fix
+      - stack:lint
+  pnpm:eslint:lint:check:
+    cmd:
+      task: pnpm:eslint:lint-folders:check
+      vars:
+        NAMES: '{{.PNPM_TYPESCRIPT_PACKAGES}}'
+    deps:
+      - pnpm:build
+  pnpm:eslint:lint:fix:
+    cmd:
+      task: pnpm:eslint:lint-folders:fix
+      vars:
+        NAMES: '{{.PNPM_TYPESCRIPT_PACKAGES}}'
+    deps:
+      - pnpm:build
+  pnpm:lint:check:
+    deps:
+      - pnpm:syncpack:lint:check
+      - pnpm:eslint:lint:check
+  pnpm:lint:fix:
+    deps:
+      - pnpm:syncpack:lint:check
+      - pnpm:eslint:lint:fix
+  pnpm:test:
+    cmd:
+      task: pnpm:execute-script
+      vars:
+        SCRIPT: svc-auth-guest-display/test.ts
+  stack:format:check:
+    cmd:
+      task: stack:format-folders:check
+      vars:
+        NAMES: '{{.STACK_PACKAGES}}'
+  stack:format:fix:
+    cmd:
+      task: stack:format-folders:fix
+      vars:
+        NAMES: '{{.STACK_PACKAGES}}'
+  stack:lint:check:
+    cmd:
+      task: stack:lint-folders:check
+      vars:
+        NAMES: '{{.STACK_PACKAGES}}'
+  test:release:
+    aliases:
+      - tr
+    deps:
+      - pnpm:test
+      - stack:test:release
+vars:
+  PNPM_TYPESCRIPT_PACKAGES:
+    dev-build dev-loader dev-local dev-suppress lib-concurrency
+    lib-crypto lib-error lib-hex lib-random lib-stream lib-style lib-test lib-time
+    lib-widget svc-auth-guest-display
+  STACK_PACKAGES: dev-gen
+version: '3'

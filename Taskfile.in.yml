@@ -1,0 +1,179 @@
+version: '3'
+
+run: when_changed
+
+vars:
+  STACK_PACKAGES: dev-gen
+
+includes:
+  cargo:
+    taskfile: dev-task/Cargo.yml
+
+  nix:
+    taskfile: dev-task/Nix.yml
+
+  pnpm:
+    taskfile: dev-task/Pnpm.yml
+
+  stack:
+    taskfile: dev-task/Stack.yml
+
+  dev-gen:
+    taskfile: dev-gen
+
+  svc-gateway-guest:
+    taskfile: svc-gateway-guest
+
+  dev-cargo-bin:
+    internal: true
+    taskfile: dev-cargo-bin
+
+  dev-nix-shell:
+    internal: true
+    taskfile: dev-nix-shell
+
+  dev-stack-bin:
+    internal: true
+    taskfile: dev-stack-bin
+
+tasks:
+  check:
+    aliases:
+      - c
+    deps:
+      - build:release
+      - gen:check
+      - test:release
+      - format:check
+      - lint:check
+
+  gen:
+    aliases:
+      - g
+    deps:
+      - stack:build:release
+    cmd:
+      task: stack:execute-target
+      vars:
+        MODE: release
+        NAME: dev-gen
+        TARGET: exe
+
+  gen:check:
+    deps:
+      - stack:build:release
+    cmd:
+      task: stack:execute-target
+      vars:
+        MODE: release
+        NAME: dev-gen
+        TARGET: exe
+        ARGS: '--check'
+
+  build:debug:
+    aliases:
+      - build
+      - b
+    deps:
+      - pnpm:build
+      - stack:build:debug
+
+  build:release:
+    aliases:
+      - br
+    deps:
+      - pnpm:build
+      - stack:build:release
+
+  test:release:
+    aliases:
+      - tr
+    deps:
+      - pnpm:test
+      - stack:test:release
+
+  pnpm:test:
+    cmd:
+      task: pnpm:execute-script
+      vars:
+        SCRIPT: svc-auth-guest-display/test.ts
+
+  install:
+    aliases:
+      - i
+    deps:
+      - cargo:install
+      - stack:install
+
+  format:fix:
+    aliases:
+      - format
+      - f
+    deps:
+      - pnpm:format:fix
+      - stack:format:fix
+
+  format:check:
+    aliases:
+      - fc
+    deps:
+      - stack:format:check
+
+  lint:check:
+    aliases:
+      - lint
+      - l
+    deps:
+      - pnpm:lint:check
+      - stack:lint:check
+
+  lint:fix:
+    aliases:
+      - lf
+    deps:
+      - pnpm:lint:fix
+      - stack:lint
+
+  pnpm:lint:check:
+    deps:
+      - pnpm:syncpack:lint:check
+      - pnpm:eslint:lint:check
+
+  pnpm:lint:fix:
+    deps:
+      - pnpm:syncpack:lint:check
+      - pnpm:eslint:lint:fix
+
+  pnpm:eslint:lint:check:
+    deps:
+      - pnpm:build
+    cmd:
+      task: pnpm:eslint:lint-folders:check
+      vars:
+        NAMES: '{{.PNPM_TYPESCRIPT_PACKAGES}}'
+
+  pnpm:eslint:lint:fix:
+    deps:
+      - pnpm:build
+    cmd:
+      task: pnpm:eslint:lint-folders:fix
+      vars:
+        NAMES: '{{.PNPM_TYPESCRIPT_PACKAGES}}'
+
+  stack:format:check:
+    cmd:
+      task: stack:format-folders:check
+      vars:
+        NAMES: '{{.STACK_PACKAGES}}'
+
+  stack:format:fix:
+    cmd:
+      task: stack:format-folders:fix
+      vars:
+        NAMES: '{{.STACK_PACKAGES}}'
+
+  stack:lint:check:
+    cmd:
+      task: stack:lint-folders:check
+      vars:
+        NAMES: '{{.STACK_PACKAGES}}'

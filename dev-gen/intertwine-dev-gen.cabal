@@ -10,7 +10,13 @@ build-type:     Simple
 
 library
   exposed-modules:
-      Lib
+      Dev.Gen
+      Dev.Gen.Command
+      Dev.Gen.Exec
+      Dev.Gen.FileFormat
+      Dev.Gen.FilePath
+      Dev.Gen.Interpret
+      Dev.Gen.Package
   other-modules:
       Paths_intertwine_dev_gen
   hs-source-dirs:
@@ -23,10 +29,24 @@ library
       OverloadedStrings
       OverloadedLabels
       DerivingStrategies
+      DeriveGeneric
+      DuplicateRecordFields
+      NoFieldSelectors
+      NamedFieldPuns
+      OverloadedRecordDot
+      DisambiguateRecordFields
+      OverloadedLists
   build-depends:
-      base >=4.7 && <5
-    , named
+      aeson
+    , base >=4.7 && <5
+    , filepath
+    , optparse-applicative
     , relude
+    , typed-process
+    , unliftio
+    , unliftio-core
+    , vector
+    , yaml
   default-language: GHC2021
 
 executable intertwine-dev-gen-exe
@@ -43,18 +63,35 @@ executable intertwine-dev-gen-exe
       OverloadedStrings
       OverloadedLabels
       DerivingStrategies
+      DeriveGeneric
+      DuplicateRecordFields
+      NoFieldSelectors
+      NamedFieldPuns
+      OverloadedRecordDot
+      DisambiguateRecordFields
+      OverloadedLists
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      aeson
+    , base >=4.7 && <5
+    , filepath
     , intertwine-dev-gen
-    , named
+    , optparse-applicative
     , relude
+    , typed-process
+    , unliftio
+    , unliftio-core
+    , vector
+    , yaml
   default-language: GHC2021
 
 test-suite intertwine-dev-gen-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      Dev.Gen.ExecSpec
+      Dev.Gen.InterpretSpec
+      Dev.Gen.PackageSpec
       Paths_intertwine_dev_gen
   hs-source-dirs:
       test
@@ -66,10 +103,25 @@ test-suite intertwine-dev-gen-test
       OverloadedStrings
       OverloadedLabels
       DerivingStrategies
+      DeriveGeneric
+      DuplicateRecordFields
+      NoFieldSelectors
+      NamedFieldPuns
+      OverloadedRecordDot
+      DisambiguateRecordFields
+      OverloadedLists
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      aeson
+    , base >=4.7 && <5
+    , filepath
+    , hspec
     , intertwine-dev-gen
-    , named
+    , optparse-applicative
     , relude
+    , typed-process
+    , unliftio
+    , unliftio-core
+    , vector
+    , yaml
   default-language: GHC2021

@@ -1,5 +1,5 @@
 import type * as tinyError from '@intertwine/lib-error/error.ts'
-import type * as tinyRandom from '@intertwine/lib-random/random.ts'
+import type * as tinyRandom from '@intertwine/lib-random'
 import * as tinyStyle from '@intertwine/lib-style/style.ts'
 import * as tinyWidget from '@intertwine/lib-widget/widget.ts'
 

@@ -1,8 +1,10 @@
 version: '3'
-  
+
 run: when_changed
-  
+
 tasks:
   update:
+    aliases:
+      - u
     deps:
       - :dev-nix-shell:update

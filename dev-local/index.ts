@@ -1,5 +1,4 @@
 import * as buildModules from '@intertwine/dev-build/modules.ts'
-import * as devRoute from '@intertwine/dev-local/route.ts'
 import chalk from 'chalk'
 import chokidar from 'chokidar'
 import lodashDebounce from 'lodash-es/debounce.js'
@@ -11,6 +10,8 @@ import * as nodeStream from 'node:stream'
 import * as nodeUrl from 'node:url'
 import * as ws from 'ws'
 import WebSocket from 'ws'
+
+import * as devRoute from '@/route.ts'
 
 type Context = {
   buildResult: Promise<buildModules.BuildResult>

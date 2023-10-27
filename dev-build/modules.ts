@@ -108,5 +108,6 @@ export async function build<T extends BuildOptions>(
     )
     entryPoints = newEntryPoints
   }
+  // TODO Print build time
   return result
 }

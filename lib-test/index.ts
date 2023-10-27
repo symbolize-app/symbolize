@@ -1,12 +1,13 @@
-import * as tinyRandomTest from '@intertwine/lib-random/random.test.ts'
-import type * as tinyRandom from '@intertwine/lib-random/random.ts'
-import * as tinyTimeTest from '@intertwine/lib-time/time.test.ts'
+import type * as tinyRandom from '@intertwine/lib-random'
 import type * as tinyTime from '@intertwine/lib-time/time.ts'
 import * as diff from 'diff'
 import lodashEq from 'lodash-es/eq.js'
 import lodashIsEqual from 'lodash-es/isEqual.js'
 import ms from 'ms'
 import type * as typeFest from 'type-fest'
+
+import * as tinyRandomTest from '@/random.ts'
+import * as tinyTimeTest from '@/time.ts'
 
 export type Test<CustomContext = unknown> = (
   ctx: CustomContext & Context
