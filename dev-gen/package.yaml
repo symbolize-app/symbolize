@@ -5,6 +5,7 @@ dependencies:
   - base >= 4.7 && < 5
   - aeson
   - filepath
+  - optparse-applicative
   - relude
   - typed-process
   - unliftio

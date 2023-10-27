@@ -1,5 +1,6 @@
 module Dev.Gen.Interpret
   ( interpret,
+    Mode (..),
   )
 where
 
@@ -11,7 +12,8 @@ import Dev.Gen.Exec qualified as Exec
 import Dev.Gen.FileFormat qualified as FileFormat
 import Dev.Gen.FilePath (FilePath (FilePath))
 import Relude.Applicative (pure)
-import Relude.Base ((==))
+import Relude.Base (Type, (==))
+import Relude.Bool (Bool (True))
 import Relude.File (readFileLBS)
 import Relude.Function (const, ($), (.))
 import Relude.Functor (first, (<$>))
@@ -28,26 +30,31 @@ import UnliftIO.Directory (removeFile, renameFile)
 import UnliftIO.Exception (bracketOnError, catchAny, tryIO)
 import UnliftIO.IO (Handle, hClose)
 
-interpret :: (MonadUnliftIO m) => Exec.Exec a -> m (Sum Integer, a)
-interpret (Exec.Pure x) =
+type Mode :: Type
+data Mode where
+  Generate :: Mode
+  Check :: Mode
+
+interpret :: (MonadUnliftIO m) => Exec.Exec a -> Mode -> m (Sum Integer, a)
+interpret (Exec.Pure x) _ =
   pure (mempty, x)
-interpret (Exec.Bind x f) = do
-  (t, x') <- interpret x
-  (t', y) <- interpret (f x')
+interpret (Exec.Bind x f) m = do
+  (t, x') <- interpret x m
+  (t', y) <- interpret (f x') m
   pure (t <> t', y)
-interpret (Exec.Concurrently x y) = do
-  ((t, x'), (t', y')) <- concurrently (interpret x) (interpret y)
+interpret (Exec.Concurrently x y) m = do
+  ((t, x'), (t', y')) <- concurrently (interpret x m) (interpret y m)
   pure (t <> t', (x', y'))
-interpret (Exec.Fail s) =
+interpret (Exec.Fail s) _ =
   liftIO $ fail s
-interpret (Exec.Command (Command.ReadFile filePath FileFormat.YAML)) =
+interpret (Exec.Command (Command.ReadFile filePath FileFormat.YAML)) _ =
   (0,) <$> _loadFromFile filePath _yamlEitherDecode
-interpret (Exec.Command (Command.ReadFile filePath FileFormat.JSON)) =
+interpret (Exec.Command (Command.ReadFile filePath FileFormat.JSON)) _ =
   (0,) <$> _loadFromFile filePath Aeson.eitherDecode
-interpret (Exec.Command (Command.WriteFile filePath FileFormat.YAML value)) = do
-  _dumpToFile filePath _yamlEitherDecode _yamlEncode value
-interpret (Exec.Command (Command.WriteFile filePath FileFormat.JSON value)) = do
-  _dumpToFile filePath Aeson.eitherDecode Aeson.encode value
+interpret (Exec.Command (Command.WriteFile filePath FileFormat.YAML value)) m = do
+  _dumpToFile filePath _yamlEitherDecode _yamlEncode value m
+interpret (Exec.Command (Command.WriteFile filePath FileFormat.JSON value)) m = do
+  _dumpToFile filePath Aeson.eitherDecode Aeson.encode value m
 
 _yamlEitherDecode :: (Aeson.FromJSON a) => LByteString -> Either String a
 _yamlEitherDecode = first show . Yaml.decodeEither' . toStrict
@@ -66,8 +73,9 @@ _dumpToFile ::
   (LByteString -> Either String Aeson.Value) ->
   (Aeson.Value -> LByteString) ->
   a ->
+  Mode ->
   m (Sum Integer, ())
-_dumpToFile filePath decode encode value = do
+_dumpToFile filePath decode encode value m = do
   -- TODO Read and compare `Value` to skip writing
   -- let value' = Aeson.toJSON value
   let value' = Aeson.toJSON value :: Aeson.Value
@@ -75,9 +83,9 @@ _dumpToFile filePath decode encode value = do
     catchAny
       (Just <$> _loadFromFile filePath decode)
       (const (pure Nothing))
-  if Just value' == oldValue
-    then pure (mempty, ())
-    else do
+  case (Just value' == oldValue, m) of
+    (True, _) -> pure (mempty, ())
+    (_, Generate) -> do
       putText ("Writing to " <> toText filePath <> "...\n")
       let bytes = encode value'
       _withReplaceFile filePath $ \_filePath handle ->
@@ -85,6 +93,9 @@ _dumpToFile filePath decode encode value = do
           . Process.setStdin (Process.byteStringInput bytes)
           . Process.setStdout (Process.useHandleClose handle)
           $ Process.proc "prettier" ["--stdin-filepath", toString filePath]
+      pure (1, ())
+    (_, Check) -> do
+      putText ("Skipped writing to " <> toText filePath <> "...\n")
       pure (1, ())
 
 _withReplaceFile :: (MonadUnliftIO m) => FilePath -> (FilePath -> Handle -> m a) -> m a

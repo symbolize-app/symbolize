@@ -20,6 +20,7 @@
         - Relude.Foldable
         - Relude.Function
         - Relude.Functor
+        - Relude.Lifted
         - Relude.Monad
         - Relude.Monoid
         - Relude.Numeric
@@ -45,5 +46,6 @@
     - { name: Dev.Gen.InterpretSpec, as: InterpretSpec }
     - { name: Dev.Gen.Package, as: Package }
     - { name: Dev.Gen.PackageSpec, as: PackageSpec }
+    - { name: Options.Applicative, as: Options }
     - { name: System.FilePath, as: FilePath }
     - { name: System.Process.Typed, as: Process }

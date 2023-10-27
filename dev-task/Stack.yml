@@ -93,7 +93,7 @@ tasks:
       DIST_DIR:
         sh: realpath --relative-to . $(sh -c "$(cd {{.NAME}} && stack config env --work-dir .stack-work-{{.MODE}}) echo \$HASKELL_DIST_DIR")
       FULL_TARGET: intertwine-{{.NAME}}-{{.TARGET}}
-    cmd: '{{.DIST_DIR}}/build/{{.FULL_TARGET}}/{{.FULL_TARGET}} {{.CLI_ARGS}}'
+    cmd: '{{.DIST_DIR}}/build/{{.FULL_TARGET}}/{{.FULL_TARGET}} {{.ARGS}} {{.CLI_ARGS}}'
 
   execute-target:watch:
     internal: true

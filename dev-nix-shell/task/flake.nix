@@ -11,7 +11,7 @@
       in
         {
           packages.default = pkgs.buildEnv {
-            name = "intertwine-dprint";
+            name = "intertwine-task";
             buildInputs = [
               pkgs.go-task
             ];

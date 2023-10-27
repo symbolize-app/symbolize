@@ -40,6 +40,7 @@ library
       aeson
     , base >=4.7 && <5
     , filepath
+    , optparse-applicative
     , relude
     , typed-process
     , unliftio
@@ -75,6 +76,7 @@ executable intertwine-dev-gen-exe
     , base >=4.7 && <5
     , filepath
     , intertwine-dev-gen
+    , optparse-applicative
     , relude
     , typed-process
     , unliftio
@@ -115,6 +117,7 @@ test-suite intertwine-dev-gen-test
     , filepath
     , hspec
     , intertwine-dev-gen
+    , optparse-applicative
     , relude
     , typed-process
     , unliftio

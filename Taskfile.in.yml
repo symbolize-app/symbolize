@@ -42,6 +42,7 @@ tasks:
       - c
     deps:
       - build:release
+      - gen:check
       - test:release
       - format:check
       - lint:check
@@ -50,9 +51,24 @@ tasks:
     aliases:
       - g
     deps:
-      - stack:build:debug
+      - stack:build:release
     cmd:
-      task: dev-gen:run
+      task: stack:execute-target
+      vars:
+        MODE: release
+        NAME: dev-gen
+        TARGET: exe
+
+  gen:check:
+    deps:
+      - stack:build:release
+    cmd:
+      task: stack:execute-target
+      vars:
+        MODE: release
+        NAME: dev-gen
+        TARGET: exe
+        ARGS: '--check'
 
   build:debug:
     aliases:
