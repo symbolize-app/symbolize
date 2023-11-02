@@ -183,7 +183,8 @@ type TaskfileTask :: Type
 data TaskfileTask = TaskfileTask
   { aliases :: Maybe (Vector Text),
     deps :: Maybe (Vector Text),
-    cmd :: Maybe TaskfileCommand
+    cmd :: Maybe TaskfileCommand,
+    cmds :: Maybe (Vector Text)
   }
   deriving stock (Show, Eq, Generic)
 

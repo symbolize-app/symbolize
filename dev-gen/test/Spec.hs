@@ -41,7 +41,8 @@ spec = context "Gen" $ do
                         FileFormat.TaskfileTask
                           { aliases = Nothing,
                             deps = Just ["y"],
-                            cmd = Nothing
+                            cmd = Nothing,
+                            cmds = Nothing
                           }
                       )
                     ]
@@ -188,7 +189,8 @@ spec = context "Gen" $ do
                         FileFormat.TaskfileTask
                           { aliases = Nothing,
                             deps = Just ["y"],
-                            cmd = Nothing
+                            cmd = Nothing,
+                            cmds = Nothing
                           }
                       )
                     ]

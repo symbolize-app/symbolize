@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "declarationDir": "./build/.d.ts",
+    "paths": { "@/*.ts": ["./*.ts"] }
+  },
+  "exclude": ["build/**"],
+  "extends": "@intertwine/dev-tsconfig/tsconfig.json",
+  "include": ["./**/*.ts", "./**/*.js", "./**/*.cjs"],
+  "references": [{ "path": "../lib-hex" }]
+}

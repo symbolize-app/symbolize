@@ -21,6 +21,7 @@
     { "path": "./lib-test" },
     { "path": "./lib-time" },
     { "path": "./lib-widget" },
-    { "path": "./svc-auth-guest-display" }
+    { "path": "./svc-auth-guest-display" },
+    { "path": "./svc-gateway-guest" }
   ]
 }

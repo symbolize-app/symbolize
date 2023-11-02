@@ -25,6 +25,8 @@ export interface BuildResult<
   outputFiles: esbuild.OutputFile[]
 }
 
+const resolveBase = Symbol('resolveBase')
+
 export async function build<T extends BuildOptions>(
   options: esbuild.SameShape<BuildOptions, T>
 ): Promise<BuildResult<T>> {
@@ -46,7 +48,7 @@ export async function build<T extends BuildOptions>(
       name: 'buildModules',
       setup(build) {
         build.onResolve({ filter: /.*/ }, async (args) => {
-          if (args.pluginData === true) {
+          if (args.pluginData === resolveBase) {
             return undefined
           }
           const resolveResult = await build.resolve(
@@ -56,7 +58,7 @@ export async function build<T extends BuildOptions>(
               namespace: args.namespace,
               resolveDir: args.resolveDir,
               kind: args.kind,
-              pluginData: true,
+              pluginData: resolveBase,
             }
           )
           if (
@@ -108,6 +110,5 @@ export async function build<T extends BuildOptions>(
     )
     entryPoints = newEntryPoints
   }
-  // TODO Print build time
   return result
 }

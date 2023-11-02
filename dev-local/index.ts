@@ -1,11 +1,10 @@
-import * as buildModules from '@intertwine/dev-build/modules.ts'
+import * as build from '@intertwine/dev-build'
 import chalk from 'chalk'
 import chokidar from 'chokidar'
 import lodashDebounce from 'lodash-es/debounce.js'
 import * as nodeFs from 'node:fs'
 import * as nodeHttp from 'node:http'
 import type * as nodeNet from 'node:net'
-import * as nodePath from 'node:path'
 import * as nodeStream from 'node:stream'
 import * as nodeUrl from 'node:url'
 import * as ws from 'ws'
@@ -14,7 +13,7 @@ import WebSocket from 'ws'
 import * as devRoute from '@/route.ts'
 
 type Context = {
-  buildResult: Promise<buildModules.BuildResult>
+  buildResult: Promise<build.BuildResult>
 } & devRoute.Context
 
 const index = devRoute.define(['GET'], /^\/$/, () => {
@@ -61,22 +60,11 @@ const js = devRoute.define<Context>(
   }
 )
 
-async function buildDev(
-  entryPoint: string
-): Promise<buildModules.BuildResult> {
-  return await buildModules.build({
-    entryPoints: [nodePath.resolve(entryPoint)],
-    format: 'esm',
-    platform: 'browser',
+async function buildDev(): Promise<build.BuildResult> {
+  return await build.buildCommon({
     outdir: '/tmp/local',
-    outbase: nodePath.resolve('.'),
-    define: {
-      ['import.meta.env.NODE_ENV']:
-        JSON.stringify('development'),
-    },
-    logLevel: 'warning',
+    nodeEnv: 'development',
     write: false,
-    external: ['timers', 'util'],
   })
 }
 
@@ -91,9 +79,8 @@ function main(): void {
     'all',
     lodashDebounce(() => void reload())
   )
-  const entryPoint = './svc-auth-guest-display/index.ts'
   const ctx: Context = {
-    buildResult: buildDev(entryPoint),
+    buildResult: buildDev(),
     maxRequestNonStreamedBytes: 4 * 1024,
   }
   const httpServer = nodeHttp.createServer(
@@ -123,7 +110,7 @@ function main(): void {
   return
 
   function reload() {
-    ctx.buildResult = buildDev(entryPoint)
+    ctx.buildResult = buildDev()
     for (const ws of wsServer.clients) {
       if (ws.readyState === WebSocket.OPEN) {
         ws.send('reload')

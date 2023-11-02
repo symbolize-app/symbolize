@@ -113,6 +113,23 @@ tasks:
         TARGET: exe
     deps:
       - stack:build:release
+  guest:build:
+    cmd:
+      task: pnpm:execute-script
+      vars:
+        SCRIPT: dev-build/index.ts
+  guest:local:
+    cmd:
+      task: pnpm:execute-script
+      vars:
+        SCRIPT: dev-local/index.ts
+  guest:start:
+    cmds:
+      - echo application/javascript mjs > build/extramimes
+      - darkhttpd build/browser/ --addr {{.APP_HOST}} --port {{.APP_PORT}} --mimetypes
+        build/extramimes
+    deps:
+      - guest:build
   install:
     aliases:
       - i
@@ -184,6 +201,6 @@ vars:
   PNPM_TYPESCRIPT_PACKAGES:
     dev-build dev-loader dev-local dev-suppress lib-concurrency
     lib-crypto lib-error lib-hex lib-random lib-stream lib-style lib-test lib-time
-    lib-widget svc-auth-guest-display
+    lib-widget svc-auth-guest-display svc-gateway-guest
   STACK_PACKAGES: dev-gen
 version: '3'

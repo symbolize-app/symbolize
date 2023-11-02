@@ -177,3 +177,22 @@ tasks:
       task: stack:lint-folders:check
       vars:
         NAMES: '{{.STACK_PACKAGES}}'
+
+  guest:build:
+    cmd:
+      task: pnpm:execute-script
+      vars:
+        SCRIPT: dev-build/index.ts
+
+  guest:local:
+    cmd:
+      task: pnpm:execute-script
+      vars:
+        SCRIPT: dev-local/index.ts
+
+  guest:start:
+    deps:
+      - guest:build
+    cmds:
+      - echo application/javascript mjs > build/extramimes
+      - darkhttpd build/browser/ --addr {{.APP_HOST}} --port {{.APP_PORT}} --mimetypes build/extramimes

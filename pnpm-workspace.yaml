@@ -17,3 +17,4 @@ packages:
   - lib-time
   - lib-widget
   - svc-auth-guest-display
+  - svc-gateway-guest

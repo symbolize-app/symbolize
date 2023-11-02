@@ -34,14 +34,13 @@ Like biology achieves scale through hierarchy and repetition.
 ### Standard
 
 - svc-<service>-doc
-- svc-<service>-guest-store
-- svc-<service>-guest-display
 - svc-<service>-guest-read
+- svc-<service>-guest-store
+- svc-<service>-guest-view
 - svc-<service>-guest-write
-- svc-<service>-host-store
 - svc-<service>-host-read
+- svc-<service>-host-store
 - svc-<service>-host-write
-- svc-<service>-stream
 
 ### Special\*
 

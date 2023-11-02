@@ -16,7 +16,8 @@
       "lib-test/tsconfig.json",
       "lib-time/tsconfig.json",
       "lib-widget/tsconfig.json",
-      "svc-auth-guest-display/tsconfig.json"
+      "svc-auth-guest-display/tsconfig.json",
+      "svc-gateway-guest/tsconfig.json"
     ],
     "tsconfigRootDir": "."
   }
