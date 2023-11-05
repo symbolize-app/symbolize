@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
     "declarationDir": "./build/tsc",
-    "paths": { "@/*.ts": ["./*.ts"] }
+    "paths": { "@/*.ts": ["./*.ts"] },
+    "tsBuildInfoFile": "build/tsc/tsconfig.tsbuildinfo"
   },
   "exclude": ["build/**"],
   "extends": "@intertwine/dev-tsconfig/tsconfig.json",

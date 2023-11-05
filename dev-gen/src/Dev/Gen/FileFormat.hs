@@ -5,6 +5,7 @@ module Dev.Gen.FileFormat
     PNPMWorkspace (..),
     Storage (..),
     Taskfile (..),
+    TaskfileCommand (..),
     TaskfileInclude (..),
     TaskfileTask (..),
     TypeScriptConfig (..),
@@ -81,7 +82,8 @@ typeScriptConfigExclude = ["build/**"]
 type TypeScriptConfigCompilerOptions :: Type
 data TypeScriptConfigCompilerOptions = TypeScriptConfigCompilerOptions
   { declarationDir :: Text,
-    paths :: Map Text (Vector Text)
+    paths :: Map Text (Vector Text),
+    tsBuildInfoFile :: Text
   }
   deriving stock (Show, Eq, Generic)
 
@@ -91,7 +93,8 @@ typeScriptConfigCompilerOptions :: TypeScriptConfigCompilerOptions
 typeScriptConfigCompilerOptions =
   TypeScriptConfigCompilerOptions
     { declarationDir = typeScriptConfigCompilerOptionsDeclarationDir,
-      paths = typeScriptConfigCompilerOptionsPaths
+      paths = typeScriptConfigCompilerOptionsPaths,
+      tsBuildInfoFile = typeScriptConfigCompilerOptionsTSBuildInfoFile
     }
 
 typeScriptConfigCompilerOptionsDeclarationDir :: Text
@@ -101,6 +104,9 @@ typeScriptConfigCompilerOptionsPaths :: Map Text (Vector Text)
 typeScriptConfigCompilerOptionsPaths =
   [ ("@/*.ts", ["./*.ts"])
   ]
+
+typeScriptConfigCompilerOptionsTSBuildInfoFile :: Text
+typeScriptConfigCompilerOptionsTSBuildInfoFile = "build/tsc/tsconfig.tsbuildinfo"
 
 type TypeScriptConfigReference :: Type
 newtype TypeScriptConfigReference = TypeScriptConfigReference

@@ -1,0 +1,25 @@
+version: '3'
+
+run: when_changed
+
+tasks:
+  link-root-build-dir:
+    status:
+      - test "$(stat --file-system --format %T build)" = tmpfs
+      - test -d "$(readlink build)"
+    cmds:
+      - rm -rf build
+      - ln -s $(mktemp --directory --tmpdir=/dev/shm) build
+
+  link-package-build-dir:
+    internal: true
+    requires:
+      vars:
+        - NAME
+    status:
+      - test "$(readlink {{.NAME}}/build)" = ../build/{{.NAME}}
+      - test -d build/{{.NAME}}
+    cmds:
+      - rm -rf {{.NAME}}/build
+      - ln -s ../build/{{.NAME}} {{.NAME}}/build
+      - mkdir -p build/{{.NAME}}

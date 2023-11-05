@@ -1,3 +1,10 @@
 run: when_changed
-tasks: {}
+tasks:
+  link-build-dir:
+    cmd:
+      task: :tmpfs:link-package-build-dir
+      vars:
+        NAME: '{{.NAME}}'
+vars:
+  NAME: dev-local
 version: '3'

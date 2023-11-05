@@ -1,6 +1,6 @@
 includes:
   cargo:
-    taskfile: dev-task/Cargo.yml
+    taskfile: dev-task/cargo.yml
   dev-build:
     taskfile: dev-build
   dev-cargo-bin:
@@ -47,15 +47,17 @@ includes:
   lib-widget:
     taskfile: lib-widget
   nix:
-    taskfile: dev-task/Nix.yml
+    taskfile: dev-task/nix.yml
   pnpm:
-    taskfile: dev-task/Pnpm.yml
+    taskfile: dev-task/pnpm.yml
   stack:
-    taskfile: dev-task/Stack.yml
+    taskfile: dev-task/stack.yml
   svc-auth-guest-display:
     taskfile: svc-auth-guest-display
   svc-gateway-guest:
     taskfile: svc-gateway-guest
+  tmpfs:
+    taskfile: dev-task/tmpfs.yml
 run: when_changed
 tasks:
   build:debug:
@@ -163,6 +165,27 @@ tasks:
         NAMES: '{{.PNPM_TYPESCRIPT_PACKAGES}}'
     deps:
       - pnpm:build
+  pnpm:link-build-dirs:
+    deps:
+      - dev-build:link-build-dir
+      - dev-eslint:link-build-dir
+      - dev-loader:link-build-dir
+      - dev-local:link-build-dir
+      - dev-prettier:link-build-dir
+      - dev-suppress:link-build-dir
+      - dev-tsconfig:link-build-dir
+      - lib-concurrency:link-build-dir
+      - lib-crypto:link-build-dir
+      - lib-error:link-build-dir
+      - lib-hex:link-build-dir
+      - lib-random:link-build-dir
+      - lib-stream:link-build-dir
+      - lib-style:link-build-dir
+      - lib-test:link-build-dir
+      - lib-time:link-build-dir
+      - lib-widget:link-build-dir
+      - svc-auth-guest-display:link-build-dir
+      - svc-gateway-guest:link-build-dir
   pnpm:lint:check:
     deps:
       - pnpm:syncpack:lint:check
@@ -186,6 +209,9 @@ tasks:
       task: stack:format-folders:fix
       vars:
         NAMES: '{{.STACK_PACKAGES}}'
+  stack:link-build-dirs:
+    deps:
+      - dev-gen:link-build-dir
   stack:lint:check:
     cmd:
       task: stack:lint-folders:check
@@ -197,6 +223,15 @@ tasks:
     deps:
       - pnpm:test
       - stack:test:release
+  tmpfs:link-build-dirs:
+    cmd:
+      task: tmpfs:link-package-build-dirs
+    deps:
+      - tmpfs:link-root-build-dir
+  tmpfs:link-package-build-dirs:
+    deps:
+      - pnpm:link-build-dirs
+      - stack:link-build-dirs
 vars:
   PNPM_TYPESCRIPT_PACKAGES:
     dev-build dev-loader dev-local dev-suppress lib-concurrency

@@ -137,8 +137,25 @@ spec = context "Gen" $ do
                 { version = FileFormat.taskfileVersion,
                   run = FileFormat.taskfileRun,
                   includes = Nothing,
-                  vars = Nothing,
-                  tasks = []
+                  vars =
+                    Just
+                      [("NAME", "a")],
+                  tasks =
+                    [ ( "link-build-dir",
+                        FileFormat.TaskfileTask
+                          { aliases = Nothing,
+                            deps = Nothing,
+                            cmd =
+                              Just
+                                ( FileFormat.TaskfileCommand
+                                    { task = ":tmpfs:link-package-build-dir",
+                                      vars = Just [("NAME", "{{.NAME}}")]
+                                    }
+                                ),
+                            cmds = Nothing
+                          }
+                      )
+                    ]
                 }
             ),
           ExecSpec.writeFile
@@ -148,8 +165,25 @@ spec = context "Gen" $ do
                 { version = FileFormat.taskfileVersion,
                   run = FileFormat.taskfileRun,
                   includes = Nothing,
-                  vars = Nothing,
-                  tasks = []
+                  vars =
+                    Just
+                      [("NAME", "b")],
+                  tasks =
+                    [ ( "link-build-dir",
+                        FileFormat.TaskfileTask
+                          { aliases = Nothing,
+                            deps = Nothing,
+                            cmd =
+                              Just
+                                ( FileFormat.TaskfileCommand
+                                    { task = ":tmpfs:link-package-build-dir",
+                                      vars = Just [("NAME", "{{.NAME}}")]
+                                    }
+                                ),
+                            cmds = Nothing
+                          }
+                      )
+                    ]
                 }
             ),
           ExecSpec.writeFile
@@ -189,6 +223,14 @@ spec = context "Gen" $ do
                         FileFormat.TaskfileTask
                           { aliases = Nothing,
                             deps = Just ["y"],
+                            cmd = Nothing,
+                            cmds = Nothing
+                          }
+                      ),
+                      ( "pnpm:link-build-dirs",
+                        FileFormat.TaskfileTask
+                          { aliases = Nothing,
+                            deps = Just ["a:link-build-dir", "b:link-build-dir"],
                             cmd = Nothing,
                             cmds = Nothing
                           }
