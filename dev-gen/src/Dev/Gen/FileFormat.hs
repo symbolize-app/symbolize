@@ -95,7 +95,7 @@ typeScriptConfigCompilerOptions =
     }
 
 typeScriptConfigCompilerOptionsDeclarationDir :: Text
-typeScriptConfigCompilerOptionsDeclarationDir = "./build/.d.ts"
+typeScriptConfigCompilerOptionsDeclarationDir = "./build/tsc"
 
 typeScriptConfigCompilerOptionsPaths :: Map Text (Vector Text)
 typeScriptConfigCompilerOptionsPaths =

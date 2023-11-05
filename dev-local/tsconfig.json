@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "declarationDir": "./build/.d.ts",
+    "declarationDir": "./build/tsc",
     "paths": { "@/*.ts": ["./*.ts"] }
   },
   "exclude": ["build/**"],

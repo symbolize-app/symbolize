@@ -20,7 +20,7 @@ tasks:
     requires:
       vars:
         - MODE
-    cmd: stack clean --work-dir .stack-work-{{.MODE}} --full
+    cmd: stack clean --work-dir build/stack-work-{{.MODE}} --full
 
   install:
     deps:
@@ -35,7 +35,7 @@ tasks:
   build:release:
     aliases:
       - br
-    cmd: stack build --work-dir .stack-work-release --test --no-run-tests --keep-going {{.RELEASE_OPTIONS}}
+    cmd: stack build --work-dir build/stack-work-release --test --no-run-tests --keep-going {{.RELEASE_OPTIONS}}
 
   build:debug:watch:
     aliases:
@@ -48,7 +48,7 @@ tasks:
       - tr
     deps:
       - build:release
-    cmd: stack build --work-dir .stack-work-release --test --keep-going {{.RELEASE_OPTIONS}}
+    cmd: stack build --work-dir build/stack-work-release --test --keep-going {{.RELEASE_OPTIONS}}
 
   format-folders:check:
     internal: true
@@ -80,7 +80,7 @@ tasks:
       vars:
         - MODE
         - NAME
-    cmd: stack ghci --work-dir .stack-work-{{.MODE}} intertwine-{{.NAME}}
+    cmd: stack ghci --work-dir build/stack-work-{{.MODE}} intertwine-{{.NAME}}
 
   execute-target:
     internal: true
@@ -91,7 +91,7 @@ tasks:
         - TARGET
     vars:
       DIST_DIR:
-        sh: realpath --relative-to . $(sh -c "$(cd {{.NAME}} && stack config env --work-dir .stack-work-{{.MODE}}) echo \$HASKELL_DIST_DIR")
+        sh: realpath --relative-to . $(sh -c "$(cd {{.NAME}} && stack config env --work-dir build/stack-work-{{.MODE}}) echo \$HASKELL_DIST_DIR")
       FULL_TARGET: intertwine-{{.NAME}}-{{.TARGET}}
     cmd: '{{.DIST_DIR}}/build/{{.FULL_TARGET}}/{{.FULL_TARGET}} {{.ARGS}} {{.CLI_ARGS}}'
 
@@ -104,6 +104,6 @@ tasks:
         - TARGET
     vars:
       DIST_DIR:
-        sh: realpath --relative-to . $(sh -c "$(cd {{.NAME}} && stack config env --work-dir .stack-work-{{.MODE}}) echo \$HASKELL_DIST_DIR")
+        sh: realpath --relative-to . $(sh -c "$(cd {{.NAME}} && stack config env --work-dir build/stack-work-{{.MODE}}) echo \$HASKELL_DIST_DIR")
       FULL_TARGET: intertwine-{{.NAME}}-{{.TARGET}}
     cmd: watchexec --fs-events create,rename,modify --debounce 150ms --no-vcs-ignore --watch {{.DIST_DIR}}/build/{{.FULL_TARGET}} --filter {{.FULL_TARGET}} -- {{.DIST_DIR}}/build/{{.FULL_TARGET}}/{{.FULL_TARGET}} {{.CLI_ARGS}}
