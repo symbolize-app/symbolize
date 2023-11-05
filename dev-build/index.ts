@@ -36,6 +36,7 @@ export async function buildCommon(options: {
   ]
   const moduleEntryPoints = [
     './svc-auth-guest-display/index.ts',
+    './svc-gateway-guest/serviceWorkerRegister.ts',
   ]
   const commonOptions = {
     format: 'esm' as const,
@@ -57,7 +58,7 @@ export async function buildCommon(options: {
     entryPoints: classicEntryPoints.map((entryPoint) =>
       nodePath.resolve(entryPoint)
     ),
-    outExtension: { ['.js']: '.mjs' },
+    outExtension: { ['.js']: '.ts.js' },
   })
   const moduleResultPromise = modules.build({
     ...commonOptions,

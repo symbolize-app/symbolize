@@ -39,7 +39,7 @@ const notFound = devRoute.define(undefined, /.*/, () => {
 
 const js = devRoute.define<Context>(
   ['GET'],
-  /^\/js\/(?<path>.+\.mjs)$/,
+  /^\/js\/(?<path>.+\.m?js)$/,
   async (ctx, request) => {
     const path = `/tmp/local/${request.match.path}`
     const buildResult = await ctx.buildResult
@@ -51,6 +51,7 @@ const js = devRoute.define<Context>(
         status: 200,
         headers: {
           ['content-type']: 'application/javascript',
+          ['service-worker-allowed']: '/',
         },
         buffer: sourceFile.contents,
       }
@@ -70,7 +71,7 @@ async function buildDev(): Promise<build.BuildResult> {
 
 function main(): void {
   const watcher = chokidar.watch(
-    ['./svc-auth-guest-display'],
+    ['./svc-auth-guest-display', './svc-gateway-guest'],
     {
       ignoreInitial: true,
     }
