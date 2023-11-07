@@ -1,9 +1,6 @@
 includes:
   cargo:
     taskfile: dev-task/cargo.yml
-  dev-cargo-bin:
-    internal: true
-    taskfile: dev-cargo-bin
   dev-esbuild:
     taskfile: dev-esbuild
   dev-eslint:
@@ -65,12 +62,14 @@ tasks:
       - build
       - b
     deps:
+      - cargo:build:debug
       - pnpm:build:debug
       - stack:build:debug
   build:release:
     aliases:
       - br
     deps:
+      - cargo:build:release
       - pnpm:build:release
       - stack:build:release
   check:
@@ -82,6 +81,12 @@ tasks:
       - test:release
       - format:check
       - lint:check
+      - lock:check
+  clean:
+    deps:
+      - cargo:clean
+      - pnpm:clean
+      - stack:clean
   format:check:
     aliases:
       - fc
@@ -134,6 +139,10 @@ tasks:
     deps:
       - pnpm:lint:fix
       - stack:lint
+  lock:check:
+    deps:
+      - cargo:lock:check
+      - pnpm:lock:check
   pnpm:eslint:lint:check:
     cmd:
       task: pnpm:eslint:lint-folders:check
@@ -199,6 +208,7 @@ tasks:
     aliases:
       - tr
     deps:
+      - cargo:test:release
       - pnpm:test
       - stack:test:release
   tmpfs:link-build-dirs:

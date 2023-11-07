@@ -1,14 +1,49 @@
 version: '3'
-  
+
 run: when_changed
-  
+
 tasks:
   install:
-    deps:
-      - :dev-cargo-bin:install
+    cmds:
+      - task: fetch
+      - task: bin:install
 
-  lock:
-    cargo metadata --format-version=1 >/dev/null
-      
-  lock:check:
-    cargo metadata --frozen --format-version=1 >/dev/null
+  fetch: cargo fetch --frozen --locked
+
+  bin:install:
+    # To avoid painful conflicts, don't use lockfile
+    - cargo install cargo-watch --version 8.4.1
+    - cargo install tantivy-cli --version 0.15.0
+    - cargo install watchexec-cli --version 1.23.0
+
+  lock: cargo metadata --format-version=1 >/dev/null
+
+  lock:check: cargo metadata --frozen --locked --format-version=1 >/dev/null
+
+  build:debug:
+    aliases:
+      - build
+      - b
+    cmd: cargo build --frozen --locked
+
+  build:release:
+    aliases:
+      - br
+    cmd: cargo build --frozen --locked --release
+
+  test:debug:
+    aliases:
+      - test
+      - t
+    deps:
+      - build:debug
+    cmd: cargo test --frozen --locked
+
+  test:release:
+    aliases:
+      - tr
+    deps:
+      - build:release
+    cmd: cargo test --frozen --locked --release
+
+  clean: cargo clean

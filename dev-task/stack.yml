@@ -6,6 +6,10 @@ vars:
   RELEASE_OPTIONS: "--ghc-options '-O2 -g0 -Werror'"
 
 tasks:
+  install:
+    deps:
+      - :dev-stack-bin:install
+
   clean:
     deps:
       - task: clean:mode
@@ -21,10 +25,6 @@ tasks:
       vars:
         - MODE
     cmd: stack clean --work-dir build/stack-work-{{.MODE}} --full
-
-  install:
-    deps:
-      - :dev-stack-bin:install
 
   build:debug:
     aliases:
@@ -42,6 +42,14 @@ tasks:
       - build:watch
       - bw
     cmd: stack build --test --no-run-tests --keep-going --file-watch
+
+  test:debug:
+    aliases:
+      - test
+      - t
+    deps:
+      - build:debug
+    cmd: stack build --test --keep-going
 
   test:release:
     aliases:

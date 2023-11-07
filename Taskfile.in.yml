@@ -27,10 +27,6 @@ includes:
   svc-gateway-guest:
     taskfile: svc-gateway-guest
 
-  dev-cargo-bin:
-    internal: true
-    taskfile: dev-cargo-bin
-
   dev-nix-shell:
     internal: true
     taskfile: dev-nix-shell
@@ -49,6 +45,7 @@ tasks:
       - test:release
       - format:check
       - lint:check
+      - lock:check
 
   gen:
     aliases:
@@ -78,6 +75,7 @@ tasks:
       - build
       - b
     deps:
+      - cargo:build:debug
       - pnpm:build:debug
       - stack:build:debug
 
@@ -85,6 +83,7 @@ tasks:
     aliases:
       - br
     deps:
+      - cargo:build:release
       - pnpm:build:release
       - stack:build:release
 
@@ -92,8 +91,15 @@ tasks:
     aliases:
       - tr
     deps:
+      - cargo:test:release
       - pnpm:test
       - stack:test:release
+
+  clean:
+    deps:
+      - cargo:clean
+      - pnpm:clean
+      - stack:clean
 
   tmpfs:link-build-dirs:
     deps:
@@ -141,6 +147,11 @@ tasks:
     deps:
       - pnpm:lint:fix
       - stack:lint
+
+  lock:check:
+    deps:
+      - cargo:lock:check
+      - pnpm:lock:check
 
   pnpm:lint:check:
     deps:

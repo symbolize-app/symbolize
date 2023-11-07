@@ -7,6 +7,10 @@ vars:
   ESLINT_ARGS: --ignore-path .gitignore --max-warnings 0 --ext ts,js,cjs
 
 tasks:
+  install: pnpm install --frozen-lockfile
+
+  lock:check: pnpm install --frozen-lockfile --lockfile-only
+
   clean:
     deps:
       - tsc:clean
