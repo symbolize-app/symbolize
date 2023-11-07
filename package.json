@@ -2,10 +2,10 @@
   "type": "module",
   "devDependencies": {
     "@intertwine/dev-esbuild": "workspace:*",
-    "@intertwine/dev-loader": "workspace:*",
+    "@intertwine/dev-node-loader": "workspace:*",
+    "@intertwine/dev-node-suppress": "workspace:*",
     "@intertwine/dev-pnpm-test": "workspace:*",
     "@intertwine/dev-prettier": "workspace:*",
-    "@intertwine/dev-suppress": "workspace:*",
     "@intertwine/dev-tsconfig": "workspace:*",
     "@intertwine/eslint-config": "workspace:@intertwine/dev-eslint@*",
     "@intertwine/lib-concurrency": "workspace:*",

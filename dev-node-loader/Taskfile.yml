@@ -6,5 +6,5 @@ tasks:
       vars:
         NAME: '{{.NAME}}'
 vars:
-  NAME: dev-suppress
+  NAME: dev-node-loader
 version: '3'

@@ -10,11 +10,13 @@ includes:
     taskfile: dev-eslint
   dev-gen:
     taskfile: dev-gen
-  dev-loader:
-    taskfile: dev-loader
   dev-nix-shell:
     internal: true
     taskfile: dev-nix-shell
+  dev-node-loader:
+    taskfile: dev-node-loader
+  dev-node-suppress:
+    taskfile: dev-node-suppress
   dev-pnpm-test:
     taskfile: dev-pnpm-test
   dev-prettier:
@@ -22,8 +24,6 @@ includes:
   dev-stack-bin:
     internal: true
     taskfile: dev-stack-bin
-  dev-suppress:
-    taskfile: dev-suppress
   dev-tsconfig:
     taskfile: dev-tsconfig
   lib-concurrency:
@@ -152,10 +152,10 @@ tasks:
     deps:
       - dev-esbuild:link-build-dir
       - dev-eslint:link-build-dir
-      - dev-loader:link-build-dir
+      - dev-node-loader:link-build-dir
+      - dev-node-suppress:link-build-dir
       - dev-pnpm-test:link-build-dir
       - dev-prettier:link-build-dir
-      - dev-suppress:link-build-dir
       - dev-tsconfig:link-build-dir
       - lib-concurrency:link-build-dir
       - lib-crypto:link-build-dir
@@ -212,8 +212,8 @@ tasks:
       - stack:link-build-dirs
 vars:
   PNPM_TYPESCRIPT_PACKAGES:
-    dev-esbuild dev-loader dev-pnpm-test dev-suppress lib-concurrency
-    lib-crypto lib-error lib-hex lib-random lib-stream lib-style lib-test lib-time
-    lib-widget svc-auth-guest-display svc-gateway-guest
+    dev-esbuild dev-node-loader dev-node-suppress dev-pnpm-test
+    lib-concurrency lib-crypto lib-error lib-hex lib-random lib-stream lib-style lib-test
+    lib-time lib-widget svc-auth-guest-display svc-gateway-guest
   STACK_PACKAGES: dev-gen
 version: '3'

@@ -18,7 +18,7 @@
         ];
         pkgs = import nixpkgs { inherit system overlays; };
         node-loader = pkgs.writeShellScriptBin "node-loader" ''
-          node --experimental-loader @intertwine/dev-loader/index.js $@
+          node --experimental-loader @intertwine/dev-node-loader/index.js $@
         '';
       in
         {

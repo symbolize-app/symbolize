@@ -3,9 +3,9 @@
   "parserOptions": {
     "project": [
       "dev-esbuild/tsconfig.json",
-      "dev-loader/tsconfig.json",
+      "dev-node-loader/tsconfig.json",
+      "dev-node-suppress/tsconfig.json",
       "dev-pnpm-test/tsconfig.json",
-      "dev-suppress/tsconfig.json",
       "lib-concurrency/tsconfig.json",
       "lib-crypto/tsconfig.json",
       "lib-error/tsconfig.json",

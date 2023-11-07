@@ -14,18 +14,18 @@ importers:
       '@intertwine/dev-esbuild':
         specifier: workspace:*
         version: link:dev-esbuild
-      '@intertwine/dev-loader':
+      '@intertwine/dev-node-loader':
         specifier: workspace:*
-        version: link:dev-loader
+        version: link:dev-node-loader
+      '@intertwine/dev-node-suppress':
+        specifier: workspace:*
+        version: link:dev-node-suppress
       '@intertwine/dev-pnpm-test':
         specifier: workspace:*
         version: link:dev-pnpm-test
       '@intertwine/dev-prettier':
         specifier: workspace:*
         version: link:dev-prettier
-      '@intertwine/dev-suppress':
-        specifier: workspace:*
-        version: link:dev-suppress
       '@intertwine/dev-tsconfig':
         specifier: workspace:*
         version: link:dev-tsconfig
@@ -190,7 +190,7 @@ importers:
         specifier: 3.0.3
         version: 3.0.3
 
-  dev-loader:
+  dev-node-loader:
     dependencies:
       '@intertwine/dev-prettier':
         specifier: workspace:*
@@ -204,6 +204,22 @@ importers:
       esbuild:
         specifier: 0.19.2
         version: 0.19.2
+    devDependencies:
+      typescript:
+        specifier: 5.2.2
+        version: 5.2.2
+
+  dev-node-suppress:
+    dependencies:
+      '@intertwine/dev-prettier':
+        specifier: workspace:*
+        version: link:../dev-prettier
+      '@intertwine/dev-tsconfig':
+        specifier: workspace:*
+        version: link:../dev-tsconfig
+      '@intertwine/lib-test':
+        specifier: workspace:*
+        version: link:../lib-test
     devDependencies:
       typescript:
         specifier: 5.2.2
@@ -251,22 +267,6 @@ importers:
       prettier:
         specifier: 3.0.3
         version: 3.0.3
-
-  dev-suppress:
-    dependencies:
-      '@intertwine/dev-prettier':
-        specifier: workspace:*
-        version: link:../dev-prettier
-      '@intertwine/dev-tsconfig':
-        specifier: workspace:*
-        version: link:../dev-tsconfig
-      '@intertwine/lib-test':
-        specifier: workspace:*
-        version: link:../lib-test
-    devDependencies:
-      typescript:
-        specifier: 5.2.2
-        version: 5.2.2
 
   dev-tsconfig:
     devDependencies:

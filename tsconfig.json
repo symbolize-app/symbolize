@@ -9,9 +9,9 @@
   "include": [],
   "references": [
     { "path": "./dev-esbuild" },
-    { "path": "./dev-loader" },
+    { "path": "./dev-node-loader" },
+    { "path": "./dev-node-suppress" },
     { "path": "./dev-pnpm-test" },
-    { "path": "./dev-suppress" },
     { "path": "./lib-concurrency" },
     { "path": "./lib-crypto" },
     { "path": "./lib-error" },

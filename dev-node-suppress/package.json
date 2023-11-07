@@ -1,10 +1,9 @@
 {
-  "name": "@intertwine/dev-loader",
+  "name": "@intertwine/dev-node-suppress",
   "type": "module",
   "dependencies": {
     "@intertwine/dev-prettier": "workspace:*",
     "@intertwine/dev-tsconfig": "workspace:*",
-    "esbuild": "0.19.2",
     "@intertwine/lib-test": "workspace:*"
   },
   "devDependencies": {
