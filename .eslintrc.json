@@ -2,9 +2,9 @@
   "extends": ["@intertwine"],
   "parserOptions": {
     "project": [
-      "dev-build/tsconfig.json",
+      "dev-esbuild/tsconfig.json",
       "dev-loader/tsconfig.json",
-      "dev-local/tsconfig.json",
+      "dev-pnpm-test/tsconfig.json",
       "dev-suppress/tsconfig.json",
       "lib-concurrency/tsconfig.json",
       "lib-crypto/tsconfig.json",

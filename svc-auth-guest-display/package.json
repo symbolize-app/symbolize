@@ -1,5 +1,5 @@
 {
-  "name": "@intertwine/lib-service-auth-guest-display",
+  "name": "@intertwine/svc-auth-guest-display",
   "type": "module",
   "dependencies": {
     "@intertwine/dev-prettier": "workspace:*",
@@ -12,8 +12,7 @@
     "@intertwine/lib-test": "workspace:*"
   },
   "devDependencies": {
-    "typescript": "5.2.2",
-    "jsdom": "22.1.0"
+    "typescript": "5.2.2"
   },
   "prettier": "@intertwine/dev-prettier/index.json"
 }

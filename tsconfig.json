@@ -8,9 +8,9 @@
   "extends": "@intertwine/dev-tsconfig/tsconfig.json",
   "include": [],
   "references": [
-    { "path": "./dev-build" },
+    { "path": "./dev-esbuild" },
     { "path": "./dev-loader" },
-    { "path": "./dev-local" },
+    { "path": "./dev-pnpm-test" },
     { "path": "./dev-suppress" },
     { "path": "./lib-concurrency" },
     { "path": "./lib-crypto" },

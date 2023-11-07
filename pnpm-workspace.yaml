@@ -1,8 +1,8 @@
 packages:
-  - dev-build
   - dev-eslint
   - dev-loader
-  - dev-local
+  - dev-esbuild
+  - dev-pnpm-test
   - dev-prettier
   - dev-suppress
   - dev-tsconfig

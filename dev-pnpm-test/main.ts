@@ -1,8 +1,10 @@
+#!/usr/bin/env node-loader
 import * as tinyTest from '@intertwine/lib-test/index.ts'
 import * as tinyTimeNode from '@intertwine/lib-time/time.node.ts'
 import type * as tinyTime from '@intertwine/lib-time/time.ts'
 import * as tinyWidget from '@intertwine/lib-widget/widget.ts'
 import jsdom from 'jsdom'
+import * as nodeFs from 'node:fs'
 import * as nodeUrl from 'node:url'
 
 export const all: tinyTest.TestCollection = () => []
@@ -17,13 +19,12 @@ export async function run(
     ...baseContext,
     ...tinyWidget.initContext(document),
   }
-  return await tinyTest.runAll(ctx, [
-    import('@/index.test.browser.ts'),
-  ])
+  return await tinyTest.runAll(ctx, [import('@/index.ts')])
 }
 
 if (
-  process.argv[1] === nodeUrl.fileURLToPath(import.meta.url)
+  nodeFs.realpathSync(process.argv[1]) ===
+  nodeUrl.fileURLToPath(import.meta.url)
 ) {
   void run({
     ...tinyTimeNode.initContext(),

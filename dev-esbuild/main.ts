@@ -1,4 +1,6 @@
+#!/usr/bin/env node-loader
 import * as esbuild from 'esbuild'
+import * as nodeFs from 'node:fs'
 import * as nodeFsPromises from 'node:fs/promises'
 import * as nodePath from 'node:path'
 import * as nodeUrl from 'node:url'
@@ -6,10 +8,6 @@ import * as nodeUrl from 'node:url'
 import * as modules from '@/modules.ts'
 
 async function main(): Promise<void> {
-  await nodeFsPromises.rm('build', {
-    recursive: true,
-    force: true,
-  })
   await nodeFsPromises.mkdir('build/browser', {
     recursive: true,
   })
@@ -86,7 +84,8 @@ export async function buildCommon(options: {
 }
 
 if (
-  process.argv[1] === nodeUrl.fileURLToPath(import.meta.url)
+  nodeFs.realpathSync(process.argv[1]) ===
+  nodeUrl.fileURLToPath(import.meta.url)
 ) {
   void main()
 }

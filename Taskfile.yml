@@ -1,22 +1,22 @@
 includes:
   cargo:
     taskfile: dev-task/cargo.yml
-  dev-build:
-    taskfile: dev-build
   dev-cargo-bin:
     internal: true
     taskfile: dev-cargo-bin
+  dev-esbuild:
+    taskfile: dev-esbuild
   dev-eslint:
     taskfile: dev-eslint
   dev-gen:
     taskfile: dev-gen
   dev-loader:
     taskfile: dev-loader
-  dev-local:
-    taskfile: dev-local
   dev-nix-shell:
     internal: true
     taskfile: dev-nix-shell
+  dev-pnpm-test:
+    taskfile: dev-pnpm-test
   dev-prettier:
     taskfile: dev-prettier
   dev-stack-bin:
@@ -65,13 +65,13 @@ tasks:
       - build
       - b
     deps:
-      - pnpm:build
+      - pnpm:build:debug
       - stack:build:debug
   build:release:
     aliases:
       - br
     deps:
-      - pnpm:build
+      - pnpm:build:release
       - stack:build:release
   check:
     aliases:
@@ -115,23 +115,6 @@ tasks:
         TARGET: exe
     deps:
       - stack:build:release
-  guest:build:
-    cmd:
-      task: pnpm:execute-script
-      vars:
-        SCRIPT: dev-build/index.ts
-  guest:local:
-    cmd:
-      task: pnpm:execute-script
-      vars:
-        SCRIPT: dev-local/index.ts
-  guest:start:
-    cmds:
-      - echo application/javascript mjs > build/extramimes
-      - darkhttpd build/browser/ --addr {{.APP_HOST}} --port {{.APP_PORT}} --mimetypes
-        build/extramimes
-    deps:
-      - guest:build
   install:
     aliases:
       - i
@@ -157,20 +140,20 @@ tasks:
       vars:
         NAMES: '{{.PNPM_TYPESCRIPT_PACKAGES}}'
     deps:
-      - pnpm:build
+      - pnpm:tsc:build
   pnpm:eslint:lint:fix:
     cmd:
       task: pnpm:eslint:lint-folders:fix
       vars:
         NAMES: '{{.PNPM_TYPESCRIPT_PACKAGES}}'
     deps:
-      - pnpm:build
+      - pnpm:tsc:build
   pnpm:link-build-dirs:
     deps:
-      - dev-build:link-build-dir
+      - dev-esbuild:link-build-dir
       - dev-eslint:link-build-dir
       - dev-loader:link-build-dir
-      - dev-local:link-build-dir
+      - dev-pnpm-test:link-build-dir
       - dev-prettier:link-build-dir
       - dev-suppress:link-build-dir
       - dev-tsconfig:link-build-dir
@@ -194,11 +177,6 @@ tasks:
     deps:
       - pnpm:syncpack:lint:check
       - pnpm:eslint:lint:fix
-  pnpm:test:
-    cmd:
-      task: pnpm:execute-script
-      vars:
-        SCRIPT: svc-auth-guest-display/test.ts
   stack:format:check:
     cmd:
       task: stack:format-folders:check
@@ -234,7 +212,7 @@ tasks:
       - stack:link-build-dirs
 vars:
   PNPM_TYPESCRIPT_PACKAGES:
-    dev-build dev-loader dev-local dev-suppress lib-concurrency
+    dev-esbuild dev-loader dev-pnpm-test dev-suppress lib-concurrency
     lib-crypto lib-error lib-hex lib-random lib-stream lib-style lib-test lib-time
     lib-widget svc-auth-guest-display svc-gateway-guest
   STACK_PACKAGES: dev-gen

@@ -6,5 +6,5 @@ tasks:
       vars:
         NAME: '{{.NAME}}'
 vars:
-  NAME: dev-build
+  NAME: dev-esbuild
 version: '3'

@@ -17,6 +17,9 @@
           })
         ];
         pkgs = import nixpkgs { inherit system overlays; };
+        node-loader = pkgs.writeShellScriptBin "node-loader" ''
+          node --experimental-loader @intertwine/dev-loader/index.js $@
+        '';
       in
         {
           packages.default = pkgs.buildEnv {
@@ -25,6 +28,7 @@
               pkgs.nodejs_20
               pkgs.nodejs_20.pkgs.node2nix
               pkgs.node-packages.pnpm
+              node-loader
             ];
             paths = [];
           };

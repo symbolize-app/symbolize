@@ -8,17 +8,31 @@ vars:
 
 tasks:
   clean:
+    deps:
+      - tsc:clean
+
+  build:debug:
+    deps:
+      - tsc:build
+      - eslint:build:debug
+
+  build:release:
+    deps:
+      - tsc:build
+
+  tsc:clean:
     cmd: tsc --build --clean
 
-  build:
-    aliases:
-      - b
+  tsc:build:
     cmd: tsc --build --verbose
 
-  build:watch:
+  tsc:build:watch:
     aliases:
       - bw
     cmd: tsc --build --verbose --watch
+
+  esbuild:build:debug:
+    cmd: dev-esbuild
 
   format:check:
     cmd: prettier {{.PRETTIER_ARGS}}
@@ -48,9 +62,5 @@ tasks:
         - NAMES
     cmd: eslint {{.ESLINT_ARGS}} {{.NAMES}} --fix
 
-  execute-script:
-    internal: true
-    requires:
-      vars:
-        - SCRIPT
-    cmd: node --experimental-loader @intertwine/dev-loader/index.js {{.SCRIPT}}
+  test:
+    cmd: dev-pnpm-test

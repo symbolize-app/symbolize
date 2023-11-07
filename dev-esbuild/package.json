@@ -1,6 +1,7 @@
 {
-  "name": "@intertwine/dev-build",
+  "name": "@intertwine/dev-esbuild",
   "type": "module",
+  "bin": "main.ts",
   "dependencies": {
     "@intertwine/dev-prettier": "workspace:*",
     "@intertwine/dev-tsconfig": "workspace:*",

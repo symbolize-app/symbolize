@@ -8,10 +8,12 @@
   "extends": "@intertwine/dev-tsconfig/tsconfig.json",
   "include": ["./**/*.ts", "./**/*.js", "./**/*.cjs"],
   "references": [
-    { "path": "../dev-pnpm-test" },
     { "path": "../lib-hex" },
+    { "path": "../lib-random" },
+    { "path": "../lib-style" },
     { "path": "../lib-test" },
     { "path": "../lib-time" },
-    { "path": "../lib-widget" }
+    { "path": "../lib-widget" },
+    { "path": "../svc-auth-guest-display" }
   ]
 }

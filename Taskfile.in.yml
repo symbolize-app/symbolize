@@ -78,14 +78,14 @@ tasks:
       - build
       - b
     deps:
-      - pnpm:build
+      - pnpm:build:debug
       - stack:build:debug
 
   build:release:
     aliases:
       - br
     deps:
-      - pnpm:build
+      - pnpm:build:release
       - stack:build:release
 
   test:release:
@@ -105,12 +105,6 @@ tasks:
     deps:
       - pnpm:link-build-dirs
       - stack:link-build-dirs
-
-  pnpm:test:
-    cmd:
-      task: pnpm:execute-script
-      vars:
-        SCRIPT: svc-auth-guest-display/test.ts
 
   install:
     aliases:
@@ -160,7 +154,7 @@ tasks:
 
   pnpm:eslint:lint:check:
     deps:
-      - pnpm:build
+      - pnpm:tsc:build
     cmd:
       task: pnpm:eslint:lint-folders:check
       vars:
@@ -168,7 +162,7 @@ tasks:
 
   pnpm:eslint:lint:fix:
     deps:
-      - pnpm:build
+      - pnpm:tsc:build
     cmd:
       task: pnpm:eslint:lint-folders:fix
       vars:
@@ -195,22 +189,3 @@ tasks:
   stack:link-build-dirs:
     deps:
       - dev-gen:link-build-dir
-
-  guest:build:
-    cmd:
-      task: pnpm:execute-script
-      vars:
-        SCRIPT: dev-build/index.ts
-
-  guest:local:
-    cmd:
-      task: pnpm:execute-script
-      vars:
-        SCRIPT: dev-local/index.ts
-
-  guest:start:
-    deps:
-      - guest:build
-    cmds:
-      - echo application/javascript mjs > build/extramimes
-      - darkhttpd build/browser/ --addr {{.APP_HOST}} --port {{.APP_PORT}} --mimetypes build/extramimes
