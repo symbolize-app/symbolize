@@ -68,14 +68,14 @@ async function main(): Promise<void> {
         'all',
         lodashDebounce((type, path) => {
           console.log(`Found ${type} at ${path}`)
-          void buildCommon(ctx, {
+          void build(ctx, {
             outdir,
             mode,
           })
         })
       )
     }
-    await buildCommon(ctx, {
+    await build(ctx, {
       outdir,
       mode,
     })
@@ -84,7 +84,7 @@ async function main(): Promise<void> {
 
 export type { BuildResult } from '@/modules.ts'
 
-export async function buildCommon(
+export async function build(
   ctx: Context,
   options: {
     outdir: string
@@ -100,7 +100,6 @@ export async function buildCommon(
     './svc-gateway-guest/serviceWorkerRegister.ts',
   ]
   const commonOptions = {
-    format: 'esm' as const,
     platform: 'browser' as const,
     outdir: options.outdir,
     outbase: nodePath.resolve('.'),
@@ -115,6 +114,7 @@ export async function buildCommon(
   }
   const classicResultPromise = esbuild.build({
     ...commonOptions,
+    format: 'iife',
     bundle: true,
     entryPoints: classicEntryPoints.map((entryPoint) =>
       nodePath.resolve(entryPoint)
@@ -123,6 +123,7 @@ export async function buildCommon(
   })
   const moduleResultPromise = modules.build({
     ...commonOptions,
+    format: 'esm',
     entryPoints: moduleEntryPoints.map((entryPoint) =>
       nodePath.resolve(entryPoint)
     ),

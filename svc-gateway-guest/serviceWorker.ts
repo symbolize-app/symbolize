@@ -1,4 +1,4 @@
-;((self: ServiceWorkerGlobalScope) => {
+function main(self: ServiceWorkerGlobalScope): void {
   const version = 2
 
   console.log(version, 'loading', self)
@@ -44,4 +44,8 @@
   self.addEventListener('fetch', (event) => {
     console.log(version, 'fetch:', event)
   })
-})(self as unknown as ServiceWorkerGlobalScope)
+}
+
+main(self as unknown as ServiceWorkerGlobalScope)
+
+export {}
