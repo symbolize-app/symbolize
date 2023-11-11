@@ -7,5 +7,5 @@
   "exclude": ["build/**"],
   "extends": "@intertwine/dev-tsconfig/tsconfig.json",
   "include": ["./**/*.ts", "./**/*.js", "./**/*.cjs"],
-  "references": [{ "path": "../lib-test" }]
+  "references": [{ "path": "../lib-time" }]
 }

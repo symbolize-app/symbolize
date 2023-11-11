@@ -13,7 +13,18 @@ tasks:
 
   clean:
     deps:
+      - clean:debug
+      - clean:release
+
+  clean:debug:
+    deps:
       - tsc:clean
+      - esbuild:clean:debug
+
+  clean:release:
+    deps:
+      - tsc:clean
+      - esbuild:clean:release
 
   build:debug:
     deps:
@@ -35,8 +46,20 @@ tasks:
       - bw
     cmd: tsc --build --verbose --watch
 
+  esbuild:clean:debug:
+    cmd: dev-esbuild --mode development --clean
+
+  esbuild:clean:release:
+    cmd: dev-esbuild --mode production --clean
+
   esbuild:build:debug:
-    cmd: dev-esbuild
+    cmd: dev-esbuild --mode development
+
+  esbuild:build:debug:watch:
+    cmd: dev-esbuild --mode development --watch
+
+  esbuild:build:release:
+    cmd: dev-esbuild --mode production
 
   format:check:
     cmd: prettier {{.PRETTIER_ARGS}}

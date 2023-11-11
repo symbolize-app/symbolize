@@ -138,7 +138,7 @@ tasks:
       - lf
     deps:
       - pnpm:lint:fix
-      - stack:lint
+      - stack:lint:check
   lock:check:
     deps:
       - cargo:lock:check
