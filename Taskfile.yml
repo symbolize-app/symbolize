@@ -25,16 +25,12 @@ includes:
     taskfile: dev-tsconfig
   lib-concurrency:
     taskfile: lib-concurrency
-  lib-crypto:
-    taskfile: lib-crypto
   lib-error:
     taskfile: lib-error
   lib-hex:
     taskfile: lib-hex
   lib-random:
     taskfile: lib-random
-  lib-stream:
-    taskfile: lib-stream
   lib-style:
     taskfile: lib-style
   lib-test:
@@ -167,11 +163,9 @@ tasks:
       - dev-prettier:link-build-dir
       - dev-tsconfig:link-build-dir
       - lib-concurrency:link-build-dir
-      - lib-crypto:link-build-dir
       - lib-error:link-build-dir
       - lib-hex:link-build-dir
       - lib-random:link-build-dir
-      - lib-stream:link-build-dir
       - lib-style:link-build-dir
       - lib-test:link-build-dir
       - lib-time:link-build-dir
@@ -223,7 +217,7 @@ tasks:
 vars:
   PNPM_TYPESCRIPT_PACKAGES:
     dev-esbuild dev-node-loader dev-node-suppress dev-pnpm-test
-    lib-concurrency lib-crypto lib-error lib-hex lib-random lib-stream lib-style lib-test
-    lib-time lib-widget svc-auth-guest-display svc-gateway-guest
+    lib-concurrency lib-error lib-hex lib-random lib-style lib-test lib-time lib-widget
+    svc-auth-guest-display svc-gateway-guest
   STACK_PACKAGES: dev-gen
 version: '3'

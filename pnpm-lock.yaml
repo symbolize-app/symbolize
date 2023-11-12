@@ -39,9 +39,6 @@ importers:
       '@intertwine/lib-concurrency':
         specifier: workspace:*
         version: link:lib-concurrency
-      '@intertwine/lib-crypto':
-        specifier: workspace:*
-        version: link:lib-crypto
       '@intertwine/lib-error':
         specifier: workspace:*
         version: link:lib-error
@@ -51,9 +48,6 @@ importers:
       '@intertwine/lib-random':
         specifier: workspace:*
         version: link:lib-random
-      '@intertwine/lib-stream':
-        specifier: workspace:*
-        version: link:lib-stream
       '@intertwine/lib-style':
         specifier: workspace:*
         version: link:lib-style
@@ -147,9 +141,6 @@ importers:
       prettier:
         specifier: 3.0.3
         version: 3.0.3
-      sodium-native:
-        specifier: 4.0.4
-        version: 4.0.4
       syncpack:
         specifier: 11.2.1
         version: 11.2.1
@@ -303,25 +294,6 @@ importers:
         specifier: 5.2.2
         version: 5.2.2
 
-  lib-crypto:
-    dependencies:
-      '@intertwine/dev-prettier':
-        specifier: workspace:*
-        version: link:../dev-prettier
-      '@intertwine/dev-tsconfig':
-        specifier: workspace:*
-        version: link:../dev-tsconfig
-      '@intertwine/lib-test':
-        specifier: workspace:*
-        version: link:../lib-test
-      sodium-native:
-        specifier: 4.0.4
-        version: 4.0.4
-    devDependencies:
-      typescript:
-        specifier: 5.2.2
-        version: 5.2.2
-
   lib-error:
     dependencies:
       '@intertwine/dev-prettier':
@@ -365,22 +337,6 @@ importers:
       '@intertwine/lib-hex':
         specifier: workspace:*
         version: link:../lib-hex
-    devDependencies:
-      typescript:
-        specifier: 5.2.2
-        version: 5.2.2
-
-  lib-stream:
-    dependencies:
-      '@intertwine/dev-prettier':
-        specifier: workspace:*
-        version: link:../dev-prettier
-      '@intertwine/dev-tsconfig':
-        specifier: workspace:*
-        version: link:../dev-tsconfig
-      '@intertwine/lib-test':
-        specifier: workspace:*
-        version: link:../lib-test
     devDependencies:
       typescript:
         specifier: 5.2.2
@@ -2610,10 +2566,6 @@ packages:
       formdata-polyfill: 4.0.10
     dev: true
 
-  /node-gyp-build@4.6.1:
-    resolution: {integrity: sha512-24vnklJmyRS8ViBNI8KbtK/r/DmXQMRiOMXTNz2nrTnAYUwjmEEbnnpB/+kt+yWRv73bPsSPRFddrcIbAxSiMQ==}
-    hasBin: true
-
   /normalize-path@3.0.0:
     resolution: {integrity: sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==}
     engines: {node: '>=0.10.0'}
@@ -3031,12 +2983,6 @@ packages:
     resolution: {integrity: sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==}
     engines: {node: '>=8'}
     dev: true
-
-  /sodium-native@4.0.4:
-    resolution: {integrity: sha512-faqOKw4WQKK7r/ybn6Lqo1F9+L5T6NlBJJYvpxbZPetpWylUVqz449mvlwIBKBqxEHbWakWuOlUt8J3Qpc4sWw==}
-    requiresBuild: true
-    dependencies:
-      node-gyp-build: 4.6.1
 
   /string.prototype.trim@1.2.7:
     resolution: {integrity: sha512-p6TmeT1T3411M8Cgg9wBTMRtY2q9+PNy9EV1i2lIXUN/btt763oIfxwN3RR8VU6wHX8j/1CFy0L+YuThm6bgOg==}
