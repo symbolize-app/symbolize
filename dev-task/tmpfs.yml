@@ -4,6 +4,7 @@ run: when_changed
 
 tasks:
   link-root-build-dir:
+    precondition: test "$(stat --file-system --format %T /dev/shm)" = tmpfs
     status:
       - test "$(stat --file-system --format %T build)" = tmpfs
       - test -d "$(readlink build)"
