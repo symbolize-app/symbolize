@@ -15,9 +15,10 @@ import * as z from 'zod'
 
 import * as modules from '@/modules.ts'
 
-export type Context = tinyTime.Context
+type Context = tinyTime.Context
 
 const modeSchema = z.enum(['development', 'production'])
+const modeEnum = modeSchema.enum
 type Mode = z.infer<typeof modeSchema>
 
 const argsSchema = z.object({
@@ -82,16 +83,24 @@ async function main(): Promise<void> {
   }
 }
 
-export type { BuildResult } from '@/modules.ts'
-
-export async function build(
+async function build(
   ctx: Context,
   options: {
     outdir: string
     mode: Mode
   }
-): Promise<modules.BuildResult> {
+): Promise<void> {
   const start = ctx.performanceNow()
+  await buildFiles(options)
+  const end = ctx.performanceNow()
+  const elapsed = ms(Math.round(end - start))
+  console.log(`Done build: ${elapsed}`)
+}
+
+async function buildFiles(options: {
+  outdir: string
+  mode: Mode
+}): Promise<modules.BuildResult> {
   const classicEntryPoints = [
     './svc-gateway-guest/serviceWorker.ts',
   ]
@@ -109,6 +118,7 @@ export async function build(
       ),
     },
     logLevel: 'warning' as const,
+    minify: options.mode === modeEnum.production,
     write: true,
     external: ['timers', 'util'],
   }
@@ -130,9 +140,6 @@ export async function build(
   })
   const classicResult = await classicResultPromise
   const moduleResult = await moduleResultPromise
-  const end = ctx.performanceNow()
-  const elapsed = ms(Math.round(end - start))
-  console.log(`Done build: ${elapsed}`)
   return {
     errors: [
       ...classicResult.errors,

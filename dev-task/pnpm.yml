@@ -29,11 +29,12 @@ tasks:
   build:debug:
     deps:
       - tsc:build
-      - eslint:build:debug
+      - esbuild:build:debug
 
   build:release:
     deps:
       - tsc:build
+      - esbuild:build:release
 
   tsc:clean:
     cmd: tsc --build --clean
