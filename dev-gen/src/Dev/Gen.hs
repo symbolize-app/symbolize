@@ -14,7 +14,7 @@ import Relude.Applicative (pure, (<*>))
 import Relude.Container (fromList)
 import Relude.Foldable (for_, toList, traverse)
 import Relude.Function (($), (.))
-import Relude.Functor (fmap, (<$>))
+import Relude.Functor ((<$>))
 import Relude.Monad (Maybe (Just, Nothing))
 import Relude.Monoid (maybeToMonoid, (<>))
 
@@ -38,7 +38,7 @@ gen = do
   let packageTypeScriptConfigs = Vector.mapMaybe genPackageTypeScriptConfig pnpmPackages
   let rootTypeScriptConfig = genRootTypeScriptConfig pnpmPackages
   let esLintConfig = genESLintConfig pnpmPackages
-  let packageTaskfiles = fmap genPNPMTaskfile pnpmPackages
+  let packageTaskfiles = genPNPMTaskfile <$> pnpmPackages
   let rootTaskfile = genRootTaskfile pnpmPackages rootTaskfileInput
 
   Exec.await_ $
@@ -67,7 +67,9 @@ genPackageTypeScriptConfig pnpmPackage = do
           include = FileFormat.typeScriptConfigInclude,
           exclude = FileFormat.typeScriptConfigExclude,
           compilerOptions = FileFormat.typeScriptConfigCompilerOptions,
-          references = fmap (FileFormat.TypeScriptConfigReference . ("../" <>)) typeScript.dependencies
+          references =
+            FileFormat.TypeScriptConfigReference . ("../" <>)
+              <$> typeScript.dependencies
         }
     )
 
@@ -79,9 +81,8 @@ genRootTypeScriptConfig pnpmPackages =
       exclude = [],
       compilerOptions = FileFormat.typeScriptConfigCompilerOptions,
       references =
-        fmap (FileFormat.TypeScriptConfigReference . ("./" <>))
-          . Package.foldTypeScriptPackageNames
-          $ pnpmPackages
+        FileFormat.TypeScriptConfigReference . ("./" <>)
+          <$> Package.foldTypeScriptPackageNames pnpmPackages
     }
 
 genESLintConfig :: Vector Package.PNPM -> FileFormat.ESLintConfig
@@ -92,9 +93,8 @@ genESLintConfig pnpmPackages =
         FileFormat.ESLintConfigParserOptions
           { tsconfigRootDir = FileFormat.esLintConfigParserOptionsTsconfigRootDir,
             project =
-              fmap (<> "/tsconfig.json")
-                . Package.foldTypeScriptPackageNames
-                $ pnpmPackages
+              (<> "/tsconfig.json")
+                <$> Package.foldTypeScriptPackageNames pnpmPackages
           }
     }
 
@@ -105,8 +105,23 @@ genPNPMTaskfile pnpmPackage =
       { version = FileFormat.taskfileVersion,
         run = FileFormat.taskfileRun,
         includes = Nothing,
-        vars = Nothing,
-        tasks = []
+        vars = Just [("NAME", pnpmPackage.name)],
+        tasks =
+          [ ( "link-build-dir",
+              FileFormat.TaskfileTask
+                { aliases = Nothing,
+                  deps = Nothing,
+                  cmd =
+                    Just
+                      ( FileFormat.TaskfileCommand
+                          { task = ":tmpfs:link-package-build-dir",
+                            vars = Just [("NAME", "{{.NAME}}")]
+                          }
+                      ),
+                  cmds = Nothing
+                }
+            )
+          ]
       }
   )
 
@@ -115,8 +130,7 @@ genRootTaskfile pnpmPackages rootTaskfileInput =
   let newIncludes =
         fromList
           . toList
-          . fmap
-            ( \pnpmPackage ->
+          $ ( \pnpmPackage ->
                 ( pnpmPackage.name,
                   FileFormat.TaskfileInclude
                     { internal = Nothing,
@@ -124,10 +138,20 @@ genRootTaskfile pnpmPackages rootTaskfileInput =
                     }
                 )
             )
-          $ pnpmPackages
+            <$> pnpmPackages
       newVars =
         [ ( "PNPM_TYPESCRIPT_PACKAGES",
             Text.intercalate " " . toList $ Package.foldTypeScriptPackageNames pnpmPackages
+          )
+        ]
+      newTasks =
+        [ ( "pnpm:link-build-dirs",
+            FileFormat.TaskfileTask
+              { aliases = Nothing,
+                deps = Just ((<> ":link-build-dir") . (.name) <$> pnpmPackages),
+                cmd = Nothing,
+                cmds = Nothing
+              }
           )
         ]
    in FileFormat.Taskfile
@@ -137,5 +161,5 @@ genRootTaskfile pnpmPackages rootTaskfileInput =
             Just (maybeToMonoid rootTaskfileInput.includes <> newIncludes),
           vars =
             Just (maybeToMonoid rootTaskfileInput.vars <> newVars),
-          tasks = rootTaskfileInput.tasks
+          tasks = rootTaskfileInput.tasks <> newTasks
         }

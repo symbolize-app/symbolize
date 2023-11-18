@@ -11,7 +11,7 @@
     "forceConsistentCasingInFileNames": true,
     "incremental": true,
     "isolatedModules": true,
-    "lib": ["dom", "dom.iterable", "es2020", "scripthost"],
+    "lib": ["DOM", "DOM.Iterable", "ESNext", "WebWorker"],
     "module": "esnext",
     "moduleResolution": "node",
     "noEmit": false,

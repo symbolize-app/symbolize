@@ -64,7 +64,7 @@ const myCounter = tinyWidget.define(
   }
 )
 
-async function main(): Promise<void> {
+function main(): void {
   const ctx: tinyWidget.Context & tinyError.Context = {
     ...tinyRandom.initContext(),
     ...tinyTimeBrowser.initContext(),
@@ -135,11 +135,6 @@ async function main(): Promise<void> {
     }),
   ]
   body.content = [rootDiv]
-
-  if (import.meta.env.NODE_ENV === 'development') {
-    const dev = await import('@/dev.ts')
-    dev.main(ctx)
-  }
 }
 
-main().catch(console.error)
+main()

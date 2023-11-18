@@ -1,26 +1,26 @@
 {
   "compilerOptions": {
-    "declarationDir": "./build/.d.ts",
-    "paths": { "@/*.ts": ["./*.ts"] }
+    "declarationDir": "./build/tsc",
+    "paths": { "@/*.ts": ["./*.ts"] },
+    "tsBuildInfoFile": "build/tsc/tsconfig.tsbuildinfo"
   },
   "exclude": [],
   "extends": "@intertwine/dev-tsconfig/tsconfig.json",
   "include": [],
   "references": [
-    { "path": "./dev-build" },
-    { "path": "./dev-loader" },
-    { "path": "./dev-local" },
-    { "path": "./dev-suppress" },
+    { "path": "./dev-esbuild" },
+    { "path": "./dev-node-loader" },
+    { "path": "./dev-node-suppress" },
+    { "path": "./dev-pnpm-test" },
     { "path": "./lib-concurrency" },
-    { "path": "./lib-crypto" },
     { "path": "./lib-error" },
     { "path": "./lib-hex" },
     { "path": "./lib-random" },
-    { "path": "./lib-stream" },
     { "path": "./lib-style" },
     { "path": "./lib-test" },
     { "path": "./lib-time" },
     { "path": "./lib-widget" },
-    { "path": "./svc-auth-guest-display" }
+    { "path": "./svc-auth-guest-display" },
+    { "path": "./svc-gateway-guest" }
   ]
 }

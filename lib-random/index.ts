@@ -1,4 +1,4 @@
-import * as tinyHex from '@intertwine/lib-hex/hex.ts'
+import * as tinyHex from '@intertwine/lib-hex'
 
 export type Context = {
   randomNumber(): number

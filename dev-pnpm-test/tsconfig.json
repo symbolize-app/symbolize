@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "declarationDir": "./build/tsc",
+    "paths": { "@/*.ts": ["./*.ts"] },
+    "tsBuildInfoFile": "build/tsc/tsconfig.tsbuildinfo"
+  },
+  "exclude": ["build/**"],
+  "extends": "@intertwine/dev-tsconfig/tsconfig.json",
+  "include": ["./**/*.ts", "./**/*.js", "./**/*.cjs"],
+  "references": [
+    { "path": "../lib-hex" },
+    { "path": "../lib-random" },
+    { "path": "../lib-style" },
+    { "path": "../lib-test" },
+    { "path": "../lib-time" },
+    { "path": "../lib-widget" },
+    { "path": "../svc-auth-guest-display" }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "@intertwine/dev-node-suppress",
+  "type": "module",
+  "dependencies": {
+    "@intertwine/dev-prettier": "workspace:*",
+    "@intertwine/dev-tsconfig": "workspace:*",
+    "@intertwine/lib-test": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "5.2.2"
+  },
+  "prettier": "@intertwine/dev-prettier/index.json"
+}

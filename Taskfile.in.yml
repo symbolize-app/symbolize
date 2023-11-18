@@ -7,26 +7,25 @@ vars:
 
 includes:
   cargo:
-    taskfile: dev-task/Cargo.yml
+    taskfile: dev-task/cargo.yml
 
   nix:
-    taskfile: dev-task/Nix.yml
+    taskfile: dev-task/nix.yml
 
   pnpm:
-    taskfile: dev-task/Pnpm.yml
+    taskfile: dev-task/pnpm.yml
 
   stack:
-    taskfile: dev-task/Stack.yml
+    taskfile: dev-task/stack.yml
+
+  tmpfs:
+    taskfile: dev-task/tmpfs.yml
 
   dev-gen:
     taskfile: dev-gen
 
   svc-gateway-guest:
     taskfile: svc-gateway-guest
-
-  dev-cargo-bin:
-    internal: true
-    taskfile: dev-cargo-bin
 
   dev-nix-shell:
     internal: true
@@ -46,6 +45,7 @@ tasks:
       - test:release
       - format:check
       - lint:check
+      - lock:check
 
   gen:
     aliases:
@@ -75,28 +75,42 @@ tasks:
       - build
       - b
     deps:
-      - pnpm:build
+      - cargo:build:debug
+      - pnpm:build:debug
       - stack:build:debug
 
   build:release:
     aliases:
       - br
     deps:
-      - pnpm:build
+      - cargo:build:release
+      - pnpm:build:release
       - stack:build:release
 
   test:release:
     aliases:
       - tr
     deps:
+      - cargo:test:release
       - pnpm:test
       - stack:test:release
 
-  pnpm:test:
+  clean:
+    deps:
+      - cargo:clean
+      - pnpm:clean
+      - stack:clean
+
+  tmpfs:link-build-dirs:
+    deps:
+      - tmpfs:link-root-build-dir
     cmd:
-      task: pnpm:execute-script
-      vars:
-        SCRIPT: svc-auth-guest-display/test.ts
+      task: tmpfs:link-package-build-dirs
+
+  tmpfs:link-package-build-dirs:
+    deps:
+      - pnpm:link-build-dirs
+      - stack:link-build-dirs
 
   install:
     aliases:
@@ -132,7 +146,12 @@ tasks:
       - lf
     deps:
       - pnpm:lint:fix
-      - stack:lint
+      - stack:lint:check
+
+  lock:check:
+    deps:
+      - cargo:lock:check
+      - pnpm:lock:check
 
   pnpm:lint:check:
     deps:
@@ -146,7 +165,7 @@ tasks:
 
   pnpm:eslint:lint:check:
     deps:
-      - pnpm:build
+      - pnpm:tsc:build
     cmd:
       task: pnpm:eslint:lint-folders:check
       vars:
@@ -154,7 +173,7 @@ tasks:
 
   pnpm:eslint:lint:fix:
     deps:
-      - pnpm:build
+      - pnpm:tsc:build
     cmd:
       task: pnpm:eslint:lint-folders:fix
       vars:
@@ -177,3 +196,7 @@ tasks:
       task: stack:lint-folders:check
       vars:
         NAMES: '{{.STACK_PACKAGES}}'
+
+  stack:link-build-dirs:
+    deps:
+      - dev-gen:link-build-dir

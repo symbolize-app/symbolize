@@ -3,7 +3,6 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
     curl.url = "path:./curl";
-    darkhttpd.url = "path:./darkhttpd";
     dasel.url = "path:./dasel";
     fd.url = "path:./fd";
     haskell.url = "path:./haskell";
@@ -12,7 +11,7 @@
     task.url = "path:./task";
   };
 
-  outputs = { nixpkgs, flake-utils, curl, darkhttpd, dasel, fd, haskell, node, rust, task, ... }:
+  outputs = { nixpkgs, flake-utils, curl, dasel, fd, haskell, node, rust, task, ... }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs { inherit system; };
@@ -21,7 +20,6 @@
           devShells.default = pkgs.mkShell {
             inputsFrom = [
               curl.packages.${system}.default
-              darkhttpd.packages.${system}.default
               dasel.packages.${system}.default
               fd.packages.${system}.default
               haskell.packages.${system}.default

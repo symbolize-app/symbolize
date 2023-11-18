@@ -15,7 +15,7 @@ import Relude.Applicative (empty, pure)
 import Relude.Base (Eq, Show, Type)
 import Relude.Container (Map, fromList)
 import Relude.Function (($), (.))
-import Relude.Functor (fmap)
+import Relude.Functor ((<$>))
 import Relude.Monad (Maybe, isJust, mapMaybe)
 import Relude.Monoid (maybeToMonoid, (<>))
 import Relude.String (Text)
@@ -66,5 +66,5 @@ transformPNPM pnpmPackageFiles =
 
 foldTypeScriptPackageNames :: Vector PNPM -> Vector Text
 foldTypeScriptPackageNames =
-  fmap (.name)
+  ((.name) <$>)
     . Vector.filter (\pnpmPackage -> isJust pnpmPackage.typeScript)

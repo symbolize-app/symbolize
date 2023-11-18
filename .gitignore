@@ -1,13 +1,9 @@
-*.tsbuildinfo
 .cargo
 .direnv
 .env
 .stack-bin
-.stack-work-debug
-.stack-work-release
 .tantivy
 build
 node_modules
 result
-target
 tmp

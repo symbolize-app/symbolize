@@ -5,6 +5,7 @@ module Dev.Gen.FileFormat
     PNPMWorkspace (..),
     Storage (..),
     Taskfile (..),
+    TaskfileCommand (..),
     TaskfileInclude (..),
     TaskfileTask (..),
     TypeScriptConfig (..),
@@ -81,7 +82,8 @@ typeScriptConfigExclude = ["build/**"]
 type TypeScriptConfigCompilerOptions :: Type
 data TypeScriptConfigCompilerOptions = TypeScriptConfigCompilerOptions
   { declarationDir :: Text,
-    paths :: Map Text (Vector Text)
+    paths :: Map Text (Vector Text),
+    tsBuildInfoFile :: Text
   }
   deriving stock (Show, Eq, Generic)
 
@@ -91,16 +93,20 @@ typeScriptConfigCompilerOptions :: TypeScriptConfigCompilerOptions
 typeScriptConfigCompilerOptions =
   TypeScriptConfigCompilerOptions
     { declarationDir = typeScriptConfigCompilerOptionsDeclarationDir,
-      paths = typeScriptConfigCompilerOptionsPaths
+      paths = typeScriptConfigCompilerOptionsPaths,
+      tsBuildInfoFile = typeScriptConfigCompilerOptionsTSBuildInfoFile
     }
 
 typeScriptConfigCompilerOptionsDeclarationDir :: Text
-typeScriptConfigCompilerOptionsDeclarationDir = "./build/.d.ts"
+typeScriptConfigCompilerOptionsDeclarationDir = "./build/tsc"
 
 typeScriptConfigCompilerOptionsPaths :: Map Text (Vector Text)
 typeScriptConfigCompilerOptionsPaths =
   [ ("@/*.ts", ["./*.ts"])
   ]
+
+typeScriptConfigCompilerOptionsTSBuildInfoFile :: Text
+typeScriptConfigCompilerOptionsTSBuildInfoFile = "build/tsc/tsconfig.tsbuildinfo"
 
 type TypeScriptConfigReference :: Type
 newtype TypeScriptConfigReference = TypeScriptConfigReference
@@ -183,7 +189,8 @@ type TaskfileTask :: Type
 data TaskfileTask = TaskfileTask
   { aliases :: Maybe (Vector Text),
     deps :: Maybe (Vector Text),
-    cmd :: Maybe TaskfileCommand
+    cmd :: Maybe TaskfileCommand,
+    cmds :: Maybe (Vector Text)
   }
   deriving stock (Show, Eq, Generic)
 

@@ -1,26 +1,10 @@
-version: '3'
-
 run: when_changed
-
+tasks:
+  link-build-dir:
+    cmd:
+      task: :tmpfs:link-package-build-dir
+      vars:
+        NAME: '{{.NAME}}'
 vars:
   NAME: svc-gateway-guest
-
-tasks:
-  build:
-    cmd:
-      task: :pnpm:execute-script
-      vars:
-        SCRIPT: dev-build/index.ts
-
-  dev:
-    cmd:
-      task: :pnpm:execute-script
-      vars:
-        SCRIPT: dev-local/index.ts
-
-  start:
-    deps:
-      - build
-    cmds:
-      - echo application/javascript mjs > build/extramimes
-      - darkhttpd build/browser/ --addr {{.APP_HOST}} --port {{.APP_PORT}} --mimetypes build/extramimes
+version: '3'

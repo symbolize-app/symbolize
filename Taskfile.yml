@@ -1,43 +1,36 @@
 includes:
   cargo:
-    taskfile: dev-task/Cargo.yml
-  dev-build:
-    taskfile: dev-build
-  dev-cargo-bin:
-    internal: true
-    taskfile: dev-cargo-bin
+    taskfile: dev-task/cargo.yml
+  dev-esbuild:
+    taskfile: dev-esbuild
   dev-eslint:
     taskfile: dev-eslint
   dev-gen:
     taskfile: dev-gen
-  dev-loader:
-    taskfile: dev-loader
-  dev-local:
-    taskfile: dev-local
   dev-nix-shell:
     internal: true
     taskfile: dev-nix-shell
+  dev-node-loader:
+    taskfile: dev-node-loader
+  dev-node-suppress:
+    taskfile: dev-node-suppress
+  dev-pnpm-test:
+    taskfile: dev-pnpm-test
   dev-prettier:
     taskfile: dev-prettier
   dev-stack-bin:
     internal: true
     taskfile: dev-stack-bin
-  dev-suppress:
-    taskfile: dev-suppress
   dev-tsconfig:
     taskfile: dev-tsconfig
   lib-concurrency:
     taskfile: lib-concurrency
-  lib-crypto:
-    taskfile: lib-crypto
   lib-error:
     taskfile: lib-error
   lib-hex:
     taskfile: lib-hex
   lib-random:
     taskfile: lib-random
-  lib-stream:
-    taskfile: lib-stream
   lib-style:
     taskfile: lib-style
   lib-test:
@@ -47,15 +40,17 @@ includes:
   lib-widget:
     taskfile: lib-widget
   nix:
-    taskfile: dev-task/Nix.yml
+    taskfile: dev-task/nix.yml
   pnpm:
-    taskfile: dev-task/Pnpm.yml
+    taskfile: dev-task/pnpm.yml
   stack:
-    taskfile: dev-task/Stack.yml
+    taskfile: dev-task/stack.yml
   svc-auth-guest-display:
     taskfile: svc-auth-guest-display
   svc-gateway-guest:
     taskfile: svc-gateway-guest
+  tmpfs:
+    taskfile: dev-task/tmpfs.yml
 run: when_changed
 tasks:
   build:debug:
@@ -63,13 +58,15 @@ tasks:
       - build
       - b
     deps:
-      - pnpm:build
+      - cargo:build:debug
+      - pnpm:build:debug
       - stack:build:debug
   build:release:
     aliases:
       - br
     deps:
-      - pnpm:build
+      - cargo:build:release
+      - pnpm:build:release
       - stack:build:release
   check:
     aliases:
@@ -80,6 +77,12 @@ tasks:
       - test:release
       - format:check
       - lint:check
+      - lock:check
+  clean:
+    deps:
+      - cargo:clean
+      - pnpm:clean
+      - stack:clean
   format:check:
     aliases:
       - fc
@@ -131,21 +134,44 @@ tasks:
       - lf
     deps:
       - pnpm:lint:fix
-      - stack:lint
+      - stack:lint:check
+  lock:check:
+    deps:
+      - cargo:lock:check
+      - pnpm:lock:check
   pnpm:eslint:lint:check:
     cmd:
       task: pnpm:eslint:lint-folders:check
       vars:
         NAMES: '{{.PNPM_TYPESCRIPT_PACKAGES}}'
     deps:
-      - pnpm:build
+      - pnpm:tsc:build
   pnpm:eslint:lint:fix:
     cmd:
       task: pnpm:eslint:lint-folders:fix
       vars:
         NAMES: '{{.PNPM_TYPESCRIPT_PACKAGES}}'
     deps:
-      - pnpm:build
+      - pnpm:tsc:build
+  pnpm:link-build-dirs:
+    deps:
+      - dev-esbuild:link-build-dir
+      - dev-eslint:link-build-dir
+      - dev-node-loader:link-build-dir
+      - dev-node-suppress:link-build-dir
+      - dev-pnpm-test:link-build-dir
+      - dev-prettier:link-build-dir
+      - dev-tsconfig:link-build-dir
+      - lib-concurrency:link-build-dir
+      - lib-error:link-build-dir
+      - lib-hex:link-build-dir
+      - lib-random:link-build-dir
+      - lib-style:link-build-dir
+      - lib-test:link-build-dir
+      - lib-time:link-build-dir
+      - lib-widget:link-build-dir
+      - svc-auth-guest-display:link-build-dir
+      - svc-gateway-guest:link-build-dir
   pnpm:lint:check:
     deps:
       - pnpm:syncpack:lint:check
@@ -154,11 +180,6 @@ tasks:
     deps:
       - pnpm:syncpack:lint:check
       - pnpm:eslint:lint:fix
-  pnpm:test:
-    cmd:
-      task: pnpm:execute-script
-      vars:
-        SCRIPT: svc-auth-guest-display/test.ts
   stack:format:check:
     cmd:
       task: stack:format-folders:check
@@ -169,6 +190,9 @@ tasks:
       task: stack:format-folders:fix
       vars:
         NAMES: '{{.STACK_PACKAGES}}'
+  stack:link-build-dirs:
+    deps:
+      - dev-gen:link-build-dir
   stack:lint:check:
     cmd:
       task: stack:lint-folders:check
@@ -178,12 +202,22 @@ tasks:
     aliases:
       - tr
     deps:
+      - cargo:test:release
       - pnpm:test
       - stack:test:release
+  tmpfs:link-build-dirs:
+    cmd:
+      task: tmpfs:link-package-build-dirs
+    deps:
+      - tmpfs:link-root-build-dir
+  tmpfs:link-package-build-dirs:
+    deps:
+      - pnpm:link-build-dirs
+      - stack:link-build-dirs
 vars:
   PNPM_TYPESCRIPT_PACKAGES:
-    dev-build dev-loader dev-local dev-suppress lib-concurrency
-    lib-crypto lib-error lib-hex lib-random lib-stream lib-style lib-test lib-time
-    lib-widget svc-auth-guest-display
+    dev-esbuild dev-node-loader dev-node-suppress dev-pnpm-test
+    lib-concurrency lib-error lib-hex lib-random lib-style lib-test lib-time lib-widget
+    svc-auth-guest-display svc-gateway-guest
   STACK_PACKAGES: dev-gen
 version: '3'

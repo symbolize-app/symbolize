@@ -1,19 +1,18 @@
 packages:
-  - dev-build
+  - dev-esbuild
   - dev-eslint
-  - dev-loader
-  - dev-local
+  - dev-node-loader
+  - dev-node-suppress
+  - dev-pnpm-test
   - dev-prettier
-  - dev-suppress
   - dev-tsconfig
   - lib-concurrency
-  - lib-crypto
   - lib-error
   - lib-hex
   - lib-random
-  - lib-stream
   - lib-style
   - lib-test
   - lib-time
   - lib-widget
   - svc-auth-guest-display
+  - svc-gateway-guest
