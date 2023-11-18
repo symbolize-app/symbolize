@@ -6,3 +6,6 @@ Guidelines for managing and organizing work:
   - Outline a few steps to connect from this task
   - Call out any special tooling or techniques
 - Stick to PRs just small enough to have a material impact or maneuver code toward impact
+  - Use multiple PRs per issue
+  - Plan out PRs inside the issue description
+  - Plan out smaller mechanical steps inside the PR description
