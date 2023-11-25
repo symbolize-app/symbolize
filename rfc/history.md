@@ -5,6 +5,7 @@ For record keeping, completeness, and auditing, a history of all changes is pres
 ## Tasks
 
 - [ ] Allow unbounded growth?
+- [ ] Separate/parallel repo service for storage/display of other services' histories? Or embedded as a library?
 
 ## Resources
 
@@ -16,11 +17,11 @@ It would be possible to store history as separate DB rows (or embedded columns),
 
 Instead, use a system built for history: Git. It will work well for history-related queries too.
 
-To reduce overhead, each DB shared has one shared Git repo embedded in the SQLite database. The embedding is done at the file-level (for compatibilty with the Git CLI) and exposed via FUSE.
+To reduce overhead, each DB shard has one shared Git repo embedded in the SQLite database. The embedding is done at the file-level (for compatibilty with the Git CLI) and exposed via FUSE.
 
 The first time Git is needed for a shard, the filesystem is mounted and the database is opened (via libgit2). These can stay open for a while, in case future requests also need Git.
 
-(Access to Git will need to be serialized, but this might be taken care of with the SQLite client anyway.)
+(Write access to Git will need to be serialized, but this might be taken care of with the SQLite client anyway.)
 
 For storing Git files in SQLite, one row should be one filesystem page.
 
