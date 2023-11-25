@@ -2,6 +2,7 @@
 
 ## Goals
 
+- Intuitive shards that match human factors and workflows
 - Small shards that can be quickly paged in from storage
 - Small shards that can be quickly distributed during scale up
 - Coherent data that does not always require multiple shards to build a display
