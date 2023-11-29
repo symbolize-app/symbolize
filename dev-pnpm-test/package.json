@@ -7,6 +7,7 @@
     "@intertwine/dev-tsconfig": "workspace:*",
     "@intertwine/lib-random": "workspace:*",
     "@intertwine/lib-hex": "workspace:*",
+    "@intertwine/lib-payload": "workspace:*",
     "@intertwine/lib-style": "workspace:*",
     "@intertwine/lib-widget": "workspace:*",
     "@intertwine/lib-time": "workspace:*",

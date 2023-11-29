@@ -1,4 +1,5 @@
 #!/usr/bin/env node-loader
+import * as payload from '@intertwine/lib-payload/index.ts'
 import * as tinyTimeNode from '@intertwine/lib-time/time.node.ts'
 import type * as tinyTime from '@intertwine/lib-time/time.ts'
 import chokidar from 'chokidar'
@@ -11,38 +12,37 @@ import * as nodePath from 'node:path'
 import * as nodeUrl from 'node:url'
 import * as nodeUtil from 'node:util'
 import YAML from 'yaml'
-import * as z from 'zod'
 
 import * as modules from '@/modules.ts'
 
 type Context = tinyTime.Context
 
-const modeSchema = z.enum(['development', 'production'])
-const modeEnum = modeSchema.enum
-type Mode = z.infer<typeof modeSchema>
+enum Mode {
+  development = 'development',
+  production = 'production',
+}
 
-const argsSchema = z.object({
-  watch: z.boolean().default(false),
-  clean: z.boolean().default(false),
-  mode: modeSchema.default(modeSchema.enum.development),
-})
-
-const workspaceSchema = z.object({
-  packages: z.string().array(),
+const workspaceTransformer = payload.object({
+  packages: payload.array(payload.string),
 })
 
 async function main(): Promise<void> {
   const ctx = tinyTimeNode.initContext()
-  const { watch, clean, mode } = argsSchema.parse(
-    nodeUtil.parseArgs({
-      options: {
-        watch: { type: 'boolean' },
-        clean: { type: 'boolean' },
-        mode: { type: 'string' },
-      },
-      strict: true,
-    }).values
-  )
+  const args = nodeUtil.parseArgs({
+    options: {
+      watch: { type: 'boolean' },
+      clean: { type: 'boolean' },
+      mode: { type: 'string' },
+    },
+    strict: true,
+  }).values
+  const { watch, clean, mode } = {
+    watch: args.watch ?? false,
+    clean: args.clean ?? false,
+    mode: payload
+      .stringEnum(Mode)
+      .fromJson(args.mode ?? Mode.development),
+  }
   const outdir = nodePath.resolve(`build/guest/${mode}`)
   if (clean) {
     await nodeFsPromises.rm(outdir, {
@@ -54,13 +54,13 @@ async function main(): Promise<void> {
       recursive: true,
     })
     if (watch) {
-      const workspace = workspaceSchema.parse(
+      const workspace = workspaceTransformer.fromJson(
         YAML.parse(
           await nodeFsPromises.readFile(
             './pnpm-workspace.yaml',
             'utf8'
           )
-        )
+        ) as payload.JsonValue
       )
       const watcher = chokidar.watch(workspace.packages, {
         ignoreInitial: true,
@@ -118,7 +118,7 @@ async function buildFiles(options: {
       ),
     },
     logLevel: 'warning' as const,
-    minify: options.mode === modeEnum.production,
+    minify: options.mode === Mode.production,
     write: true,
     external: ['timers', 'util'],
   }

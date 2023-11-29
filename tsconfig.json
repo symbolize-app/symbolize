@@ -15,6 +15,7 @@
     { "path": "./lib-concurrency" },
     { "path": "./lib-error" },
     { "path": "./lib-hex" },
+    { "path": "./lib-payload" },
     { "path": "./lib-random" },
     { "path": "./lib-style" },
     { "path": "./lib-test" },

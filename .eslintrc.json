@@ -9,6 +9,7 @@
       "lib-concurrency/tsconfig.json",
       "lib-error/tsconfig.json",
       "lib-hex/tsconfig.json",
+      "lib-payload/tsconfig.json",
       "lib-random/tsconfig.json",
       "lib-style/tsconfig.json",
       "lib-test/tsconfig.json",

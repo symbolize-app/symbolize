@@ -4,14 +4,13 @@ import * as diff from 'diff'
 import lodashEq from 'lodash-es/eq.js'
 import lodashIsEqual from 'lodash-es/isEqual.js'
 import ms from 'ms'
-import type * as typeFest from 'type-fest'
 
 import * as tinyRandomTest from '@/random.ts'
 import * as tinyTimeTest from '@/time.ts'
 
 export type Test<CustomContext = unknown> = (
   ctx: CustomContext & Context
-) => typeFest.Promisable<void>
+) => void | Promise<void>
 
 export type Context = tinyTimeTest.Context &
   tinyRandom.Context
@@ -235,7 +234,7 @@ export type SyncPromise<Value> = {
 }
 
 export function sync<Value>(
-  promise: typeFest.Promisable<Value>
+  promise: Value | Promise<Value>
 ): SyncPromise<Value> {
   let isResolved = false
   let resolvedValue: Value | undefined = undefined

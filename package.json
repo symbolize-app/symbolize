@@ -11,6 +11,7 @@
     "@intertwine/lib-concurrency": "workspace:*",
     "@intertwine/lib-error": "workspace:*",
     "@intertwine/lib-hex": "workspace:*",
+    "@intertwine/lib-payload": "workspace:*",
     "@intertwine/lib-random": "workspace:*",
     "@intertwine/lib-style": "workspace:*",
     "@intertwine/lib-test": "workspace:*",
@@ -44,9 +45,7 @@
     "node-fetch": "3.3.2",
     "prettier": "3.0.3",
     "syncpack": "11.2.1",
-    "type-fest": "4.3.1",
-    "typescript": "5.2.2",
-    "zod": "3.22.4"
+    "typescript": "5.2.2"
   },
   "pnpm": {
     "neverBuiltDependencies": [
