@@ -21,7 +21,7 @@
 - cal
   - calendar
 - chat
-  - thread / day
+  - thread / capacity
 - feed
   - author
 - forum
@@ -29,7 +29,7 @@
 - letter
   - post
 - log
-  - service / day
+  - service / capacity
 - media
   - file
 - mod
@@ -51,7 +51,7 @@
 - review
   - review
 - track
-  - service / day
+  - service / capacity
 - vote
   - vote
 
@@ -66,13 +66,14 @@
 ## Notes
 
 - Some DBs contain unstructured streams
-  - These need to be partitioned by day
+  - These need to be partitioned by capacity
   - Shard ID is still a GUID, gets registered in an index
+  - Shards indexed by start timestamp
 - Some DBs contain recursive threads
   - Each thread still partitioned separately even though only some are top-level
   - Links to messages must include thread ID (DB shard ID)
 - All DB shards have a capacity limit
-  - For example, max notifications or feed size per author, or max thread messages per day (chat) or all time (forum)
+  - For example, max notifications or feed size per author, or max posts per forum thread
   - This preserves DB shard performance
   - Needs special UI treatment (e.g. "please create a new thread")
 - To preserve resources, some DBs do not allow subscriptions
