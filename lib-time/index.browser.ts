@@ -1,6 +1,6 @@
-import type * as tinyTime from '@intertwine/lib-time/time.ts'
+import type * as time from '@intertwine/lib-time'
 
-export function initContext(): tinyTime.Context {
+export function initContext(): time.Context {
   return {
     performanceNow: () => window.performance.now(),
     setTimeout: (...args) => window.setTimeout(...args),

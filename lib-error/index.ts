@@ -1,7 +1,7 @@
-import type * as tinyRandom from '@intertwine/lib-random'
-import * as tinyTime from '@intertwine/lib-time/time.ts'
+import type * as random from '@intertwine/lib-random'
+import * as time from '@intertwine/lib-time'
 
-export type Context = tinyTime.Context & tinyRandom.Context
+export type Context = time.Context & random.Context
 
 export type RetryConfig = {
   minDelayMs: number
@@ -42,7 +42,7 @@ export async function retry<Result>(
       }
 
       config.onError(error, attempt, delayMs)
-      await tinyTime.delay(ctx, delayMs)
+      await time.delay(ctx, delayMs)
       attempt += 1
     }
   }

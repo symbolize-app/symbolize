@@ -1,20 +1,20 @@
-import * as tinyWidget from '@intertwine/lib-widget/widget.ts'
+import * as widget from '@intertwine/lib-widget'
 
-const button = tinyWidget.html.button
+const button = widget.html.button
 
-export const custom = tinyWidget.define(
+export const custom = widget.define(
   (
-    ctx: tinyWidget.Context
+    ctx: widget.Context
   ): {
-    body: tinyWidget.Widget
-    listen: tinyWidget.HtmlListeners
+    body: widget.Widget
+    listen: widget.HtmlListeners
   } => {
     const body = button(ctx, {
       content: ['OK'],
     })
     return {
       body,
-      set listen(value: tinyWidget.HtmlListeners) {
+      set listen(value: widget.HtmlListeners) {
         body.listen = value
       },
     }

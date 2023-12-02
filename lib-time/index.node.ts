@@ -1,7 +1,7 @@
-import type * as tinyTime from '@intertwine/lib-time/time.ts'
+import type * as time from '@intertwine/lib-time'
 import * as nodePerfHooks from 'node:perf_hooks'
 
-export function initContext(): tinyTime.Context {
+export function initContext(): time.Context {
   return {
     performanceNow: () => nodePerfHooks.performance.now(),
     setTimeout: (...args) => global.setTimeout(...args),

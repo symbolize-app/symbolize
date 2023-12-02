@@ -1,4 +1,4 @@
-import * as tinyWidget from '@/widget.ts'
+import * as widget from '@/index.ts'
 
 export function withTempDocument<
   CustomContext extends Record<string, unknown> = Record<
@@ -7,11 +7,9 @@ export function withTempDocument<
   >,
 >(
   callback: (
-    ctx: CustomContext & tinyWidget.Context
+    ctx: CustomContext & widget.Context
   ) => void | Promise<void>
-): (
-  ctx: CustomContext & tinyWidget.Context
-) => Promise<void> {
+): (ctx: CustomContext & widget.Context) => Promise<void> {
   return async (baseContext) => {
     const iframe =
       baseContext.document.createElement('iframe')
@@ -24,7 +22,7 @@ export function withTempDocument<
       }
       await callback({
         ...baseContext,
-        ...tinyWidget.initContext(iframeDocument),
+        ...widget.initContext(iframeDocument),
       })
     } finally {
       iframe.remove()

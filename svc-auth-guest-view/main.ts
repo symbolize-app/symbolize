@@ -1,50 +1,50 @@
-import type * as tinyError from '@intertwine/lib-error/error.ts'
-import * as tinyRandom from '@intertwine/lib-random'
-import * as tinyStyle from '@intertwine/lib-style/style.ts'
-import * as tinyTimeBrowser from '@intertwine/lib-time/time.browser.ts'
-import * as tinyWidget from '@intertwine/lib-widget/widget.ts'
+import type * as error from '@intertwine/lib-error'
+import * as random from '@intertwine/lib-random'
+import * as style from '@intertwine/lib-style'
+import * as timeBrowser from '@intertwine/lib-time/index.browser.ts'
+import * as widget from '@intertwine/lib-widget'
 
-import * as appWidgetButton from '@/widget/button.ts'
-import * as appWidgetFile from '@/widget/file.ts'
-import * as appWidgetMember from '@/widget/member.ts'
-import * as appWidgetSearch from '@/widget/search.ts'
-import * as appWidgetTopic from '@/widget/topic.ts'
+import * as svcWidgetButton from '@/widget/button.ts'
+import * as svcWidgetFile from '@/widget/file.ts'
+import * as svcWidgetMember from '@/widget/member.ts'
+import * as svcWidgetSearch from '@/widget/search.ts'
+import * as svcWidgetTopic from '@/widget/topic.ts'
 
-const green = tinyStyle.build([
+const green = style.build([
   {
     backgroundColor: 'green',
   },
 ])
-const blue = tinyStyle.build([
+const blue = style.build([
   {
     backgroundColor: 'blue',
   },
 ])
-const red = tinyStyle.build([
+const red = style.build([
   {
     backgroundColor: 'red',
   },
   blue,
-  tinyStyle.useSelector('&:hover', [green]),
+  style.useSelector('&:hover', [green]),
 ])
-const bold = tinyStyle.build([
+const bold = style.build([
   {
     fontWeight: 'bold',
   },
 ])
 
-const div = tinyWidget.html.div
-const li = tinyWidget.html.li
-const link = tinyWidget.html.link
-const span = tinyWidget.html.span
-const title = tinyWidget.html.title
-const ul = tinyWidget.html.ul
+const div = widget.html.div
+const li = widget.html.li
+const link = widget.html.link
+const span = widget.html.span
+const title = widget.html.title
+const ul = widget.html.ul
 
-const myCounter = tinyWidget.define(
+const myCounter = widget.define(
   (
-    ctx: tinyWidget.Context
+    ctx: widget.Context
   ): {
-    body: tinyWidget.Widget
+    body: widget.Widget
     value: number
   } => {
     let value: number
@@ -65,15 +65,15 @@ const myCounter = tinyWidget.define(
 )
 
 function main(): void {
-  const ctx: tinyWidget.Context & tinyError.Context = {
-    ...tinyRandom.initContext(),
-    ...tinyTimeBrowser.initContext(),
-    ...tinyWidget.initContext(window.document),
+  const ctx: widget.Context & error.Context = {
+    ...random.initContext(),
+    ...timeBrowser.initContext(),
+    ...widget.initContext(window.document),
   }
 
   const counter = myCounter(ctx, {})
 
-  const listContents = tinyWidget.range(ctx, {
+  const listContents = widget.range(ctx, {
     content: [
       li(ctx, {
         styles: [bold],
@@ -99,7 +99,7 @@ function main(): void {
   const rootDiv = div(ctx, {
     content: [
       'HI ',
-      appWidgetButton.custom(ctx, {
+      svcWidgetButton.custom(ctx, {
         listen: {
           click: onClick,
         },
@@ -117,10 +117,10 @@ function main(): void {
           }),
         ],
       }),
-      appWidgetMember.create(ctx, {}),
-      appWidgetTopic.list(ctx, {}),
-      appWidgetSearch.query(ctx, {}),
-      appWidgetFile.query(ctx, {}),
+      svcWidgetMember.create(ctx, {}),
+      svcWidgetTopic.list(ctx, {}),
+      svcWidgetSearch.query(ctx, {}),
+      svcWidgetFile.query(ctx, {}),
     ],
   })
 

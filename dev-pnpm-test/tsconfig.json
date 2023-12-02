@@ -8,6 +8,7 @@
   "extends": "@intertwine/dev-tsconfig/tsconfig.json",
   "include": ["./**/*.ts", "./**/*.js", "./**/*.cjs"],
   "references": [
+    { "path": "../lib-error" },
     { "path": "../lib-hex" },
     { "path": "../lib-payload" },
     { "path": "../lib-random" },
