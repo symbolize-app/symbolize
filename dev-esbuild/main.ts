@@ -1,7 +1,7 @@
 #!/usr/bin/env node-loader
-import * as payload from '@intertwine/lib-payload/index.ts'
-import * as tinyTimeNode from '@intertwine/lib-time/time.node.ts'
-import type * as tinyTime from '@intertwine/lib-time/time.ts'
+import * as payload from '@intertwine/lib-payload'
+import type * as time from '@intertwine/lib-time'
+import * as timeNode from '@intertwine/lib-time/index.node.ts'
 import chokidar from 'chokidar'
 import * as esbuild from 'esbuild'
 import lodashDebounce from 'lodash-es/debounce.js'
@@ -13,9 +13,9 @@ import * as nodeUrl from 'node:url'
 import * as nodeUtil from 'node:util'
 import YAML from 'yaml'
 
-import * as modules from '@/modules.ts'
+import * as devModules from '@/modules.ts'
 
-type Context = tinyTime.Context
+type Context = time.Context
 
 enum Mode {
   development = 'development',
@@ -27,7 +27,7 @@ const workspaceTransformer = payload.object({
 })
 
 async function main(): Promise<void> {
-  const ctx = tinyTimeNode.initContext()
+  const ctx = timeNode.initContext()
   const args = nodeUtil.parseArgs({
     options: {
       watch: { type: 'boolean' },
@@ -100,12 +100,12 @@ async function build(
 async function buildFiles(options: {
   outdir: string
   mode: Mode
-}): Promise<modules.BuildResult> {
+}): Promise<devModules.BuildResult> {
   const classicEntryPoints = [
     './svc-gateway-guest-run/serviceWorker.ts',
   ]
   const moduleEntryPoints = [
-    './svc-auth-guest-view/index.ts',
+    './svc-auth-guest-view/main.ts',
     './svc-gateway-guest-run/serviceWorkerRegister.ts',
   ]
   const commonOptions = {
@@ -131,7 +131,7 @@ async function buildFiles(options: {
     ),
     outExtension: { ['.js']: '.ts.js' },
   })
-  const moduleResultPromise = modules.build({
+  const moduleResultPromise = devModules.build({
     ...commonOptions,
     format: 'esm',
     entryPoints: moduleEntryPoints.map((entryPoint) =>

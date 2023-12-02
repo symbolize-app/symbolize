@@ -1,11 +1,11 @@
-import * as tinyTest from '@intertwine/lib-test/index.ts'
-import type * as tinyTime from '@intertwine/lib-time/time.ts'
-import type * as tinyWidget from '@intertwine/lib-widget/widget.ts'
+import * as test from '@intertwine/lib-test'
+import type * as time from '@intertwine/lib-time'
+import type * as widget from '@intertwine/lib-widget'
 
 export function main(
-  ctx: tinyWidget.Context & tinyTime.Context
+  ctx: widget.Context & time.Context
 ): void {
-  tinyTest
+  test
     .runAll(ctx, [import('@intertwine/dev-pnpm-test')])
     .catch(console.error)
 

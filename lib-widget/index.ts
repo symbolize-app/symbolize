@@ -1,4 +1,4 @@
-import * as tinyStyle from '@intertwine/lib-style/style.ts'
+import * as style from '@intertwine/lib-style'
 
 const listeners = Symbol('listeners')
 
@@ -33,14 +33,14 @@ export type Context = {
     body: HtmlWidget<HTMLBodyElement>
     defaultView: NonNullable<Document['defaultView']>
   }
-} & tinyStyle.Context
+} & style.Context
 
 export function initContext(document: Document): Context {
   if (!document.defaultView) {
     throw new Error('No document default view')
   }
   const ctx = {
-    ...tinyStyle.initContext(document),
+    ...style.initContext(document),
     document,
     window: document.defaultView,
   } as Context
@@ -118,14 +118,14 @@ const elementProperties = {
   styles: {
     set(
       this: Element & { [context]: Context },
-      value: tinyStyle.Style[]
+      value: style.Style[]
     ) {
       if (this.classList.length) {
         this.classList.remove(...this.classList)
       }
       for (const styleItem of value) {
         this.classList.add(
-          ...tinyStyle.render(this[context], styleItem)
+          ...style.render(this[context], styleItem)
         )
       }
     },
@@ -233,7 +233,7 @@ export function define<
 }
 
 export type HtmlWidget<T extends HTMLElement> = T & {
-  styles: tinyStyle.Style[]
+  styles: style.Style[]
   listen: HtmlListeners<T>
   content: Widget[]
 }

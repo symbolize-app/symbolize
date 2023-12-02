@@ -1,25 +1,25 @@
 #!/usr/bin/env node-loader
-import * as tinyTest from '@intertwine/lib-test/index.ts'
-import * as tinyTimeNode from '@intertwine/lib-time/time.node.ts'
-import type * as tinyTime from '@intertwine/lib-time/time.ts'
-import * as tinyWidget from '@intertwine/lib-widget/widget.ts'
+import * as test from '@intertwine/lib-test'
+import type * as time from '@intertwine/lib-time'
+import * as timeNode from '@intertwine/lib-time/index.node.ts'
+import * as widget from '@intertwine/lib-widget'
 import jsdom from 'jsdom'
 import * as nodeFs from 'node:fs'
 import * as nodeUrl from 'node:url'
 
-export const all: tinyTest.TestCollection = () => []
+export const all: test.TestCollection = () => []
 
 export async function run(
-  baseContext: tinyTime.Context
+  baseContext: time.Context
 ): Promise<boolean> {
   const dom = new jsdom.JSDOM('<!DOCTYPE html>')
   const window = dom.window
   const document = window.document
   const ctx = {
     ...baseContext,
-    ...tinyWidget.initContext(document),
+    ...widget.initContext(document),
   }
-  return await tinyTest.runAll(ctx, [import('@/index.ts')])
+  return await test.runAll(ctx, [import('@/index.ts')])
 }
 
 if (
@@ -27,7 +27,7 @@ if (
   nodeUrl.fileURLToPath(import.meta.url)
 ) {
   void run({
-    ...tinyTimeNode.initContext(),
+    ...timeNode.initContext(),
   }).then((success) => {
     process.exit(success ? 0 : 1)
   })

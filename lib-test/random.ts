@@ -1,7 +1,7 @@
-import type * as tinyRandom from '@intertwine/lib-random'
+import type * as random from '@intertwine/lib-random'
 import * as fastMersenneTwister from 'fast-mersenne-twister'
 
-export function initContext(): tinyRandom.Context {
+export function initContext(): random.Context {
   const twister =
     fastMersenneTwister.MersenneTwister(1616952581493)
   return {

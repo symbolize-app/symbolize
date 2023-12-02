@@ -1,21 +1,20 @@
-import type * as tinyRandom from '@intertwine/lib-random'
-import type * as tinyTime from '@intertwine/lib-time/time.ts'
+import type * as random from '@intertwine/lib-random'
+import type * as time from '@intertwine/lib-time'
 import * as diff from 'diff'
 import lodashEq from 'lodash-es/eq.js'
 import lodashIsEqual from 'lodash-es/isEqual.js'
 import ms from 'ms'
 
-import * as tinyRandomTest from '@/random.ts'
-import * as tinyTimeTest from '@/time.ts'
+import * as randomTest from '@/random.ts'
+import * as timeTest from '@/time.ts'
 
 export type Test<CustomContext = unknown> = (
   ctx: CustomContext & Context
 ) => void | Promise<void>
 
-export type Context = tinyTimeTest.Context &
-  tinyRandom.Context
+export type Context = timeTest.Context & random.Context
 
-export type RunContext = tinyTime.Context
+export type RunContext = time.Context
 
 type TestModule<CustomContext = unknown> = {
   url: string
@@ -80,8 +79,8 @@ export async function runAll<
       try {
         const testContext: CustomContext & Context = {
           ...ctx,
-          ...tinyTimeTest.initContext(),
-          ...tinyRandomTest.initContext(),
+          ...timeTest.initContext(),
+          ...randomTest.initContext(),
         }
         await test(testContext)
         pass += 1

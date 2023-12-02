@@ -1,7 +1,7 @@
-import type * as tinyTime from '@intertwine/lib-time/time.ts'
+import type * as time from '@intertwine/lib-time'
 import fakeTimers from '@sinonjs/fake-timers'
 
-export type Context = tinyTime.Context & {
+export type Context = time.Context & {
   clock: fakeTimers.Clock
 }
 

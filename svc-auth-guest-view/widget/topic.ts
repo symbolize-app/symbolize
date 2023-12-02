@@ -1,15 +1,15 @@
-import type * as tinyError from '@intertwine/lib-error/error.ts'
-import * as tinyRandom from '@intertwine/lib-random'
-import * as tinyStyle from '@intertwine/lib-style/style.ts'
-import * as tinyWidget from '@intertwine/lib-widget/widget.ts'
+import type * as error from '@intertwine/lib-error'
+import * as ranom from '@intertwine/lib-random'
+import * as style from '@intertwine/lib-style'
+import * as widget from '@intertwine/lib-widget'
 
-const button = tinyWidget.html.button
-const div = tinyWidget.html.div
-const form = tinyWidget.html.form
-const input = tinyWidget.html.input
-const range = tinyWidget.range
+const button = widget.html.button
+const div = widget.html.div
+const form = widget.html.form
+const input = widget.html.input
+const range = widget.range
 
-const column = tinyStyle.build([
+const column = style.build([
   {
     marginTop: '20px',
     display: 'flex',
@@ -18,13 +18,11 @@ const column = tinyStyle.build([
   },
 ])
 
-export const list = tinyWidget.define(
+export const list = widget.define(
   (
-    ctx: tinyWidget.Context &
-      tinyError.Context &
-      tinyRandom.Context
+    ctx: widget.Context & error.Context & ranom.Context
   ): {
-    body: tinyWidget.Widget
+    body: widget.Widget
   } => {
     const resultsRange = range(ctx, {
       content: ['Loading...'],
@@ -71,20 +69,18 @@ type CreateListeners = {
   submit?: () => void
   cancel?: () => void
 }
-const create = tinyWidget.define(
+const create = widget.define(
   (
-    ctx: tinyWidget.Context &
-      tinyError.Context &
-      tinyRandom.Context
+    ctx: widget.Context & error.Context & ranom.Context
   ): {
-    body: tinyWidget.Widget
+    body: widget.Widget
     listen: CreateListeners
   } => {
     let listen: CreateListeners = {}
     const requestIdInput = input(ctx, {
       name: 'requestId',
       type: 'hidden',
-      value: tinyRandom.requestIdHex(ctx),
+      value: ranom.requestIdHex(ctx),
     })
     const memberIdInput = input(ctx, {
       name: 'memberId',

@@ -1,24 +1,22 @@
-import type * as tinyError from '@intertwine/lib-error/error.ts'
-import * as tinyRandom from '@intertwine/lib-random'
-import * as tinyWidget from '@intertwine/lib-widget/widget.ts'
+import type * as error from '@intertwine/lib-error'
+import * as random from '@intertwine/lib-random'
+import * as widget from '@intertwine/lib-widget'
 
-const button = tinyWidget.html.button
-const div = tinyWidget.html.div
-const form = tinyWidget.html.form
-const input = tinyWidget.html.input
+const button = widget.html.button
+const div = widget.html.div
+const form = widget.html.form
+const input = widget.html.input
 
-export const create = tinyWidget.define(
+export const create = widget.define(
   (
-    ctx: tinyWidget.Context &
-      tinyError.Context &
-      tinyRandom.Context
+    ctx: widget.Context & error.Context & random.Context
   ): {
-    body: tinyWidget.Widget
+    body: widget.Widget
   } => {
     const requestIdInput = input(ctx, {
       name: 'requestId',
       type: 'hidden',
-      value: tinyRandom.requestIdHex(ctx),
+      value: random.requestIdHex(ctx),
     })
     const emailInput = input(ctx, {
       name: 'email',

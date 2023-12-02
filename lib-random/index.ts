@@ -1,4 +1,4 @@
-import * as tinyHex from '@intertwine/lib-hex'
+import * as hex from '@intertwine/lib-hex'
 
 export type Context = {
   randomNumber(): number
@@ -23,5 +23,5 @@ export function requestId(ctx: Context): Uint8Array {
 }
 
 export function requestIdHex(ctx: Context): string {
-  return tinyHex.uint8ArrayToHex(requestId(ctx))
+  return hex.uint8ArrayToHex(requestId(ctx))
 }

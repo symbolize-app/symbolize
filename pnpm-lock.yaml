@@ -243,6 +243,9 @@ importers:
       '@intertwine/dev-tsconfig':
         specifier: workspace:*
         version: link:../dev-tsconfig
+      '@intertwine/lib-error':
+        specifier: workspace:*
+        version: link:../lib-error
       '@intertwine/lib-hex':
         specifier: workspace:*
         version: link:../lib-hex
