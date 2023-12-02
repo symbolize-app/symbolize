@@ -9,6 +9,7 @@
   "include": ["./**/*.ts", "./**/*.js", "./**/*.cjs"],
   "references": [
     { "path": "../lib-hex" },
+    { "path": "../lib-payload" },
     { "path": "../lib-random" },
     { "path": "../lib-style" },
     { "path": "../lib-test" },

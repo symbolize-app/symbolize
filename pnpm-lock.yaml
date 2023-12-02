@@ -45,6 +45,9 @@ importers:
       '@intertwine/lib-hex':
         specifier: workspace:*
         version: link:lib-hex
+      '@intertwine/lib-payload':
+        specifier: workspace:*
+        version: link:lib-payload
       '@intertwine/lib-random':
         specifier: workspace:*
         version: link:lib-random
@@ -144,15 +147,9 @@ importers:
       syncpack:
         specifier: 11.2.1
         version: 11.2.1
-      type-fest:
-        specifier: 4.3.1
-        version: 4.3.1
       typescript:
         specifier: 5.2.2
         version: 5.2.2
-      zod:
-        specifier: 3.22.4
-        version: 3.22.4
 
   dev-esbuild:
     dependencies:
@@ -162,6 +159,9 @@ importers:
       '@intertwine/dev-tsconfig':
         specifier: workspace:*
         version: link:../dev-tsconfig
+      '@intertwine/lib-payload':
+        specifier: workspace:*
+        version: link:../lib-payload
       '@intertwine/lib-time':
         specifier: workspace:*
         version: link:../lib-time
@@ -240,6 +240,9 @@ importers:
       '@intertwine/lib-hex':
         specifier: workspace:*
         version: link:../lib-hex
+      '@intertwine/lib-payload':
+        specifier: workspace:*
+        version: link:../lib-payload
       '@intertwine/lib-random':
         specifier: workspace:*
         version: link:../lib-random
@@ -321,6 +324,22 @@ importers:
       '@intertwine/dev-tsconfig':
         specifier: workspace:*
         version: link:../dev-tsconfig
+    devDependencies:
+      typescript:
+        specifier: 5.2.2
+        version: 5.2.2
+
+  lib-payload:
+    dependencies:
+      '@intertwine/dev-prettier':
+        specifier: workspace:*
+        version: link:../dev-prettier
+      '@intertwine/dev-tsconfig':
+        specifier: workspace:*
+        version: link:../dev-tsconfig
+      '@intertwine/lib-test':
+        specifier: workspace:*
+        version: link:../lib-test
     devDependencies:
       typescript:
         specifier: 5.2.2
@@ -3178,11 +3197,6 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  /type-fest@4.3.1:
-    resolution: {integrity: sha512-pphNW/msgOUSkJbH58x8sqpq8uQj6b0ZKGxEsLKMUnGorRcDjrUaLS+39+/ub41JNTwrrMyJcUB8+YZs3mbwqw==}
-    engines: {node: '>=16'}
-    dev: true
-
   /typed-array-buffer@1.0.0:
     resolution: {integrity: sha512-Y8KTSIglk9OZEr8zywiIHG/kmQ7KWyjseXs1CbSo8vC42w7hg2HgYTxSWwP0+is7bWDc1H+Fo026CpHFwm8tkw==}
     engines: {node: '>= 0.4'}
@@ -3374,3 +3388,4 @@ packages:
 
   /zod@3.22.4:
     resolution: {integrity: sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==}
+    dev: false

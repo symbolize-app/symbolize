@@ -1,6 +1,5 @@
 import type * as tinyRandom from '@intertwine/lib-random'
 import * as tinyTime from '@intertwine/lib-time/time.ts'
-import type * as typeFest from 'type-fest'
 
 export type Context = tinyTime.Context & tinyRandom.Context
 
@@ -17,7 +16,7 @@ export type RetryConfig = {
 
 export async function retry<Result>(
   ctx: Context,
-  callback: () => typeFest.Promisable<Result>,
+  callback: () => Result | Promise<Result>,
   config: RetryConfig
 ): Promise<Result> {
   const startMs = ctx.performanceNow()

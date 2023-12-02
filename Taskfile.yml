@@ -29,6 +29,8 @@ includes:
     taskfile: lib-error
   lib-hex:
     taskfile: lib-hex
+  lib-payload:
+    taskfile: lib-payload
   lib-random:
     taskfile: lib-random
   lib-style:
@@ -165,6 +167,7 @@ tasks:
       - lib-concurrency:link-build-dir
       - lib-error:link-build-dir
       - lib-hex:link-build-dir
+      - lib-payload:link-build-dir
       - lib-random:link-build-dir
       - lib-style:link-build-dir
       - lib-test:link-build-dir
@@ -217,7 +220,7 @@ tasks:
 vars:
   PNPM_TYPESCRIPT_PACKAGES:
     dev-esbuild dev-node-loader dev-node-suppress dev-pnpm-test
-    lib-concurrency lib-error lib-hex lib-random lib-style lib-test lib-time lib-widget
-    svc-auth-guest-display svc-gateway-guest
+    lib-concurrency lib-error lib-hex lib-payload lib-random lib-style lib-test lib-time
+    lib-widget svc-auth-guest-display svc-gateway-guest
   STACK_PACKAGES: dev-gen
 version: '3'

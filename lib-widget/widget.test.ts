@@ -1,5 +1,3 @@
-import type * as typeFest from 'type-fest'
-
 import * as tinyWidget from '@/widget.ts'
 
 export function withTempDocument<
@@ -10,7 +8,7 @@ export function withTempDocument<
 >(
   callback: (
     ctx: CustomContext & tinyWidget.Context
-  ) => typeFest.Promisable<void>
+  ) => void | Promise<void>
 ): (
   ctx: CustomContext & tinyWidget.Context
 ) => Promise<void> {
