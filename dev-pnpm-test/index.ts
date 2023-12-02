@@ -7,9 +7,9 @@ export const all: tinyTest.TestCollection<
   import('@intertwine/lib-payload/index.test.ts'),
   import('@intertwine/lib-test/hex.test.ts'),
   import(
-    '@intertwine/svc-auth-guest-display/widget/button.test.ts'
+    '@intertwine/svc-auth-guest-view/widget/button.test.ts'
   ),
   import(
-    '@intertwine/svc-auth-guest-display/widget/member.test.ts'
+    '@intertwine/svc-auth-guest-view/widget/member.test.ts'
   ),
 ]

@@ -24,9 +24,6 @@ includes:
   dev-gen:
     taskfile: dev-gen
 
-  svc-gateway-guest:
-    taskfile: svc-gateway-guest
-
   dev-nix-shell:
     internal: true
     taskfile: dev-nix-shell

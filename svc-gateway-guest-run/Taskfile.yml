@@ -6,5 +6,5 @@ tasks:
       vars:
         NAME: '{{.NAME}}'
 vars:
-  NAME: svc-gateway-guest
+  NAME: svc-gateway-guest-run
 version: '3'

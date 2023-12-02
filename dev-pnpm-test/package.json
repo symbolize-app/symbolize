@@ -12,7 +12,7 @@
     "@intertwine/lib-widget": "workspace:*",
     "@intertwine/lib-time": "workspace:*",
     "@intertwine/lib-test": "workspace:*",
-    "@intertwine/svc-auth-guest-display": "workspace:*",
+    "@intertwine/svc-auth-guest-view": "workspace:*",
     "jsdom": "22.1.0"
   },
   "devDependencies": {

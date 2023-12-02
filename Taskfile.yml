@@ -47,10 +47,10 @@ includes:
     taskfile: dev-task/pnpm.yml
   stack:
     taskfile: dev-task/stack.yml
-  svc-auth-guest-display:
-    taskfile: svc-auth-guest-display
-  svc-gateway-guest:
-    taskfile: svc-gateway-guest
+  svc-auth-guest-view:
+    taskfile: svc-auth-guest-view
+  svc-gateway-guest-run:
+    taskfile: svc-gateway-guest-run
   tmpfs:
     taskfile: dev-task/tmpfs.yml
 run: when_changed
@@ -173,8 +173,8 @@ tasks:
       - lib-test:link-build-dir
       - lib-time:link-build-dir
       - lib-widget:link-build-dir
-      - svc-auth-guest-display:link-build-dir
-      - svc-gateway-guest:link-build-dir
+      - svc-auth-guest-view:link-build-dir
+      - svc-gateway-guest-run:link-build-dir
   pnpm:lint:check:
     deps:
       - pnpm:syncpack:lint:check
@@ -221,6 +221,6 @@ vars:
   PNPM_TYPESCRIPT_PACKAGES:
     dev-esbuild dev-node-loader dev-node-suppress dev-pnpm-test
     lib-concurrency lib-error lib-hex lib-payload lib-random lib-style lib-test lib-time
-    lib-widget svc-auth-guest-display svc-gateway-guest
+    lib-widget svc-auth-guest-view svc-gateway-guest-run
   STACK_PACKAGES: dev-gen
 version: '3'

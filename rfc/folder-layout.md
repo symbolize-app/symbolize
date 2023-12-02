@@ -44,7 +44,10 @@ Like biology achieves scale through hierarchy and repetition.
 
 ### Special\*
 
-Some of the above.
+Read/write switch to...
+
+- svc-<service>-guest-run
+- svc-<service>-host-run
 
 ## Misc
 

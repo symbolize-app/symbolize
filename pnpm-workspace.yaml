@@ -15,5 +15,5 @@ packages:
   - lib-test
   - lib-time
   - lib-widget
-  - svc-auth-guest-display
-  - svc-gateway-guest
+  - svc-auth-guest-view
+  - svc-gateway-guest-run

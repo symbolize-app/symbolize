@@ -1,5 +1,5 @@
 {
-  "name": "@intertwine/svc-gateway-guest",
+  "name": "@intertwine/svc-gateway-guest-run",
   "type": "module",
   "dependencies": {
     "@intertwine/dev-prettier": "workspace:*",
