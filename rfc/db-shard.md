@@ -17,15 +17,16 @@
 - auth
   - author
 - blog
-  - thread
+  - thread / capacity
 - cal
-  - calendar
+  - entry
 - chat
+  - thread / capacity
   - thread / capacity
 - feed
   - author
 - forum
-  - thread
+  - thread / capacity
 - letter
   - post
 - log
@@ -65,7 +66,7 @@
 
 ## Notes
 
-- Some DBs contain unstructured streams
+- Some DBs contain time-based streams
   - These need to be partitioned by capacity
   - Shard ID is still a GUID, gets registered in an index
   - Shards indexed by start timestamp
@@ -73,8 +74,8 @@
   - Each thread still partitioned separately even though only some are top-level
   - Links to messages must include thread ID (DB shard ID)
 - All DB shards have a capacity limit
-  - For example, max notifications or feed size per author, or max posts per forum thread
+  - For example, max notifications or feed size per author
   - This preserves DB shard performance
-  - Needs special UI treatment (e.g. "please create a new thread")
+  - Don't block any workflows when DB isn't partitioned by capacity or object
 - To preserve resources, some DBs do not allow subscriptions
   - For example, media
