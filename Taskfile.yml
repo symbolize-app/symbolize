@@ -45,12 +45,16 @@ includes:
     taskfile: dev-task/nix.yml
   pnpm:
     taskfile: dev-task/pnpm.yml
+  sqlite:
+    taskfile: dev-task/sqlite.yml
   stack:
     taskfile: dev-task/stack.yml
   svc-auth-guest-view:
     taskfile: svc-auth-guest-view
   svc-gateway-guest-run:
     taskfile: svc-gateway-guest-run
+  svc-gateway-host-store:
+    taskfile: svc-gateway-host-store
   tmpfs:
     taskfile: dev-task/tmpfs.yml
 run: when_changed
@@ -130,12 +134,14 @@ tasks:
       - l
     deps:
       - pnpm:lint:check
+      - sqlite:lint:check
       - stack:lint:check
   lint:fix:
     aliases:
       - lf
     deps:
       - pnpm:lint:fix
+      - sqlite:lint:fix
       - stack:lint:check
   lock:check:
     deps:
@@ -183,6 +189,9 @@ tasks:
     deps:
       - pnpm:syncpack:lint:check
       - pnpm:eslint:lint:fix
+  sqlite:link-build-dirs:
+    deps:
+      - svc-gateway-host-store:link-build-dir
   stack:format:check:
     cmd:
       task: stack:format-folders:check
@@ -216,6 +225,7 @@ tasks:
   tmpfs:link-package-build-dirs:
     deps:
       - pnpm:link-build-dirs
+      - sqlite:link-build-dirs
       - stack:link-build-dirs
 vars:
   PNPM_TYPESCRIPT_PACKAGES:

@@ -15,6 +15,9 @@ includes:
   pnpm:
     taskfile: dev-task/pnpm.yml
 
+  sqlite:
+    taskfile: dev-task/sqlite.yml
+
   stack:
     taskfile: dev-task/stack.yml
 
@@ -31,6 +34,9 @@ includes:
   dev-stack-bin:
     internal: true
     taskfile: dev-stack-bin
+
+  svc-gateway-host-store:
+    taskfile: svc-gateway-host-store
 
 tasks:
   check:
@@ -107,6 +113,7 @@ tasks:
   tmpfs:link-package-build-dirs:
     deps:
       - pnpm:link-build-dirs
+      - sqlite:link-build-dirs
       - stack:link-build-dirs
 
   install:
@@ -136,6 +143,7 @@ tasks:
       - l
     deps:
       - pnpm:lint:check
+      - sqlite:lint:check
       - stack:lint:check
 
   lint:fix:
@@ -143,6 +151,7 @@ tasks:
       - lf
     deps:
       - pnpm:lint:fix
+      - sqlite:lint:fix
       - stack:lint:check
 
   lock:check:
@@ -175,6 +184,10 @@ tasks:
       task: pnpm:eslint:lint-folders:fix
       vars:
         NAMES: '{{.PNPM_TYPESCRIPT_PACKAGES}}'
+
+  sqlite:link-build-dirs:
+    deps:
+      - svc-gateway-host-store:link-build-dir
 
   stack:format:check:
     cmd:

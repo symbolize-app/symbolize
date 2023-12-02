@@ -102,7 +102,8 @@ typeScriptConfigCompilerOptionsDeclarationDir = "./build/tsc"
 
 typeScriptConfigCompilerOptionsPaths :: Map Text (Vector Text)
 typeScriptConfigCompilerOptionsPaths =
-  [ ("@/*.ts", ["./*.ts"])
+  [ ("@/*.ts", ["./*.ts"]),
+    ("@/*.sql", ["./*.sql"])
   ]
 
 typeScriptConfigCompilerOptionsTSBuildInfoFile :: Text

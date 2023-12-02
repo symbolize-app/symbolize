@@ -1,0 +1,15 @@
+version: '3'
+
+run: when_changed
+
+tasks:
+  lint:check:
+    aliases:
+      - lint
+      - l
+    cmd: sqlfluff lint --nocolor dev-esbuild svc-gateway-host-store
+
+  lint:fix:
+    aliases:
+      - lf
+    cmd: sqlfluff fix --nocolor --force dev-esbuild svc-gateway-host-store

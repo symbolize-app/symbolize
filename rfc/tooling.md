@@ -44,7 +44,6 @@
   - https://www.sqlite.org/whentouse.html
 - https://github.com/amacneil/dbmate
 - https://sqlfluff.com/
-- https://github.com/sql-formatter-org/sql-formatter
 - https://www.dragonflydb.io/
 
 ## Hosting
