@@ -102,11 +102,11 @@ async function buildFiles(options: {
   mode: Mode
 }): Promise<modules.BuildResult> {
   const classicEntryPoints = [
-    './svc-gateway-guest/serviceWorker.ts',
+    './svc-gateway-guest-run/serviceWorker.ts',
   ]
   const moduleEntryPoints = [
-    './svc-auth-guest-display/index.ts',
-    './svc-gateway-guest/serviceWorkerRegister.ts',
+    './svc-auth-guest-view/index.ts',
+    './svc-gateway-guest-run/serviceWorkerRegister.ts',
   ]
   const commonOptions = {
     platform: 'browser' as const,

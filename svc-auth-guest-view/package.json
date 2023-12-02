@@ -1,5 +1,5 @@
 {
-  "name": "@intertwine/svc-auth-guest-display",
+  "name": "@intertwine/svc-auth-guest-view",
   "type": "module",
   "dependencies": {
     "@intertwine/dev-prettier": "workspace:*",

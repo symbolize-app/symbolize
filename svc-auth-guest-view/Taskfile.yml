@@ -6,5 +6,5 @@ tasks:
       vars:
         NAME: '{{.NAME}}'
 vars:
-  NAME: svc-auth-guest-display
+  NAME: svc-auth-guest-view
 version: '3'
