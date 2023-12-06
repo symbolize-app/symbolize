@@ -46,7 +46,7 @@
       "warn",
       {
         "selector": "default",
-        "format": ["strictCamelCase"],
+        "format": ["strictCamelCase", "snake_case"],
         "leadingUnderscore": "forbid",
         "trailingUnderscore": "allow"
       },

@@ -1,7 +1,10 @@
 {
   "compilerOptions": {
     "declarationDir": "./build/tsc",
-    "paths": { "@/*.ts": ["./*.ts"] },
+    "paths": {
+      "@/*.sql": ["./*.sql"],
+      "@/*.ts": ["./*.ts"]
+    },
     "tsBuildInfoFile": "build/tsc/tsconfig.tsbuildinfo"
   },
   "exclude": [],
