@@ -132,9 +132,7 @@ pub async fn find_recent_updates(
   language: Language,
   mut updated_at: Option<OffsetDateTime>,
 ) -> DynResult<Vec<Document>> {
-  const QUERY_TEXT: &str = include_str!(
-    "../../../svc-auth-host-store/query/recent_updates_find.sql"
-  );
+  const QUERY_TEXT: &str = "";
   const QUERY_LIMIT: i64 = 256;
   let mut done = false;
   let mut type_: Option<String> = None;
