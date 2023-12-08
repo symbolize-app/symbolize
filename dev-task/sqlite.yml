@@ -7,9 +7,9 @@ tasks:
     aliases:
       - lint
       - l
-    cmd: sqlfluff lint --nocolor dev-esbuild svc-gateway-host-store
+    cmd: sqlfluff lint --nocolor .
 
   lint:fix:
     aliases:
       - lf
-    cmd: sqlfluff fix --nocolor --force dev-esbuild svc-gateway-host-store
+    cmd: sqlfluff fix --nocolor --force .
