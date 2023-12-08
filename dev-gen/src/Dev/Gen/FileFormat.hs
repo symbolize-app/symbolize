@@ -3,7 +3,7 @@ module Dev.Gen.FileFormat
     ESLintConfigParserOptions (..),
     PNPMPackageFile (..),
     PNPMWorkspace (..),
-    Storage (..),
+    JSONStorage (..),
     Taskfile (..),
     TaskfileCommand (..),
     TaskfileInclude (..),
@@ -32,14 +32,14 @@ import Relude.Container (Map)
 import Relude.Monad (Maybe)
 import Relude.String (Text)
 
-type Storage :: Type
-data Storage where
-  JSON :: Storage
-  YAML :: Storage
+type JSONStorage :: Type
+data JSONStorage where
+  JSON :: JSONStorage
+  YAML :: JSONStorage
 
-deriving stock instance Eq Storage
+deriving stock instance Eq JSONStorage
 
-deriving stock instance Show Storage
+deriving stock instance Show JSONStorage
 
 type PNPMWorkspace :: Type
 newtype PNPMWorkspace = PNPMWorkspace

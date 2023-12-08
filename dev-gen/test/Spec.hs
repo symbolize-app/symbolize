@@ -20,9 +20,11 @@ spec = context "Gen" $ do
     specify "OK" $
       InterpretSpec.interpret
         gen
-        [ ExecSpec.readFile
+        [ ExecSpec.readLines
+            ".gitignore"
+            ["a", "b"],
+          ExecSpec.readYAML
             "Taskfile.in.yml"
-            FileFormat.YAML
             ( FileFormat.Taskfile
                 { version = FileFormat.taskfileVersion,
                   run = FileFormat.taskfileRun,
@@ -48,16 +50,14 @@ spec = context "Gen" $ do
                     ]
                 }
             ),
-          ExecSpec.readFile
+          ExecSpec.readYAML
             "pnpm-workspace.yaml"
-            FileFormat.YAML
             ( FileFormat.PNPMWorkspace
                 { packages = ["a", "b"]
                 }
             ),
-          ExecSpec.readFile
+          ExecSpec.readJSON
             "a/package.json"
-            FileFormat.JSON
             ( FileFormat.PNPMPackageFile
                 { dependencies = Nothing,
                   devDependencies =
@@ -66,9 +66,8 @@ spec = context "Gen" $ do
                       ]
                 }
             ),
-          ExecSpec.readFile
+          ExecSpec.readJSON
             "b/package.json"
-            FileFormat.JSON
             ( FileFormat.PNPMPackageFile
                 { dependencies =
                     Just
@@ -80,9 +79,11 @@ spec = context "Gen" $ do
                       ]
                 }
             ),
-          ExecSpec.writeFile
+          ExecSpec.writeLines
+            ".sqlfluffignore"
+            ["a", "b"],
+          ExecSpec.writeJSON
             "a/tsconfig.json"
-            FileFormat.JSON
             ( FileFormat.TypeScriptConfig
                 { extends = FileFormat.typeScriptConfigExtends,
                   include = FileFormat.typeScriptConfigInclude,
@@ -91,9 +92,8 @@ spec = context "Gen" $ do
                   references = []
                 }
             ),
-          ExecSpec.writeFile
+          ExecSpec.writeJSON
             "b/tsconfig.json"
-            FileFormat.JSON
             ( FileFormat.TypeScriptConfig
                 { extends = FileFormat.typeScriptConfigExtends,
                   include = FileFormat.typeScriptConfigInclude,
@@ -104,9 +104,8 @@ spec = context "Gen" $ do
                     ]
                 }
             ),
-          ExecSpec.writeFile
+          ExecSpec.writeJSON
             "tsconfig.json"
-            FileFormat.JSON
             ( FileFormat.TypeScriptConfig
                 { extends = FileFormat.typeScriptConfigExtends,
                   include = [],
@@ -118,9 +117,8 @@ spec = context "Gen" $ do
                     ]
                 }
             ),
-          ExecSpec.writeFile
+          ExecSpec.writeJSON
             ".eslintrc.json"
-            FileFormat.JSON
             ( FileFormat.ESLintConfig
                 { extends = FileFormat.esLintConfigExtends,
                   parserOptions =
@@ -130,9 +128,8 @@ spec = context "Gen" $ do
                       }
                 }
             ),
-          ExecSpec.writeFile
+          ExecSpec.writeYAML
             "a/Taskfile.yml"
-            FileFormat.YAML
             ( FileFormat.Taskfile
                 { version = FileFormat.taskfileVersion,
                   run = FileFormat.taskfileRun,
@@ -158,9 +155,8 @@ spec = context "Gen" $ do
                     ]
                 }
             ),
-          ExecSpec.writeFile
+          ExecSpec.writeYAML
             "b/Taskfile.yml"
-            FileFormat.YAML
             ( FileFormat.Taskfile
                 { version = FileFormat.taskfileVersion,
                   run = FileFormat.taskfileRun,
@@ -186,9 +182,8 @@ spec = context "Gen" $ do
                     ]
                 }
             ),
-          ExecSpec.writeFile
+          ExecSpec.writeYAML
             "Taskfile.yml"
-            FileFormat.YAML
             ( FileFormat.Taskfile
                 { version = FileFormat.taskfileVersion,
                   run = FileFormat.taskfileRun,

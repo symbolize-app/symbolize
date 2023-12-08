@@ -9,7 +9,8 @@
     "ms-azuretools.vscode-docker",
     "redhat.vscode-yaml",
     "tamasfe.even-better-toml",
-    "task.vscode-task"
+    "task.vscode-task",
+    "dorzey.vscode-sqlfluff"
   ],
   "unwantedRecommendations": [
     "christian-kohler.npm-intellisense",
