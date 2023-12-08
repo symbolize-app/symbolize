@@ -20,16 +20,17 @@ import Relude.Monoid (maybeToMonoid, (<>))
 
 gen :: Exec.Exec ()
 gen = do
-  (rootTaskfileInput, pnpmPackageFiles) <-
+  (gitIgnore, rootTaskfileInput, pnpmPackageFiles) <-
     Exec.await $
-      (,)
-        <$> Exec.async (Exec.readFile "Taskfile.in.yml" FileFormat.YAML)
+      (,,)
+        <$> Exec.async (Exec.readLines ".gitignore")
+        <*> Exec.async (Exec.readYAML "Taskfile.in.yml")
         <*> Exec.async
           ( do
-              pnpmWorkspace <- Exec.readFile "pnpm-workspace.yaml" FileFormat.YAML :: Exec.Exec FileFormat.PNPMWorkspace
+              pnpmWorkspace <- Exec.readYAML "pnpm-workspace.yaml" :: Exec.Exec FileFormat.PNPMWorkspace
               Exec.await
                 ( traverse
-                    (\package -> (package,) <$> Exec.async (Exec.readFile (FilePath (package <> "/package.json")) FileFormat.JSON))
+                    (\package -> (package,) <$> Exec.async (Exec.readJSON (FilePath (package <> "/package.json"))))
                     pnpmWorkspace.packages
                 )
           )
@@ -42,20 +43,21 @@ gen = do
   let rootTaskfile = genRootTaskfile pnpmPackages rootTaskfileInput
 
   Exec.await_ $
-    (,,,,)
-      <$> for_
+    (,,,,,)
+      <$> Exec.async (Exec.writeLines ".sqlfluffignore" gitIgnore)
+      <*> for_
         packageTypeScriptConfigs
         ( \(filePath, packageTypeScriptConfig) ->
-            Exec.async (Exec.writeFile filePath FileFormat.JSON packageTypeScriptConfig)
+            Exec.async (Exec.writeJSON filePath packageTypeScriptConfig)
         )
-      <*> Exec.async (Exec.writeFile "tsconfig.json" FileFormat.JSON rootTypeScriptConfig)
-      <*> Exec.async (Exec.writeFile ".eslintrc.json" FileFormat.JSON esLintConfig)
+      <*> Exec.async (Exec.writeJSON "tsconfig.json" rootTypeScriptConfig)
+      <*> Exec.async (Exec.writeJSON ".eslintrc.json" esLintConfig)
       <*> for_
         packageTaskfiles
         ( \(filePath, packageTaskfile) ->
-            Exec.async (Exec.writeFile filePath FileFormat.YAML packageTaskfile)
+            Exec.async (Exec.writeYAML filePath packageTaskfile)
         )
-      <*> Exec.async (Exec.writeFile "Taskfile.yml" FileFormat.YAML rootTaskfile)
+      <*> Exec.async (Exec.writeYAML "Taskfile.yml" rootTaskfile)
 
 genPackageTypeScriptConfig :: Package.PNPM -> Maybe (FilePath, FileFormat.TypeScriptConfig)
 genPackageTypeScriptConfig pnpmPackage = do

@@ -44,7 +44,7 @@ tasks:
 
   tsc:build:watch:
     aliases:
-      - bw
+      - tsc:bw
     cmd: tsc --build --verbose --watch
 
   esbuild:clean:debug:

@@ -1,15 +1,20 @@
 module Dev.Gen.Exec
   ( Exec (..),
-    readFile,
-    writeFile,
-    await,
     async,
+    await,
     await_,
+    readJSON,
+    readLines,
+    readYAML,
+    writeJSON,
+    writeLines,
+    writeYAML,
   )
 where
 
 import Control.Monad (MonadFail, ap, liftM, (>>))
 import Data.Aeson qualified as Aeson
+import Data.Vector (Vector)
 import Dev.Gen.Command qualified as Command
 import Dev.Gen.FileFormat qualified as FileFormat
 import Dev.Gen.FilePath (FilePath)
@@ -18,7 +23,7 @@ import Relude.Base (Eq, Show, Type, Typeable)
 import Relude.Function (($), (.))
 import Relude.Functor (Functor, fmap, (<$>))
 import Relude.Monad (Monad, fail, (>>=))
-import Relude.String (String)
+import Relude.String (String, Text)
 
 type Exec :: Type -> Type
 data Exec a where
@@ -47,17 +52,29 @@ instance MonadFail Exec where
   fail :: String -> Exec a
   fail = Fail
 
-readFile :: (Aeson.FromJSON a, Eq a, Show a, Typeable a) => FilePath -> FileFormat.Storage -> Exec a
-readFile = _command2 Command.ReadFile
+readJSON :: (Aeson.FromJSON a, Eq a, Show a, Typeable a) => FilePath -> Exec a
+readJSON = _command1 (Command.ReadJSON FileFormat.JSON)
 
-writeFile :: (Aeson.ToJSON b, Eq b, Show b, Typeable b) => FilePath -> FileFormat.Storage -> b -> Exec ()
-writeFile = _command3 Command.WriteFile
+writeJSON :: (Aeson.ToJSON b, Eq b, Show b, Typeable b) => FilePath -> b -> Exec ()
+writeJSON = _command2 (Command.WriteJSON FileFormat.JSON)
+
+readYAML :: (Aeson.FromJSON a, Eq a, Show a, Typeable a) => FilePath -> Exec a
+readYAML = _command1 (Command.ReadJSON FileFormat.YAML)
+
+writeYAML :: (Aeson.ToJSON b, Eq b, Show b, Typeable b) => FilePath -> b -> Exec ()
+writeYAML = _command2 (Command.WriteJSON FileFormat.YAML)
+
+readLines :: FilePath -> Exec (Vector Text)
+readLines = _command1 Command.ReadLines
+
+writeLines :: FilePath -> Vector Text -> Exec ()
+writeLines = _command2 Command.WriteLines
+
+_command1 :: (Typeable a) => (t1 -> Command.Command a) -> t1 -> Exec a
+_command1 command b = Command (command b)
 
 _command2 :: (Typeable a) => (t1 -> t2 -> Command.Command a) -> t1 -> t2 -> Exec a
 _command2 command b c = Command (command b c)
-
-_command3 :: (Typeable a) => (t1 -> t2 -> t3 -> Command.Command a) -> t1 -> t2 -> t3 -> Exec a
-_command3 command b c d = Command (command b c d)
 
 type ExecConcurrently :: Type -> Type
 newtype ExecConcurrently a where
