@@ -27,8 +27,7 @@
 - https://doc.rust-lang.org/stable/cargo/
   - https://doc.rust-lang.org/stable/cargo/reference/specifying-dependencies.html#inheriting-a-dependency-from-a-workspace
 - https://github.com/rust-lang/rust-clippy
-- https://deno.com/runtime
-  - https://deno.com/blog/roll-your-own-javascript-runtime
+- https://github.com/EmbarkStudios/cargo-deny
 - https://github.com/tantivy-search/tantivy
 - https://github.com/hyperium/h3
   - https://github.com/hyperium/h3/pull/183
