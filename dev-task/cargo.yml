@@ -13,7 +13,7 @@ tasks:
   bin:install:
     # To avoid painful conflicts, don't use lockfile
     - cargo install cargo-watch --version 8.4.1
-    - cargo install tantivy-cli --version 0.15.0
+    - cargo install tantivy-cli --version 0.21.0
     - cargo install watchexec-cli --version 1.23.0
 
   lock: cargo metadata --format-version=1 >/dev/null
