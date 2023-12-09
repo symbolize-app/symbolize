@@ -12,10 +12,10 @@ impl FromHex for Vec<u8> {
     if value.len() % 2 != 0 {
       Err("invalid hex size".into())
     } else {
-      (0..value.len())
+      (0 .. value.len())
         .step_by(2)
         .map(|i| {
-          Ok(u8::from_str_radix(&value[i..i + 2], 16)?)
+          Ok(u8::from_str_radix(&value[i .. i + 2], 16)?)
         })
         .collect()
     }
@@ -30,7 +30,7 @@ impl ToHex for [u8] {
   fn to_hex(&self) -> String {
     let mut s = String::with_capacity(2 + 2 * self.len());
     for byte in self {
-      write!(s, "{:02x}", byte).unwrap();
+      write!(s, "{byte:02x}").unwrap();
     }
     s
   }

@@ -3,14 +3,11 @@ version: '3'
 run: when_changed
 
 tasks:
-  link-root-build-dir:
-    precondition: test "$(stat --file-system --format %T /dev/shm)" = tmpfs
-    status:
-      - test "$(stat --file-system --format %T build)" = tmpfs
-      - test -d "$(readlink build)"
-    cmds:
-      - rm -rf build
-      - ln -s $(mktemp --directory --tmpdir=/dev/shm) build
+  link-build-dirs:
+    deps:
+      - link-root-build-dir
+    cmd:
+      task: link-package-build-dirs
 
   link-package-build-dir:
     internal: true
@@ -24,3 +21,18 @@ tasks:
       - rm -rf {{.NAME}}/build
       - ln -s ../build/{{.NAME}} {{.NAME}}/build
       - mkdir -p build/{{.NAME}}
+
+  link-package-build-dirs:
+    deps:
+      - :pnpm:link-build-dirs
+      - :sqlite:link-build-dirs
+      - :stack:link-build-dirs
+
+  link-root-build-dir:
+    precondition: test "$(stat --file-system --format %T /dev/shm)" = tmpfs
+    status:
+      - test "$(stat --file-system --format %T build)" = tmpfs
+      - test -d "$(readlink build)"
+    cmds:
+      - rm -rf build
+      - ln -s $(mktemp --directory --tmpdir=/dev/shm) build

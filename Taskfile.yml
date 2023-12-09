@@ -55,6 +55,8 @@ includes:
     taskfile: svc-gateway-guest-run
   svc-gateway-host-store:
     taskfile: svc-gateway-host-store
+  svc-search-host-read:
+    taskfile: svc-search-host-read
   tmpfs:
     taskfile: dev-task/tmpfs.yml
 run: when_changed
@@ -93,12 +95,15 @@ tasks:
     aliases:
       - fc
     deps:
+      - cargo:format:check
+      - pnpm:format:check
       - stack:format:check
   format:fix:
     aliases:
       - format
       - f
     deps:
+      - cargo:format:fix
       - pnpm:format:fix
       - stack:format:fix
   gen:
@@ -133,34 +138,22 @@ tasks:
       - lint
       - l
     deps:
+      - cargo:lint:check
       - pnpm:lint:check
       - sqlite:lint:check
-      - stack:lint:check
+      - stack:lint
   lint:fix:
     aliases:
       - lf
     deps:
+      - cargo:lint:fix
       - pnpm:lint:fix
       - sqlite:lint:fix
-      - stack:lint:check
+      - stack:lint
   lock:check:
     deps:
       - cargo:lock:check
       - pnpm:lock:check
-  pnpm:eslint:lint:check:
-    cmd:
-      task: pnpm:eslint:lint-folders:check
-      vars:
-        NAMES: '{{.PNPM_TYPESCRIPT_PACKAGES}}'
-    deps:
-      - pnpm:tsc:build
-  pnpm:eslint:lint:fix:
-    cmd:
-      task: pnpm:eslint:lint-folders:fix
-      vars:
-        NAMES: '{{.PNPM_TYPESCRIPT_PACKAGES}}'
-    deps:
-      - pnpm:tsc:build
   pnpm:link-build-dirs:
     deps:
       - dev-esbuild:link-build-dir
@@ -181,35 +174,6 @@ tasks:
       - lib-widget:link-build-dir
       - svc-auth-guest-view:link-build-dir
       - svc-gateway-guest-run:link-build-dir
-  pnpm:lint:check:
-    deps:
-      - pnpm:syncpack:lint:check
-      - pnpm:eslint:lint:check
-  pnpm:lint:fix:
-    deps:
-      - pnpm:syncpack:lint:check
-      - pnpm:eslint:lint:fix
-  sqlite:link-build-dirs:
-    deps:
-      - svc-gateway-host-store:link-build-dir
-  stack:format:check:
-    cmd:
-      task: stack:format-folders:check
-      vars:
-        NAMES: '{{.STACK_PACKAGES}}'
-  stack:format:fix:
-    cmd:
-      task: stack:format-folders:fix
-      vars:
-        NAMES: '{{.STACK_PACKAGES}}'
-  stack:link-build-dirs:
-    deps:
-      - dev-gen:link-build-dir
-  stack:lint:check:
-    cmd:
-      task: stack:lint-folders:check
-      vars:
-        NAMES: '{{.STACK_PACKAGES}}'
   test:release:
     aliases:
       - tr
@@ -217,20 +181,4 @@ tasks:
       - cargo:test:release
       - pnpm:test
       - stack:test:release
-  tmpfs:link-build-dirs:
-    cmd:
-      task: tmpfs:link-package-build-dirs
-    deps:
-      - tmpfs:link-root-build-dir
-  tmpfs:link-package-build-dirs:
-    deps:
-      - pnpm:link-build-dirs
-      - sqlite:link-build-dirs
-      - stack:link-build-dirs
-vars:
-  PNPM_TYPESCRIPT_PACKAGES:
-    dev-esbuild dev-node-loader dev-node-suppress dev-pnpm-test
-    lib-concurrency lib-error lib-hex lib-payload lib-random lib-style lib-test lib-time
-    lib-widget svc-auth-guest-view svc-gateway-guest-run
-  STACK_PACKAGES: dev-gen
 version: '3'

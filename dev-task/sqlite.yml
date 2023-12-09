@@ -3,6 +3,10 @@ version: '3'
 run: when_changed
 
 tasks:
+  link-build-dirs:
+    deps:
+      - :svc-gateway-host-store:link-build-dir
+
   lint:check:
     aliases:
       - lint

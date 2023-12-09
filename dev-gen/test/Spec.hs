@@ -208,11 +208,7 @@ spec = context "Gen" $ do
                             }
                         )
                       ],
-                  vars =
-                    Just
-                      [ ("PNPM_TYPESCRIPT_PACKAGES", "a b"),
-                        ("v1", "v2")
-                      ],
+                  vars = Just [("v1", "v2")],
                   tasks =
                     [ ( "y",
                         FileFormat.TaskfileTask

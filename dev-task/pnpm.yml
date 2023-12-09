@@ -3,13 +3,19 @@ version: '3'
 run: when_changed
 
 vars:
+  ESLINT_ARGS: "--ignore-path .gitignore --max-warnings 0 --ext ts,js,cjs $(dasel -f .eslintrc.json -r json -w - '.parserOptions.project.all()' | sed -e 's,/tsconfig\\.json$,,')"
   PRETTIER_ARGS: --ignore-path .gitignore --check '**/*'.{cjs,js,json,ts,html,md,yaml} '!pnpm-lock.yaml'
-  ESLINT_ARGS: --ignore-path .gitignore --max-warnings 0 --ext ts,js,cjs
 
 tasks:
-  install: pnpm install --frozen-lockfile
+  build:debug:
+    deps:
+      - esbuild:build:debug
+      - tsc:build
 
-  lock:check: pnpm install --frozen-lockfile --lockfile-only
+  build:release:
+    deps:
+      - esbuild:build:release
+      - tsc:build
 
   clean:
     deps:
@@ -18,40 +24,13 @@ tasks:
 
   clean:debug:
     deps:
-      - tsc:clean
       - esbuild:clean:debug
+      - tsc:clean
 
   clean:release:
     deps:
-      - tsc:clean
       - esbuild:clean:release
-
-  build:debug:
-    deps:
-      - tsc:build
-      - esbuild:build:debug
-
-  build:release:
-    deps:
-      - tsc:build
-      - esbuild:build:release
-
-  tsc:clean:
-    cmd: tsc --build --clean
-
-  tsc:build:
-    cmd: tsc --build --verbose
-
-  tsc:build:watch:
-    aliases:
-      - tsc:bw
-    cmd: tsc --build --verbose --watch
-
-  esbuild:clean:debug:
-    cmd: dev-esbuild --mode development --clean
-
-  esbuild:clean:release:
-    cmd: dev-esbuild --mode production --clean
+      - tsc:clean
 
   esbuild:build:debug:
     cmd: dev-esbuild --mode development
@@ -59,8 +38,20 @@ tasks:
   esbuild:build:debug:watch:
     cmd: dev-esbuild --mode development --watch
 
+  esbuild:clean:debug:
+    cmd: dev-esbuild --mode development --clean
+
+  esbuild:clean:release:
+    cmd: dev-esbuild --mode production --clean
+
   esbuild:build:release:
     cmd: dev-esbuild --mode production
+
+  eslint:lint:check:
+    cmd: eslint {{.ESLINT_ARGS}}
+
+  eslint:lint:fix:
+    cmd: eslint {{.ESLINT_ARGS}} --fix
 
   format:check:
     cmd: prettier {{.PRETTIER_ARGS}}
@@ -68,27 +59,42 @@ tasks:
   format:fix:
     cmd: prettier {{.PRETTIER_ARGS}} --write
 
+  install:
+    cmd: pnpm install --frozen-lockfile
+
+  lint:check:
+    deps:
+      - eslint:lint:check
+      - syncpack:lint:check
+
+  lint:fix:
+    deps:
+      - eslint:lint:fix
+      - syncpack:lint:fix
+
+  lock:check:
+    cmd: pnpm install --frozen-lockfile --lockfile-only
+
   syncpack:lint:check:
     cmd: syncpack lint
 
   syncpack:lint:fix:
     cmds:
       - syncpack fix-mismatches
-      - syncpack lint
+      - task: syncpack:lint:check
 
-  eslint:lint-folders:check:
-    internal: true
-    requires:
-      vars:
-        - NAMES
-    cmd: eslint {{.ESLINT_ARGS}} {{.NAMES}}
+  tsc:clean:
+    cmd: tsc --build --clean
 
-  eslint:lint-folders:fix:
-    internal: true
-    requires:
-      vars:
-        - NAMES
-    cmd: eslint {{.ESLINT_ARGS}} {{.NAMES}} --fix
+  tsc:build:
+    aliases:
+      - tsc:b
+    cmd: tsc --build --verbose
+
+  tsc:build:watch:
+    aliases:
+      - tsc:bw
+    cmd: tsc --build --verbose --watch
 
   test:
     cmd: dev-pnpm-test

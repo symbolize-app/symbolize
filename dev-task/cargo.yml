@@ -2,23 +2,40 @@ version: '3'
 
 run: when_changed
 
+vars:
+  CLIPPY_ARGS: >-
+    --frozen --locked --release
+    --all-targets
+    --all-features
+    --
+    -W clippy::cargo
+    -W clippy::pedantic
+    -W clippy::style
+    {{.CLIPPY_PEDANTIC}}
+    {{.CLIPPY_RESTRICTIONS}}
+    -D warnings
+
+  CLIPPY_PEDANTIC: >-
+    -A clippy::module_name_repetitions
+
+  CLIPPY_RESTRICTIONS: >-
+    -W clippy::dbg_macro
+    -W clippy::error_impl_error
+    -W clippy::exit
+    -W clippy::panic_in_result_fn
+    -W clippy::print_stderr
+    -W clippy::print_stdout
+    -W clippy::try_err
+    -W clippy::unwrap_in_result
+
 tasks:
-  install:
-    cmds:
-      - task: fetch
-      - task: bin:install
-
-  fetch: cargo fetch --frozen --locked
-
   bin:install:
-    # To avoid painful conflicts, don't use lockfile
-    - cargo install cargo-watch --version 8.4.1
-    - cargo install tantivy-cli --version 0.21.0
-    - cargo install watchexec-cli --version 1.23.0
-
-  lock: cargo metadata --format-version=1 >/dev/null
-
-  lock:check: cargo metadata --frozen --locked --format-version=1 >/dev/null
+    cmds:
+      # To avoid painful conflicts, don't use lockfile
+      - cargo install cargo-deny --version 0.14.3
+      - cargo install cargo-watch --version 8.4.1
+      - cargo install tantivy-cli --version 0.21.0
+      - cargo install watchexec-cli --version 1.23.0
 
   build:debug:
     aliases:
@@ -31,13 +48,89 @@ tasks:
       - br
     cmd: cargo build --frozen --locked --release
 
+  clean:
+    cmd: cargo clean
+
+  clippy:lint:check:
+    cmd: cargo clippy {{.CLIPPY_ARGS}}
+
+  clippy:lint:fix:
+    cmd: cargo clippy --fix --allow-staged {{.CLIPPY_ARGS}}
+
+  deny:lint:
+    cmd: cargo deny check
+
+  execute-package:
+    internal: true
+    requires:
+      vars:
+        - RELEASE
+        - NAME
+    cmd: cargo run --package intertwine-{{.NAME}} {{if eq .RELEASE "true"}}--frozen --locked --release{{end}}
+
+  execute-package:watch:
+    internal: true
+    requires:
+      vars:
+        - RELEASE
+        - NAME
+    # Main ignores specified manually (https://github.com/watchexec/cargo-watch/issues/276)
+    cmd: cargo watch --no-vcs-ignores --no-dot-ignores --ignore .cargo --ignore build --ignore node_modules --package intertwine-{{.NAME}} {{if eq .RELEASE "true"}}--release{{end}} --exec run
+
+  fetch:
+    cmd: cargo fetch --frozen --locked
+
+  format:check:
+    aliases:
+      - fc
+    cmd: cargo fmt --all -- --check
+
+  format:fix:
+    aliases:
+      - format
+      - f
+    cmd: cargo fmt --all
+
+  install:
+    cmds:
+      - task: fetch
+      - task: bin:install
+
+  lint:check:
+    aliases:
+      - lint
+      - l
+    deps:
+      - clippy:lint:check
+      - deny:lint
+
+  lint:fix:
+    aliases:
+      - lf
+    deps:
+      - clippy:lint:fix
+      - deny:lint
+
+  lock:
+    cmd: cargo metadata --format-version=1 >/dev/null
+
+  lock:check:
+    cmd: cargo metadata --frozen --locked --format-version=1 >/dev/null
+
   test:debug:
     aliases:
       - test
       - t
     deps:
       - build:debug
-    cmd: cargo test --frozen --locked
+    cmd: cargo test
+
+  test:debug:watch:
+    aliases:
+      - tw
+    deps:
+      - build:debug
+    cmd: cargo watch --exec test
 
   test:release:
     aliases:
@@ -45,5 +138,3 @@ tasks:
     deps:
       - build:release
     cmd: cargo test --frozen --locked --release
-
-  clean: cargo clean
