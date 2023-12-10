@@ -1,4 +1,6 @@
 #!/usr/bin/env node-loader
+import * as devDatabase from '@/database.ts'
+import * as devModules from '@/modules.ts'
 import * as payload from '@intertwine/lib-payload'
 import type * as time from '@intertwine/lib-time'
 import * as timeNode from '@intertwine/lib-time/index.node.ts'
@@ -14,9 +16,6 @@ import * as nodeUrl from 'node:url'
 import * as nodeUtil from 'node:util'
 import * as nodeZlib from 'node:zlib'
 import YAML from 'yaml'
-
-import * as devDatabase from '@/database.ts'
-import * as devModules from '@/modules.ts'
 
 type Context = time.Context & devDatabase.Context
 

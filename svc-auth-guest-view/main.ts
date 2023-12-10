@@ -1,14 +1,13 @@
-import type * as error from '@intertwine/lib-error'
-import * as random from '@intertwine/lib-random'
-import * as style from '@intertwine/lib-style'
-import * as timeBrowser from '@intertwine/lib-time/index.browser.ts'
-import * as widget from '@intertwine/lib-widget'
-
 import * as svcWidgetButton from '@/widget/button.ts'
 import * as svcWidgetFile from '@/widget/file.ts'
 import * as svcWidgetMember from '@/widget/member.ts'
 import * as svcWidgetSearch from '@/widget/search.ts'
 import * as svcWidgetTopic from '@/widget/topic.ts'
+import type * as error from '@intertwine/lib-error'
+import * as random from '@intertwine/lib-random'
+import * as style from '@intertwine/lib-style'
+import * as timeBrowser from '@intertwine/lib-time/index.browser.ts'
+import * as widget from '@intertwine/lib-widget'
 
 const green = style.build([
   {

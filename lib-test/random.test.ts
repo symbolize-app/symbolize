@@ -1,6 +1,5 @@
-import * as random from '@intertwine/lib-random'
-
 import * as test from '@/index.ts'
+import * as random from '@intertwine/lib-random'
 
 export const url = import.meta.url
 

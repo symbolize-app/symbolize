@@ -1,7 +1,6 @@
+import * as error from '@/index.ts'
 import * as test from '@intertwine/lib-test'
 import * as time from '@intertwine/lib-time'
-
-import * as error from '@/index.ts'
 
 export const retryConfig: Omit<
   error.RetryConfig,

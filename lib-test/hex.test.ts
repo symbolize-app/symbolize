@@ -1,6 +1,5 @@
-import * as hex from '@intertwine/lib-hex'
-
 import * as test from '@/index.ts'
+import * as hex from '@intertwine/lib-hex'
 
 export const url = import.meta.url
 

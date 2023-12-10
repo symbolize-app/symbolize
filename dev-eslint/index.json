@@ -39,7 +39,7 @@
     "simple-import-sort/imports": [
       "warn",
       {
-        "groups": [[""], ["^@/"], ["^\\."]]
+        "groups": [[""], ["^\\."]]
       }
     ],
     "@typescript-eslint/naming-convention": [

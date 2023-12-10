@@ -1,7 +1,3 @@
-import sqlite from 'better-sqlite3'
-import * as nodeChildProcess from 'node:child_process'
-import * as nodeUtil from 'node:util'
-
 import insertPath from '@/query/insert_path.sql'
 import insertVersion from '@/query/insert_version.sql'
 import pragmaForeignKey from '@/query/pragma_foreign_key.sql'
@@ -9,6 +5,9 @@ import pragmaWalAutocheckpoint from '@/query/pragma_wal_autocheckpoint.sql'
 import pragmaWalCheckpoint from '@/query/pragma_wal_checkpoint.sql'
 import updateContentCompressed from '@/query/update_content_compressed.sql'
 import upsertContent from '@/query/upsert_content.sql'
+import sqlite from 'better-sqlite3'
+import * as nodeChildProcess from 'node:child_process'
+import * as nodeUtil from 'node:util'
 
 export type Database = sqlite.Database
 
