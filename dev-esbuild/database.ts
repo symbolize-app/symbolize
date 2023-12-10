@@ -39,13 +39,10 @@ async function runMigrations(): Promise<void> {
 }
 
 function open(): Database {
-  return sqlite(
-    'svc-gateway-host-store/build/manifest.sqlite3',
-    {
-      readonly: false,
-      fileMustExist: true,
-    }
-  )
+  return sqlite('svc-gateway-host-store/build/manifest.sqlite3', {
+    readonly: false,
+    fileMustExist: true,
+  })
 }
 
 function configure(db: Database): void {
@@ -59,9 +56,7 @@ function prepareStatements(db: Database): Context['query'] {
     insertPath: db.prepare(insertPath),
     insertVersion: db.prepare(insertVersion),
     pragmaWalCheckpoint: parsePragma(pragmaWalCheckpoint),
-    updateContentCompressed: db.prepare(
-      updateContentCompressed
-    ),
+    updateContentCompressed: db.prepare(updateContentCompressed),
     upsertContent: db.prepare(upsertContent),
   }
 }

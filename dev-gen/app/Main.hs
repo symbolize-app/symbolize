@@ -42,14 +42,15 @@ main = do
   startTime <- getMonotonicTime
   (Sum t, ()) <- Interpret.interpret gen mode
   endTime <- getMonotonicTime
-  let timeText = "(" <> toText (showFFloat (Just 3) (endTime - startTime) "") <> " s)"
+  let timeText = showFFloat (Just 3) (endTime - startTime) ""
+  let timeText' = "(" <> toText timeText <> " s)"
   case mode of
     Interpret.Generate -> do
       putTextLn $ "Files written: " <> show t
-      putTextLn $ "Done " <> timeText <> " ✅"
+      putTextLn $ "Done " <> timeText' <> " ✅"
     Interpret.Check -> do
       putTextLn $ "Files skipped: " <> show t
       when (t > 0) $ do
-        putTextLn $ "Failed " <> timeText <> " ❌"
+        putTextLn $ "Failed " <> timeText' <> " ❌"
         exitFailure
-      putTextLn $ "OK " <> timeText <> " ✅"
+      putTextLn $ "OK " <> timeText' <> " ✅"

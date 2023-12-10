@@ -40,9 +40,7 @@ async function main(): Promise<void> {
   const { watch, clean, mode } = {
     watch: args.watch ?? false,
     clean: args.clean ?? false,
-    mode: payload
-      .stringEnum(Mode)
-      .fromJson(args.mode ?? Mode.development),
+    mode: payload.stringEnum(Mode).fromJson(args.mode ?? Mode.development),
   }
   const outdir = nodePath.resolve(`build/guest/${mode}`)
   if (clean) {
@@ -61,10 +59,7 @@ async function main(): Promise<void> {
     if (watch) {
       const workspace = workspaceTransformer.fromJson(
         YAML.parse(
-          await nodeFsPromises.readFile(
-            './pnpm-workspace.yaml',
-            'utf8'
-          )
+          await nodeFsPromises.readFile('./pnpm-workspace.yaml', 'utf8')
         ) as payload.JsonValue
       )
       const watcher = chokidar.watch(workspace.packages, {
@@ -117,9 +112,7 @@ async function buildFiles(options: {
   outdir: string
   mode: Mode
 }): Promise<devModules.BuildResult> {
-  const classicEntryPoints = [
-    './svc-gateway-guest-run/serviceWorker.ts',
-  ]
+  const classicEntryPoints = ['./svc-gateway-guest-run/serviceWorker.ts']
   const moduleEntryPoints = [
     './svc-auth-guest-view/main.ts',
     './svc-gateway-guest-run/serviceWorkerRegister.ts',
@@ -129,9 +122,7 @@ async function buildFiles(options: {
     outdir: options.outdir,
     outbase: nodePath.resolve('.'),
     define: {
-      ['import.meta.env.NODE_ENV']: JSON.stringify(
-        options.mode
-      ),
+      ['import.meta.env.NODE_ENV']: JSON.stringify(options.mode),
     },
     logLevel: 'warning' as const,
     minify: options.mode === Mode.production,
@@ -157,14 +148,8 @@ async function buildFiles(options: {
   const classicResult = await classicResultPromise
   const moduleResult = await moduleResultPromise
   return {
-    errors: [
-      ...classicResult.errors,
-      ...moduleResult.errors,
-    ],
-    warnings: [
-      ...classicResult.warnings,
-      ...moduleResult.warnings,
-    ],
+    errors: [...classicResult.errors, ...moduleResult.errors],
+    warnings: [...classicResult.warnings, ...moduleResult.warnings],
     outputFiles: [
       ...(classicResult.outputFiles ?? []),
       ...moduleResult.outputFiles,
@@ -182,9 +167,7 @@ function writeOutputFiles(
   outputFiles: esbuild.OutputFile[]
 ): void {
   for (const outputFile of outputFiles) {
-    const pathId = outputFile.path.substring(
-      options.outdir.length
-    )
+    const pathId = outputFile.path.substring(options.outdir.length)
     const original = outputFile.contents
     const contentId = getContentId(original)
     const contentResult = ctx.query.upsertContent.run({

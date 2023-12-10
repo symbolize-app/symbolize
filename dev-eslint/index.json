@@ -2,11 +2,7 @@
   "root": true,
   "parser": "@typescript-eslint/parser",
   "ignorePatterns": ["build/**"],
-  "plugins": [
-    "import",
-    "simple-import-sort",
-    "@typescript-eslint"
-  ],
+  "plugins": ["import", "simple-import-sort", "@typescript-eslint"],
   "extends": [
     "eslint:recommended",
     "plugin:@typescript-eslint/eslint-recommended",

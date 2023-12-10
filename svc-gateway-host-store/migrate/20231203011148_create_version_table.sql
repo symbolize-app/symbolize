@@ -1,8 +1,7 @@
 -- migrate:up
 
-create table version (
-  id integer primary key not null
-) strict, without rowid;
+create table version (id integer primary key not null) strict,
+without rowid;
 
 -- migrate:down
 

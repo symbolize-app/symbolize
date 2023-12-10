@@ -14,9 +14,7 @@ impl FromHex for Vec<u8> {
     } else {
       (0 .. value.len())
         .step_by(2)
-        .map(|i| {
-          Ok(u8::from_str_radix(&value[i .. i + 2], 16)?)
-        })
+        .map(|i| Ok(u8::from_str_radix(&value[i .. i + 2], 16)?))
         .collect()
     }
   }

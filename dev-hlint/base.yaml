@@ -5,6 +5,7 @@
 - modules:
     - { name: '**', within: [] }
     - name:
+        - Control.Applicative
         - Control.Monad
         - Control.Monad.IO.Unlift
         - Data.ByteString.Lazy

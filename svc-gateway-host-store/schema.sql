@@ -1,6 +1,4 @@
-create table if not exists migration (
-  version varchar(128) primary key
-);
+create table if not exists migration (version varchar(128) primary key);
 create table version (
   id integer primary key not null
 ) strict, without rowid;

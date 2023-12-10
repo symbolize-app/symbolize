@@ -9,9 +9,7 @@ import * as nodeUrl from 'node:url'
 
 export const all: test.TestCollection = () => []
 
-export async function run(
-  baseContext: time.Context
-): Promise<boolean> {
+export async function run(baseContext: time.Context): Promise<boolean> {
   const dom = new jsdom.JSDOM('<!DOCTYPE html>')
   const window = dom.window
   const document = window.document

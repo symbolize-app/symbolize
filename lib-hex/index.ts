@@ -4,9 +4,7 @@ export function uint8ArrayToHex(input: Uint8Array): string {
     .join('')
 }
 
-export function uint8ArrayFromHex(
-  input: string
-): Uint8Array {
+export function uint8ArrayFromHex(input: string): Uint8Array {
   return new Uint8Array(
     input
       .split(/(..)/)

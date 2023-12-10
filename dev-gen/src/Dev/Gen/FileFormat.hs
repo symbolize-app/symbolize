@@ -107,7 +107,8 @@ typeScriptConfigCompilerOptionsPaths =
   ]
 
 typeScriptConfigCompilerOptionsTSBuildInfoFile :: Text
-typeScriptConfigCompilerOptionsTSBuildInfoFile = "build/tsc/tsconfig.tsbuildinfo"
+typeScriptConfigCompilerOptionsTSBuildInfoFile =
+  "build/tsc/tsconfig.tsbuildinfo"
 
 type TypeScriptConfigReference :: Type
 newtype TypeScriptConfigReference = TypeScriptConfigReference

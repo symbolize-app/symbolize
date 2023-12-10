@@ -12,9 +12,7 @@ function main() {
 
   if (import.meta.env.NODE_ENV === 'development') {
     ;(async () => {
-      const development = await import(
-        '@/main.development.ts'
-      )
+      const development = await import('@/main.development.ts')
       development.main(ctx)
     })().catch(console.error)
   }

@@ -22,8 +22,9 @@ type TestModule<CustomContext = unknown> = {
   }
 }
 
-export type TestCollection<CustomContext = unknown> =
-  () => Promise<TestModule<CustomContext>>[]
+export type TestCollection<CustomContext = unknown> = () => Promise<
+  TestModule<CustomContext>
+>[]
 
 type TestCollectionModule<CustomContext = unknown> = {
   all: TestCollection<CustomContext>
@@ -48,19 +49,12 @@ class AssertionError extends Error {
 }
 
 export async function runAll<
-  CustomContext extends Record<string, unknown> = Record<
-    string,
-    unknown
-  >,
+  CustomContext extends Record<string, unknown> = Record<string, unknown>,
 >(
   ctx: CustomContext & RunContext,
-  testCollectionModules: Promise<
-    TestCollectionModule<CustomContext>
-  >[]
+  testCollectionModules: Promise<TestCollectionModule<CustomContext>>[]
 ): Promise<boolean> {
-  const testModules = (
-    [] as Promise<TestModule<CustomContext>>[]
-  ).concat(
+  const testModules = ([] as Promise<TestModule<CustomContext>>[]).concat(
     ...(await Promise.all(testCollectionModules)).map(
       (testCollectionModule) => testCollectionModule.all()
     )
@@ -91,9 +85,7 @@ export async function runAll<
                 stack: error.stack,
               }
             : {
-                message: `Error value ${JSON.stringify(
-                  error
-                )}`,
+                message: `Error value ${JSON.stringify(error)}`,
                 stack: undefined,
               }
 
@@ -104,10 +96,8 @@ export async function runAll<
           'expected' in error &&
           'diff' in error
             ? {
-                actual: (error as { actual: unknown })
-                  .actual,
-                expected: (error as { expected: unknown })
-                  .expected,
+                actual: (error as { actual: unknown }).actual,
+                expected: (error as { expected: unknown }).expected,
                 diff: (error as { diff: unknown }).diff,
               }
             : undefined
@@ -125,22 +115,11 @@ export async function runAll<
         } else {
           console.groupCollapsed(testName)
         }
-        console.log(
-          `%c${basicInfo.message}`,
-          'color: crimson'
-        )
+        console.log(`%c${basicInfo.message}`, 'color: crimson')
         console.groupCollapsed('Details')
         if (assertionInfo) {
-          console.log(
-            '%cExpected',
-            'color: green',
-            assertionInfo.expected
-          )
-          console.log(
-            '%cActual',
-            'color: crimson',
-            assertionInfo.actual
-          )
+          console.log('%cExpected', 'color: green', assertionInfo.expected)
+          console.log('%cActual', 'color: crimson', assertionInfo.actual)
           if (assertionInfo.diff) {
             const diffSections = diff.diffJson(
               assertionInfo.expected as string | object,
@@ -156,9 +135,7 @@ export async function runAll<
               } else {
                 prefix = ' '
               }
-              for (const diffLine of diffSection.value.split(
-                '\n'
-              )) {
+              for (const diffLine of diffSection.value.split('\n')) {
                 if (diffLine) {
                   outputLines.push(`${prefix} ${diffLine}`)
                 }
@@ -166,10 +143,7 @@ export async function runAll<
             }
             console.log(outputLines.join('\n'))
           }
-          basicInfo.stack = basicInfo.stack?.replace(
-            /^Assertion/,
-            ''
-          )
+          basicInfo.stack = basicInfo.stack?.replace(/^Assertion/, '')
         }
         if (basicInfo.stack) {
           console.log(basicInfo.stack, 'color: grey')
@@ -187,15 +161,10 @@ export async function runAll<
   const end = ctx.performanceNow()
   const elapsed = ms(Math.round(end - start))
 
-  console.log(
-    `%cPass: ${pass}`,
-    'font-weight: bold; color: green'
-  )
+  console.log(`%cPass: ${pass}`, 'font-weight: bold; color: green')
   console.log(
     `%cFail: ${fail}`,
-    `font-weight: bold; color: ${
-      fail ? 'crimson' : 'green'
-    }`
+    `font-weight: bold; color: ${fail ? 'crimson' : 'green'}`
   )
   console.log(`Elapsed: ${elapsed}`)
   console.groupEnd()
@@ -253,11 +222,7 @@ export function sync<Value>(
     },
     get rejectedValue() {
       if (isResolved) {
-        throw new AssertionError(
-          'Promise resolved',
-          result,
-          '<rejected>'
-        )
+        throw new AssertionError('Promise resolved', result, '<rejected>')
       } else if (!isRejected) {
         throw new Error('Promise not rejected yet')
       } else {
@@ -284,10 +249,7 @@ export function assert(actual: unknown): asserts actual {
   }
 }
 
-export function assertEquals<Value>(
-  actual: Value,
-  expected: Value
-): void {
+export function assertEquals<Value>(actual: Value, expected: Value): void {
   if (!lodashEq(actual, expected)) {
     throw new AssertionError('Not equal', actual, expected)
   }
@@ -316,27 +278,16 @@ export function assertDeepEquals<Value>(
   expected: Value
 ): void {
   if (!lodashIsEqual(actual, expected)) {
-    throw new AssertionError(
-      'Not deep equal',
-      actual,
-      expected,
-      'diff'
-    )
+    throw new AssertionError('Not deep equal', actual, expected, 'diff')
   }
 }
 
-export function assertThrows(
-  callback: () => unknown
-): unknown {
+export function assertThrows(callback: () => unknown): unknown {
   let result: unknown
   try {
     result = callback()
   } catch (error) {
     return error
   }
-  throw new AssertionError(
-    'No error thrown',
-    result,
-    '<error>'
-  )
+  throw new AssertionError('No error thrown', result, '<error>')
 }

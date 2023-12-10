@@ -7,11 +7,7 @@ export type RetryConfig = {
   minDelayMs: number
   windowMs: number
   maxAttempts: number
-  onError: (
-    error: unknown,
-    attempt: number,
-    nextDelayMs: number
-  ) => void
+  onError: (error: unknown, attempt: number, nextDelayMs: number) => void
 }
 
 export async function retry<Result>(
@@ -33,9 +29,7 @@ export async function retry<Result>(
       const nowMs = ctx.performanceNow()
       const delayMs = Math.max(
         config.minDelayMs,
-        ctx.randomNumber() *
-          config.minDelayMs *
-          Math.pow(2, attempt)
+        ctx.randomNumber() * config.minDelayMs * Math.pow(2, attempt)
       )
       if (nowMs + delayMs >= startMs + config.windowMs) {
         throw error

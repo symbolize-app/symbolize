@@ -6,9 +6,7 @@ const context = Symbol('context')
 
 const listenerOptions = Symbol('listenerOptions')
 
-export function advancedListener<
-  T extends Record<string, unknown>,
->(
+export function advancedListener<T extends Record<string, unknown>>(
   body: T,
   options: AddEventListenerOptions
 ): T & { [listenerOptions]: AddEventListenerOptions } {
@@ -116,17 +114,12 @@ const elementProperties = {
     value: {},
   },
   styles: {
-    set(
-      this: Element & { [context]: Context },
-      value: style.Style[]
-    ) {
+    set(this: Element & { [context]: Context }, value: style.Style[]) {
       if (this.classList.length) {
         this.classList.remove(...this.classList)
       }
       for (const styleItem of value) {
-        this.classList.add(
-          ...style.render(this[context], styleItem)
-        )
+        this.classList.add(...style.render(this[context], styleItem))
       }
     },
   },
@@ -150,19 +143,11 @@ const elementProperties = {
       const oldListeners = this[listeners]
       for (const key in oldListeners) {
         const listener = oldListeners[key]
-        this.removeEventListener(
-          key,
-          listener,
-          listener[listenerOptions]
-        )
+        this.removeEventListener(key, listener, listener[listenerOptions])
       }
       for (const key in value) {
         const listener = value[key]
-        this.addEventListener(
-          key,
-          listener,
-          listener[listenerOptions]
-        )
+        this.addEventListener(key, listener, listener[listenerOptions])
       }
     },
   },
@@ -171,31 +156,19 @@ const elementProperties = {
     value: {},
   },
   content: {
-    set(
-      this: Element & { [context]: Context },
-      value: Widget[]
-    ) {
+    set(this: Element & { [context]: Context }, value: Widget[]) {
       replaceChildren(this[context], this, collect(value))
     },
   },
 }
 
-export function collect(
-  items: Widget[]
-): (string | Node)[] {
+export function collect(items: Widget[]): (string | Node)[] {
   const results: (string | Node)[] = []
 
   function loop(item: Widget) {
-    if (
-      item === false ||
-      item === undefined ||
-      item === null
-    ) {
+    if (item === false || item === undefined || item === null) {
       // Skip
-    } else if (
-      typeof item == 'string' ||
-      Reflect.has(item, 'nodeType')
-    ) {
+    } else if (typeof item == 'string' || Reflect.has(item, 'nodeType')) {
       results.push(item as string | Node)
     } else if (Reflect.has(item, 'body')) {
       loop((item as BodyWidget).body)
@@ -216,10 +189,7 @@ export function collect(
 type WidgetFunction<
   Body extends Widget & { [Key in keyof Body]: Body[Key] },
   CustomContext = unknown,
-> = (
-  ctx: CustomContext & Context,
-  data: Partial<Body>
-) => Body
+> = (ctx: CustomContext & Context, data: Partial<Body>) => Body
 
 export function define<
   Body extends Widget & { [Key in keyof Body]: Body[Key] },
@@ -246,8 +216,7 @@ export function toHtmlWidget<T extends HTMLElement>(
     element,
     elementProperties
   ) as HtmlWidget<T>
-  ;(widget as unknown as { [context]: Context })[context] =
-    ctx
+  ;(widget as unknown as { [context]: Context })[context] = ctx
   return widget
 }
 
@@ -257,29 +226,21 @@ type HtmlWidgetMap = {
   >
 }
 
-export const html: HtmlWidgetMap = new Proxy(
-  {} as HtmlWidgetMap,
-  {
-    get<K extends keyof HTMLElementTagNameMap>(
-      target: unknown,
-      property: K
-    ) {
-      return ((
-        target as Record<
-          K,
-          WidgetFunction<
-            HtmlWidget<HTMLElementTagNameMap[K]>
-          >
-        >
-      )[property] ??= define((ctx) =>
-        toHtmlWidget(
-          ctx,
-          ctx.document.createElement(property)
-        )
-      ))
-    },
-  }
-)
+export const html: HtmlWidgetMap = new Proxy({} as HtmlWidgetMap, {
+  get<K extends keyof HTMLElementTagNameMap>(
+    target: unknown,
+    property: K
+  ) {
+    return ((
+      target as Record<
+        K,
+        WidgetFunction<HtmlWidget<HTMLElementTagNameMap[K]>>
+      >
+    )[property] ??= define((ctx) =>
+      toHtmlWidget(ctx, ctx.document.createElement(property))
+    ))
+  },
+})
 
 export const range = define(
   (
@@ -299,9 +260,7 @@ export const range = define(
         const inner = collect(value)
         const parent = start.parentNode
         if (parent) {
-          const siblings: (string | Node)[] = Array.from(
-            parent.childNodes
-          )
+          const siblings: (string | Node)[] = Array.from(parent.childNodes)
           siblings.splice(
             siblings.indexOf(start) + 1,
             content.length - 2,

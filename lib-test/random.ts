@@ -2,8 +2,7 @@ import type * as random from '@intertwine/lib-random'
 import * as fastMersenneTwister from 'fast-mersenne-twister'
 
 export function initContext(): random.Context {
-  const twister =
-    fastMersenneTwister.MersenneTwister(1616952581493)
+  const twister = fastMersenneTwister.MersenneTwister(1616952581493)
   return {
     randomNumber: () => twister.random(),
     randomCryptoBits(bits) {

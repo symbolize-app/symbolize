@@ -15,20 +15,34 @@ import Relude.String (Text)
 
 type Command :: Type -> Type
 data Command a where
-  ReadJSON :: (Aeson.FromJSON a, Eq a, Show a, Typeable a) => FileFormat.JSONStorage -> FilePath -> Command a
-  WriteJSON :: (Aeson.ToJSON b, Eq b, Show b, Typeable b) => FileFormat.JSONStorage -> FilePath -> b -> Command ()
+  ReadJSON ::
+    (Aeson.FromJSON a, Eq a, Show a, Typeable a) =>
+    FileFormat.JSONStorage ->
+    FilePath ->
+    Command a
+  WriteJSON ::
+    (Aeson.ToJSON b, Eq b, Show b, Typeable b) =>
+    FileFormat.JSONStorage ->
+    FilePath ->
+    b ->
+    Command ()
   ReadLines :: FilePath -> Command (Vector Text)
   WriteLines :: FilePath -> Vector Text -> Command ()
 
 instance Eq (Command a) where
   (==) :: Command a -> Command a -> Bool
-  (ReadJSON fileFormatX filePathX) == (ReadJSON fileFormatY filePathY) =
-    (fileFormatX, filePathX) == (fileFormatY, filePathY)
-  (WriteJSON fileFormatX filePathX valueX) == (WriteJSON fileFormatY filePathY valueY) =
-    maybe
-      False
-      (\valueY' -> (fileFormatX, filePathX, valueX) == (fileFormatY, filePathY, valueY'))
-      (cast valueY)
+  (ReadJSON fileFormatX filePathX)
+    == (ReadJSON fileFormatY filePathY) =
+      (fileFormatX, filePathX) == (fileFormatY, filePathY)
+  (WriteJSON fileFormatX filePathX valueX)
+    == (WriteJSON fileFormatY filePathY valueY) =
+      maybe
+        False
+        ( \valueY' ->
+            (fileFormatX, filePathX, valueX)
+              == (fileFormatY, filePathY, valueY')
+        )
+        (cast valueY)
   (ReadLines filePathX) == (ReadLines filePathY) =
     filePathX == filePathY
   (WriteLines filePathX valueX) == (WriteLines filePathY valueY) =

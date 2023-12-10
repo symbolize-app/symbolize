@@ -2,7 +2,7 @@
 dialect = "sqlite"
 templater = "placeholder"
 sql_file_exts = ".sql"
-max_line_length = 60
+max_line_length = 75
 processes = -1
 
 [tool.sqlfluff.templater.placeholder]

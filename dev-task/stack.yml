@@ -68,9 +68,14 @@ tasks:
     cmd: watchexec --fs-events create,rename,modify --debounce 150ms --no-vcs-ignore --watch {{.DIST_DIR}}/build/{{.FULL_TARGET}} --filter {{.FULL_TARGET}} -- {{.DIST_DIR}}/build/{{.FULL_TARGET}}/{{.FULL_TARGET}} {{.CLI_ARGS}}
 
   format:check:
+    aliases:
+      - fc
     cmd: ormolu --mode check {{.FIND_FILES}}
 
   format:fix:
+    aliases:
+      - format
+      - f
     cmd: ormolu --mode inplace {{.FIND_FILES}}
 
   install:
@@ -82,6 +87,9 @@ tasks:
       - :dev-gen:link-build-dir
 
   lint:
+    aliases:
+      - lint
+      - l
     vars:
       STACK_LOCAL_BIN_PATH:
         sh: realpath --relative-to . {{.STACK_LOCAL_BIN_PATH}}

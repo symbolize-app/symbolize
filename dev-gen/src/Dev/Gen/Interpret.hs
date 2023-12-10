@@ -25,7 +25,21 @@ import Relude.Monad (Either, Maybe (Just, Nothing), either, fail, liftIO)
 import Relude.Monoid (Sum, mempty, (<>))
 import Relude.Numeric (Integer)
 import Relude.Print (putText)
-import Relude.String (LByteString, String, Text, decodeUtf8Strict, encodeUtf8, fromString, lines, show, toLazy, toStrict, toString, toText, unlines)
+import Relude.String
+  ( LByteString,
+    String,
+    Text,
+    decodeUtf8Strict,
+    encodeUtf8,
+    fromString,
+    lines,
+    show,
+    toLazy,
+    toStrict,
+    toString,
+    toText,
+    unlines,
+  )
 import System.FilePath qualified as FilePath
 import System.IO (openTempFile)
 import System.Process.Typed qualified as Process
@@ -55,14 +69,36 @@ interpret (Exec.Command (Command.ReadJSON FileFormat.YAML filePath)) _ =
   (0,) <$> _loadFromFile filePath _yamlEitherDecode
 interpret (Exec.Command (Command.ReadJSON FileFormat.JSON filePath)) _ =
   (0,) <$> _loadFromFile filePath Aeson.eitherDecode
-interpret (Exec.Command (Command.WriteJSON FileFormat.YAML filePath value)) mode = do
-  _dumpToFile filePath _yamlEitherDecode _yamlEncode (Aeson.toJSON value) mode (_formatWithPrettier filePath)
-interpret (Exec.Command (Command.WriteJSON FileFormat.JSON filePath value)) mode = do
-  _dumpToFile filePath Aeson.eitherDecode Aeson.encode (Aeson.toJSON value) mode (_formatWithPrettier filePath)
+interpret
+  (Exec.Command (Command.WriteJSON FileFormat.YAML filePath value))
+  mode =
+    _dumpToFile
+      filePath
+      _yamlEitherDecode
+      _yamlEncode
+      (Aeson.toJSON value)
+      mode
+      (_formatWithPrettier filePath)
+interpret
+  (Exec.Command (Command.WriteJSON FileFormat.JSON filePath value))
+  mode =
+    _dumpToFile
+      filePath
+      Aeson.eitherDecode
+      Aeson.encode
+      (Aeson.toJSON value)
+      mode
+      (_formatWithPrettier filePath)
 interpret (Exec.Command (Command.ReadLines filePath)) _ =
   (0,) <$> _loadFromFile filePath _linesEitherDecode
-interpret (Exec.Command (Command.WriteLines filePath value)) mode = do
-  _dumpToFile filePath _linesEitherDecode _linesEncode value mode (\handle bytes -> liftIO $ hPut handle bytes)
+interpret (Exec.Command (Command.WriteLines filePath value)) mode =
+  _dumpToFile
+    filePath
+    _linesEitherDecode
+    _linesEncode
+    value
+    mode
+    (\handle bytes -> liftIO $ hPut handle bytes)
 
 _yamlEitherDecode :: (Aeson.FromJSON a) => LByteString -> Either String a
 _yamlEitherDecode = first show . Yaml.decodeEither' . toStrict
@@ -76,7 +112,11 @@ _linesEitherDecode = bimap show (fromList . lines) . decodeUtf8Strict
 _linesEncode :: Vector Text -> LByteString
 _linesEncode = encodeUtf8 . unlines . toList
 
-_loadFromFile :: (MonadUnliftIO m) => FilePath -> (LByteString -> Either String a) -> m a
+_loadFromFile ::
+  (MonadUnliftIO m) =>
+  FilePath ->
+  (LByteString -> Either String a) ->
+  m a
 _loadFromFile filePath decode = do
   bytes <- readFileLBS (toString filePath)
   either (liftIO . fail) pure (decode bytes)
@@ -107,7 +147,11 @@ _dumpToFile filePath decode encode value mode write = do
       putText ("Skipped writing to " <> toText filePath <> "...\n")
       pure (1, ())
 
-_withReplaceFile :: (MonadUnliftIO m) => FilePath -> (FilePath -> Handle -> m a) -> m a
+_withReplaceFile ::
+  (MonadUnliftIO m) =>
+  FilePath ->
+  (FilePath -> Handle -> m a) ->
+  m a
 _withReplaceFile filePath action =
   let filePath' = toString filePath
       (tempDir, tempTemplate) = FilePath.splitFileName filePath'
@@ -124,7 +168,12 @@ _withReplaceFile filePath action =
             pure result
         )
 
-_formatWithPrettier :: (MonadUnliftIO m) => FilePath -> Handle -> LByteString -> m ()
+_formatWithPrettier ::
+  (MonadUnliftIO m) =>
+  FilePath ->
+  Handle ->
+  LByteString ->
+  m ()
 _formatWithPrettier filePath handle bytes =
   Process.runProcess_
     . Process.setStdin (Process.byteStringInput bytes)

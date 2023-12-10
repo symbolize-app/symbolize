@@ -20,14 +20,12 @@ export const load = (url, context, defaultLoad) => {
   // Defer to Node.js for all other sources.
   const ext = nodePath.extname(url)
   if (!localMatcher.exec(url)) {
-    const fullPath = nodeUrl.fileURLToPath(
-      new nodeUrl.URL(url)
-    )
+    const fullPath = nodeUrl.fileURLToPath(new nodeUrl.URL(url))
     return (async () => {
       if (ext === '.sql') {
-        const source = (
-          await nodeFsPromises.readFile(fullPath)
-        ).toString('utf-8')
+        const source = (await nodeFsPromises.readFile(fullPath)).toString(
+          'utf-8'
+        )
         return {
           format: 'module',
           source: `const text = ${JSON.stringify(
