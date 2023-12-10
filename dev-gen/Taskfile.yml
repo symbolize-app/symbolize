@@ -23,22 +23,22 @@ tasks:
         NAME: '{{.NAME}}'
         TARGET: exe
 
-  run:release:
-    aliases:
-      - rr
-    cmd:
-      task: :stack:execute-target
-      vars:
-        MODE: debug
-        NAME: '{{.NAME}}'
-        TARGET: exe
-
   run:debug:watch:
     aliases:
       - run:watch
       - rw
     cmd:
       task: :stack:execute-target:watch
+      vars:
+        MODE: debug
+        NAME: '{{.NAME}}'
+        TARGET: exe
+
+  run:release:
+    aliases:
+      - rr
+    cmd:
+      task: :stack:execute-target
       vars:
         MODE: debug
         NAME: '{{.NAME}}'

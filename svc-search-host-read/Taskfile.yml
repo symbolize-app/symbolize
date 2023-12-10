@@ -1,0 +1,36 @@
+version: '3'
+
+run: when_changed
+
+vars:
+  NAME: svc-search-host-read
+
+tasks:
+  run:debug:
+    aliases:
+      - run
+      - r
+    cmd:
+      task: :cargo:execute-package
+      vars:
+        RELEASE: false
+        NAME: '{{.NAME}}'
+
+  run:debug:watch:
+    aliases:
+      - run:watch
+      - rw
+    cmd:
+      task: :cargo:execute-package:watch
+      vars:
+        RELEASE: false
+        NAME: '{{.NAME}}'
+
+  run:release:
+    aliases:
+      - rr
+    cmd:
+      task: :cargo:execute-package
+      vars:
+        RELEASE: true
+        NAME: '{{.NAME}}'

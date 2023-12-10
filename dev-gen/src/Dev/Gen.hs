@@ -3,7 +3,6 @@ module Dev.Gen
   )
 where
 
-import Data.Text qualified as Text
 import Data.Vector (Vector)
 import Data.Vector qualified as Vector
 import Dev.Gen.Exec qualified as Exec
@@ -141,11 +140,6 @@ genRootTaskfile pnpmPackages rootTaskfileInput =
                 )
             )
             <$> pnpmPackages
-      newVars =
-        [ ( "PNPM_TYPESCRIPT_PACKAGES",
-            Text.intercalate " " . toList $ Package.foldTypeScriptPackageNames pnpmPackages
-          )
-        ]
       newTasks =
         [ ( "pnpm:link-build-dirs",
             FileFormat.TaskfileTask
@@ -161,7 +155,6 @@ genRootTaskfile pnpmPackages rootTaskfileInput =
           run = FileFormat.taskfileRun,
           includes =
             Just (maybeToMonoid rootTaskfileInput.includes <> newIncludes),
-          vars =
-            Just (maybeToMonoid rootTaskfileInput.vars <> newVars),
+          vars = rootTaskfileInput.vars,
           tasks = rootTaskfileInput.tasks <> newTasks
         }
