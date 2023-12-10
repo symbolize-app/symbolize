@@ -1,8 +1,7 @@
+import * as svcWidgetButton from '@/widget/button.ts'
 import * as test from '@intertwine/lib-test'
 import type * as widget from '@intertwine/lib-widget'
 import * as widgetTest from '@intertwine/lib-widget/index.test.ts'
-
-import * as svcWidgetButton from '@/widget/button.ts'
 
 export const url = import.meta.url
 

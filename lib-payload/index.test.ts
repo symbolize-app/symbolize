@@ -1,6 +1,5 @@
-import * as test from '@intertwine/lib-test'
-
 import * as payload from '@/index.ts'
+import * as test from '@intertwine/lib-test'
 
 export const url = import.meta.url
 

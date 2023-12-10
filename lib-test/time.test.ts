@@ -1,6 +1,5 @@
-import * as time from '@intertwine/lib-time'
-
 import * as test from '@/index.ts'
+import * as time from '@intertwine/lib-time'
 
 export const url = import.meta.url
 
