@@ -11,11 +11,22 @@ import GHC.IO.Exception (IOException (ioe_description))
 import Relude.Applicative (empty, pure)
 import Relude.Base (Eq, IO, Show, (==))
 import Relude.Foldable (null)
-import Relude.Monad (Either (Left, Right), Maybe (Just, Nothing), fail, maybe, (>>))
+import Relude.Monad
+  ( Either (Left, Right),
+    Maybe (Just, Nothing),
+    fail,
+    maybe,
+    (>>),
+  )
 import Relude.String (String)
 import Test.Hspec (shouldBe, shouldSatisfy, shouldThrow)
 
-interpret :: (Show a, Eq a) => Exec.Exec a -> [ExecSpec.Result] -> a -> IO ()
+interpret ::
+  (Show a, Eq a) =>
+  Exec.Exec a ->
+  [ExecSpec.Result] ->
+  a ->
+  IO ()
 interpret e s r = do
   (s', r') <- _interpret e s
   s' `shouldSatisfy` null
@@ -23,7 +34,8 @@ interpret e s r = do
 
 interpretFail :: Exec.Exec a -> [ExecSpec.Result] -> String -> IO ()
 interpretFail e s f = do
-  _interpret e s `shouldThrow` (\(ex :: IOException) -> ex.ioe_description == f)
+  _interpret e s
+    `shouldThrow` (\(ex :: IOException) -> ex.ioe_description == f)
 
 _interpret :: Exec.Exec a -> [ExecSpec.Result] -> IO ([ExecSpec.Result], a)
 _interpret (Exec.Pure x) s = pure (s, x)

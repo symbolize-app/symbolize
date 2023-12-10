@@ -55,7 +55,7 @@ tasks:
     cmd: cargo clippy {{.CLIPPY_ARGS}}
 
   clippy:lint:fix:
-    cmd: cargo clippy --fix --allow-staged {{.CLIPPY_ARGS}}
+    cmd: cargo clippy --fix --allow-dirty {{.CLIPPY_ARGS}}
 
   deny:lint:
     cmd: cargo deny check

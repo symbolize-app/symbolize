@@ -13,9 +13,7 @@ function main(self: ServiceWorkerGlobalScope): void {
     event.waitUntil(
       Promise.all([
         self.skipWaiting(),
-        caches
-          .open('static-v1')
-          .then((cache) => cache.add('/')),
+        caches.open('static-v1').then((cache) => cache.add('/')),
       ])
     )
   })

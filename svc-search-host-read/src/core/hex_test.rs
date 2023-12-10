@@ -10,8 +10,5 @@ fn from_hex_basic() {
 
 #[test]
 fn to_hex_basic() {
-  assert_eq!(
-    "00200aff".to_string(),
-    [0x00, 0x20, 0x0a, 0xff].to_hex()
-  );
+  assert_eq!("00200aff".to_string(), [0x00, 0x20, 0x0a, 0xff].to_hex());
 }

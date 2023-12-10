@@ -6,9 +6,7 @@ export const url = import.meta.url
 export const tests = {
   ['null, ok']: (): void => {
     const validator = payload.object({
-      x: payload.nullOr(
-        payload.object<Record<never, never>>({})
-      ),
+      x: payload.nullOr(payload.object<Record<never, never>>({})),
       y: payload.nullOr(payload.object({})),
     })
     const input = { x: null, y: {} }
@@ -23,9 +21,7 @@ export const tests = {
   },
   ['object, wrong type']: (): void => {
     const validator = payload.object({})
-    const error = test.assertThrows(() =>
-      validator.fromJson(null)
-    )
+    const error = test.assertThrows(() => validator.fromJson(null))
     test.assertInstanceOf(error, payload.PayloadError)
     test.assertEquals(
       error.message,
@@ -41,9 +37,7 @@ export const tests = {
     const validator = payload.object({
       x: payload.object({}),
     })
-    const error = test.assertThrows(() =>
-      validator.fromJson({})
-    )
+    const error = test.assertThrows(() => validator.fromJson({}))
     test.assertInstanceOf(error, payload.PayloadError)
     test.assertEquals(
       error.message,
@@ -74,9 +68,7 @@ export const tests = {
   },
   ['array, wrong type']: (): void => {
     const validator = payload.array(payload.object({}))
-    const error = test.assertThrows(() =>
-      validator.fromJson(null)
-    )
+    const error = test.assertThrows(() => validator.fromJson(null))
     test.assertInstanceOf(error, payload.PayloadError)
     test.assertEquals(
       error.message,
@@ -113,9 +105,7 @@ export const tests = {
       min: 2,
       max: 5,
     })
-    const error = test.assertThrows(() =>
-      validator.fromJson([])
-    )
+    const error = test.assertThrows(() => validator.fromJson([]))
     test.assertInstanceOf(error, payload.PayloadError)
     test.assertEquals(
       error.message,
@@ -127,9 +117,7 @@ export const tests = {
       min: 2,
       max: 5,
     })
-    const error = test.assertThrows(() =>
-      validator.fromJson('a')
-    )
+    const error = test.assertThrows(() => validator.fromJson('a'))
     test.assertInstanceOf(error, payload.PayloadError)
     test.assertEquals(
       error.message,
@@ -141,9 +129,7 @@ export const tests = {
       min: 2,
       max: 5,
     })
-    const error = test.assertThrows(() =>
-      validator.fromJson('abcdef')
-    )
+    const error = test.assertThrows(() => validator.fromJson('abcdef'))
     test.assertInstanceOf(error, payload.PayloadError)
     test.assertEquals(
       error.message,
@@ -157,9 +143,7 @@ export const tests = {
   },
   ['stringOptions, wrong type']: (): void => {
     const validator = payload.stringOption('abc', 'xyz')
-    const error = test.assertThrows(() =>
-      validator.fromJson(2)
-    )
+    const error = test.assertThrows(() => validator.fromJson(2))
     test.assertInstanceOf(error, payload.PayloadError)
     test.assertEquals(
       error.message,
@@ -168,9 +152,7 @@ export const tests = {
   },
   ['stringOptions, wrong option']: (): void => {
     const validator = payload.stringOption('abc', 'xyz')
-    const error = test.assertThrows(() =>
-      validator.fromJson('a')
-    )
+    const error = test.assertThrows(() => validator.fromJson('a'))
     test.assertInstanceOf(error, payload.PayloadError)
     test.assertEquals(
       error.message,
@@ -192,9 +174,7 @@ export const tests = {
       y = 'y2',
     }
     const validator = payload.stringEnum(Test)
-    const error = test.assertThrows(() =>
-      validator.fromJson('y')
-    )
+    const error = test.assertThrows(() => validator.fromJson('y'))
     test.assertInstanceOf(error, payload.PayloadError)
     test.assertEquals(
       error.message,

@@ -1,18 +1,12 @@
 import * as widget from '@/index.ts'
 
 export function withTempDocument<
-  CustomContext extends Record<string, unknown> = Record<
-    string,
-    unknown
-  >,
+  CustomContext extends Record<string, unknown> = Record<string, unknown>,
 >(
-  callback: (
-    ctx: CustomContext & widget.Context
-  ) => void | Promise<void>
+  callback: (ctx: CustomContext & widget.Context) => void | Promise<void>
 ): (ctx: CustomContext & widget.Context) => Promise<void> {
   return async (baseContext) => {
-    const iframe =
-      baseContext.document.createElement('iframe')
+    const iframe = baseContext.document.createElement('iframe')
     iframe.style.display = 'none'
     baseContext.document.body.append(iframe)
     try {

@@ -36,12 +36,10 @@ export async function build<T extends BuildOptions>(
     outputFiles: [],
   }
   const allEntryPoints = new Set(options.entryPoints)
-  let entryPoints = options.entryPoints.map(
-    (entryPoint) => ({
-      in: entryPoint,
-      out: nodePath.relative(options.outbase, entryPoint),
-    })
-  )
+  let entryPoints = options.entryPoints.map((entryPoint) => ({
+    in: entryPoint,
+    out: nodePath.relative(options.outbase, entryPoint),
+  }))
   while (entryPoints.length) {
     const newEntryPoints: { in: string; out: string }[] = []
     const plugin: esbuild.Plugin = {
@@ -51,22 +49,17 @@ export async function build<T extends BuildOptions>(
           if (args.pluginData === resolveBase) {
             return undefined
           }
-          const resolveResult = await build.resolve(
-            args.path,
-            {
-              importer: args.importer,
-              namespace: args.namespace,
-              resolveDir: args.resolveDir,
-              kind: args.kind,
-              pluginData: resolveBase,
-            }
-          )
+          const resolveResult = await build.resolve(args.path, {
+            importer: args.importer,
+            namespace: args.namespace,
+            resolveDir: args.resolveDir,
+            kind: args.kind,
+            pluginData: resolveBase,
+          })
           if (
             !resolveResult.errors.length &&
             !resolveResult.external &&
-            ['import-statement', 'dynamic-import'].includes(
-              args.kind
-            )
+            ['import-statement', 'dynamic-import'].includes(args.kind)
           ) {
             if (!allEntryPoints.has(resolveResult.path)) {
               newEntryPoints.push({
@@ -105,9 +98,7 @@ export async function build<T extends BuildOptions>(
     })
     result.errors.push(...moduleResult.errors)
     result.warnings.push(...moduleResult.warnings)
-    result.outputFiles.push(
-      ...(moduleResult.outputFiles ?? [])
-    )
+    result.outputFiles.push(...(moduleResult.outputFiles ?? []))
     entryPoints = newEntryPoints
   }
   return result

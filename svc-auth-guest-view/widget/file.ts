@@ -48,12 +48,7 @@ export const query = widget.define(
     })
     const body = div(ctx, {
       styles: [column],
-      content: [
-        writeForm,
-        resultsRange,
-        readInput,
-        readOutput,
-      ],
+      content: [writeForm, resultsRange, readInput, readOutput],
     })
     return {
       body,

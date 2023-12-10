@@ -23,14 +23,8 @@ export const tests = {
     )
   },
   ['convert']: (): void => {
-    test.assertEquals(
-      time.convert(2 * 60 * 60 * 1000, 'hours'),
-      2
-    )
-    test.assertEquals(
-      time.convert(2 * 60 * 60 * 1000, 'minutes'),
-      2 * 60
-    )
+    test.assertEquals(time.convert(2 * 60 * 60 * 1000, 'hours'), 2)
+    test.assertEquals(time.convert(2 * 60 * 60 * 1000, 'minutes'), 2 * 60)
     test.assertEquals(
       time.convert(2 * 60 * 60 * 1000, 'seconds'),
       2 * 60 * 60

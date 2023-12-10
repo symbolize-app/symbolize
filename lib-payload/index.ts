@@ -12,11 +12,7 @@ export type JsonArray = JsonValue[]
 
 export type JsonPayload<
   CustomTransformer extends JsonPayloadTransformer<unknown>,
-> = CustomTransformer extends JsonPayloadTransformer<
-  infer T
->
-  ? T
-  : never
+> = CustomTransformer extends JsonPayloadTransformer<infer T> ? T : never
 
 export type JsonPayloadTransformer<Value> = {
   fromJson: (input: JsonValue, path?: Path) => Value
@@ -60,9 +56,7 @@ export function nullOr<Value>(
   }
 }
 
-export function object<
-  Value extends Record<never, never>,
->(config: {
+export function object<Value extends Record<never, never>>(config: {
   [Key in keyof Value]: JsonPayloadTransformer<Value[Key]>
 }): JsonPayloadTransformer<Value> {
   return {
@@ -72,10 +66,7 @@ export function object<
       for (const key in config) {
         const value = input[key]
         checkValue(value, key, path)
-        result[key] = config[key].fromJson(
-          value,
-          buildPath(key, path)
-        )
+        result[key] = config[key].fromJson(value, buildPath(key, path))
       }
       return result
     },
@@ -85,10 +76,7 @@ export function object<
       for (const key in config) {
         const value = output[key]
         checkValue(value, key, path)
-        result[key] = config[key].toJson(
-          value,
-          buildPath(key, path)
-        )
+        result[key] = config[key].toJson(value, buildPath(key, path))
       }
       return result
     },
@@ -98,10 +86,7 @@ export function object<
 function checkObject(
   value: unknown,
   path: Path
-): asserts value is Record<
-  string | symbol | number,
-  unknown
-> {
+): asserts value is Record<string | symbol | number, unknown> {
   if (
     value === null ||
     typeof value !== 'object' ||
@@ -114,11 +99,7 @@ function checkObject(
   }
 }
 
-function checkValue(
-  value: unknown,
-  key: string,
-  path: Path
-): void {
+function checkValue(value: unknown, key: string, path: Path): void {
   if (value === undefined) {
     throw new PayloadError(
       `Invalid object (missing key ${JSON.stringify(key)})`,
@@ -136,10 +117,7 @@ export function array<Value>(
       const result = [] as Value[]
       for (let i = 0; i < input.length; i++) {
         const item = input[i]
-        result[i] = config.fromJson(
-          item,
-          buildPath(i, path)
-        )
+        result[i] = config.fromJson(item, buildPath(i, path))
       }
       return result
     },
@@ -182,10 +160,7 @@ export const string: JsonPayloadTransformer<string> = {
   },
 }
 
-function checkString(
-  value: unknown,
-  path: Path
-): asserts value is string {
+function checkString(value: unknown, path: Path): asserts value is string {
   if (typeof value !== 'string') {
     throw new PayloadError(
       `Invalid string (wrong type ${getTypeName(value)})`,
@@ -229,10 +204,7 @@ export function stringLength(config: {
 export function stringOption<Options extends string>(
   ...options: Options[]
 ): JsonPayloadTransformer<Options> {
-  function check(
-    value: string,
-    path: Path
-  ): asserts value is Options {
+  function check(value: string, path: Path): asserts value is Options {
     for (const option of options) {
       if (value === option) {
         return
@@ -307,10 +279,7 @@ export const number: JsonPayloadTransformer<number> = {
   },
 }
 
-function checkNumber(
-  value: unknown,
-  path: Path
-): asserts value is number {
+function checkNumber(value: unknown, path: Path): asserts value is number {
   if (typeof value !== 'number') {
     throw new PayloadError(
       `Invalid number (wrong type ${getTypeName(value)})`,
@@ -401,10 +370,7 @@ function checkBoolean(
   }
 }
 
-export function buildPath(
-  part: string | number,
-  parentPath: Path
-): Path {
+export function buildPath(part: string | number, parentPath: Path): Path {
   return () => [...(parentPath ? parentPath() : []), part]
 }
 

@@ -88,7 +88,8 @@ spec = context "Gen" $ do
                 { extends = FileFormat.typeScriptConfigExtends,
                   include = FileFormat.typeScriptConfigInclude,
                   exclude = FileFormat.typeScriptConfigExclude,
-                  compilerOptions = FileFormat.typeScriptConfigCompilerOptions,
+                  compilerOptions =
+                    FileFormat.typeScriptConfigCompilerOptions,
                   references = []
                 }
             ),
@@ -98,7 +99,8 @@ spec = context "Gen" $ do
                 { extends = FileFormat.typeScriptConfigExtends,
                   include = FileFormat.typeScriptConfigInclude,
                   exclude = FileFormat.typeScriptConfigExclude,
-                  compilerOptions = FileFormat.typeScriptConfigCompilerOptions,
+                  compilerOptions =
+                    FileFormat.typeScriptConfigCompilerOptions,
                   references =
                     [ FileFormat.TypeScriptConfigReference {path = "../a"}
                     ]
@@ -110,7 +112,8 @@ spec = context "Gen" $ do
                 { extends = FileFormat.typeScriptConfigExtends,
                   include = [],
                   exclude = [],
-                  compilerOptions = FileFormat.typeScriptConfigCompilerOptions,
+                  compilerOptions =
+                    FileFormat.typeScriptConfigCompilerOptions,
                   references =
                     [ FileFormat.TypeScriptConfigReference {path = "./a"},
                       FileFormat.TypeScriptConfigReference {path = "./b"}
@@ -123,7 +126,8 @@ spec = context "Gen" $ do
                 { extends = FileFormat.esLintConfigExtends,
                   parserOptions =
                     FileFormat.ESLintConfigParserOptions
-                      { tsconfigRootDir = FileFormat.esLintConfigParserOptionsTsconfigRootDir,
+                      { tsconfigRootDir =
+                          FileFormat.esLintConfigParserOptionsTsconfigRootDir,
                         project = ["a/tsconfig.json", "b/tsconfig.json"]
                       }
                 }
@@ -145,7 +149,8 @@ spec = context "Gen" $ do
                             cmd =
                               Just
                                 ( FileFormat.TaskfileCommand
-                                    { task = ":tmpfs:link-package-build-dir",
+                                    { task =
+                                        ":tmpfs:link-package-build-dir",
                                       vars = Just [("NAME", "{{.NAME}}")]
                                     }
                                 ),
@@ -172,7 +177,8 @@ spec = context "Gen" $ do
                             cmd =
                               Just
                                 ( FileFormat.TaskfileCommand
-                                    { task = ":tmpfs:link-package-build-dir",
+                                    { task =
+                                        ":tmpfs:link-package-build-dir",
                                       vars = Just [("NAME", "{{.NAME}}")]
                                     }
                                 ),
@@ -221,7 +227,11 @@ spec = context "Gen" $ do
                       ( "pnpm:link-build-dirs",
                         FileFormat.TaskfileTask
                           { aliases = Nothing,
-                            deps = Just ["a:link-build-dir", "b:link-build-dir"],
+                            deps =
+                              Just
+                                [ "a:link-build-dir",
+                                  "b:link-build-dir"
+                                ],
                             cmd = Nothing,
                             cmds = Nothing
                           }

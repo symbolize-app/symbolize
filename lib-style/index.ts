@@ -14,10 +14,7 @@ export function initContext(document: Document): Context {
   if (!styleSheet) {
     throw Error('Problem adding style element')
   }
-  const styleRenderMap = new Map<
-    string,
-    Map<Style, string[]>
-  >()
+  const styleRenderMap = new Map<string, Map<Style, string[]>>()
   const styleRenderCount = 0
   return {
     styleElement,
@@ -69,9 +66,7 @@ export type Style = {
 }
 
 export function build(body: StyleBody): Style {
-  const styleNameClass = `s${globalStyleNameCount.toString(
-    styleNameBase
-  )}`
+  const styleNameClass = `s${globalStyleNameCount.toString(styleNameBase)}`
   globalStyleNameCount += 1
   return {
     name: styleNameClass,
@@ -105,10 +100,7 @@ export function useCombinatorSelector(
   ]
 }
 
-export function render(
-  ctx: Context,
-  style: Style
-): string[] {
+export function render(ctx: Context, style: Style): string[] {
   return renderNestedStyle(ctx, style, '', '', false)
 }
 
@@ -120,31 +112,20 @@ function renderNestedStyle(
   newStyleName: boolean
 ): string[] {
   const fullSelectorValue = `${combinatorSelectorValue}${selectorValue}`
-  let fullSelectorStyleMap = ctx.styleRenderMap.get(
-    fullSelectorValue
-  )
+  let fullSelectorStyleMap = ctx.styleRenderMap.get(fullSelectorValue)
   if (!fullSelectorStyleMap) {
     fullSelectorStyleMap = new Map<Style, string[]>()
-    ctx.styleRenderMap.set(
-      fullSelectorValue,
-      fullSelectorStyleMap
-    )
+    ctx.styleRenderMap.set(fullSelectorValue, fullSelectorStyleMap)
   }
 
-  const existingStyleClasses =
-    fullSelectorStyleMap.get(style)
+  const existingStyleClasses = fullSelectorStyleMap.get(style)
   if (existingStyleClasses) {
     return existingStyleClasses
   }
 
   let styleName: string
-  if (
-    newStyleName &&
-    (combinatorSelectorValue || selectorValue)
-  ) {
-    styleName = `r${ctx.styleRenderCount.toString(
-      styleNameBase
-    )}`
+  if (newStyleName && (combinatorSelectorValue || selectorValue)) {
+    styleName = `r${ctx.styleRenderCount.toString(styleNameBase)}`
     ctx.styleRenderCount += 1
   } else {
     styleName = style.name

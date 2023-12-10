@@ -54,20 +54,30 @@ tasks:
     cmd: eslint {{.ESLINT_ARGS}} --fix
 
   format:check:
+    aliases:
+      - fc
     cmd: prettier {{.PRETTIER_ARGS}}
 
   format:fix:
+    aliases:
+      - format
+      - f
     cmd: prettier {{.PRETTIER_ARGS}} --write
 
   install:
     cmd: pnpm install --frozen-lockfile
 
   lint:check:
+    aliases:
+      - lint
+      - l
     deps:
       - eslint:lint:check
       - syncpack:lint:check
 
   lint:fix:
+    aliases:
+      - lf
     deps:
       - eslint:lint:fix
       - syncpack:lint:fix

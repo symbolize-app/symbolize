@@ -1,9 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
 declare module 'fast-mersenne-twister' {
-  export function MersenneTwister(
-    seed: number | number[]
-  ): {
+  export function MersenneTwister(seed: number | number[]): {
     randomNumber(): number
     genrand_int32(): number
     random31Bit(): number
