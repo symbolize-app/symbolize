@@ -49,9 +49,8 @@
     "--hint",
     "dev-hlint/base.yaml"
   ],
-  "rust-analyzer.assist.importGranularity": "item",
-  "rust-analyzer.assist.importGroup": false,
-  "rust-analyzer.assist.importPrefix": "crate",
+  "rust-analyzer.imports.granularity.group": "item",
+  "rust-analyzer.imports.group.enable": false,
   "task": {
     "checkForUpdates": false
   },

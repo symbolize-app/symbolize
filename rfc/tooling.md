@@ -29,7 +29,7 @@
 - https://github.com/rust-lang/rust-clippy
 - https://github.com/EmbarkStudios/cargo-deny
 - https://github.com/tantivy-search/tantivy
-- https://github.com/hyperium/h3
+- https://github.com/hyperium/hyper
   - https://github.com/hyperium/h3/pull/183
 - https://github.com/rusqlite/rusqlite
 - https://github.com/cberner/fuser

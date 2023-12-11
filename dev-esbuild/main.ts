@@ -112,7 +112,10 @@ async function buildFiles(options: {
   outdir: string
   mode: Mode
 }): Promise<devModules.BuildResult> {
-  const classicEntryPoints = ['./svc-gateway-guest-run/serviceWorker.ts']
+  const classicEntryPoints = [
+    './svc-gateway-guest-run/index.html',
+    './svc-gateway-guest-run/serviceWorker.ts',
+  ]
   const moduleEntryPoints = [
     './svc-auth-guest-view/main.ts',
     './svc-gateway-guest-run/serviceWorkerRegister.ts',
@@ -136,7 +139,12 @@ async function buildFiles(options: {
     entryPoints: classicEntryPoints.map((entryPoint) =>
       nodePath.resolve(entryPoint)
     ),
-    outExtension: { ['.js']: '.ts.js' },
+    loader: {
+      ['.html']: 'copy',
+    },
+    outExtension: {
+      ['.js']: '.ts.js',
+    },
   })
   const moduleResultPromise = devModules.build({
     ...commonOptions,
@@ -145,8 +153,10 @@ async function buildFiles(options: {
       nodePath.resolve(entryPoint)
     ),
   })
-  const classicResult = await classicResultPromise
-  const moduleResult = await moduleResultPromise
+  const [classicResult, moduleResult] = await Promise.all([
+    classicResultPromise,
+    moduleResultPromise,
+  ])
   return {
     errors: [...classicResult.errors, ...moduleResult.errors],
     warnings: [...classicResult.warnings, ...moduleResult.warnings],
@@ -167,7 +177,7 @@ function writeOutputFiles(
   outputFiles: esbuild.OutputFile[]
 ): void {
   for (const outputFile of outputFiles) {
-    const pathId = outputFile.path.substring(options.outdir.length)
+    const pathId = outputFile.path.substring(options.outdir.length + 1)
     const original = outputFile.contents
     const contentId = getContentId(original)
     const contentResult = ctx.query.upsertContent.run({

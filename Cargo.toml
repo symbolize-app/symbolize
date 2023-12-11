@@ -1,7 +1,18 @@
 [workspace]
 members = [
+  "svc-gateway-host-run",
   "svc-search-host-read",
 ]
 resolver = "2"
 
 [workspace.dependencies]
+anyhow = { version = "1.0.75", features = ["std"] }
+headers = { version = "0.4.0", features = [] }
+http = { version = "1.0.0", features = [] }
+http-body-util = { version = "0.1.0", features = [] }
+hyper = { version = "1.0.1", features = ["http1", "server"] }
+hyper-util = { version = "0.1.1", features = ["tokio"] }
+mime = { version = "0.3.17", features = [] }
+rusqlite = { version = "0.30.0", features = ["bundled"] }
+self_cell = { version = "1.0.2", features = [] }
+tokio = { version = "1.35.0", features = ["macros", "net", "process", "rt-multi-thread"] }
