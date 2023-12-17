@@ -127,7 +127,7 @@ function main(): void {
   const body = ctx.document.body
 
   head.content = [
-    title(ctx, { content: ['Fertile Earth'] }),
+    title(ctx, { content: ['Intertwine'] }),
     link(ctx, {
       rel: 'icon',
       href: 'data:;base64,iVBORw0KGgo=',

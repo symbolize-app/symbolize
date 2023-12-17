@@ -53,6 +53,8 @@ includes:
     taskfile: svc-auth-guest-view
   svc-gateway-guest-run:
     taskfile: svc-gateway-guest-run
+  svc-gateway-host-run:
+    taskfile: svc-gateway-host-run
   svc-gateway-host-store:
     taskfile: svc-gateway-host-store
   svc-search-host-read:
