@@ -12,6 +12,7 @@
 
 - https://developer.mozilla.org/en-US/docs/Web/API
   - https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API
+  - https://developer.mozilla.org/en-US/docs/Web/API/SharedWorker
   - https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API
   - https://developer.mozilla.org/en-US/docs/Web/API/WebTransport_API
 - https://www.typescriptlang.org/
