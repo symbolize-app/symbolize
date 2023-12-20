@@ -1,16 +1,17 @@
-use crate::core::result::DynResult;
+use anyhow::anyhow;
+use anyhow::Result;
 use std::fmt::Write as _;
 
 pub trait FromHex {
-  fn from_hex(value: &str) -> DynResult<Self>
+  fn from_hex(value: &str) -> Result<Self>
   where
     Self: Sized;
 }
 
 impl FromHex for Vec<u8> {
-  fn from_hex(value: &str) -> DynResult<Self> {
+  fn from_hex(value: &str) -> Result<Self> {
     if value.len() % 2 != 0 {
-      Err("invalid hex size".into())
+      Err(anyhow!("invalid hex size"))
     } else {
       (0 .. value.len())
         .step_by(2)

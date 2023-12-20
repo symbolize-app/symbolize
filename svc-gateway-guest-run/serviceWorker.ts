@@ -1,7 +1,9 @@
-function main(self: ServiceWorkerGlobalScope): void {
-  const version = 2
+declare const self: ServiceWorkerGlobalScope
+declare const version: bigint
+declare const manifest: Record<string, string>
 
-  console.log(version, 'loading', self)
+function main(): void {
+  console.log(version, 'loading', self, manifest)
 
   self.addEventListener('message', (event) => {
     console.log(version, 'message:', event)
@@ -44,6 +46,6 @@ function main(self: ServiceWorkerGlobalScope): void {
   })
 }
 
-main(self as unknown as ServiceWorkerGlobalScope)
+main()
 
 export {}

@@ -14,7 +14,7 @@ async function main(): Promise<void> {
   })
 
   const reg = await navigator.serviceWorker.register(
-    '/.assets/svc-gateway-guest-run/serviceWorker.ts.js',
+    '/.code/svc-gateway-guest-run/serviceWorkerShell.js',
     {
       scope: '/',
       updateViaCache: 'none',
