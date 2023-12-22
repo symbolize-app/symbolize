@@ -32,6 +32,8 @@ use tokio::net::TcpListener;
 use tokio::process::Command;
 use tokio::task::spawn;
 use tokio::task::spawn_blocking;
+mod hex;
+use hex::FromHex as _;
 
 #[allow(clippy::print_stdout)]
 #[tokio::main]
@@ -94,8 +96,10 @@ fn prepare_statements(
   connection: &DbConnection,
 ) -> Result<DbQueryContext<'_>> {
   Ok(DbQueryContext {
-    get_content: connection
-      .prepare(include_str!("query/get_content.sql"))?,
+    get_content_by_id: connection
+      .prepare(include_str!("query/get_content_by_id.sql"))?,
+    get_content_by_path: connection
+      .prepare(include_str!("query/get_content_by_path.sql"))?,
   })
 }
 
@@ -114,7 +118,8 @@ self_cell!(
 );
 
 struct DbQueryContext<'connection> {
-  get_content: DbStatement<'connection>,
+  get_content_by_id: DbStatement<'connection>,
+  get_content_by_path: DbStatement<'connection>,
 }
 
 // Assumed safe since owner and dependent are sent together
@@ -138,20 +143,23 @@ async fn handle(
   }
 }
 
-const ASSETS_PATH: &str = "/.assets/";
+const CODE_ID_PATH: &str = "/.code/.id/";
+const CODE_PATH: &str = "/.code/";
 const INDEX_HTML_PATH: &str = "svc-gateway-guest-run/index.html";
-const SERVICE_WORKER_PATH: &str =
-  "svc-gateway-guest-run/serviceWorker.ts.js";
+const SERVICE_WORKER_SHELL_PATH: &str =
+  "svc-gateway-guest-run/serviceWorkerShell.js";
 
 async fn handle_paths(
   ctx: Context,
   req: Request<IncomingBody>,
 ) -> Result<Response<FullBody<BodyBytes>>> {
   let path = req.uri().path();
-  let response = if let Some(path) = path.strip_prefix(ASSETS_PATH) {
-    handle_content(&ctx, &req, path).await?
+  let response = if let Some(path) = path.strip_prefix(CODE_ID_PATH) {
+    handle_content_by_id(&ctx, &req, path).await?
+  } else if let Some(path) = path.strip_prefix(CODE_PATH) {
+    handle_content_by_path(&ctx, &req, path).await?
   } else if path == "/" {
-    handle_content(&ctx, &req, INDEX_HTML_PATH).await?
+    handle_content_by_path(&ctx, &req, INDEX_HTML_PATH).await?
   } else {
     None
   };
@@ -166,7 +174,34 @@ async fn handle_paths(
   }
 }
 
-async fn handle_content(
+async fn handle_content_by_id(
+  ctx: &Context,
+  _: &Request<IncomingBody>,
+  path: &str,
+) -> Result<Option<Response<FullBody<BodyBytes>>>> {
+  let db = ctx.db.clone();
+  let content_id = Vec::from_hex(
+    path.rsplit_once('.').ok_or(anyhow!("invalid hex path"))?.0,
+  )?;
+  let content = spawn_blocking(move || {
+    let mut db = db.lock().expect("failed to lock db");
+    let content: Option<Vec<u8>> = db.with_dependent_mut(|_, query| {
+      query
+        .get_content_by_id
+        .query_row(named_params! {":content_id": content_id}, |row| {
+          row.get(0)
+        })
+    })?;
+    AnyOk(content)
+  })
+  .await??;
+  match content {
+    None => Ok(None),
+    Some(content) => Ok(Some(build_content_response(path, content)?)),
+  }
+}
+
+async fn handle_content_by_path(
   ctx: &Context,
   _: &Request<IncomingBody>,
   path: &str,
@@ -177,7 +212,7 @@ async fn handle_content(
     let mut db = db.lock().expect("failed to lock db");
     let content: Option<Vec<u8>> = db.with_dependent_mut(|_, query| {
       query
-        .get_content
+        .get_content_by_path
         .query_row(named_params! {":path_id": path_copy}, |row| row.get(0))
     })?;
     AnyOk(content)
@@ -185,19 +220,22 @@ async fn handle_content(
   .await??;
   match content {
     None => Ok(None),
-    Some(content) => {
-      let mut response = Response::builder();
-      let headers =
-        response.headers_mut().ok_or(anyhow!("response error"))?;
-      headers.typed_insert(ContentType::from(get_media_type(path)?));
-      if path == SERVICE_WORKER_PATH {
-        headers.typed_insert(ServiceWorkerAllowed("/"));
-      }
-      let response =
-        response.body(FullBody::new(BodyBytes::from(content)))?;
-      Ok(Some(response))
-    }
+    Some(content) => Ok(Some(build_content_response(path, content)?)),
   }
+}
+
+fn build_content_response(
+  path: &str,
+  content: Vec<u8>,
+) -> Result<Response<FullBody<BodyBytes>>> {
+  let mut response = Response::builder();
+  let headers = response.headers_mut().ok_or(anyhow!("response error"))?;
+  headers.typed_insert(ContentType::from(get_media_type(path)?));
+  if path == SERVICE_WORKER_SHELL_PATH {
+    headers.typed_insert(ServiceWorkerAllowed("/"));
+  }
+  let response = response.body(FullBody::new(BodyBytes::from(content)))?;
+  Ok(response)
 }
 
 fn get_media_type(path: &str) -> Result<Mime> {

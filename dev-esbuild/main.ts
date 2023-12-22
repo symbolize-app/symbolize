@@ -1,28 +1,20 @@
 #!/usr/bin/env node-loader
+import * as devContext from '@/context.ts'
 import * as devDatabase from '@/database.ts'
 import * as devModules from '@/modules.ts'
+import * as devOutput from '@/output.ts'
 import * as payload from '@intertwine/lib-payload'
-import type * as time from '@intertwine/lib-time'
 import * as timeNode from '@intertwine/lib-time/index.node.ts'
 import chokidar from 'chokidar'
 import * as esbuild from 'esbuild'
 import lodashDebounce from 'lodash-es/debounce.js'
 import ms from 'ms'
-import * as nodeCrypto from 'node:crypto'
 import * as nodeFs from 'node:fs'
 import * as nodeFsPromises from 'node:fs/promises'
 import * as nodePath from 'node:path'
 import * as nodeUrl from 'node:url'
 import * as nodeUtil from 'node:util'
-import * as nodeZlib from 'node:zlib'
 import YAML from 'yaml'
-
-type Context = time.Context & devDatabase.Context
-
-enum Mode {
-  development = 'development',
-  production = 'production',
-}
 
 const workspaceTransformer = payload.object({
   packages: payload.array(payload.string),
@@ -40,7 +32,9 @@ async function main(): Promise<void> {
   const { watch, clean, mode } = {
     watch: args.watch ?? false,
     clean: args.clean ?? false,
-    mode: payload.stringEnum(Mode).fromJson(args.mode ?? Mode.development),
+    mode: payload
+      .stringEnum(devContext.Mode)
+      .fromJson(args.mode ?? devContext.Mode.development),
   }
   const outdir = nodePath.resolve(`build/guest/${mode}`)
   if (clean) {
@@ -52,6 +46,8 @@ async function main(): Promise<void> {
     const ctx = {
       ...timeNode.initContext(),
       ...(await devDatabase.initContext()),
+      outdir,
+      mode,
     }
     await nodeFsPromises.mkdir(outdir, {
       recursive: true,
@@ -69,66 +65,56 @@ async function main(): Promise<void> {
         'all',
         lodashDebounce((type, path) => {
           console.log(`Found ${type} at ${path}`)
-          void build(ctx, {
-            outdir,
-            mode,
-          })
+          void build(ctx)
         })
       )
     }
-    await build(ctx, {
-      outdir,
-      mode,
-    })
+    await build(ctx)
     ctx.db.close()
   }
 }
 
-async function build(
-  ctx: Context,
-  options: {
-    outdir: string
-    mode: Mode
-  }
-): Promise<void> {
+async function build(ctx: devContext.Context): Promise<void> {
   const start = ctx.performanceNow()
-  const versionId = createVersion(ctx)
-  const { errors, outputFiles } = await buildFiles(options)
+  const versionId = devOutput.createVersion()
+  const { errors, outputFiles } = await buildFiles(ctx)
   if (!errors.length) {
-    writeOutputFiles(ctx, options, versionId, outputFiles)
+    devOutput.write(
+      ctx,
+      versionId,
+      outputFiles.map((item) => ({
+        pathId: item.path.substring(ctx.outdir.length + 1),
+        original: item.contents,
+      }))
+    )
   }
   const end = ctx.performanceNow()
   const elapsed = ms(Math.round(end - start))
   console.log(`Done build: ${elapsed}`)
 }
 
-function createVersion(ctx: Context): bigint {
-  const versionId = BigInt(Date.now())
-  ctx.query.insertVersion.run({ id: versionId })
-  return versionId
-}
-
-async function buildFiles(options: {
-  outdir: string
-  mode: Mode
-}): Promise<devModules.BuildResult> {
+async function buildFiles(
+  ctx: devContext.Context
+): Promise<devModules.BuildResult> {
   const classicEntryPoints = [
     './svc-gateway-guest-run/index.html',
     './svc-gateway-guest-run/serviceWorker.ts',
   ]
   const moduleEntryPoints = [
+    './lib-test/index.ts',
+    './lib-test/time.test.ts',
     './svc-auth-guest-view/main.ts',
     './svc-gateway-guest-run/serviceWorkerRegister.ts',
   ]
   const commonOptions = {
     platform: 'browser' as const,
-    outdir: options.outdir,
+    outdir: ctx.outdir,
     outbase: nodePath.resolve('.'),
     define: {
-      ['import.meta.env.NODE_ENV']: JSON.stringify(options.mode),
+      ['import.meta.env.NODE_ENV']: JSON.stringify(ctx.mode),
     },
     logLevel: 'warning' as const,
-    minify: options.mode === Mode.production,
+    minify: ctx.mode === devContext.Mode.production,
     write: false,
     external: ['timers', 'util'],
   }
@@ -165,58 +151,6 @@ async function buildFiles(options: {
       ...moduleResult.outputFiles,
     ],
   }
-}
-
-function writeOutputFiles(
-  ctx: Context,
-  options: {
-    outdir: string
-    mode: Mode
-  },
-  versionId: bigint,
-  outputFiles: esbuild.OutputFile[]
-): void {
-  for (const outputFile of outputFiles) {
-    const pathId = outputFile.path.substring(options.outdir.length + 1)
-    const original = outputFile.contents
-    const contentId = getContentId(original)
-    const contentResult = ctx.query.upsertContent.run({
-      id: contentId,
-      original,
-    })
-    if (
-      contentResult.lastInsertRowid &&
-      options.mode === Mode.production
-    ) {
-      const compressed = compressContent(original)
-      ctx.query.updateContentCompressed.run({
-        id: contentId,
-        compressed,
-      })
-    }
-    ctx.query.insertPath.run({
-      id: pathId,
-      version_id: versionId,
-      content_id: contentId,
-    })
-  }
-}
-
-function getContentId(original: Uint8Array): Uint8Array {
-  const hash = nodeCrypto.createHash('sha256')
-  hash.update(original)
-  return hash.digest()
-}
-
-function compressContent(original: Uint8Array): Uint8Array {
-  return nodeZlib.brotliCompressSync(original, {
-    params: {
-      [nodeZlib.constants.BROTLI_PARAM_MODE]:
-        nodeZlib.constants.BROTLI_MODE_TEXT,
-      [nodeZlib.constants.BROTLI_PARAM_QUALITY]:
-        nodeZlib.constants.BROTLI_MAX_QUALITY,
-    },
-  })
 }
 
 if (
