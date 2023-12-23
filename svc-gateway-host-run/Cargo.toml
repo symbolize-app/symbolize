@@ -4,9 +4,13 @@ version = "0.1.0"
 edition = "2021"
 publish = false
 
+[[bin]]
+name = "intertwine-svc-gateway-host-run"
+path = "src/mod.rs"
+
 [dependencies]
 anyhow = { workspace = true }
-headers = { workspace = true }
+bytes = { workspace = true }
 http = { workspace = true }
 http-body-util = { workspace = true }
 hyper = { workspace = true }
@@ -14,4 +18,5 @@ hyper-util = { workspace = true }
 mime = { workspace = true }
 rusqlite = { workspace = true }
 self_cell = { workspace = true }
+thiserror = { workspace = true }
 tokio = { workspace = true }
