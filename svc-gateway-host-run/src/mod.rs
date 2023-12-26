@@ -6,7 +6,6 @@ mod handle;
 mod header;
 mod hex;
 mod main_;
-mod path;
 mod request;
 mod response;
 

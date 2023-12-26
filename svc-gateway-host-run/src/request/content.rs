@@ -1,0 +1,179 @@
+use crate::header as svc_header;
+use crate::request::simple as svc_request_simple;
+use crate::response as svc_response;
+use anyhow::anyhow;
+use anyhow::Result;
+use http::Method;
+use http::StatusCode;
+use mime;
+
+#[derive(Debug)]
+pub struct ContentRequest<'a> {
+  pub full_path: &'a str,
+  pub path_prefix: &'a str,
+  pub mime: ContentMime,
+  pub sandbox: bool,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ContentMime {
+  Html,
+  JavaScript,
+}
+
+impl ContentRequest<'_> {
+  pub fn try_new_no_sandbox<'a>(
+    req: &'a svc_request_simple::SimpleRequest<'a>,
+    full_path: &'a str,
+  ) -> Result<ContentRequest<'a>> {
+    Self::try_new_base(req, full_path, false)
+  }
+
+  pub fn try_new<'a>(
+    req: &'a svc_request_simple::SimpleRequest<'a>,
+    full_path: &'a str,
+  ) -> Result<ContentRequest<'a>> {
+    Self::try_new_base(req, full_path, true)
+  }
+
+  #[allow(clippy::print_stdout)]
+  fn try_new_base<'a>(
+    req: &'a svc_request_simple::SimpleRequest<'a>,
+    full_path: &'a str,
+    sandbox: bool,
+  ) -> Result<ContentRequest<'a>> {
+    println!("{full_path}");
+
+    let (path_prefix, ext) = Self::split_path(full_path)?;
+    let mime = Self::get_mime(full_path, ext)?;
+    let sandbox = sandbox && matches!(mime, ContentMime::Html);
+
+    Self::check_method(req.method)?;
+    if let Some(accept) = &req.accept {
+      Self::check_accept(accept, mime)?;
+    }
+    if let (Some(dest), Some(mode), Some(site)) =
+      (req.dest, req.mode, req.site)
+    {
+      Self::check_fetch_metadata(dest, mode, site, mime)?;
+    }
+
+    Ok(ContentRequest {
+      full_path,
+      path_prefix,
+      mime,
+      sandbox,
+    })
+  }
+
+  fn split_path(full_path: &str) -> Result<(&str, &str)> {
+    full_path
+      .rsplit_once('.')
+      .ok_or(anyhow!("invalid hex path"))
+  }
+
+  fn get_mime(full_path: &str, ext: &str) -> Result<ContentMime> {
+    match ext {
+      "html" => Ok(ContentMime::Html),
+      "js" | "mjs" => Ok(ContentMime::JavaScript),
+      _ => Err(anyhow!("invalid extension for {full_path:?}")),
+    }
+  }
+
+  fn check_method(method: &Method) -> Result<()> {
+    if method == Method::GET {
+      Ok(())
+    } else {
+      Err(
+        svc_response::Error::new(
+          StatusCode::BAD_REQUEST,
+          "only GET supported",
+        )
+        .into(),
+      )
+    }
+  }
+
+  #[allow(clippy::print_stderr)]
+  fn check_accept(
+    accept: &svc_header::Accept,
+    mime: ContentMime,
+  ) -> Result<()> {
+    let mime: &mime::Mime = mime.into();
+    let found = accept.0.clone().any(|item| {
+      item
+        .map(|item| match (item.type_(), item.subtype()) {
+          (mime::STAR, mime::STAR) => true,
+          (mime::STAR, subtype) => subtype == mime.subtype(),
+          (type_, subtype) => {
+            (type_, subtype) == (mime.type_(), mime.subtype())
+          }
+        })
+        .unwrap_or(false)
+    });
+    if found {
+      Ok(())
+    } else {
+      eprint!("  wrong accept type {accept:?} {mime:?}");
+      Err(
+        svc_response::Error::new(
+          StatusCode::BAD_REQUEST,
+          "wrong accept type",
+        )
+        .into(),
+      )
+    }
+  }
+
+  #[allow(clippy::print_stderr)]
+  fn check_fetch_metadata(
+    dest: svc_header::SecFetchDest,
+    mode: svc_header::SecFetchMode,
+    site: svc_header::SecFetchSite,
+    mime: ContentMime,
+  ) -> Result<()> {
+    let safe = matches!(
+      (dest, mode, site, mime),
+      (
+        svc_header::SecFetchDest::Document,
+        svc_header::SecFetchMode::Navigate,
+        svc_header::SecFetchSite::None,
+        ContentMime::Html,
+      ) | (
+        svc_header::SecFetchDest::Script
+          | svc_header::SecFetchDest::ServiceWorker,
+        _,
+        svc_header::SecFetchSite::SameOrigin,
+        ContentMime::JavaScript,
+      ) | (
+        svc_header::SecFetchDest::Empty,
+        svc_header::SecFetchMode::Cors,
+        svc_header::SecFetchSite::SameOrigin,
+        _,
+      )
+    );
+    if safe {
+      Ok(())
+    } else {
+      eprintln!(
+        "  wrong fetch metadata {dest:?} {mode:?} {site:?} {mime:?}"
+      );
+      Err(
+        svc_response::Error::new(
+          StatusCode::BAD_REQUEST,
+          "wrong fetch metadata",
+        )
+        .into(),
+      )
+    }
+  }
+}
+
+impl From<ContentMime> for &'static mime::Mime {
+  fn from(value: ContentMime) -> Self {
+    match value {
+      ContentMime::Html => &mime::TEXT_HTML,
+      ContentMime::JavaScript => &mime::TEXT_JAVASCRIPT,
+    }
+  }
+}
