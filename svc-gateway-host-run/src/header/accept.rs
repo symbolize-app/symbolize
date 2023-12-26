@@ -6,7 +6,7 @@ use hyper::header::HeaderName;
 use mime;
 
 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Accept<'a>(pub mime::MimeIter<'a>);
 
 impl HeaderPair for Accept<'_> {

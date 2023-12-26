@@ -1,42 +1,21 @@
-use crate::header::HeaderPair;
+use crate::header as svc_header;
 use bytes::Bytes;
 use http;
 use http::response::Builder;
 use http::HeaderValue;
 use http::Response;
-use http::StatusCode;
 use http_body_util::Full as FullBody;
-use thiserror;
-
-#[derive(thiserror::Error, Debug)]
-#[error("response error {status:?} ({message:?})")]
-pub struct Error {
-  pub status: StatusCode,
-  pub message: Bytes,
-}
-
-impl Error {
-  pub fn new<T>(status: StatusCode, message: T) -> Self
-  where
-    Bytes: From<T>,
-  {
-    Self {
-      status,
-      message: message.into(),
-    }
-  }
-}
 
 pub trait BuilderExt {
   fn header_pair<T>(self, header: T) -> Self
   where
-    T: HeaderPair,
+    T: svc_header::HeaderPair,
     HeaderValue: TryFrom<T>,
     <HeaderValue as TryFrom<T>>::Error: Into<http::Error>;
 
   fn header_pair_opt<T>(self, header: Option<T>) -> Self
   where
-    T: HeaderPair,
+    T: svc_header::HeaderPair,
     HeaderValue: TryFrom<T>,
     <HeaderValue as TryFrom<T>>::Error: Into<http::Error>;
 
@@ -51,7 +30,7 @@ pub trait BuilderExt {
 impl BuilderExt for Builder {
   fn header_pair<T>(self, header: T) -> Self
   where
-    T: HeaderPair,
+    T: svc_header::HeaderPair,
     HeaderValue: TryFrom<T>,
     <HeaderValue as TryFrom<T>>::Error: Into<http::Error>,
   {
@@ -60,7 +39,7 @@ impl BuilderExt for Builder {
 
   fn header_pair_opt<T>(self, header: Option<T>) -> Self
   where
-    T: HeaderPair,
+    T: svc_header::HeaderPair,
     HeaderValue: TryFrom<T>,
     <HeaderValue as TryFrom<T>>::Error: Into<http::Error>,
   {
