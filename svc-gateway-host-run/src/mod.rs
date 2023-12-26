@@ -1,4 +1,5 @@
 #![feature(imported_main)]
+#![feature(never_type)]
 
 mod context;
 mod db;

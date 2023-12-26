@@ -1,9 +1,9 @@
 use crate::context as svc_context;
+use crate::db::Context as _;
 use crate::hex::FromHex as _;
 use crate::request as svc_request;
 use crate::response as svc_response;
 use anyhow::Error;
-use anyhow::Ok as AnyOk;
 use anyhow::Result;
 use bytes::Bytes;
 use http::StatusCode;
@@ -11,18 +11,20 @@ use http_body_util::Full as FullBody;
 use hyper::body::Incoming as IncomingBody;
 use hyper::Request;
 use hyper::Response;
-use rusqlite;
-use tokio::task::spawn_blocking;
+use std::sync::Arc;
 
 const CODE_ID_PATH: &str = "/.code/.id/";
 const CODE_PATH: &str = "/.code/";
 const INDEX_HTML_PATH: &str = "svc-gateway-guest-run/index.html";
 
-pub async fn handle(
-  ctx: svc_context::Context,
+pub async fn handle<TContext>(
+  ctx: Arc<TContext>,
   req: Request<IncomingBody>,
-) -> Result<Response<FullBody<Bytes>>> {
-  handle_paths(&ctx, &svc_request::SimpleRequest::new(&req))
+) -> Result<Response<FullBody<Bytes>>>
+where
+  TContext: svc_context::DbContext,
+{
+  handle_paths(ctx.as_ref(), &svc_request::SimpleRequest::new(&req))
     .await
     .unwrap_or_else(handle_error)
     .into_response()
@@ -42,10 +44,13 @@ fn handle_error(err: Error) -> svc_response::SimpleResponse {
   err.into_simple_response()
 }
 
-async fn handle_paths(
-  ctx: &svc_context::Context,
+async fn handle_paths<TContext>(
+  ctx: &TContext,
   req: &svc_request::SimpleRequest<'_>,
-) -> Result<svc_response::SimpleResponse> {
+) -> Result<svc_response::SimpleResponse>
+where
+  TContext: svc_context::DbContext,
+{
   let path = req.path;
   let response = if let Some(path) = path.strip_prefix(CODE_ID_PATH) {
     handle_content_by_id(
@@ -80,48 +85,30 @@ async fn handle_paths(
   }
 }
 
-async fn handle_content_by_id(
-  ctx: &svc_context::Context,
+async fn handle_content_by_id<TContext>(
+  ctx: &TContext,
   req: &svc_request::ContentRequest<'_>,
-) -> Result<Option<svc_response::ContentResponse>> {
-  let db = ctx.db.clone();
+) -> Result<Option<svc_response::ContentResponse>>
+where
+  TContext: svc_context::DbContext,
+{
   let content_id = Vec::from_hex(req.path_prefix)?;
-  let content = spawn_blocking(move || {
-    let mut db = db.lock().expect("failed to lock db");
-    let content: Option<Vec<u8>> = db.with_dependent_mut(|_, query| {
-      query.get_content_by_id.query_row(
-        rusqlite::named_params! {":content_id": content_id},
-        |row| row.get(0),
-      )
-    })?;
-    AnyOk(content)
-  })
-  .await??;
-  Ok(
-    content
-      .map(|content| svc_response::ContentResponse::new(req, content)),
-  )
+  let content = ctx.db().get_content_by_id(content_id).await?;
+  Ok(svc_response::ContentResponse::map_new(req, content))
 }
 
-async fn handle_content_by_path(
-  ctx: &svc_context::Context,
+async fn handle_content_by_path<TContext>(
+  ctx: &TContext,
   req: &svc_request::ContentRequest<'_>,
-) -> Result<Option<svc_response::ContentResponse>> {
-  let db = ctx.db.clone();
-  let path_copy = req.full_path.to_owned();
-  let content = spawn_blocking(move || {
-    let mut db = db.lock().expect("failed to lock db");
-    let content: Option<Vec<u8>> = db.with_dependent_mut(|_, query| {
-      query.get_content_by_path.query_row(
-        rusqlite::named_params! {":path_id": path_copy},
-        |row| row.get(0),
-      )
-    })?;
-    AnyOk(content)
-  })
-  .await??;
-  Ok(
-    content
-      .map(|content| svc_response::ContentResponse::new(req, content)),
-  )
+) -> Result<Option<svc_response::ContentResponse>>
+where
+  TContext: svc_context::DbContext,
+{
+  let path_id = req.full_path.to_owned();
+  let content = ctx.db().get_content_by_path(path_id).await?;
+  Ok(svc_response::ContentResponse::map_new(req, content))
 }
+
+#[cfg(test)]
+#[path = "./handle_test.rs"]
+mod handle_test;

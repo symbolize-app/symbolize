@@ -20,3 +20,6 @@ rusqlite = { workspace = true }
 self_cell = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true }
+
+[dev-dependencies]
+mockall = { workspace = true }

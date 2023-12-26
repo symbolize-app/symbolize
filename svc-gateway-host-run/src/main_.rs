@@ -8,15 +8,15 @@ use hyper_util::rt::TokioIo;
 use std::env;
 use std::net::SocketAddr;
 use std::sync::Arc;
-use std::sync::Mutex;
 use tokio::net::TcpListener;
 use tokio::task::spawn;
 
 #[allow(clippy::print_stdout)]
 #[tokio::main]
-pub async fn main() -> Result<()> {
-  let db = Arc::new(Mutex::new(svc_db::init_db_context().await?));
-  let ctx = svc_context::Context { db };
+pub async fn main() -> Result<!> {
+  let ctx = Arc::new(svc_context::MainContext {
+    db: svc_db::MainContext::init().await?,
+  });
   let service =
     service_fn(move |req| svc_handle::handle(ctx.clone(), req));
   println!("Opened");

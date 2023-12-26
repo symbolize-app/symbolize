@@ -7,6 +7,7 @@ use http::StatusCode;
 const SERVICE_WORKER_SHELL_PATH: &str =
   "svc-gateway-guest-run/serviceWorkerShell.js";
 
+#[derive(Debug, PartialEq, Eq)]
 pub struct ContentResponse {
   pub sandbox: bool,
   pub mime: svc_request::ContentMime,
@@ -15,16 +16,19 @@ pub struct ContentResponse {
 }
 
 impl ContentResponse {
-  pub fn new<T>(req: &svc_request::ContentRequest, body: T) -> Self
+  pub fn map_new<T>(
+    req: &svc_request::ContentRequest,
+    body: Option<T>,
+  ) -> Option<Self>
   where
     Bytes: From<T>,
   {
-    Self {
+    body.map(|body| Self {
       sandbox: req.sandbox,
       mime: req.mime,
       is_service_worker_shell: req.full_path == SERVICE_WORKER_SHELL_PATH,
       body: body.into(),
-    }
+    })
   }
 
   pub fn into_simple_response(
