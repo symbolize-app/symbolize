@@ -141,12 +141,10 @@ const elementProperties = {
       >
     ) {
       const oldListeners = this[listeners]
-      for (const key in oldListeners) {
-        const listener = oldListeners[key]
+      for (const [key, listener] of Object.entries(oldListeners)) {
         this.removeEventListener(key, listener, listener[listenerOptions])
       }
-      for (const key in value) {
-        const listener = value[key]
+      for (const [key, listener] of Object.entries(value)) {
         this.addEventListener(key, listener, listener[listenerOptions])
       }
     },

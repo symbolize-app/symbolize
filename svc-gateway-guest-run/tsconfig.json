@@ -1,10 +1,7 @@
 {
   "compilerOptions": {
     "declarationDir": "./build/tsc",
-    "paths": {
-      "@/*.sql": ["./*.sql"],
-      "@/*.ts": ["./*.ts"]
-    },
+    "paths": { "@/*.sql": ["./*.sql"], "@/*.ts": ["./*.ts"] },
     "tsBuildInfoFile": "build/tsc/tsconfig.tsbuildinfo"
   },
   "exclude": ["build/**"],
@@ -15,6 +12,7 @@
     { "path": "../lib-hex" },
     { "path": "../lib-test" },
     { "path": "../lib-time" },
-    { "path": "../lib-widget" }
+    { "path": "../lib-widget" },
+    { "path": "../svc-auth-guest-view" }
   ]
 }

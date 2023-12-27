@@ -512,6 +512,9 @@ importers:
       '@intertwine/lib-widget':
         specifier: workspace:*
         version: link:../lib-widget
+      '@intertwine/svc-auth-guest-view':
+        specifier: workspace:*
+        version: link:../svc-auth-guest-view
     devDependencies:
       typescript:
         specifier: 5.2.2

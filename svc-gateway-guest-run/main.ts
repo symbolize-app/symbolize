@@ -10,10 +10,18 @@ function main() {
     ...widget.initContext(window.document),
   }
 
-  if (import.meta.env.NODE_ENV === 'development') {
+  const entryPoints: Promise<{
+    main(ctx: widget.Context & error.Context): void
+  }>[] = [
+    import('@intertwine/svc-auth-guest-view/main.ts'),
+    ...(import.meta.env.NODE_ENV === 'development'
+      ? [import('@/main.development.ts')]
+      : []),
+  ]
+
+  for (const entryPoint of entryPoints) {
     ;(async () => {
-      const development = await import('@/main.development.ts')
-      development.main(ctx)
+      ;(await entryPoint).main(ctx)
     })().catch(console.error)
   }
 }

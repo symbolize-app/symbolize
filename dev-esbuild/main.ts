@@ -70,7 +70,6 @@ async function main(): Promise<void> {
       )
     }
     await build(ctx)
-    ctx.db.close()
   }
 }
 
@@ -90,20 +89,19 @@ async function build(ctx: devContext.Context): Promise<void> {
   }
   const end = ctx.performanceNow()
   const elapsed = ms(Math.round(end - start))
-  console.log(`Done build: ${elapsed}`)
+  console.log(`Done build ${versionId}: ${elapsed}`)
 }
 
 async function buildFiles(
   ctx: devContext.Context
 ): Promise<devModules.BuildResult> {
   const classicEntryPoints = [
-    './svc-gateway-guest-run/index.html',
+    './svc-gateway-guest-run/init.html',
+    './svc-gateway-guest-run/main.html',
     './svc-gateway-guest-run/serviceWorker.ts',
   ]
   const moduleEntryPoints = [
-    './lib-test/index.ts',
-    './lib-test/time.test.ts',
-    './svc-auth-guest-view/main.ts',
+    './svc-gateway-guest-run/main.ts',
     './svc-gateway-guest-run/serviceWorkerRegister.ts',
   ]
   const commonOptions = {
@@ -154,8 +152,9 @@ async function buildFiles(
 }
 
 if (
+  process.argv[1] &&
   nodeFs.realpathSync(process.argv[1]) ===
-  nodeUrl.fileURLToPath(import.meta.url)
+    nodeUrl.fileURLToPath(import.meta.url)
 ) {
   void main()
 }

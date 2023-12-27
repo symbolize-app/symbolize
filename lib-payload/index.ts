@@ -64,7 +64,7 @@ export function object<Value extends Record<never, never>>(config: {
       checkObject(input, path)
       const result = {} as Value
       for (const key in config) {
-        const value = input[key]
+        const value: JsonValue | undefined = input[key]
         checkValue(value, key, path)
         result[key] = config[key].fromJson(value, buildPath(key, path))
       }
@@ -99,7 +99,11 @@ function checkObject(
   }
 }
 
-function checkValue(value: unknown, key: string, path: Path): void {
+function checkValue<T>(
+  value: T,
+  key: string,
+  path: Path
+): asserts value is Exclude<T, undefined> {
   if (value === undefined) {
     throw new PayloadError(
       `Invalid object (missing key ${JSON.stringify(key)})`,
@@ -116,7 +120,7 @@ export function array<Value>(
       checkArray(input, path)
       const result = [] as Value[]
       for (let i = 0; i < input.length; i++) {
-        const item = input[i]
+        const item = input[i]!
         result[i] = config.fromJson(item, buildPath(i, path))
       }
       return result
@@ -125,7 +129,7 @@ export function array<Value>(
       checkArray(output, path)
       const result = [] as JsonArray
       for (let i = 0; i < output.length; i++) {
-        const item = output[i]
+        const item = output[i]!
         result[i] = config.toJson(item, buildPath(i, path))
       }
       return result
