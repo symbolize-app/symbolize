@@ -1,4 +1,5 @@
 use crate::context as svc_context;
+use crate::db as svc_db;
 use crate::db::Context as _;
 use crate::hex::FromHex as _;
 use crate::request as svc_request;
@@ -93,8 +94,18 @@ where
   TContext: svc_context::DbContext,
 {
   let content_id = Vec::from_hex(req.path_prefix)?;
-  let content = ctx.db().get_content_by_id(content_id).await?;
-  Ok(svc_response::ContentResponse::map_new(req, content))
+  let original = ctx.db().get_content_by_id(content_id.clone()).await?;
+  if let Some(original) = original {
+    Ok(Some(svc_response::ContentResponse::try_new_immutable(
+      req,
+      svc_db::ContentRowWithId {
+        id: content_id,
+        original,
+      },
+    )?))
+  } else {
+    Ok(None)
+  }
 }
 
 async fn handle_content_by_path<TContext>(
@@ -105,8 +116,15 @@ where
   TContext: svc_context::DbContext,
 {
   let path_id = req.full_path.to_owned();
-  let content = ctx.db().get_content_by_path(path_id).await?;
-  Ok(svc_response::ContentResponse::map_new(req, content))
+  let content_row = ctx.db().get_content_by_path(path_id).await?;
+  if let Some(content_row) = content_row {
+    Ok(Some(svc_response::ContentResponse::try_new(
+      req,
+      content_row,
+    )?))
+  } else {
+    Ok(None)
+  }
 }
 
 #[cfg(test)]

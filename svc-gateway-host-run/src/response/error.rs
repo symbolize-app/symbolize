@@ -28,11 +28,13 @@ impl Error {
   ) -> svc_response_simple::SimpleResponse {
     svc_response_simple::SimpleResponse {
       status: self.status,
+      cache_control: None,
       content_security_policy:
         (svc_header::ContentSecurityPolicy::builder()
           .default_source_self()
           .build()),
       content_type: svc_header::ContentType(&mime::TEXT_PLAIN),
+      e_tag: None,
       service_worker_allowed: None,
       body: self.message,
     }
