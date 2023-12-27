@@ -17,6 +17,8 @@ impl ContentSecurityPolicy {
 #[derive(Debug, Clone, Copy)]
 pub enum Directive {
   DefaultSourceSelf,
+  ImageSourceSelfData,
+  StyleSourceSelfUnsafeInline,
   Sandbox,
 }
 
@@ -24,6 +26,10 @@ impl Directive {
   fn to_str(self) -> &'static str {
     match self {
       Self::DefaultSourceSelf => "default-src 'self'",
+      Self::ImageSourceSelfData => "img-src 'self' data:",
+      Self::StyleSourceSelfUnsafeInline => {
+        "style-src 'self' 'unsafe-inline'"
+      }
       Self::Sandbox => "sandbox",
     }
   }
@@ -34,6 +40,23 @@ pub struct Builder(Vec<Directive>);
 impl Builder {
   pub fn default_source_self(mut self) -> Self {
     self.0.push(Directive::DefaultSourceSelf);
+    self
+  }
+
+  pub fn image_source_self_data_opt(mut self, enable: bool) -> Self {
+    if enable {
+      self.0.push(Directive::ImageSourceSelfData);
+    }
+    self
+  }
+
+  pub fn style_source_self_unsafe_inline_opt(
+    mut self,
+    enable: bool,
+  ) -> Self {
+    if enable {
+      self.0.push(Directive::StyleSourceSelfUnsafeInline);
+    }
     self
   }
 

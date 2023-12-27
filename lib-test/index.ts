@@ -67,8 +67,7 @@ export async function runAll<
   for (const testModule of resolvedTestModules) {
     const { url, tests } = testModule
     let testUrlPrinted = false
-    for (const testName in tests) {
-      const test = tests[testName]
+    for (const [testName, test] of Object.entries(tests)) {
       try {
         const testContext: CustomContext & Context = {
           ...ctx,
@@ -184,7 +183,7 @@ export function mock<
     if (i === returnValues.length) {
       throw new Error('called too many times')
     } else {
-      const result = returnValues[i]()
+      const result = returnValues[i]!()
       callback[mockHistory].push(args)
       i += 1
       return result

@@ -13,9 +13,9 @@ use hyper::Request;
 use hyper::Response;
 use std::sync::Arc;
 
-const CODE_ID_PATH: &str = "/.code/.id/";
-const CODE_PATH: &str = "/.code/";
-const INDEX_HTML_PATH: &str = "svc-gateway-guest-run/index.html";
+const CODE_ID_PREFIX: &str = "/.code/.id/";
+const CODE_PREFIX: &str = "/.code/";
+const INIT_HTML_PATH: &str = "svc-gateway-guest-run/init.html";
 
 pub async fn handle<TContext>(
   ctx: Arc<TContext>,
@@ -52,13 +52,13 @@ where
   TContext: svc_context::DbContext,
 {
   let path = req.path;
-  let response = if let Some(path) = path.strip_prefix(CODE_ID_PATH) {
+  let response = if let Some(path) = path.strip_prefix(CODE_ID_PREFIX) {
     handle_content_by_id(
       ctx,
       &svc_request::ContentRequest::try_new(req, path)?,
     )
     .await?
-  } else if let Some(path) = path.strip_prefix(CODE_PATH) {
+  } else if let Some(path) = path.strip_prefix(CODE_PREFIX) {
     handle_content_by_path(
       ctx,
       &svc_request::ContentRequest::try_new(req, path)?,
@@ -69,7 +69,7 @@ where
       ctx,
       &svc_request::ContentRequest::try_new_no_sandbox(
         req,
-        INDEX_HTML_PATH,
+        INIT_HTML_PATH,
       )?,
     )
     .await?

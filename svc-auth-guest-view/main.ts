@@ -4,9 +4,7 @@ import * as svcWidgetMember from '@/widget/member.ts'
 import * as svcWidgetSearch from '@/widget/search.ts'
 import * as svcWidgetTopic from '@/widget/topic.ts'
 import type * as error from '@intertwine/lib-error'
-import * as random from '@intertwine/lib-random'
 import * as style from '@intertwine/lib-style'
-import * as timeBrowser from '@intertwine/lib-time/index.browser.ts'
 import * as widget from '@intertwine/lib-widget'
 
 const green = style.build([
@@ -63,13 +61,7 @@ const myCounter = widget.define(
   }
 )
 
-function main(): void {
-  const ctx: widget.Context & error.Context = {
-    ...random.initContext(),
-    ...timeBrowser.initContext(),
-    ...widget.initContext(window.document),
-  }
-
+export function main(ctx: widget.Context & error.Context): void {
   const counter = myCounter(ctx, {})
 
   const listContents = widget.range(ctx, {
@@ -135,5 +127,3 @@ function main(): void {
   ]
   body.content = [rootDiv]
 }
-
-main()

@@ -36,11 +36,17 @@ impl ContentResponse {
   ) -> svc_response_simple::SimpleResponse {
     svc_response_simple::SimpleResponse {
       status: StatusCode::OK,
-      content_security_policy: svc_header::ContentSecurityPolicy::builder(
-      )
-      .default_source_self()
-      .sandbox_opt(self.sandbox)
-      .build(),
+      content_security_policy:
+        (svc_header::ContentSecurityPolicy::builder()
+          .default_source_self()
+          .image_source_self_data_opt(
+            self.mime == svc_request::ContentMime::Html,
+          )
+          .style_source_self_unsafe_inline_opt(
+            self.mime == svc_request::ContentMime::Html,
+          )
+          .sandbox_opt(self.sandbox)
+          .build()),
       content_type: svc_header::ContentType(self.mime.into()),
       service_worker_allowed: self
         .is_service_worker_shell

@@ -45,9 +45,13 @@ export const load = (url, context, defaultLoad) => {
           external: ['/*', 'node:*'],
           logLevel: 'warning',
         })
+        const outputFile = result.outputFiles[0]
+        if (!outputFile) {
+          throw new Error('Missing output file')
+        }
         return {
           format: 'module',
-          source: result.outputFiles[0].contents,
+          source: outputFile.contents,
           shortCircuit: true,
         }
       }

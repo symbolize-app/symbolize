@@ -21,8 +21,9 @@ export async function run(baseContext: time.Context): Promise<boolean> {
 }
 
 if (
+  process.argv[1] &&
   nodeFs.realpathSync(process.argv[1]) ===
-  nodeUrl.fileURLToPath(import.meta.url)
+    nodeUrl.fileURLToPath(import.meta.url)
 ) {
   void run({
     ...timeNode.initContext(),
