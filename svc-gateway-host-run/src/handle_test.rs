@@ -11,7 +11,7 @@ async fn test_handle_content_by_id() {
   db.expect_get_content_by_id()
     .with(eq(vec![0x01, 0x0f]))
     .times(1)
-    .returning(|_| Ok(Some(vec![9])));
+    .returning(|_| Ok(Some(vec![0x09])));
 
   let mut ctx = svc_context::MockDbContext::new();
   ctx.expect_db().times(1).return_const(db);
@@ -21,6 +21,7 @@ async fn test_handle_content_by_id() {
     path_prefix: "010f",
     mime: svc_request::ContentMime::JavaScript,
     sandbox: false,
+    if_none_match: None,
   };
 
   assert_eq!(
@@ -29,7 +30,9 @@ async fn test_handle_content_by_id() {
       sandbox: false,
       mime: svc_request::ContentMime::JavaScript,
       is_service_worker_shell: false,
-      body: vec![9].into()
+      immutable: true,
+      e_tag: "010f".to_owned(),
+      original: vec![0x09]
     })
   );
 }
@@ -40,7 +43,12 @@ async fn test_handle_content_by_path() {
   db.expect_get_content_by_path()
     .with(eq("a.js".to_owned()))
     .times(1)
-    .returning(|_| Ok(Some(vec![8])));
+    .returning(|_| {
+      Ok(Some(svc_db::ContentRowWithId {
+        id: vec![0xff],
+        original: vec![0x08],
+      }))
+    });
 
   let mut ctx = svc_context::MockDbContext::new();
   ctx.expect_db().times(1).return_const(db);
@@ -50,6 +58,7 @@ async fn test_handle_content_by_path() {
     path_prefix: "a",
     mime: svc_request::ContentMime::JavaScript,
     sandbox: false,
+    if_none_match: None,
   };
 
   assert_eq!(
@@ -58,7 +67,9 @@ async fn test_handle_content_by_path() {
       sandbox: false,
       mime: svc_request::ContentMime::JavaScript,
       is_service_worker_shell: false,
-      body: vec![8].into()
+      immutable: false,
+      e_tag: "ff".to_owned(),
+      original: vec![8]
     })
   );
 }

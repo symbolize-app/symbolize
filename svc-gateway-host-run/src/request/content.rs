@@ -13,6 +13,7 @@ pub struct ContentRequest<'a> {
   pub path_prefix: &'a str,
   pub mime: ContentMime,
   pub sandbox: bool,
+  pub if_none_match: Option<&'a str>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -47,13 +48,17 @@ impl ContentRequest<'_> {
     let (path_prefix, ext) = Self::split_path(full_path)?;
     let mime = Self::get_mime(full_path, ext)?;
     let sandbox = sandbox && matches!(mime, ContentMime::Html);
+    let if_none_match = req
+      .if_none_match
+      .as_ref()
+      .map(|if_none_match| if_none_match.0);
 
     Self::check_method(req.method)?;
     if let Some(accept) = &req.accept {
       Self::check_accept(accept, mime)?;
     }
     if let (Some(dest), Some(mode), Some(site)) =
-      (req.dest, req.mode, req.site)
+      (req.sec_fetch_dest, req.sec_fetch_mode, req.sec_fetch_site)
     {
       Self::check_fetch_metadata(dest, mode, site, mime)?;
     }
@@ -63,6 +68,7 @@ impl ContentRequest<'_> {
       path_prefix,
       mime,
       sandbox,
+      if_none_match,
     })
   }
 

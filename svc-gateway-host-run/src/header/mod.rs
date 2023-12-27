@@ -1,6 +1,9 @@
 mod accept;
+mod cache_control;
 mod content_security_policy;
 mod content_type;
+mod e_tag;
+mod if_none_match;
 mod pair;
 mod sec_fetch_dest;
 mod sec_fetch_mode;
@@ -8,8 +11,11 @@ mod sec_fetch_site;
 mod service_worker_allowed;
 
 pub use accept::Accept;
+pub use cache_control::CacheControl;
 pub use content_security_policy::ContentSecurityPolicy;
 pub use content_type::ContentType;
+pub use e_tag::ETag;
+pub use if_none_match::IfNoneMatch;
 pub use pair::HeaderPair;
 pub use sec_fetch_dest::SecFetchDest;
 pub use sec_fetch_mode::SecFetchMode;

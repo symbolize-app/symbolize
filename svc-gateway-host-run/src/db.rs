@@ -3,6 +3,7 @@ use anyhow::Result;
 #[cfg(test)]
 use mockall::automock;
 use rusqlite;
+use rusqlite::OptionalExtension as _;
 use self_cell::self_cell;
 use std::sync::Arc;
 use std::sync::Mutex;
@@ -19,7 +20,7 @@ pub trait Context {
   async fn get_content_by_path(
     &self,
     path_id: String,
-  ) -> Result<Option<Vec<u8>>>;
+  ) -> Result<Option<ContentRowWithId>>;
 }
 
 #[derive(Clone)]
@@ -41,6 +42,11 @@ pub struct MainQueryContext<'connection> {
 
 // Assumed safe since owner and dependent are sent together
 unsafe impl Send for MainContextCell {}
+
+pub struct ContentRowWithId {
+  pub id: Vec<u8>,
+  pub original: Vec<u8>,
+}
 
 impl MainContext {
   pub async fn init() -> Result<Self> {
@@ -108,10 +114,13 @@ impl Context for MainContext {
     Ok(
       self
         .spawn_blocking(move |_, query| {
-          query.get_content_by_id.query_row(
-            rusqlite::named_params! {":content_id": content_id},
-            |row| row.get(0),
-          )
+          query
+            .get_content_by_id
+            .query_row(
+              rusqlite::named_params! {":content_id": content_id},
+              |row| row.get("original"),
+            )
+            .optional()
         })
         .await??,
     )
@@ -120,14 +129,22 @@ impl Context for MainContext {
   async fn get_content_by_path(
     &self,
     path_id: String,
-  ) -> Result<Option<Vec<u8>>> {
+  ) -> Result<Option<ContentRowWithId>> {
     Ok(
       self
         .spawn_blocking(move |_, query| {
-          query.get_content_by_path.query_row(
-            rusqlite::named_params! {":path_id": path_id},
-            |row| row.get(0),
-          )
+          query
+            .get_content_by_path
+            .query_row(
+              rusqlite::named_params! {":path_id": path_id},
+              |row| {
+                Ok(ContentRowWithId {
+                  id: row.get("id")?,
+                  original: row.get("original")?,
+                })
+              },
+            )
+            .optional()
         })
         .await??,
     )
