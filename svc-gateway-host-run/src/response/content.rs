@@ -68,6 +68,7 @@ impl ContentResponse {
   ) -> svc_response_simple::SimpleResponse {
     svc_response_simple::SimpleResponse {
       status: StatusCode::OK,
+      sandbox: self.sandbox,
       cache_control: Some(
         svc_header::CacheControl::builder()
           .max_age_30_days()
@@ -75,17 +76,6 @@ impl ContentResponse {
           .no_cache_opt(!self.immutable)
           .build(),
       ),
-      content_security_policy:
-        (svc_header::ContentSecurityPolicy::builder()
-          .default_source_self()
-          .image_source_self_data_opt(
-            self.mime == svc_request::ContentMime::Html,
-          )
-          .style_source_self_unsafe_inline_opt(
-            self.mime == svc_request::ContentMime::Html,
-          )
-          .sandbox_opt(self.sandbox)
-          .build()),
       content_type: svc_header::ContentType(self.mime.into()),
       e_tag: Some(svc_header::ETag(self.e_tag)),
       service_worker_allowed: self
