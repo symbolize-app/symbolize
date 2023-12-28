@@ -1,4 +1,6 @@
 import * as collection from '@intertwine/lib-collection'
+import * as time from '@intertwine/lib-time'
+import * as timeBrowser from '@intertwine/lib-time/index.browser.ts'
 
 declare const self: ServiceWorkerGlobalScope
 declare const version: bigint
@@ -9,40 +11,24 @@ const codeIdPrefix = /^\/\.code\/\.id\//
 const codePrefix = /\/\.code\//
 const mainHtmlPath = 'svc-gateway-guest-run/main.html'
 
+const cachePromise = self.caches.open(cacheName)
+
 function main(): void {
   console.log(version, 'loading', self, manifest)
 
   self.addEventListener('message', (event) => {
-    console.log(version, 'message:', event)
+    console.log(version, 'message', event)
   })
 
-  self.addEventListener('install', (event) => {
-    console.log(version, 'installing...')
-
-    prepareCache()
-
-    event.waitUntil(self.skipWaiting())
+  self.addEventListener('install', () => {
+    console.log(version, 'install')
+    void self.skipWaiting()
   })
 
   self.addEventListener('activate', () => {
-    console.log(version, 'activating...')
-
-    void (async () => {
-      const clients = new Set(
-        await self.clients.matchAll({
-          includeUncontrolled: true,
-        })
-      )
-      for (const client of await self.clients.matchAll()) {
-        clients.delete(client)
-      }
-      console.log(version, 'clients:', clients)
-      for (const client of clients) {
-        client.postMessage(['TEST0', version])
-      }
-    })()
-
-    void cleanCache()
+    console.log(version, 'activate')
+    void resetClients()
+    void prepareCache()
   })
 
   self.addEventListener('fetch', (event) => {
@@ -94,7 +80,7 @@ const fetchContentMemo = collection.memo(
   async (contentPath: string): Promise<Response> => {
     let ok = false
     try {
-      const cache = await self.caches.open(cacheName)
+      const cache = await cachePromise
       const request = new Request(`/.code/.id/${contentPath}`)
       const cacheResponse = await cache.match(request)
       if (cacheResponse) {
@@ -139,23 +125,42 @@ async function patchFetchContent(
   })
 }
 
-function prepareCache() {
-  for (const contentPath of Object.values(manifest)) {
+async function prepareCache(): Promise<void> {
+  const cache = await cachePromise
+  const ctx = timeBrowser.initContext()
+
+  await time.delay(ctx, 5_000)
+
+  const contentPaths = new Set(Object.values(manifest))
+
+  for (const key of await cache.keys()) {
+    const url = new URL(key.url)
+    const contentPath = collection.stripPrefix(url.pathname, codeIdPrefix)
+    if (
+      url.origin !== self.origin ||
+      key.method !== 'GET' ||
+      !contentPath ||
+      !contentPaths.delete(contentPath)
+    ) {
+      console.log(version, 'evict', key.method, key.url)
+      await cache.delete(key)
+    }
+  }
+
+  for (const contentPath of contentPaths) {
     console.log(version, 'prepare', contentPath)
-    void fetchContentMemo.get(contentPath)
+    await fetchContentMemo.get(contentPath)
   }
 }
 
-async function cleanCache() {
-  const cache = await self.caches.open(cacheName)
-  const contentPaths = new Set(Object.values(manifest))
-  for (const key of await cache.keys()) {
-    const codePath = collection.stripPrefix(
-      new URL(key.url).pathname,
-      codeIdPrefix
-    )
-    if (!codePath || !contentPaths.has(codePath)) {
-      await cache.delete(key)
+async function resetClients(): Promise<void> {
+  const clients = await self.clients.matchAll({
+    includeUncontrolled: true,
+  })
+  for (const client of clients) {
+    if (client instanceof WindowClient) {
+      console.log(version, 'reloading window', client.id)
+      client.postMessage('reload')
     }
   }
 }

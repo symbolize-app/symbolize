@@ -1,9 +1,13 @@
+import * as svcReload from '@/reload.ts'
 import type * as error from '@intertwine/lib-error'
 import * as random from '@intertwine/lib-random'
 import * as timeBrowser from '@intertwine/lib-time/index.browser.ts'
 import * as widget from '@intertwine/lib-widget'
 
 function main() {
+  svcReload.listenForMessage()
+  svcReload.listenForKeyboardShortcut()
+
   const ctx: widget.Context & error.Context = {
     ...random.initContext(),
     ...timeBrowser.initContext(),

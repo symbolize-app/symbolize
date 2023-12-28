@@ -29,20 +29,18 @@ Content API:
 - Service worker code loads together with embedded manifest JSON
   - Manifest version ID
   - All paths and content IDs
-- Start caching all manifest items in background
-  - Does not block upgrade
-  - May want to load in DAG order or small batches, to be responsive to actual critical path
 - Block on human intervention if unsafe
   - Loaded pages, recent activity, unsaved changes, release mode, etc.
 - Skip waiting
-- Claim all
-- Terminate shared worker
-  - Will be restarted by new windows
-- Reload windows
-- (Alternatively, could send messages to shared worker and windows, and let them control the flow themselves)
-- Remove all extras from cache
-  - One shared version
-  - Creates race condition, but OK since cache eviction is assumed possible
+- Send message to windows to reload
+  - New windows will load a new version-specific shared worker
+  - Old shared worker will expire with no windows left
+- Prepare cache
+  - Delayed, after upgrade finished, to be responsive to actual critical path
+  - Remove all extras from cache
+  - Fetch any missing into cache
+  - One cache, shared across service worker versions
+  - Creates race condition with other service worker versions, but OK since cache eviction is assumed possible
 
 ### Fetch intercepts
 

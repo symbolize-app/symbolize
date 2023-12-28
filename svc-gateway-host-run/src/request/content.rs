@@ -143,7 +143,7 @@ impl ContentRequest<'_> {
       (
         svc_header::SecFetchDest::Document,
         svc_header::SecFetchMode::Navigate,
-        svc_header::SecFetchSite::None,
+        _,
         ContentMime::Html,
       ) | (
         svc_header::SecFetchDest::Script
