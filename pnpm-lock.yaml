@@ -507,6 +507,9 @@ importers:
       '@intertwine/dev-tsconfig':
         specifier: workspace:*
         version: link:../dev-tsconfig
+      '@intertwine/lib-collection':
+        specifier: workspace:*
+        version: link:../lib-collection
       '@intertwine/lib-hex':
         specifier: workspace:*
         version: link:../lib-hex
