@@ -9,6 +9,7 @@
   "include": ["./**/*.ts", "./**/*.js", "./**/*.cjs"],
   "references": [
     { "path": "../dev-pnpm-test" },
+    { "path": "../lib-collection" },
     { "path": "../lib-hex" },
     { "path": "../lib-test" },
     { "path": "../lib-time" },

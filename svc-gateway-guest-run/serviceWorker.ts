@@ -1,7 +1,10 @@
+import * as collection from '@intertwine/lib-collection'
+
 declare const self: ServiceWorkerGlobalScope
 declare const version: bigint
 declare const manifest: Record<string, string>
 
+const cacheName = 'code-v1'
 const codeIdPrefix = /^\/\.code\/\.id\//
 const codePrefix = /\/\.code\//
 const mainHtmlPath = 'svc-gateway-guest-run/main.html'
@@ -16,33 +19,30 @@ function main(): void {
   self.addEventListener('install', (event) => {
     console.log(version, 'installing...')
 
-    event.waitUntil(
-      Promise.all([
-        self.skipWaiting(),
-        self.caches.open('static-v1').then((cache) => cache.add('/')),
-      ])
-    )
+    prepareCache()
+
+    event.waitUntil(self.skipWaiting())
   })
 
-  self.addEventListener('activate', (event) => {
+  self.addEventListener('activate', () => {
     console.log(version, 'activating...')
 
-    event.waitUntil(
-      (async () => {
-        const clients = new Set(
-          await self.clients.matchAll({
-            includeUncontrolled: true,
-          })
-        )
-        for (const client of await self.clients.matchAll()) {
-          clients.delete(client)
-        }
-        console.log(version, 'clients:', clients)
-        for (const client of clients) {
-          client.postMessage(['TEST0', version])
-        }
-      })()
-    )
+    void (async () => {
+      const clients = new Set(
+        await self.clients.matchAll({
+          includeUncontrolled: true,
+        })
+      )
+      for (const client of await self.clients.matchAll()) {
+        clients.delete(client)
+      }
+      console.log(version, 'clients:', clients)
+      for (const client of clients) {
+        client.postMessage(['TEST0', version])
+      }
+    })()
+
+    void cleanCache()
   })
 
   self.addEventListener('fetch', (event) => {
@@ -55,10 +55,10 @@ function main(): void {
 
 function handle(event: FetchEvent, url: URL) {
   const path = url.pathname
-  const codeIdPath = stripPrefix(path, codeIdPrefix)
-  const codePath = codeIdPath ?? stripPrefix(path, codePrefix)
+  const codeIdPath = collection.stripPrefix(path, codeIdPrefix)
+  const codePath = codeIdPath ?? collection.stripPrefix(path, codePrefix)
   if (codeIdPath) {
-    handleContentById(event, event.request, true)
+    handleContentById(event, codeIdPath, true)
   } else if (codePath) {
     handleContentByPath(event, codePath, true)
   } else {
@@ -68,10 +68,10 @@ function handle(event: FetchEvent, url: URL) {
 
 function handleContentById(
   event: FetchEvent,
-  request: Request,
+  contentPath: string,
   sandbox: boolean
 ) {
-  event.respondWith(fetchContent(request, sandbox))
+  event.respondWith(patchFetchContent(contentPath, sandbox))
 }
 
 function handleContentByPath(
@@ -86,22 +86,41 @@ function handleContentByPath(
       new Response('Path missing from manifest', { status: 404 })
     )
   } else {
-    handleContentById(
-      event,
-      new Request(`${self.origin}/.code/.id/${contentPath}`, {
-        ...event.request,
-        mode: 'cors',
-      }),
-      sandbox
-    )
+    handleContentById(event, contentPath, sandbox)
   }
 }
 
-async function fetchContent(
-  request: Request,
+const fetchContentMemo = collection.memo(
+  async (contentPath: string): Promise<Response> => {
+    let ok = false
+    try {
+      const cache = await self.caches.open(cacheName)
+      const request = new Request(`/.code/.id/${contentPath}`)
+      const cacheResponse = await cache.match(request)
+      if (cacheResponse) {
+        return cacheResponse
+      } else {
+        console.log(version, 'cache miss', contentPath)
+        const response = await fetch(request)
+        ok = response.ok
+        if (ok) {
+          await cache.put(request, response.clone())
+        }
+        return response
+      }
+    } finally {
+      if (!ok) {
+        fetchContentMemo.delete(contentPath)
+      }
+    }
+  }
+)
+
+async function patchFetchContent(
+  contentPath: string,
   sandbox: boolean
 ): Promise<Response> {
-  const response = await fetch(request)
+  const response = (await fetchContentMemo.get(contentPath)).clone()
   const headers = new Headers(response.headers)
   const contentSecurityPolicy = headers.get('content-security-policy')
   if (!sandbox && contentSecurityPolicy) {
@@ -113,15 +132,31 @@ async function fetchContent(
         .join(';')
     )
   }
-  return new Response(response.body, { ...response, headers })
+  return new Response(response.body, {
+    headers,
+    status: response.status,
+    statusText: response.statusText,
+  })
 }
 
-function stripPrefix(input: string, pattern: RegExp): string | null {
-  const match = pattern.exec(input)
-  if (match) {
-    return input.substring(match[0].length)
-  } else {
-    return null
+function prepareCache() {
+  for (const contentPath of Object.values(manifest)) {
+    console.log(version, 'prepare', contentPath)
+    void fetchContentMemo.get(contentPath)
+  }
+}
+
+async function cleanCache() {
+  const cache = await self.caches.open(cacheName)
+  const contentPaths = new Set(Object.values(manifest))
+  for (const key of await cache.keys()) {
+    const codePath = collection.stripPrefix(
+      new URL(key.url).pathname,
+      codeIdPrefix
+    )
+    if (!codePath || !contentPaths.has(codePath)) {
+      await cache.delete(key)
+    }
   }
 }
 

@@ -86,6 +86,7 @@ where
   }
 }
 
+#[allow(clippy::print_stderr)]
 async fn handle_content_by_id<TContext>(
   ctx: &TContext,
   req: &svc_request::ContentRequest<'_>,
@@ -93,7 +94,13 @@ async fn handle_content_by_id<TContext>(
 where
   TContext: svc_context::DbContext,
 {
-  let content_id = Vec::from_hex(req.path_prefix)?;
+  let content_id = Vec::from_hex(req.path_prefix).map_err(|_| {
+    eprintln!("  invalid content ID hex");
+    svc_response::Error::new(
+      StatusCode::BAD_REQUEST,
+      "invalid content ID hex",
+    )
+  })?;
   let original = ctx.db().get_content_by_id(content_id.clone()).await?;
   if let Some(original) = original {
     Ok(Some(svc_response::ContentResponse::try_new_immutable(

@@ -43,7 +43,7 @@ impl ContentRequest<'_> {
     full_path: &'a str,
     sandbox: bool,
   ) -> Result<ContentRequest<'a>> {
-    println!("{full_path}");
+    println!("{}", req.path);
 
     let (path_prefix, ext) = Self::split_path(full_path)?;
     let mime = Self::get_mime(full_path, ext)?;
@@ -120,7 +120,7 @@ impl ContentRequest<'_> {
     if found {
       Ok(())
     } else {
-      eprint!("  wrong accept type {accept:?} {mime:?}");
+      eprintln!("  wrong accept type {accept:?} {mime:?}");
       Err(
         svc_response::Error::new(
           StatusCode::BAD_REQUEST,
