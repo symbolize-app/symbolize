@@ -1,5 +1,5 @@
+import * as collection from '@intertwine/lib-collection'
 import * as esbuild from 'esbuild'
-import lodashMemoize from 'lodash-es/memoize.js'
 import * as nodePath from 'node:path'
 
 export interface BuildOptions
@@ -38,13 +38,13 @@ export async function build<T extends BuildOptions>(
   }
 
   const pnpmPackageVersions = new Map<string, string>()
-  const convertToOutPathMemo = lodashMemoize((inPath: string) =>
+  const convertToOutPathMemo = collection.memo((inPath: string) =>
     convertToOutPath(inPath, options.outbase, pnpmPackageVersions)
   )
   const allEntryPoints = new Set(options.entryPoints)
   let entryPoints = options.entryPoints.map((entryPoint) => ({
     in: entryPoint,
-    out: convertToOutPathMemo(entryPoint),
+    out: convertToOutPathMemo.get(entryPoint),
   }))
 
   while (entryPoints.length) {
@@ -84,7 +84,7 @@ export async function build<T extends BuildOptions>(
 
 async function resolve(
   build: esbuild.PluginBuild,
-  convertToOutPathMemo: (inPath: string) => string,
+  convertToOutPathMemo: collection.Memo<string, string>,
   allEntryPoints: Set<string>,
   newEntryPoints: { in: string; out: string }[],
   args: esbuild.OnResolveArgs
@@ -104,7 +104,7 @@ async function resolve(
     !resolveResult.external &&
     ['import-statement', 'dynamic-import'].includes(args.kind)
   ) {
-    const outPath = convertToOutPathMemo(resolveResult.path)
+    const outPath = convertToOutPathMemo.get(resolveResult.path)
     if (!allEntryPoints.has(resolveResult.path)) {
       newEntryPoints.push({
         in: resolveResult.path,
@@ -113,7 +113,7 @@ async function resolve(
       allEntryPoints.add(resolveResult.path)
     }
     const relativePath = `${nodePath.relative(
-      nodePath.dirname(convertToOutPathMemo(args.importer)),
+      nodePath.dirname(convertToOutPathMemo.get(args.importer)),
       outPath
     )}.mjs`
     return {

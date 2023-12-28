@@ -6,6 +6,7 @@
       "dev-node-loader/tsconfig.json",
       "dev-node-suppress/tsconfig.json",
       "dev-pnpm-test/tsconfig.json",
+      "lib-collection/tsconfig.json",
       "lib-concurrency/tsconfig.json",
       "lib-error/tsconfig.json",
       "lib-hex/tsconfig.json",

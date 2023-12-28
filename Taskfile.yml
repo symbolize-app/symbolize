@@ -23,6 +23,8 @@ includes:
     taskfile: dev-stack-bin
   dev-tsconfig:
     taskfile: dev-tsconfig
+  lib-collection:
+    taskfile: lib-collection
   lib-concurrency:
     taskfile: lib-concurrency
   lib-error:
@@ -165,6 +167,7 @@ tasks:
       - dev-pnpm-test:link-build-dir
       - dev-prettier:link-build-dir
       - dev-tsconfig:link-build-dir
+      - lib-collection:link-build-dir
       - lib-concurrency:link-build-dir
       - lib-error:link-build-dir
       - lib-hex:link-build-dir
