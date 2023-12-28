@@ -43,20 +43,13 @@ impl Builder {
     self
   }
 
-  pub fn image_source_self_data_opt(mut self, enable: bool) -> Self {
-    if enable {
-      self.0.push(Directive::ImageSourceSelfData);
-    }
+  pub fn image_source_self_data(mut self) -> Self {
+    self.0.push(Directive::ImageSourceSelfData);
     self
   }
 
-  pub fn style_source_self_unsafe_inline_opt(
-    mut self,
-    enable: bool,
-  ) -> Self {
-    if enable {
-      self.0.push(Directive::StyleSourceSelfUnsafeInline);
-    }
+  pub fn style_source_self_unsafe_inline(mut self) -> Self {
+    self.0.push(Directive::StyleSourceSelfUnsafeInline);
     self
   }
 
