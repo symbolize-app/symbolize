@@ -1,7 +1,7 @@
 import * as devContext from '@/context.ts'
 import * as devDatabase from '@/database.ts'
+import * as collection from '@intertwine/lib-collection'
 import * as hex from '@intertwine/lib-hex'
-import groupBy from 'lodash-es/groupBy.js'
 import * as nodeCrypto from 'node:crypto'
 import * as nodePath from 'node:path'
 import * as nodeZlib from 'node:zlib'
@@ -31,11 +31,10 @@ export function write(
   outputFiles: OutputFile[]
 ): void {
   const mainContentFiles = outputFiles.map(convertToContentFile)
-  const manifestFiles = Object.entries(
-    groupBy(mainContentFiles, (item) =>
+  const manifestFiles = collection
+    .groupBy(mainContentFiles, (item) =>
       item.pathId.substring(0, item.pathId.indexOf('/'))
     )
-  )
     .map(([name, items]) => buildManifest(name, items))
     .map(convertToContentFile)
   const serviceWorkerShell = convertToContentFile(

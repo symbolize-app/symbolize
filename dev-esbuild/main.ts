@@ -7,7 +7,6 @@ import * as payload from '@intertwine/lib-payload'
 import * as timeNode from '@intertwine/lib-time/index.node.ts'
 import chokidar from 'chokidar'
 import * as esbuild from 'esbuild'
-import lodashDebounce from 'lodash-es/debounce.js'
 import ms from 'ms'
 import * as nodeFs from 'node:fs'
 import * as nodeFsPromises from 'node:fs/promises'
@@ -61,13 +60,10 @@ async function main(): Promise<void> {
       const watcher = chokidar.watch(workspace.packages, {
         ignoreInitial: true,
       })
-      watcher.on(
-        'all',
-        lodashDebounce((type, path) => {
-          console.log(`Found ${type} at ${path}`)
-          void build(ctx)
-        })
-      )
+      watcher.on('all', (type, path) => {
+        console.log(`Found ${type} at ${path}`)
+        void build(ctx)
+      })
     }
     await build(ctx)
   }

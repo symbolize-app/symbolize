@@ -1,15 +1,14 @@
 {
   "compilerOptions": {
     "declarationDir": "./build/tsc",
-    "paths": { "@/*.sql": ["./*.sql"], "@/*.ts": ["./*.ts"] },
+    "paths": {
+      "@/*.sql": ["./*.sql"],
+      "@/*.ts": ["./*.ts"]
+    },
     "tsBuildInfoFile": "build/tsc/tsconfig.tsbuildinfo"
   },
   "exclude": ["build/**"],
   "extends": "@intertwine/dev-tsconfig/tsconfig.json",
   "include": ["./**/*.ts", "./**/*.js", "./**/*.cjs"],
-  "references": [
-    { "path": "../lib-collection" },
-    { "path": "../lib-payload" },
-    { "path": "../lib-time" }
-  ]
+  "references": []
 }

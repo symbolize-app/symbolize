@@ -6,6 +6,7 @@ packages:
   - dev-pnpm-test
   - dev-prettier
   - dev-tsconfig
+  - lib-collection
   - lib-concurrency
   - lib-error
   - lib-hex

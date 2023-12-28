@@ -1,10 +1,7 @@
 {
   "compilerOptions": {
     "declarationDir": "./build/tsc",
-    "paths": {
-      "@/*.sql": ["./*.sql"],
-      "@/*.ts": ["./*.ts"]
-    },
+    "paths": { "@/*.sql": ["./*.sql"], "@/*.ts": ["./*.ts"] },
     "tsBuildInfoFile": "build/tsc/tsconfig.tsbuildinfo"
   },
   "exclude": [],
@@ -15,6 +12,7 @@
     { "path": "./dev-node-loader" },
     { "path": "./dev-node-suppress" },
     { "path": "./dev-pnpm-test" },
+    { "path": "./lib-collection" },
     { "path": "./lib-concurrency" },
     { "path": "./lib-error" },
     { "path": "./lib-hex" },

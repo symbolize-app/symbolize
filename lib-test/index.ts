@@ -1,17 +1,16 @@
-import * as randomTest from '@/random.ts'
-import * as timeTest from '@/time.ts'
+import * as testIsDeepEqual from '@/isDeepEqual.ts'
+import * as testRandom from '@/random.ts'
+import * as testTime from '@/time.ts'
 import type * as random from '@intertwine/lib-random'
 import type * as time from '@intertwine/lib-time'
 import * as diff from 'diff'
-import lodashEq from 'lodash-es/eq.js'
-import lodashIsEqual from 'lodash-es/isEqual.js'
 import ms from 'ms'
 
 export type Test<CustomContext = unknown> = (
   ctx: CustomContext & Context
 ) => void | Promise<void>
 
-export type Context = timeTest.Context & random.Context
+export type Context = testTime.Context & random.Context
 
 export type RunContext = time.Context
 
@@ -71,8 +70,8 @@ export async function runAll<
       try {
         const testContext: CustomContext & Context = {
           ...ctx,
-          ...timeTest.initContext(),
-          ...randomTest.initContext(),
+          ...testTime.initContext(),
+          ...testRandom.initContext(),
         }
         await test(testContext)
         pass += 1
@@ -249,7 +248,7 @@ export function assert(actual: unknown): asserts actual {
 }
 
 export function assertEquals<Value>(actual: Value, expected: Value): void {
-  if (!lodashEq(actual, expected)) {
+  if (actual !== expected) {
     throw new AssertionError('Not equal', actual, expected)
   }
 }
@@ -276,7 +275,7 @@ export function assertDeepEquals<Value>(
   actual: Value,
   expected: Value
 ): void {
-  if (!lodashIsEqual(actual, expected)) {
+  if (!testIsDeepEqual.isDeepEqual(actual, expected)) {
     throw new AssertionError('Not deep equal', actual, expected, 'diff')
   }
 }
