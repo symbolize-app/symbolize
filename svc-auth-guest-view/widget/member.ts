@@ -1,5 +1,7 @@
 import type * as error from '@intertwine/lib-error'
 import * as random from '@intertwine/lib-random'
+import type {} from '@intertwine/lib-style'
+import type {} from '@intertwine/lib-time'
 import * as widget from '@intertwine/lib-widget'
 
 const button = widget.html.button
