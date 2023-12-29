@@ -107,6 +107,7 @@ async function buildFiles(
     './svc-gateway-guest-run/serviceWorker.ts',
   ]
   const moduleEntryPoints = [
+    './svc-gateway-guest-run/dedicatedWorker.ts',
     './svc-gateway-guest-run/main.ts',
     './svc-gateway-guest-run/serviceWorkerRegister.ts',
   ]

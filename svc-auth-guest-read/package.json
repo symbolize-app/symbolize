@@ -1,16 +1,12 @@
 {
-  "name": "@intertwine/svc-auth-guest-view",
+  "name": "@intertwine/svc-auth-guest-read",
   "type": "module",
   "dependencies": {
     "@intertwine/dev-prettier": "workspace:*",
     "@intertwine/dev-tsconfig": "workspace:*",
-    "@intertwine/lib-error": "workspace:*",
-    "@intertwine/lib-hex": "workspace:*",
     "@intertwine/lib-random": "workspace:*",
-    "@intertwine/lib-style": "workspace:*",
-    "@intertwine/lib-test": "workspace:*",
     "@intertwine/lib-time": "workspace:*",
-    "@intertwine/lib-widget": "workspace:*"
+    "@intertwine/lib-error": "workspace:*"
   },
   "devDependencies": {
     "typescript": "5.2.2"

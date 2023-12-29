@@ -16,6 +16,7 @@
       "lib-test/tsconfig.json",
       "lib-time/tsconfig.json",
       "lib-widget/tsconfig.json",
+      "svc-auth-guest-read/tsconfig.json",
       "svc-auth-guest-view/tsconfig.json",
       "svc-gateway-guest-run/tsconfig.json"
     ],
