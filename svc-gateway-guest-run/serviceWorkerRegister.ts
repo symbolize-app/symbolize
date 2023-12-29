@@ -1,16 +1,10 @@
+import * as svcReload from '@/reload.ts'
+
 async function main(): Promise<void> {
-  const id = Math.random()
-
-  navigator.serviceWorker.addEventListener('message', (event) => {
-    console.log(id, 'message:', event)
-
-    navigator.serviceWorker.controller?.postMessage(['TEST1', id])
-  })
+  svcReload.listenForMessage()
 
   navigator.serviceWorker.addEventListener('controllerchange', () => {
-    console.log(id, 'controller change')
-
-    navigator.serviceWorker.controller?.postMessage(['TEST2', id])
+    console.log('controller change')
   })
 
   const reg = await navigator.serviceWorker.register(
@@ -20,11 +14,12 @@ async function main(): Promise<void> {
       updateViaCache: 'none',
     }
   )
+
   reg.addEventListener('updatefound', () => {
-    console.log(id, 'update found')
+    console.log('update found')
   })
 }
 
-main().catch(console.error)
+void main()
 
 export {}
