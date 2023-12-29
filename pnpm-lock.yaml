@@ -330,6 +330,9 @@ importers:
       '@intertwine/dev-tsconfig':
         specifier: workspace:*
         version: link:../dev-tsconfig
+      '@intertwine/lib-random':
+        specifier: workspace:*
+        version: link:../lib-random
       '@intertwine/lib-time':
         specifier: workspace:*
         version: link:../lib-time

@@ -1,3 +1,4 @@
+import type {} from '@intertwine/lib-style'
 import * as widget from '@intertwine/lib-widget'
 
 const button = widget.html.button
