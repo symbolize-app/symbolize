@@ -66,6 +66,9 @@ importers:
       '@intertwine/lib-widget':
         specifier: workspace:*
         version: link:lib-widget
+      '@intertwine/svc-auth-guest-read':
+        specifier: workspace:*
+        version: link:svc-auth-guest-read
       '@intertwine/svc-auth-guest-view':
         specifier: workspace:*
         version: link:svc-auth-guest-view
@@ -465,6 +468,28 @@ importers:
         specifier: 5.2.2
         version: 5.2.2
 
+  svc-auth-guest-read:
+    dependencies:
+      '@intertwine/dev-prettier':
+        specifier: workspace:*
+        version: link:../dev-prettier
+      '@intertwine/dev-tsconfig':
+        specifier: workspace:*
+        version: link:../dev-tsconfig
+      '@intertwine/lib-error':
+        specifier: workspace:*
+        version: link:../lib-error
+      '@intertwine/lib-random':
+        specifier: workspace:*
+        version: link:../lib-random
+      '@intertwine/lib-time':
+        specifier: workspace:*
+        version: link:../lib-time
+    devDependencies:
+      typescript:
+        specifier: 5.2.2
+        version: 5.2.2
+
   svc-auth-guest-view:
     dependencies:
       '@intertwine/dev-prettier':
@@ -473,6 +498,9 @@ importers:
       '@intertwine/dev-tsconfig':
         specifier: workspace:*
         version: link:../dev-tsconfig
+      '@intertwine/lib-error':
+        specifier: workspace:*
+        version: link:../lib-error
       '@intertwine/lib-hex':
         specifier: workspace:*
         version: link:../lib-hex
@@ -522,6 +550,9 @@ importers:
       '@intertwine/lib-widget':
         specifier: workspace:*
         version: link:../lib-widget
+      '@intertwine/svc-auth-guest-read':
+        specifier: workspace:*
+        version: link:../svc-auth-guest-read
       '@intertwine/svc-auth-guest-view':
         specifier: workspace:*
         version: link:../svc-auth-guest-view

@@ -51,6 +51,8 @@ includes:
     taskfile: dev-task/sqlite.yml
   stack:
     taskfile: dev-task/stack.yml
+  svc-auth-guest-read:
+    taskfile: svc-auth-guest-read
   svc-auth-guest-view:
     taskfile: svc-auth-guest-view
   svc-gateway-guest-run:
@@ -177,6 +179,7 @@ tasks:
       - lib-test:link-build-dir
       - lib-time:link-build-dir
       - lib-widget:link-build-dir
+      - svc-auth-guest-read:link-build-dir
       - svc-auth-guest-view:link-build-dir
       - svc-gateway-guest-run:link-build-dir
   test:release:

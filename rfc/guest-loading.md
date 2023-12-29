@@ -3,7 +3,7 @@
 Guest code will be run at three levels:
 
 - Service worker
-- Shared worker
+- Dedicated worker
 - Window
 
 Manifest schema:
@@ -33,8 +33,8 @@ Content API:
   - Loaded pages, recent activity, unsaved changes, release mode, etc.
 - Skip waiting
 - Send message to windows to reload
-  - New windows will load a new version-specific shared worker
-  - Old shared worker will expire with no windows left
+  - Each window has its own dedicated worker
+  - Old dedicated worker will expire with no window
 - Prepare cache
   - Delayed, after upgrade finished, to be responsive to actual critical path
   - Remove all extras from cache
@@ -63,7 +63,7 @@ Content API:
 - Practical isolation benefits from splitting seem weak, actual benefit is likely more from caching
   - Big chunks of unchanged splits don't need re-downloading
 
-### Shared worker and window
+### Dedicated worker and window
 
 - Split with ES modules
 - Hardcoded top level has module with all async imports
@@ -84,4 +84,4 @@ Content API:
   - Just needs caching by content ID and file extension
 - When compilation is done (and successful), a reload is triggered
 - Some/all of the files may be ready to use with the new manifest
-- The pushes will need to be handled by the shared worker, since the service worker doesn't handle long-running connections
+- The pushes will need to be handled by the dedicated worker, since the service worker doesn't handle long-running connections

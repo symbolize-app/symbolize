@@ -1,3 +1,4 @@
+import * as svcDedicatedWorkerClient from '@/dedicatedWorkerClient.ts'
 import * as svcReload from '@/reload.ts'
 import type * as error from '@intertwine/lib-error'
 import * as random from '@intertwine/lib-random'
@@ -8,10 +9,13 @@ function main() {
   svcReload.listenForMessage()
   svcReload.listenForKeyboardShortcut()
 
-  const ctx: widget.Context & error.Context = {
+  const ctx: widget.Context &
+    error.Context &
+    svcDedicatedWorkerClient.Context = {
     ...random.initContext(),
     ...timeBrowser.initContext(),
     ...widget.initContext(window.document),
+    ...svcDedicatedWorkerClient.initContext(),
   }
 
   const entryPoints: Promise<{
@@ -24,9 +28,9 @@ function main() {
   ]
 
   for (const entryPoint of entryPoints) {
-    ;(async () => {
+    void (async () => {
       ;(await entryPoint).main(ctx)
-    })().catch(console.error)
+    })()
   }
 }
 
