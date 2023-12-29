@@ -72,8 +72,16 @@ async function main(): Promise<void> {
 async function build(ctx: devContext.Context): Promise<void> {
   const start = ctx.performanceNow()
   const versionId = devOutput.createVersion()
-  const { errors, outputFiles } = await buildFiles(ctx)
-  if (!errors.length) {
+  let outputFiles = null
+  try {
+    const buildResult = await buildFiles(ctx)
+    if (!buildResult.errors.length) {
+      outputFiles = buildResult.outputFiles
+    }
+  } catch (error) {
+    console.error(error)
+  }
+  if (outputFiles) {
     devOutput.write(
       ctx,
       versionId,
@@ -82,6 +90,8 @@ async function build(ctx: devContext.Context): Promise<void> {
         original: item.contents,
       }))
     )
+  } else {
+    process.exitCode = 1
   }
   const end = ctx.performanceNow()
   const elapsed = ms(Math.round(end - start))
