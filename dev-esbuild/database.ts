@@ -17,25 +17,27 @@ export type Database = sqlite.Database
 export type Statement = sqlite.Statement
 
 export type Context = {
-  db: Database
-  query: {
-    beginTransaction: Statement
-    commitTransaction: Statement
-    insertPath: Statement
-    insertVersion: Statement
-    pragmaWalCheckpoint: string
-    rollbackTransaction: Statement
-    updateContentCompressed: Statement
-    upsertContent: Statement
+  db: {
+    connection: Database
+    query: {
+      beginTransaction: Statement
+      commitTransaction: Statement
+      insertPath: Statement
+      insertVersion: Statement
+      pragmaWalCheckpoint: string
+      rollbackTransaction: Statement
+      updateContentCompressed: Statement
+      upsertContent: Statement
+    }
   }
 }
 
 export async function initContext(): Promise<Context> {
   await runMigrations()
-  const db = open()
-  configure(db)
-  const query = prepareStatements(db)
-  return { db, query }
+  const connection = open()
+  configure(connection)
+  const query = prepareStatements(connection)
+  return { db: { connection, query } }
 }
 
 async function runMigrations(): Promise<void> {
@@ -51,22 +53,22 @@ function open(): Database {
   })
 }
 
-function configure(db: Database): void {
-  db.defaultSafeIntegers()
-  db.pragma(parsePragma(pragmaForeignKey))
-  db.pragma(parsePragma(pragmaWalAutocheckpoint))
+function configure(connection: Database): void {
+  connection.defaultSafeIntegers()
+  connection.pragma(parsePragma(pragmaForeignKey))
+  connection.pragma(parsePragma(pragmaWalAutocheckpoint))
 }
 
-function prepareStatements(db: Database): Context['query'] {
+function prepareStatements(connection: Database): Context['db']['query'] {
   return {
-    beginTransaction: db.prepare(beginTransaction),
-    commitTransaction: db.prepare(commitTransaction),
-    insertPath: db.prepare(insertPath),
-    insertVersion: db.prepare(insertVersion),
+    beginTransaction: connection.prepare(beginTransaction),
+    commitTransaction: connection.prepare(commitTransaction),
+    insertPath: connection.prepare(insertPath),
+    insertVersion: connection.prepare(insertVersion),
     pragmaWalCheckpoint: parsePragma(pragmaWalCheckpoint),
-    rollbackTransaction: db.prepare(rollbackTransaction),
-    updateContentCompressed: db.prepare(updateContentCompressed),
-    upsertContent: db.prepare(upsertContent),
+    rollbackTransaction: connection.prepare(rollbackTransaction),
+    updateContentCompressed: connection.prepare(updateContentCompressed),
+    upsertContent: connection.prepare(upsertContent),
   }
 }
 
@@ -76,12 +78,12 @@ function parsePragma(pragma: string): string {
 
 export function withTransactionSync<T>(ctx: Context, action: () => T): T {
   try {
-    ctx.query.beginTransaction.run()
+    ctx.db.query.beginTransaction.run()
     const result = action()
-    ctx.query.commitTransaction.run()
+    ctx.db.query.commitTransaction.run()
     return result
   } catch (exception) {
-    ctx.query.rollbackTransaction.run()
+    ctx.db.query.rollbackTransaction.run()
     throw exception
   }
 }

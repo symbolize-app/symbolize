@@ -35,6 +35,8 @@ includes:
     taskfile: lib-payload
   lib-random:
     taskfile: lib-random
+  lib-stream:
+    taskfile: lib-stream
   lib-style:
     taskfile: lib-style
   lib-test:
@@ -175,6 +177,7 @@ tasks:
       - lib-hex:link-build-dir
       - lib-payload:link-build-dir
       - lib-random:link-build-dir
+      - lib-stream:link-build-dir
       - lib-style:link-build-dir
       - lib-test:link-build-dir
       - lib-time:link-build-dir

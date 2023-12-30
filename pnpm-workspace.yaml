@@ -12,6 +12,7 @@ packages:
   - lib-hex
   - lib-payload
   - lib-random
+  - lib-stream
   - lib-style
   - lib-test
   - lib-time

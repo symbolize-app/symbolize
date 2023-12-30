@@ -70,7 +70,7 @@ async function main(): Promise<void> {
 }
 
 async function build(ctx: devContext.Context): Promise<void> {
-  const start = ctx.performanceNow()
+  const start = ctx.time.performanceNow()
   const versionId = devOutput.createVersion()
   let outputFiles = null
   try {
@@ -93,7 +93,7 @@ async function build(ctx: devContext.Context): Promise<void> {
   } else {
     process.exitCode = 1
   }
-  const end = ctx.performanceNow()
+  const end = ctx.time.performanceNow()
   const elapsed = ms(Math.round(end - start))
   console.log(`Done build ${versionId}: ${elapsed}`)
 }

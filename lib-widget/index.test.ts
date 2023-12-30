@@ -6,9 +6,9 @@ export function withTempDocument<
   callback: (ctx: CustomContext & widget.Context) => void | Promise<void>
 ): (ctx: CustomContext & widget.Context) => Promise<void> {
   return async (baseContext) => {
-    const iframe = baseContext.document.createElement('iframe')
+    const iframe = baseContext.widget.document.createElement('iframe')
     iframe.style.display = 'none'
-    baseContext.document.body.append(iframe)
+    baseContext.widget.document.body.append(iframe)
     try {
       const iframeDocument = iframe.contentDocument
       if (!iframeDocument) {

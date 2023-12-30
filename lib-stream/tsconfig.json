@@ -8,13 +8,8 @@
   "extends": "@intertwine/dev-tsconfig/tsconfig.json",
   "include": ["./**/*.ts", "./**/*.js", "./**/*.cjs"],
   "references": [
-    { "path": "../lib-error" },
-    { "path": "../lib-hex" },
-    { "path": "../lib-random" },
-    { "path": "../lib-stream" },
-    { "path": "../lib-style" },
+    { "path": "../lib-collection" },
     { "path": "../lib-test" },
-    { "path": "../lib-time" },
-    { "path": "../lib-widget" }
+    { "path": "../lib-time" }
   ]
 }

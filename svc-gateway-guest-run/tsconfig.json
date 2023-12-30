@@ -11,6 +11,7 @@
     { "path": "../dev-pnpm-test" },
     { "path": "../lib-collection" },
     { "path": "../lib-hex" },
+    { "path": "../lib-stream" },
     { "path": "../lib-test" },
     { "path": "../lib-time" },
     { "path": "../lib-widget" },

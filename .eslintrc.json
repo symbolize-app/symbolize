@@ -12,6 +12,7 @@
       "lib-hex/tsconfig.json",
       "lib-payload/tsconfig.json",
       "lib-random/tsconfig.json",
+      "lib-stream/tsconfig.json",
       "lib-style/tsconfig.json",
       "lib-test/tsconfig.json",
       "lib-time/tsconfig.json",
