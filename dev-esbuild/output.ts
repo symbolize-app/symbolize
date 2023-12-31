@@ -47,7 +47,7 @@ export function write(
   ]
 
   for (const contentFile of allContentFiles) {
-    const contentResult = ctx.query.upsertContent.run({
+    const contentResult = ctx.db.query.upsertContent.run({
       id: contentFile.contentId,
       original: contentFile.original,
     })
@@ -56,7 +56,7 @@ export function write(
       ctx.mode === devContext.Mode.production
     ) {
       const compressed = compressContent(contentFile.original)
-      ctx.query.updateContentCompressed.run({
+      ctx.db.query.updateContentCompressed.run({
         id: contentFile.contentId,
         compressed,
       })
@@ -64,9 +64,9 @@ export function write(
   }
 
   devDatabase.withTransactionSync(ctx, () => {
-    ctx.query.insertVersion.run({ id: versionId })
+    ctx.db.query.insertVersion.run({ id: versionId })
     for (const contentFile of allContentFiles) {
-      ctx.query.insertPath.run({
+      ctx.db.query.insertPath.run({
         id: contentFile.pathId,
         version_id: versionId,
         content_id: contentFile.contentId,

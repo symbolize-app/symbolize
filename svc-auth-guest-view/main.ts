@@ -4,6 +4,7 @@ import * as svcWidgetMember from '@/widget/member.ts'
 import * as svcWidgetSearch from '@/widget/search.ts'
 import * as svcWidgetTopic from '@/widget/topic.ts'
 import type * as error from '@intertwine/lib-error'
+import * as stream from '@intertwine/lib-stream'
 import * as style from '@intertwine/lib-style'
 import * as widget from '@intertwine/lib-widget'
 
@@ -61,7 +62,19 @@ const myCounter = widget.define(
   }
 )
 
-export function main(ctx: widget.Context & error.Context): void {
+export function main(
+  ctx: widget.Context & error.Context & stream.ClientContext
+): void {
+  const clientSource = stream.connect(
+    ctx,
+    'svc-auth-guest-read',
+    (data) => {
+      console.log('client data', data)
+      return Promise.resolve()
+    }
+  )
+  void clientSource.send(ctx, 'ping')
+
   const counter = myCounter(ctx, {})
 
   const listContents = widget.range(ctx, {
@@ -115,8 +128,8 @@ export function main(ctx: widget.Context & error.Context): void {
     ],
   })
 
-  const head = ctx.document.head
-  const body = ctx.document.body
+  const head = ctx.widget.document.head
+  const body = ctx.widget.document.body
 
   head.content = [
     title(ctx, { content: ['Intertwine'] }),

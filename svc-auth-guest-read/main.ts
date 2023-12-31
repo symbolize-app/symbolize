@@ -1,7 +1,13 @@
 import type * as error from '@intertwine/lib-error'
-import * as time from '@intertwine/lib-time'
+import * as stream from '@intertwine/lib-stream'
 
-export async function main(ctx: error.Context): Promise<void> {
-  await time.delay(ctx, 1)
-  console.log('svc-auth-guest-read')
+export function main(ctx: error.Context & stream.ServerContext): void {
+  stream.serve(ctx, 'svc-auth-guest-read', (serverSource) => {
+    return Promise.resolve({
+      async onData(data) {
+        console.log('server data', data)
+        await serverSource.send(ctx, 'pong')
+      },
+    })
+  })
 }

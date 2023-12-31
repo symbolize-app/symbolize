@@ -76,7 +76,7 @@ function handleContentByPath(
   }
 }
 
-const fetchContentMemo = collection.memo(
+const fetchContentMemo = new collection.Memo(
   async (contentPath: string): Promise<Response> => {
     let ok = false
     try {

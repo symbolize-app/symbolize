@@ -16,7 +16,10 @@ export const tests = {
   ): Promise<void> => {
     const ctx: test.Context & error.Context = {
       ...baseContext,
-      randomNumber: test.mock([]),
+      random: {
+        ...baseContext.random,
+        number: test.mock([]),
+      },
     }
     const expectedResult = {}
     const onError = test.mock([])
@@ -30,7 +33,7 @@ export const tests = {
         onError,
       })
     )
-    await ctx.clock.tickAsync(0)
+    await ctx.time.clock.tickAsync(0)
     test.assertEquals(actualResult.resolvedValue, expectedResult)
   },
   ['two attempts, count limit']: async (
@@ -38,7 +41,10 @@ export const tests = {
   ): Promise<void> => {
     const ctx: test.Context & error.Context = {
       ...baseContext,
-      randomNumber: test.mock([() => 0.5]),
+      random: {
+        ...baseContext.random,
+        number: test.mock([() => 0.5]),
+      },
     }
     const expectedResult = new Error('TEST')
     const onError = test.mock([() => undefined])
@@ -52,12 +58,12 @@ export const tests = {
         onError,
       })
     )
-    await ctx.clock.tickAsync(0)
+    await ctx.time.clock.tickAsync(0)
     test.assertDeepEquals(onError[test.mockHistory], [
       [expectedResult, 0, 10],
     ])
     test.assert(!actualResult.isSettled)
-    await ctx.clock.tickAsync(10)
+    await ctx.time.clock.tickAsync(10)
     test.assertEquals(actualResult.rejectedValue, expectedResult)
   },
   ['three attempts, count limit']: async (
@@ -65,7 +71,10 @@ export const tests = {
   ): Promise<void> => {
     const ctx: test.Context & error.Context = {
       ...baseContext,
-      randomNumber: test.mock([() => 0.8, () => 0.8]),
+      random: {
+        ...baseContext.random,
+        number: test.mock([() => 0.8, () => 0.8]),
+      },
     }
     const expectedResult = new Error('TEST')
     const onError = test.mock([() => undefined, () => undefined])
@@ -79,18 +88,18 @@ export const tests = {
         onError,
       })
     )
-    await ctx.clock.tickAsync(0)
+    await ctx.time.clock.tickAsync(0)
     test.assertDeepEquals(onError[test.mockHistory], [
       [expectedResult, 0, 10],
     ])
     test.assert(!actualResult.isSettled)
-    await ctx.clock.tickAsync(10)
+    await ctx.time.clock.tickAsync(10)
     test.assertDeepEquals(onError[test.mockHistory], [
       [expectedResult, 0, 10],
       [expectedResult, 1, 16],
     ])
     test.assert(!actualResult.isSettled)
-    await ctx.clock.tickAsync(16)
+    await ctx.time.clock.tickAsync(16)
     test.assertEquals(actualResult.rejectedValue, expectedResult)
   },
   ['one attempt, window limit']: async (
@@ -98,7 +107,10 @@ export const tests = {
   ): Promise<void> => {
     const ctx: test.Context & error.Context = {
       ...baseContext,
-      randomNumber: test.mock([() => 0]),
+      random: {
+        ...baseContext.random,
+        number: test.mock([() => 0]),
+      },
     }
     const expectedResult = new Error('TEST')
     const onError = test.mock([])
@@ -117,9 +129,9 @@ export const tests = {
         }
       )
     )
-    await ctx.clock.tickAsync(0)
+    await ctx.time.clock.tickAsync(0)
     test.assert(!actualResult.isSettled)
-    await ctx.clock.tickAsync(9_000)
+    await ctx.time.clock.tickAsync(9_000)
     test.assertEquals(actualResult.rejectedValue, expectedResult)
   },
   ['three attempts, window limit']: async (
@@ -127,7 +139,10 @@ export const tests = {
   ): Promise<void> => {
     const ctx: test.Context & error.Context = {
       ...baseContext,
-      randomNumber: test.mock([() => 0.6, () => 0.6, () => 0]),
+      random: {
+        ...baseContext.random,
+        number: test.mock([() => 0.6, () => 0.6, () => 0]),
+      },
     }
     const expectedResult = new Error('TEST')
     const onError = test.mock([() => undefined, () => undefined])
@@ -142,18 +157,18 @@ export const tests = {
         onError,
       })
     )
-    await ctx.clock.tickAsync(0)
+    await ctx.time.clock.tickAsync(0)
     test.assertDeepEquals(onError[test.mockHistory], [
       [expectedResult, 0, 1000],
     ])
     test.assert(!actualResult.isSettled)
-    await ctx.clock.tickAsync(1000)
+    await ctx.time.clock.tickAsync(1000)
     test.assertDeepEquals(onError[test.mockHistory], [
       [expectedResult, 0, 1000],
       [expectedResult, 1, 1200],
     ])
     test.assert(!actualResult.isSettled)
-    await ctx.clock.tickAsync(1200)
+    await ctx.time.clock.tickAsync(1200)
     test.assertEquals(actualResult.rejectedValue, expectedResult)
   },
   ['three attempts, pass']: async (
@@ -161,7 +176,10 @@ export const tests = {
   ): Promise<void> => {
     const ctx: test.Context & error.Context = {
       ...baseContext,
-      randomNumber: test.mock([() => 0.8, () => 0.8]),
+      random: {
+        ...baseContext.random,
+        number: test.mock([() => 0.8, () => 0.8]),
+      },
     }
     const expectedResult = {}
     const expectedError = new Error('TEST')
@@ -179,18 +197,18 @@ export const tests = {
         onError,
       })
     )
-    await ctx.clock.tickAsync(0)
+    await ctx.time.clock.tickAsync(0)
     test.assertDeepEquals(onError[test.mockHistory], [
       [expectedError, 0, 10],
     ])
     test.assert(!actualResult.isSettled)
-    await ctx.clock.tickAsync(10)
+    await ctx.time.clock.tickAsync(10)
     test.assertDeepEquals(onError[test.mockHistory], [
       [expectedError, 0, 10],
       [expectedError, 1, 16],
     ])
     test.assert(!actualResult.isSettled)
-    await ctx.clock.tickAsync(16)
+    await ctx.time.clock.tickAsync(16)
     test.assertEquals(actualResult.resolvedValue, expectedResult)
   },
 }

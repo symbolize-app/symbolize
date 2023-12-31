@@ -25,11 +25,13 @@ export type HtmlListeners<E extends Element = Element> = {
 }
 
 export type Context = {
-  window: NonNullable<Document['defaultView']>
-  document: Document & {
-    head: HtmlWidget<HTMLHeadElement>
-    body: HtmlWidget<HTMLBodyElement>
-    defaultView: NonNullable<Document['defaultView']>
+  widget: {
+    window: NonNullable<Document['defaultView']>
+    document: Document & {
+      head: HtmlWidget<HTMLHeadElement>
+      body: HtmlWidget<HTMLBodyElement>
+      defaultView: NonNullable<Document['defaultView']>
+    }
   }
 } & style.Context
 
@@ -39,8 +41,10 @@ export function initContext(document: Document): Context {
   }
   const ctx = {
     ...style.initContext(document),
-    document,
-    window: document.defaultView,
+    widget: {
+      document,
+      window: document.defaultView,
+    },
   } as Context
   toHtmlWidget(ctx, document.body)
   toHtmlWidget(ctx, document.head)
@@ -69,22 +73,22 @@ function replaceChildren(
   parent: Node & ParentNode,
   children: (Node | string)[]
 ): void {
-  if (parent instanceof ctx.window.HTMLHeadElement) {
+  if (parent instanceof ctx.widget.window.HTMLHeadElement) {
     let styleElement: HTMLStyleElement | null = null
     let node = parent.firstChild
     while (node) {
       const nextNode = node.nextSibling
-      if (node !== ctx.styleElement) {
+      if (node !== ctx.style.element) {
         node.remove()
       } else if (!styleElement) {
-        styleElement = ctx.styleElement
+        styleElement = ctx.style.element
       }
       node = nextNode
     }
     for (const child of children) {
       parent.insertBefore(
         typeof child === 'string'
-          ? ctx.document.createTextNode(child)
+          ? ctx.widget.document.createTextNode(child)
           : child,
         styleElement
       )
@@ -101,7 +105,7 @@ function replaceChildren(
     for (const child of children) {
       parent.appendChild(
         typeof child === 'string'
-          ? ctx.document.createTextNode(child)
+          ? ctx.widget.document.createTextNode(child)
           : child
       )
     }
@@ -235,7 +239,7 @@ export const html: HtmlWidgetMap = new Proxy({} as HtmlWidgetMap, {
         WidgetFunction<HtmlWidget<HTMLElementTagNameMap[K]>>
       >
     )[property] ??= define((ctx) =>
-      toHtmlWidget(ctx, ctx.document.createElement(property))
+      toHtmlWidget(ctx, ctx.widget.document.createElement(property))
     ))
   },
 })
@@ -246,8 +250,8 @@ export const range = define(
   ): {
     content: Widget[]
   } => {
-    const start = ctx.document.createComment('')
-    const end = ctx.document.createComment('')
+    const start = ctx.widget.document.createComment('')
+    const end = ctx.widget.document.createComment('')
     const content: Widget[] = [start, end]
 
     return {

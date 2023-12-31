@@ -10,9 +10,8 @@ export type JsonObject = { [Key in string]: JsonValue }
 
 export type JsonArray = JsonValue[]
 
-export type JsonPayload<
-  CustomTransformer extends JsonPayloadTransformer<unknown>,
-> = CustomTransformer extends JsonPayloadTransformer<infer T> ? T : never
+export type JsonPayload<CustomTransformer> =
+  CustomTransformer extends JsonPayloadTransformer<infer T> ? T : never
 
 export type JsonPayloadTransformer<Value> = {
   fromJson: (input: JsonValue, path?: Path) => Value

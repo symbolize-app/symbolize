@@ -1,26 +1,30 @@
 export type Context = {
-  styleElement: HTMLStyleElement
-  styleSheet: CSSStyleSheet
-  styleRenderMap: Map<string, Map<Style, string[]>>
-  styleRenderCount: number
+  style: {
+    element: HTMLStyleElement
+    sheet: CSSStyleSheet
+    renderMap: Map<string, Map<Style, string[]>>
+    renderCount: number
+  }
 }
 
 let globalStyleNameCount = 0
 
 export function initContext(document: Document): Context {
-  const styleElement = document.createElement('style')
-  document.head.appendChild(styleElement)
-  const styleSheet = styleElement.sheet
-  if (!styleSheet) {
+  const element = document.createElement('style')
+  document.head.appendChild(element)
+  const sheet = element.sheet
+  if (!sheet) {
     throw Error('Problem adding style element')
   }
-  const styleRenderMap = new Map<string, Map<Style, string[]>>()
-  const styleRenderCount = 0
+  const renderMap = new Map<string, Map<Style, string[]>>()
+  const renderCount = 0
   return {
-    styleElement,
-    styleSheet,
-    styleRenderMap,
-    styleRenderCount,
+    style: {
+      element,
+      sheet,
+      renderMap,
+      renderCount,
+    },
   }
 }
 
@@ -112,10 +116,10 @@ function renderNestedStyle(
   newStyleName: boolean
 ): string[] {
   const fullSelectorValue = `${combinatorSelectorValue}${selectorValue}`
-  let fullSelectorStyleMap = ctx.styleRenderMap.get(fullSelectorValue)
+  let fullSelectorStyleMap = ctx.style.renderMap.get(fullSelectorValue)
   if (!fullSelectorStyleMap) {
     fullSelectorStyleMap = new Map<Style, string[]>()
-    ctx.styleRenderMap.set(fullSelectorValue, fullSelectorStyleMap)
+    ctx.style.renderMap.set(fullSelectorValue, fullSelectorStyleMap)
   }
 
   const existingStyleClasses = fullSelectorStyleMap.get(style)
@@ -125,8 +129,8 @@ function renderNestedStyle(
 
   let styleName: string
   if (newStyleName && (combinatorSelectorValue || selectorValue)) {
-    styleName = `r${ctx.styleRenderCount.toString(styleNameBase)}`
-    ctx.styleRenderCount += 1
+    styleName = `r${ctx.style.renderCount.toString(styleNameBase)}`
+    ctx.style.renderCount += 1
   } else {
     styleName = style.name
   }
@@ -229,9 +233,9 @@ function renderStyleProps(
   combinatorSelectorValue: string,
   selectorValue: string
 ): void {
-  const styleRules = ctx.styleSheet.cssRules
+  const styleRules = ctx.style.sheet.cssRules
   const styleIndex = styleRules.length
-  ctx.styleSheet.insertRule(
+  ctx.style.sheet.insertRule(
     `${combinatorSelectorValue.substring(
       0,
       combinatorSelectorValue.length - 1

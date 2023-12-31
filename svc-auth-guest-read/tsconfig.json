@@ -10,6 +10,7 @@
   "references": [
     { "path": "../lib-error" },
     { "path": "../lib-random" },
+    { "path": "../lib-stream" },
     { "path": "../lib-time" }
   ]
 }

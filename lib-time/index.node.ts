@@ -3,7 +3,9 @@ import * as nodePerfHooks from 'node:perf_hooks'
 
 export function initContext(): time.Context {
   return {
-    performanceNow: () => nodePerfHooks.performance.now(),
-    setTimeout: (...args) => global.setTimeout(...args),
+    time: {
+      performanceNow: () => nodePerfHooks.performance.now(),
+      setTimeout: (...args) => global.setTimeout(...args),
+    },
   }
 }

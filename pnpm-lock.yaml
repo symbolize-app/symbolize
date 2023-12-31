@@ -54,6 +54,9 @@ importers:
       '@intertwine/lib-random':
         specifier: workspace:*
         version: link:lib-random
+      '@intertwine/lib-stream':
+        specifier: workspace:*
+        version: link:lib-stream
       '@intertwine/lib-style':
         specifier: workspace:*
         version: link:lib-style
@@ -389,6 +392,28 @@ importers:
         specifier: 5.2.2
         version: 5.2.2
 
+  lib-stream:
+    dependencies:
+      '@intertwine/dev-prettier':
+        specifier: workspace:*
+        version: link:../dev-prettier
+      '@intertwine/dev-tsconfig':
+        specifier: workspace:*
+        version: link:../dev-tsconfig
+      '@intertwine/lib-collection':
+        specifier: workspace:*
+        version: link:../lib-collection
+      '@intertwine/lib-test':
+        specifier: workspace:*
+        version: link:../lib-test
+      '@intertwine/lib-time':
+        specifier: workspace:*
+        version: link:../lib-time
+    devDependencies:
+      typescript:
+        specifier: 5.2.2
+        version: 5.2.2
+
   lib-style:
     dependencies:
       '@intertwine/dev-prettier':
@@ -485,6 +510,9 @@ importers:
       '@intertwine/lib-random':
         specifier: workspace:*
         version: link:../lib-random
+      '@intertwine/lib-stream':
+        specifier: workspace:*
+        version: link:../lib-stream
       '@intertwine/lib-time':
         specifier: workspace:*
         version: link:../lib-time
@@ -510,6 +538,9 @@ importers:
       '@intertwine/lib-random':
         specifier: workspace:*
         version: link:../lib-random
+      '@intertwine/lib-stream':
+        specifier: workspace:*
+        version: link:../lib-stream
       '@intertwine/lib-style':
         specifier: workspace:*
         version: link:../lib-style
@@ -544,6 +575,9 @@ importers:
       '@intertwine/lib-hex':
         specifier: workspace:*
         version: link:../lib-hex
+      '@intertwine/lib-stream':
+        specifier: workspace:*
+        version: link:../lib-stream
       '@intertwine/lib-test':
         specifier: workspace:*
         version: link:../lib-test

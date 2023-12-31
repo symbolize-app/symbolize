@@ -1,7 +1,7 @@
-import * as svcDedicatedWorkerClient from '@/dedicatedWorkerClient.ts'
 import * as svcReload from '@/reload.ts'
 import type * as error from '@intertwine/lib-error'
 import * as random from '@intertwine/lib-random'
+import * as stream from '@intertwine/lib-stream'
 import * as timeBrowser from '@intertwine/lib-time/index.browser.ts'
 import * as widget from '@intertwine/lib-widget'
 
@@ -9,17 +9,20 @@ function main() {
   svcReload.listenForMessage()
   svcReload.listenForKeyboardShortcut()
 
-  const ctx: widget.Context &
-    error.Context &
-    svcDedicatedWorkerClient.Context = {
+  const worker = new Worker(
+    '/.code/svc-gateway-guest-run/dedicatedWorker.ts.mjs',
+    { type: 'module' }
+  )
+
+  const ctx: widget.Context & error.Context & stream.ClientContext = {
     ...random.initContext(),
     ...timeBrowser.initContext(),
     ...widget.initContext(window.document),
-    ...svcDedicatedWorkerClient.initContext(),
+    ...stream.initClientContext(worker),
   }
 
   const entryPoints: Promise<{
-    main(ctx: widget.Context & error.Context): void
+    main(ctx: widget.Context & error.Context & stream.ClientContext): void
   }>[] = [
     import('@intertwine/svc-auth-guest-view/main.ts'),
     ...(import.meta.env.NODE_ENV === 'development'

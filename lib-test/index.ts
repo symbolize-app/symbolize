@@ -59,7 +59,7 @@ export async function runAll<
     )
   )
   const resolvedTestModules = await Promise.all(testModules)
-  const start = ctx.performanceNow()
+  const start = ctx.time.performanceNow()
   let pass = 0
   let fail = 0
   console.group('Testing...')
@@ -156,7 +156,7 @@ export async function runAll<
     }
   }
 
-  const end = ctx.performanceNow()
+  const end = ctx.time.performanceNow()
   const elapsed = ms(Math.round(end - start))
 
   console.log(`%cPass: ${pass}`, 'font-weight: bold; color: green')

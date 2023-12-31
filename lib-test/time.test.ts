@@ -6,9 +6,9 @@ export const url = import.meta.url
 export const tests = {
   ['delay']: async (ctx: test.Context): Promise<void> => {
     const result = test.sync(time.delay(ctx, 20))
-    await ctx.clock.tickAsync(0)
+    await ctx.time.clock.tickAsync(0)
     test.assert(!result.isSettled)
-    await ctx.clock.tickAsync(20)
+    await ctx.time.clock.tickAsync(20)
     test.assertEquals(result.resolvedValue, undefined)
   },
   ['interval']: (): void => {

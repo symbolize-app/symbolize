@@ -1,22 +1,19 @@
-export type Memo<K, V> = {
-  get(key: K): V
-  delete(key: K): void
-}
+export class Memo<K, V> {
+  private readonly results = new Map<K, V>()
 
-export function memo<K, V>(builder: (key: K) => V): Memo<K, V> {
-  const results = new Map<K, V>()
-  return {
-    get(key) {
-      if (results.has(key)) {
-        return results.get(key)!
-      } else {
-        const value = builder(key)
-        results.set(key, value)
-        return value
-      }
-    },
-    delete(key) {
-      results.delete(key)
-    },
+  constructor(private readonly builder: (key: K) => V) {}
+
+  get(key: K): V {
+    if (this.results.has(key)) {
+      return this.results.get(key)!
+    } else {
+      const value = this.builder(key)
+      this.results.set(key, value)
+      return value
+    }
+  }
+
+  delete(key: K): void {
+    this.results.delete(key)
   }
 }
