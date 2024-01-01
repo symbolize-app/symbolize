@@ -34,6 +34,7 @@
   - https://github.com/hyperium/h3/pull/183
 - https://github.com/rusqlite/rusqlite
 - https://github.com/cberner/fuser
+- https://github.com/Byron/gitoxide
 - https://github.com/aembke/fred.rs
 - https://github.com/jamesmunns/postcard
 - https://github.com/awslabs/aws-sdk-rust/tree/main/sdk/s3

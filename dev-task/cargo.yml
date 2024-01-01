@@ -6,7 +6,6 @@ vars:
   CLIPPY_ARGS: >-
     --frozen --locked --release
     --all-targets
-    --all-features
     --
     -W clippy::cargo
     -W clippy::pedantic
@@ -42,20 +41,18 @@ tasks:
     cmds:
       # To avoid painful conflicts, don't use lockfile
       - cargo install cargo-deny --version 0.14.3
-      - cargo install cargo-watch --version 8.4.1
       - cargo install tantivy-cli --version 0.21.0
-      - cargo install watchexec-cli --version 1.23.0
 
   build:debug:
     aliases:
       - build
       - b
-    cmd: cargo build --frozen --locked
+    cmd: cargo build --all-targets --frozen --locked
 
   build:release:
     aliases:
       - br
-    cmd: cargo build --frozen --locked --release
+    cmd: cargo build --all-targets --frozen --locked --release
 
   clean:
     cmd: cargo clean
@@ -73,18 +70,10 @@ tasks:
     internal: true
     requires:
       vars:
-        - RELEASE
+        - MDOE
+        - TEST
         - NAME
-    cmd: cargo run --package intertwine-{{.NAME}} {{if eq .RELEASE "true"}}--frozen --locked --release{{end}}
-
-  execute-package:watch:
-    internal: true
-    requires:
-      vars:
-        - RELEASE
-        - NAME
-    # Main ignores specified manually (https://github.com/watchexec/cargo-watch/issues/276)
-    cmd: cargo watch --no-vcs-ignores --no-dot-ignores --ignore .cargo --ignore build --ignore node_modules --package intertwine-{{.NAME}} {{if eq .RELEASE "true"}}--release{{end}} --exec run
+    cmd: build/target/{{.MODE}/intertwine-{{.NAME}}{{if eq .TEST "true"}}-test{{end}}
 
   fetch:
     cmd: cargo fetch --frozen --locked
@@ -133,13 +122,6 @@ tasks:
     deps:
       - build:debug
     cmd: cargo test
-
-  test:debug:watch:
-    aliases:
-      - tw
-    deps:
-      - build:debug
-    cmd: cargo watch --exec test
 
   test:release:
     aliases:

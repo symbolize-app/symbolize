@@ -20,6 +20,9 @@ includes:
   nix:
     taskfile: dev-task/nix.yml
 
+  overmind:
+    taskfile: dev-task/overmind.yml
+
   pnpm:
     taskfile: dev-task/pnpm.yml
 
@@ -40,6 +43,9 @@ includes:
 
   tmpfs:
     taskfile: dev-task/tmpfs.yml
+
+  watchman:
+    taskfile: dev-task/watchman.yml
 
 tasks:
   build:debug:
@@ -74,6 +80,12 @@ tasks:
       - cargo:clean
       - pnpm:clean
       - stack:clean
+
+  dev:
+    aliases:
+      - d
+    deps:
+      - overmind:start
 
   format:check:
     aliases:

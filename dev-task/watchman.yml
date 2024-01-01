@@ -1,0 +1,12 @@
+version: '3'
+
+run: when_changed
+
+tasks:
+  server:
+    cmd: watchman --unix-listener-path=$(realpath build/watchman-unix-listener) --pidfile=$(realpath build/watchman-pid) --statefile=$(realpath build/watchman-state) --foreground
+
+  client:
+    cmds:
+      - watchman --unix-listener-path=$(realpath build/watchman-unix-listener) --no-spawn --no-local watch .
+      - watchman --unix-listener-path=$(realpath build/watchman-unix-listener) --no-spawn --no-local -p subscribe . x {}

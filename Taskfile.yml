@@ -47,6 +47,8 @@ includes:
     taskfile: lib-widget
   nix:
     taskfile: dev-task/nix.yml
+  overmind:
+    taskfile: dev-task/overmind.yml
   pnpm:
     taskfile: dev-task/pnpm.yml
   sqlite:
@@ -67,6 +69,8 @@ includes:
     taskfile: svc-search-host-read
   tmpfs:
     taskfile: dev-task/tmpfs.yml
+  watchman:
+    taskfile: dev-task/watchman.yml
 run: when_changed
 tasks:
   build:debug:
@@ -99,6 +103,11 @@ tasks:
       - cargo:clean
       - pnpm:clean
       - stack:clean
+  dev:
+    aliases:
+      - d
+    deps:
+      - overmind:start
   format:check:
     aliases:
       - fc

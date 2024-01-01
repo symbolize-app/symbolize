@@ -1,5 +1,6 @@
 [workspace]
 members = [
+  "dev-cargo-build",
   "svc-gateway-host-run",
   "svc-search-host-read",
 ]
@@ -15,6 +16,8 @@ hyper-util = { version = "0.1.1", features = ["tokio"] }
 mime = { version = "0.3.17", features = [] }
 mockall = { version = "0.12.1", features = [] }
 rusqlite = { version = "0.30.0", features = ["bundled"] }
+serde = { version = "1.0.194", features = ["derive", "std"] }
+serde_json = { version = "1.0.110", features = [] }
 self_cell = { version = "1.0.3", features = [] }
 thiserror = { version = "1.0.51", features = [] }
-tokio = { version = "1.35.0", features = ["macros", "net", "process", "rt-multi-thread"] }
+tokio = { version = "1.35.0", features = ["fs", "io-util", "macros", "net", "process", "rt-multi-thread"] }
