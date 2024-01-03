@@ -13,7 +13,7 @@ import * as nodeFsPromises from 'node:fs/promises'
 import * as nodePath from 'node:path'
 import * as nodeUrl from 'node:url'
 import * as nodeUtil from 'node:util'
-import YAML from 'yaml'
+import yaml from 'yaml'
 
 const workspaceTransformer = payload.object({
   packages: payload.array(payload.string),
@@ -53,7 +53,7 @@ async function main(): Promise<void> {
     })
     if (watch) {
       const workspace = workspaceTransformer.fromJson(
-        YAML.parse(
+        yaml.parse(
           await nodeFsPromises.readFile('./pnpm-workspace.yaml', 'utf8')
         ) as payload.JsonValue
       )

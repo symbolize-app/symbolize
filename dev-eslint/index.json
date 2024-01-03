@@ -1,7 +1,7 @@
 {
   "root": true,
   "parser": "@typescript-eslint/parser",
-  "ignorePatterns": ["build/**"],
+  "ignorePatterns": ["build/**", "node_modules/**"],
   "plugins": ["import", "simple-import-sort", "@typescript-eslint"],
   "extends": [
     "eslint:recommended",
@@ -15,13 +15,6 @@
       "error",
       {
         "checkLoops": false
-      }
-    ],
-    "import/extensions": [
-      "warn",
-      "always",
-      {
-        "ignorePackages": true
       }
     ],
     "import/first": "warn",

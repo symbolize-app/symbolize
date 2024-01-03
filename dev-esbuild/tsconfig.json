@@ -4,7 +4,7 @@
     "paths": { "@/*.sql": ["./*.sql"], "@/*.ts": ["./*.ts"] },
     "tsBuildInfoFile": "build/tsc/tsconfig.tsbuildinfo"
   },
-  "exclude": ["build/**"],
+  "exclude": ["build/**", "node_modules/**"],
   "extends": "@intertwine/dev-tsconfig/tsconfig.json",
   "include": ["./**/*.ts", "./**/*.js", "./**/*.cjs"],
   "references": [
