@@ -31,8 +31,8 @@
     "@types/sinonjs__fake-timers": "8.1.2",
     "@types/sodium-native": "2.3.5",
     "@types/ws": "8.5.5",
-    "@typescript-eslint/eslint-plugin": "6.8.0",
-    "@typescript-eslint/parser": "6.8.0",
+    "@typescript-eslint/eslint-plugin": "6.17.0",
+    "@typescript-eslint/parser": "6.17.0",
     "better-sqlite3": "9.2.2",
     "chokidar": "3.5.3",
     "diff": "5.1.0",
@@ -48,7 +48,8 @@
     "node-fetch": "3.3.2",
     "prettier": "3.0.3",
     "syncpack": "11.2.1",
-    "typescript": "5.2.2"
+    "typescript": "5.2.2",
+    "yaml": "2.3.4"
   },
   "pnpm": {
     "neverBuiltDependencies": [
@@ -76,8 +77,5 @@
         "isBanned": true
       }
     ]
-  },
-  "dependencies": {
-    "yaml": "2.3.4"
   }
 }

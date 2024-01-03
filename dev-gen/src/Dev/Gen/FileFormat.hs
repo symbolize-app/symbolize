@@ -77,7 +77,7 @@ typeScriptConfigInclude :: Vector Text
 typeScriptConfigInclude = ["./**/*.ts", "./**/*.js", "./**/*.cjs"]
 
 typeScriptConfigExclude :: Vector Text
-typeScriptConfigExclude = ["build/**"]
+typeScriptConfigExclude = ["build/**", "node_modules/**"]
 
 type TypeScriptConfigCompilerOptions :: Type
 data TypeScriptConfigCompilerOptions = TypeScriptConfigCompilerOptions
