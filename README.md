@@ -46,32 +46,6 @@ echo 'source $HOME/.nix-profile/share/nix-direnv/direnvrc' >> $HOME/.config/dire
 1. Install [Visual Studio Code](https://code.visualstudio.com/docs/setup/setup-overview)
 1. Run the command `Tasks: Allow Automatic Tasks in Folder`
 
-# App development
+# Commands
 
-## `pnpm db up`
-
-## `pnpm import-basic`
-
-## `pnpm dev`
-
-Runs the development server
-
-## `pnpm fmt`
-
-Formats all source code
-
-## `pnpm build`
-
-Compiles all source code
-
-# FTS development
-
-## `cargo fetch`
-
-## `cargo watch-run`
-
-## `cargo fix-fmt`
-
-## `cargo fix-clippy`
-
-## `curl -i -G -u :$FTS_PASSWORD 'localhost:7070/query' --data-urlencode 'language=en' --data-urlencode 'query=flower'`
+- `task c`

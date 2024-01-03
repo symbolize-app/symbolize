@@ -3,7 +3,7 @@ version: '3'
 run: when_changed
 
 vars:
-  NAME: svc-gateway-host-run
+  NAME: dev-cargo-build
 
 tasks:
   run:debug:

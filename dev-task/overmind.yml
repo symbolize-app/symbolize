@@ -1,0 +1,7 @@
+version: '3'
+
+run: when_changed
+
+tasks:
+  start:
+    cmd: overmind start --no-port --auto-restart=watchman-client,watchman-server

@@ -54,19 +54,6 @@ tasks:
       FULL_TARGET: intertwine-{{.NAME}}-{{.TARGET}}
     cmd: '{{.DIST_DIR}}/build/{{.FULL_TARGET}}/{{.FULL_TARGET}} {{.ARGS}} {{.CLI_ARGS}}'
 
-  execute-target:watch:
-    internal: true
-    requires:
-      vars:
-        - MODE
-        - NAME
-        - TARGET
-    vars:
-      DIST_DIR:
-        sh: realpath --relative-to . $(sh -c "$(cd {{.NAME}} && stack config env --work-dir build/stack-work-{{.MODE}}) echo \$HASKELL_DIST_DIR")
-      FULL_TARGET: intertwine-{{.NAME}}-{{.TARGET}}
-    cmd: watchexec --fs-events create,rename,modify --debounce 150ms --no-vcs-ignore --watch {{.DIST_DIR}}/build/{{.FULL_TARGET}} --filter {{.FULL_TARGET}} -- {{.DIST_DIR}}/build/{{.FULL_TARGET}}/{{.FULL_TARGET}} {{.CLI_ARGS}}
-
   format:check:
     aliases:
       - fc
