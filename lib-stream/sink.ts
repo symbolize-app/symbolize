@@ -15,8 +15,7 @@ export class Sink<T> {
           )
           active.add(current)
           while (active.size >= limit) {
-            // eslint-disable-next-line @typescript-eslint/no-floating-promises
-            await Promise.race([...active.entries()])
+            await Promise.race([...active.values()])
           }
         },
       },
