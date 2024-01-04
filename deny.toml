@@ -19,10 +19,18 @@ ignore = true
 multiple-versions = "deny"
 wildcards = "deny"
 
+[[bans.skip]]
+name = "futures"
+version = "=0.1.31"
+
+[[bans.skip-tree]]
+name = "redox_syscall"
+version = "0.4.1"
+
 [sources]
 unknown-registry = "deny"
 unknown-git = "deny"
-allow-registry = ["https://github.com/rust-lang/crates.io-index"]
+allow-registry = ["https://github.com/rust-lang/crates.io-index", "https://github.com/facebook/watchman"]
 allow-git = []
 
 [sources.allow-org]
