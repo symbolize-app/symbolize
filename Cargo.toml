@@ -1,6 +1,7 @@
 [workspace]
 members = [
   "dev-cargo-build",
+  "dev-watchman-client",
   "svc-gateway-host-run",
   "svc-search-host-read",
 ]
@@ -9,6 +10,7 @@ resolver = "2"
 [workspace.dependencies]
 anyhow = { version = "1.0.75", features = ["std"] }
 bytes = { version = "1.5.0", features = [] }
+clap = { version = "4.4.12", features = ["color", "derive", "error-context", "help", "std", "suggestions", "usage"] }
 http = { version = "1.0.0", features = [] }
 http-body-util = { version = "0.1.0", features = [] }
 hyper = { version = "1.0.1", features = ["http1", "server"] }
@@ -21,3 +23,10 @@ serde_json = { version = "1.0.110", features = [] }
 self_cell = { version = "1.0.3", features = [] }
 thiserror = { version = "1.0.51", features = [] }
 tokio = { version = "1.35.0", features = ["fs", "io-util", "macros", "net", "process", "rt-multi-thread"] }
+watchman_client = { version = "0.8.0", features = [] }
+
+[patch.crates-io]
+serde_bser = { git = "https://github.com/facebook/watchman?rev=74be16ffe71e99ca74833ed92e0d07240bf45a18", rev = "74be16ffe71e99ca74833ed92e0d07240bf45a18" }
+
+[patch.'https://github.com/facebook/watchman']
+serde_bser = { git = "https://github.com/facebook/watchman?rev=74be16ffe71e99ca74833ed92e0d07240bf45a18", rev = "74be16ffe71e99ca74833ed92e0d07240bf45a18" }

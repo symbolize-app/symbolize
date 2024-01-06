@@ -1,3 +1,13 @@
 {
-  "ignore_dirs": ["build", "node_modules"]
+  "ignore_dirs": [
+    ".cargo",
+    ".direnv",
+    ".env",
+    ".stack-bin",
+    ".tantivy",
+    "build",
+    "node_modules",
+    "result",
+    "tmp"
+  ]
 }

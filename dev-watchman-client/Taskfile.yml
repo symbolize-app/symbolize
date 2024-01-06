@@ -1,0 +1,39 @@
+version: '3'
+
+run: when_changed
+
+vars:
+  NAME: dev-cargo-build
+
+tasks:
+  run:debug:
+    aliases:
+      - run
+      - r
+    cmd:
+      task: :cargo:execute-package
+      vars:
+        MODE: debug
+        TEST: false
+        NAME: '{{.NAME}}'
+
+  run:release:
+    aliases:
+      - rr
+    cmd:
+      task: :cargo:execute-package
+      vars:
+        MODE: release
+        TEST: false
+        NAME: '{{.NAME}}'
+
+  test:debug:
+    aliases:
+      - test
+      - t
+    cmd:
+      task: :cargo:execute-package
+      vars:
+        MODE: debug
+        TEST: true
+        NAME: '{{.NAME}}'

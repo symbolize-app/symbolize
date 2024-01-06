@@ -4,7 +4,7 @@ run: when_changed
 
 vars:
   CLIPPY_ARGS: >-
-    --frozen --locked --release
+    --locked --release
     --all-targets
     --
     -W clippy::cargo
@@ -47,12 +47,12 @@ tasks:
     aliases:
       - build
       - b
-    cmd: cargo build --all-targets --frozen --locked
+    cmd: cargo build --all-targets --locked
 
   build:release:
     aliases:
       - br
-    cmd: cargo build --all-targets --frozen --locked --release
+    cmd: cargo build --all-targets --locked --release
 
   clean:
     cmd: cargo clean
@@ -76,7 +76,7 @@ tasks:
     cmd: build/target/{{.MODE}/intertwine-{{.NAME}}{{if eq .TEST "true"}}-test{{end}}
 
   fetch:
-    cmd: cargo fetch --frozen --locked
+    cmd: cargo fetch --locked
 
   format:check:
     aliases:
@@ -113,7 +113,7 @@ tasks:
     cmd: cargo metadata --format-version=1 >/dev/null
 
   lock:check:
-    cmd: cargo metadata --frozen --locked --format-version=1 >/dev/null
+    cmd: cargo metadata --locked --format-version=1 >/dev/null
 
   test:debug:
     aliases:
@@ -128,4 +128,4 @@ tasks:
       - tr
     deps:
       - build:release
-    cmd: cargo test --frozen --locked --release
+    cmd: cargo test --locked --release
