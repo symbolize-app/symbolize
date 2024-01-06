@@ -1,9 +1,12 @@
+use crate::nix_child::NixChild as _;
 use anyhow::anyhow;
 use anyhow::Result;
 use clap;
 use clap::Parser as _;
+use nix::sys::signal::Signal;
 use std::path::Path;
 use std::process::ExitCode;
+use std::process::ExitStatus;
 use std::sync::Arc;
 use tokio::fs;
 use tokio::process::Child;
@@ -26,6 +29,9 @@ use watchman_client::SubscriptionData;
 struct Cli {
   #[arg(short, long)]
   mode: Mode,
+
+  #[arg(short, long)]
+  restart: bool,
 
   #[arg(required = true, last = true)]
   command: Vec<String>,
@@ -51,7 +57,6 @@ enum Mode {
   TypeScript,
 }
 
-#[allow(clippy::print_stdout)]
 #[allow(clippy::print_stderr)]
 #[tokio::main]
 pub async fn main() -> Result<ExitCode> {
@@ -222,31 +227,79 @@ fn build_expr(cli: &Cli) -> Result<Expr> {
   ]))
 }
 
-#[allow(clippy::print_stdout)]
 async fn run_command(
   cli: Cli,
   files_changed: Arc<Semaphore>,
 ) -> Result<!> {
-  let program = cli.program()?;
-  let args = cli.args();
   let mut child: Option<Child> = None;
+  let mut restart_pending = false;
   loop {
     select! {
-      permit = files_changed.acquire(), if child.is_none() => {
+      permit = files_changed.acquire(),
+      if (cli.restart && !restart_pending) || child.is_none() => {
         permit?.forget();
-        child = Some(Command::new(program).args(args).spawn()?);
-        println!("[watch] Started {program}");
+        handle_files_changed(&cli, &mut child, &mut restart_pending)?;
       }
       status = async {
         child.as_mut().map(Child::wait).expect("some child").await
       }, if child.is_some() => {
-        if let Some(code) = status?.code() {
-          println!("[watch] Exit code {code}");
-        } else {
-          println!("[watch] Unknown exit code");
-        }
-        child = None;
+        handle_child_done(
+          &cli, status?, &mut child, &mut restart_pending
+        )?;
       }
     }
   }
+}
+
+fn handle_files_changed(
+  cli: &Cli,
+  child: &mut Option<Child>,
+  restart_pending: &mut bool,
+) -> Result<()> {
+  match &child {
+    Some(child) => {
+      restart_child(child, restart_pending)?;
+    }
+    None => {
+      start_child(cli, child)?;
+    }
+  }
+  Ok(())
+}
+
+#[allow(clippy::print_stdout)]
+fn handle_child_done(
+  cli: &Cli,
+  status: ExitStatus,
+  child: &mut Option<Child>,
+  restart_pending: &mut bool,
+) -> Result<()> {
+  if let Some(code) = status.code() {
+    println!("[watch] Exit code {code}");
+  } else {
+    println!("[watch] Unknown exit code");
+  }
+  *child = None;
+  if *restart_pending {
+    start_child(cli, child)?;
+    *restart_pending = false;
+  }
+  Ok(())
+}
+
+#[allow(clippy::print_stdout)]
+fn start_child(cli: &Cli, child: &mut Option<Child>) -> Result<()> {
+  let program = cli.program()?;
+  let args = cli.args();
+  *child = Some(Command::new(program).args(args).spawn()?);
+  println!("[watch] Started {program}");
+  Ok(())
+}
+
+#[allow(clippy::print_stdout)]
+fn restart_child(child: &Child, restart_pending: &mut bool) -> Result<()> {
+  child.signal_kill(Signal::SIGTERM)?;
+  *restart_pending = true;
+  println!("[watch] Restarting");
+  Ok(())
 }
