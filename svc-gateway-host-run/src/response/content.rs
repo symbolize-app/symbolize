@@ -1,11 +1,11 @@
 use crate::db as svc_db;
 use crate::header as svc_header;
-use crate::hex::ToHex as _;
 use crate::request as svc_request;
 use crate::response::error as svc_response_error;
 use crate::response::simple as svc_response_simple;
 use anyhow::Result;
 use http::StatusCode;
+use intertwine_lib_hex::ToHex as _;
 
 const SERVICE_WORKER_SHELL_PATH: &str =
   "svc-gateway-guest-run/serviceWorkerShell.js";

@@ -9,10 +9,8 @@
     "@intertwine/lib-payload": "workspace:*",
     "@intertwine/lib-time": "workspace:*",
     "better-sqlite3": "9.2.2",
-    "chokidar": "3.5.3",
     "esbuild": "0.19.5",
     "ms": "2.1.3",
-    "yaml": "2.3.4",
     "zod": "3.22.4"
   },
   "devDependencies": {

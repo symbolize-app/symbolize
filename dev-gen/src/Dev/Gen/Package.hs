@@ -7,13 +7,12 @@ module Dev.Gen.Package
 where
 
 import Data.Map.Strict qualified as Map
-import Data.Text qualified as Text
 import Data.Vector (Vector)
 import Data.Vector qualified as Vector
 import Dev.Gen.FileFormat qualified as FileFormat
 import Relude.Applicative (empty, pure)
 import Relude.Base (Eq, Show, Type)
-import Relude.Container (Map, fromList)
+import Relude.Container (Map, fromList, uncurry)
 import Relude.Function (($), (.))
 import Relude.Functor ((<$>))
 import Relude.Monad (Maybe, isJust, mapMaybe)
@@ -36,13 +35,15 @@ newtype TypeScript = TypeScript
 transformPNPM :: Map Text FileFormat.PNPMPackageFile -> Vector PNPM
 transformPNPM pnpmPackageFiles =
   let packagesMap :: Map Text PNPM
-      packagesMap = transformOne `Map.mapWithKey` pnpmPackageFiles
-      transformOne :: Text -> FileFormat.PNPMPackageFile -> PNPM
-      transformOne name pnpmPackageFile = do
-        PNPM
-          { name = name,
-            typeScript = transformTypeScript pnpmPackageFile
-          }
+      packagesMap = Map.fromList $ uncurry transformOne <$> Map.toList pnpmPackageFiles
+      transformOne :: Text -> FileFormat.PNPMPackageFile -> (Text, PNPM)
+      transformOne name pnpmPackageFile =
+        ( pnpmPackageFile.name,
+          PNPM
+            { name = name,
+              typeScript = transformTypeScript pnpmPackageFile
+            }
+        )
       transformTypeScript :: FileFormat.PNPMPackageFile -> Maybe TypeScript
       transformTypeScript pnpmPackageFile = do
         devDependencies <- pnpmPackageFile.devDependencies
@@ -59,9 +60,8 @@ transformPNPM pnpmPackageFiles =
           else empty
       findDependency :: Text -> Maybe Text
       findDependency name = do
-        name' <- Text.stripPrefix "@intertwine/" name
-        package <- Map.lookup name' packagesMap
-        if isJust package.typeScript then pure name' else empty
+        package <- Map.lookup name packagesMap
+        if isJust package.typeScript then pure package.name else empty
    in fromList $ Map.elems packagesMap
 
 foldTypeScriptPackageNames :: Vector PNPM -> Vector Text

@@ -17,6 +17,9 @@ includes:
     internal: true
     taskfile: dev-stack-bin
 
+  lib-hex-rs:
+    taskfile: lib-hex-rs
+
   nix:
     taskfile: dev-task/nix.yml
 
@@ -110,21 +113,17 @@ tasks:
     deps:
       - stack:build:release
     cmd:
-      task: stack:execute-target
+      task: stack:execute-target:run:release
       vars:
-        MODE: release
         NAME: dev-gen
-        TARGET: exe
 
   gen:check:
     deps:
       - stack:build:release
     cmd:
-      task: stack:execute-target
+      task: stack:execute-target:run:release
       vars:
-        MODE: release
         NAME: dev-gen
-        TARGET: exe
         ARGS: '--check'
 
   install:

@@ -51,7 +51,8 @@ instance Aeson.FromJSON PNPMWorkspace
 
 type PNPMPackageFile :: Type
 data PNPMPackageFile = PNPMPackageFile
-  { dependencies :: Maybe (Map Text Text),
+  { name :: Text,
+    dependencies :: Maybe (Map Text Text),
     devDependencies :: Maybe (Map Text Text)
   }
   deriving stock (Show, Eq, Generic)

@@ -1,6 +1,7 @@
 use crate::nix_child::NixChild as _;
 use anyhow::anyhow;
 use anyhow::Result;
+use backon::Retryable as _;
 use clap;
 use clap::Parser as _;
 use nix::sys::signal::Signal;
@@ -8,6 +9,7 @@ use std::path::Path;
 use std::process::ExitCode;
 use std::process::ExitStatus;
 use std::sync::Arc;
+use std::time::Duration;
 use tokio::fs;
 use tokio::process::Child;
 use tokio::process::Command;
@@ -88,9 +90,17 @@ async fn watch_files(
   cli: Cli,
   files_changed: Arc<Semaphore>,
 ) -> Result<!> {
-  let client = Connector::new()
+  let connector = Connector::new()
     .unix_domain_socket("build/watchman-unix-listener")
-    .connect()
+    .watchman_cli_path("/dev/null");
+  let client = { || connector.connect() }
+    .retry(
+      &backon::ExponentialBuilder::default()
+        .with_jitter()
+        .with_min_delay(Duration::from_millis(100))
+        .with_max_delay(Duration::from_secs(2))
+        .with_max_times(10),
+    )
     .await?;
   println!("[watch] Connected to Watchman server");
   let root_path = if cli.mode == Mode::Executable {

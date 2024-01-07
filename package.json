@@ -34,7 +34,6 @@
     "@typescript-eslint/eslint-plugin": "6.17.0",
     "@typescript-eslint/parser": "6.17.0",
     "better-sqlite3": "9.2.2",
-    "chokidar": "3.5.3",
     "diff": "5.1.0",
     "esbuild": "0.19.5",
     "eslint": "8.48.0",
@@ -48,8 +47,7 @@
     "node-fetch": "3.3.2",
     "prettier": "3.0.3",
     "syncpack": "11.2.1",
-    "typescript": "5.2.2",
-    "yaml": "2.3.4"
+    "typescript": "5.2.2"
   },
   "pnpm": {
     "neverBuiltDependencies": [

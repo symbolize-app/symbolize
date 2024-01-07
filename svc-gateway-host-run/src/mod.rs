@@ -5,7 +5,6 @@ mod context;
 mod db;
 mod handle;
 mod header;
-mod hex;
 mod main_;
 mod request;
 mod response;

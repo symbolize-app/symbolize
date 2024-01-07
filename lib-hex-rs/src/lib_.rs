@@ -36,5 +36,5 @@ impl ToHex for [u8] {
 }
 
 #[cfg(test)]
-#[path = "./hex_test.rs"]
-mod hex_test;
+#[path = "./lib_test.rs"]
+mod lib_test;
