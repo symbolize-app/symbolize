@@ -6,34 +6,28 @@ vars:
   NAME: dev-cargo-build
 
 tasks:
-  run:debug:
-    aliases:
-      - run
-      - r
-    cmd:
-      task: :cargo:execute-package
-      vars:
-        MODE: debug
-        TEST: false
-        NAME: '{{.NAME}}'
-
-  run:release:
-    aliases:
-      - rr
-    cmd:
-      task: :cargo:execute-package
-      vars:
-        MODE: release
-        TEST: false
-        NAME: '{{.NAME}}'
-
   test:debug:
     aliases:
       - test
       - t
     cmd:
-      task: :cargo:execute-package
+      task: :cargo:execute-package:test:debug
       vars:
-        MODE: debug
-        TEST: true
+        NAME: '{{.NAME}}'
+
+  test:debug:watch:
+    aliases:
+      - test:watch
+      - tw
+    cmd:
+      task: :cargo:execute-package:test:debug:watch
+      vars:
+        NAME: '{{.NAME}}'
+
+  test:release:
+    aliases:
+      - tr
+    cmd:
+      task: :cargo:execute-package:test:release
+      vars:
         NAME: '{{.NAME}}'

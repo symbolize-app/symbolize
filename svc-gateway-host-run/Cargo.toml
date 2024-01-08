@@ -15,6 +15,7 @@ http = { workspace = true }
 http-body-util = { workspace = true }
 hyper = { workspace = true }
 hyper-util = { workspace = true }
+intertwine-lib-hex = { workspace = true }
 mime = { workspace = true }
 rusqlite = { workspace = true }
 self_cell = { workspace = true }

@@ -1,7 +1,6 @@
 use crate::context as svc_context;
 use crate::db as svc_db;
 use crate::db::Context as _;
-use crate::hex::FromHex as _;
 use crate::request as svc_request;
 use crate::response as svc_response;
 use anyhow::Error;
@@ -12,6 +11,7 @@ use http_body_util::Full as FullBody;
 use hyper::body::Incoming as IncomingBody;
 use hyper::Request;
 use hyper::Response;
+use intertwine_lib_hex::FromHex as _;
 use std::sync::Arc;
 
 const CODE_ID_PREFIX: &str = "/.code/.id/";

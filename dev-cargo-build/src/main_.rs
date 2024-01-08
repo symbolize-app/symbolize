@@ -1,5 +1,7 @@
 use anyhow::anyhow;
 use anyhow::Result;
+use clap;
+use clap::Parser as _;
 use serde::Deserialize;
 use serde_json;
 use std::collections::HashSet;
@@ -11,6 +13,21 @@ use tokio::io::AsyncBufReadExt as _;
 use tokio::io::BufReader;
 use tokio::process::Child;
 use tokio::process::Command;
+
+#[derive(Clone, Debug, clap::Parser)]
+#[command(version)]
+struct Cli {
+  #[arg(short, long)]
+  mode: Mode,
+}
+
+#[derive(
+  Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, clap::ValueEnum,
+)]
+enum Mode {
+  Debug,
+  Release,
+}
 
 #[derive(Deserialize, Debug)]
 #[serde(untagged)]
@@ -55,26 +72,35 @@ struct EventMessage {
 #[allow(clippy::print_stderr)]
 #[tokio::main]
 pub async fn main() -> Result<ExitCode> {
-  let mut child = Command::new("cargo")
-    .args([
-      "build",
-      "--all-targets",
-      "--quiet",
-      "--message-format=json-diagnostic-rendered-ansi",
-    ])
-    .stdout(Stdio::piped())
-    .spawn()?;
-  let read_error = process_events(&mut child).await.map_or_else(
-    |err| {
-      eprintln!("Read error {err:?}");
-      true
-    },
-    |()| false,
-  );
-  let status = child.wait().await?;
-  Ok(ExitCode::from(u8::from(
-    read_error || status.exit_ok().is_err(),
-  )))
+  match Cli::try_parse() {
+    Ok(cli) => {
+      let mut child = Command::new("cargo")
+        .args([
+          "build",
+          "--all-targets",
+          "--quiet",
+          "--message-format=json-diagnostic-rendered-ansi",
+        ])
+        .args((cli.mode == Mode::Release).then_some("--release"))
+        .stdout(Stdio::piped())
+        .spawn()?;
+      let read_error = process_events(&mut child).await.map_or_else(
+        |err| {
+          eprintln!("Read error {err:?}");
+          true
+        },
+        |()| false,
+      );
+      let status = child.wait().await?;
+      Ok(ExitCode::from(u8::from(
+        read_error || status.exit_ok().is_err(),
+      )))
+    }
+    Err(err) => {
+      err.print()?;
+      Ok(ExitCode::from(1))
+    }
+  }
 }
 
 #[allow(clippy::print_stdout)]

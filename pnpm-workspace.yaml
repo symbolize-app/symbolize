@@ -9,7 +9,7 @@ packages:
   - lib-collection
   - lib-concurrency
   - lib-error
-  - lib-hex
+  - lib-hex-ts
   - lib-payload
   - lib-random
   - lib-stream

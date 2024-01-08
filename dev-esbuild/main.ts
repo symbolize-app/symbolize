@@ -5,7 +5,6 @@ import * as devModules from '@/modules.ts'
 import * as devOutput from '@/output.ts'
 import * as payload from '@intertwine/lib-payload'
 import * as timeNode from '@intertwine/lib-time/index.node.ts'
-import chokidar from 'chokidar'
 import * as esbuild from 'esbuild'
 import ms from 'ms'
 import * as nodeFs from 'node:fs'
@@ -13,23 +12,16 @@ import * as nodeFsPromises from 'node:fs/promises'
 import * as nodePath from 'node:path'
 import * as nodeUrl from 'node:url'
 import * as nodeUtil from 'node:util'
-import yaml from 'yaml'
-
-const workspaceTransformer = payload.object({
-  packages: payload.array(payload.string),
-})
 
 async function main(): Promise<void> {
   const args = nodeUtil.parseArgs({
     options: {
-      watch: { type: 'boolean' },
       clean: { type: 'boolean' },
       mode: { type: 'string' },
     },
     strict: true,
   }).values
-  const { watch, clean, mode } = {
-    watch: args.watch ?? false,
+  const { clean, mode } = {
     clean: args.clean ?? false,
     mode: payload
       .stringEnum(devContext.Mode)
@@ -51,20 +43,6 @@ async function main(): Promise<void> {
     await nodeFsPromises.mkdir(outdir, {
       recursive: true,
     })
-    if (watch) {
-      const workspace = workspaceTransformer.fromJson(
-        yaml.parse(
-          await nodeFsPromises.readFile('./pnpm-workspace.yaml', 'utf8')
-        ) as payload.JsonValue
-      )
-      const watcher = chokidar.watch(workspace.packages, {
-        ignoreInitial: true,
-      })
-      watcher.on('all', (type, path) => {
-        console.log(`Found ${type} at ${path}`)
-        void build(ctx)
-      })
-    }
     await build(ctx)
   }
 }

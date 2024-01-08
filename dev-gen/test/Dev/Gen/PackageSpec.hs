@@ -19,7 +19,8 @@ spec = context "Gen.PackageSpec" $ do
         ( Package.transformPNPM
             [ ( "a",
                 FileFormat.PNPMPackageFile
-                  { dependencies = Nothing,
+                  { name = "@intertwine/a",
+                    dependencies = Nothing,
                     devDependencies =
                       Just
                         [ ("typescript", "*")
@@ -28,7 +29,8 @@ spec = context "Gen.PackageSpec" $ do
               ),
               ( "b",
                 FileFormat.PNPMPackageFile
-                  { dependencies =
+                  { name = "@intertwine/b",
+                    dependencies =
                       Just
                         [ ("@intertwine/a", "*")
                         ],
@@ -59,18 +61,67 @@ spec = context "Gen.PackageSpec" $ do
                   )
             }
         ]
+    specify "non-matching name OK" $
+      shouldBe
+        ( Package.transformPNPM
+            [ ( "a",
+                FileFormat.PNPMPackageFile
+                  { name = "@intertwine/c",
+                    dependencies = Nothing,
+                    devDependencies =
+                      Just
+                        [ ("typescript", "*")
+                        ]
+                  }
+              ),
+              ( "b",
+                FileFormat.PNPMPackageFile
+                  { name = "@intertwine/b",
+                    dependencies =
+                      Just
+                        [ ("@intertwine/c", "*")
+                        ],
+                    devDependencies =
+                      Just
+                        [ ("typescript", "*")
+                        ]
+                  }
+              )
+            ]
+        )
+        [ Package.PNPM
+            { name = "b",
+              typeScript =
+                Just
+                  ( Package.TypeScript
+                      { dependencies = ["a"]
+                      }
+                  )
+            },
+          Package.PNPM
+            { name = "a",
+              typeScript =
+                Just
+                  ( Package.TypeScript
+                      { dependencies = []
+                      }
+                  )
+            }
+        ]
     specify "ignored dependency OK" $
       shouldBe
         ( Package.transformPNPM
             [ ( "a",
                 FileFormat.PNPMPackageFile
-                  { dependencies = Nothing,
+                  { name = "@intertwine/a",
+                    dependencies = Nothing,
                     devDependencies = Nothing
                   }
               ),
               ( "b",
                 FileFormat.PNPMPackageFile
-                  { dependencies =
+                  { name = "@intertwine/b",
+                    dependencies =
                       Just
                         [ ("@intertwine/a", "*")
                         ],

@@ -6,53 +6,45 @@ vars:
   NAME: dev-gen
 
 tasks:
-  repl:
+  repl:debug:
+    aliases:
+      - repl
     cmd:
-      task: :stack:repl
+      task: :stack:repl:debug
       vars:
         NAME: '{{.NAME}}'
 
-  run:debug:
-    aliases:
-      - run
-      - r
+  repl:release:
     cmd:
-      task: :stack:execute-target
+      task: :stack:repl:release
       vars:
-        MODE: debug
         NAME: '{{.NAME}}'
-        TARGET: exe
-
-  run:release:
-    aliases:
-      - rr
-    cmd:
-      task: :stack:execute-target
-      vars:
-        MODE: debug
-        NAME: '{{.NAME}}'
-        TARGET: exe
 
   test:debug:
     aliases:
       - test
       - t
     cmd:
-      task: :stack:execute-target
+      task: :stack:execute-target:test:debug
       vars:
-        MODE: debug
         NAME: '{{.NAME}}'
-        TARGET: test
+
+  test:debug:watch:
+    aliases:
+      - test:watch
+      - tw
+    cmd:
+      task: :stack:execute-target:test:debug:watch
+      vars:
+        NAME: '{{.NAME}}'
 
   test:release:
     aliases:
       - tr
     cmd:
-      task: :stack:execute-target
+      task: :stack:execute-target:test:release
       vars:
-        MODE: release
         NAME: '{{.NAME}}'
-        TARGET: test
 
   link-build-dir:
     cmd:

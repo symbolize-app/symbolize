@@ -6,5 +6,5 @@ tasks:
       vars:
         NAME: '{{.NAME}}'
 vars:
-  NAME: lib-hex
+  NAME: lib-hex-ts
 version: '3'

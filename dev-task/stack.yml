@@ -18,7 +18,13 @@ tasks:
     aliases:
       - build:watch
       - bw
-    cmd: stack build --test --no-run-tests --keep-going --file-watch
+    cmd:
+      task: :watchman:client
+      vars:
+        WATCH: true
+        RESTART: false
+        MODE: haskell
+        COMMAND: stack build --test --no-run-tests --keep-going
 
   build:release:
     aliases:
@@ -45,14 +51,96 @@ tasks:
     internal: true
     requires:
       vars:
+        - WATCH
         - MODE
         - NAME
         - TARGET
+        - ARGS
     vars:
       DIST_DIR:
         sh: realpath --relative-to . $(sh -c "$(cd {{.NAME}} && stack config env --work-dir build/stack-work-{{.MODE}}) echo \$HASKELL_DIST_DIR")
       FULL_TARGET: intertwine-{{.NAME}}-{{.TARGET}}
     cmd: '{{.DIST_DIR}}/build/{{.FULL_TARGET}}/{{.FULL_TARGET}} {{.ARGS}} {{.CLI_ARGS}}'
+
+  execute-target:run:debug:
+    internal: true
+    requires:
+      vars:
+        - NAME
+    deps:
+      - build:debug
+    cmd:
+      task: execute-target
+      vars:
+        WATCH: false
+        MODE: debug
+        NAME: '{{.NAME}}'
+        TARGET: exe
+        ARGS: '{{.ARGS}}'
+
+  execute-target:run:release:
+    internal: true
+    requires:
+      vars:
+        - NAME
+    deps:
+      - build:release
+    cmd:
+      task: execute-target
+      vars:
+        WATCH: false
+        MODE: release
+        NAME: '{{.NAME}}'
+        TARGET: exe
+        ARGS: '{{.ARGS}}'
+
+  execute-target:test:debug:
+    internal: true
+    requires:
+      vars:
+        - NAME
+    deps:
+      - build:debug
+    cmd:
+      task: execute-target
+      vars:
+        WATCH: false
+        MODE: debug
+        NAME: '{{.NAME}}'
+        TARGET: test
+        ARGS: '{{.ARGS}}'
+
+  execute-target:test:debug:watch:
+    internal: true
+    requires:
+      vars:
+        - NAME
+    deps:
+      - build:debug
+    cmd:
+      task: execute-target
+      vars:
+        WATCH: true
+        MODE: debug
+        NAME: '{{.NAME}}'
+        TARGET: test
+        ARGS: '{{.ARGS}}'
+
+  execute-target:test:release:
+    internal: true
+    requires:
+      vars:
+        - NAME
+    deps:
+      - build:release
+    cmd:
+      task: execute-target
+      vars:
+        WATCH: false
+        MODE: release
+        NAME: '{{.NAME}}'
+        TARGET: test
+        ARGS: '{{.ARGS}}'
 
   format:check:
     aliases:
@@ -75,12 +163,35 @@ tasks:
 
   lint:
     aliases:
-      - lint
       - l
+    cmd:
+      task: lint:exec
+      vars:
+        WATCH: false
+
+  lint:exec:
+    internal: true
+    requires:
+      vars:
+        - WATCH
     vars:
       STACK_LOCAL_BIN_PATH:
         sh: realpath --relative-to . {{.STACK_LOCAL_BIN_PATH}}
-    cmd: hlint --hint {{.STACK_LOCAL_BIN_PATH}}/relude-hlint.yaml --hint dev-hlint/base.yaml --threads {{.FIND_FILES}}
+    cmd:
+      task: :watchman:client
+      vars:
+        WATCH: '{{.WATCH}}'
+        RESTART: false
+        MODE: haskell
+        COMMAND: hlint --hint {{.STACK_LOCAL_BIN_PATH}}/relude-hlint.yaml --hint dev-hlint/base.yaml --threads {{.FIND_FILES}}
+
+  lint:watch:
+    aliases:
+      - lw
+    cmd:
+      task: lint:exec
+      vars:
+        WATCH: true
 
   repl-target:
     internal: true
@@ -90,17 +201,41 @@ tasks:
         - NAME
     cmd: stack ghci --work-dir build/stack-work-{{.MODE}} intertwine-{{.NAME}}
 
+  repl-target:debug:
+    internal: true
+    requires:
+      vars:
+        - NAME
+    deps:
+      - build:debug
+    cmd:
+      task: repl-target
+      vars:
+        MODE: debug
+        NAME: '{{.NAME}}'
+
+  repl-target:release:
+    internal: true
+    requires:
+      vars:
+        - NAME
+    deps:
+      - build:release
+    cmd:
+      task: repl-target
+      vars:
+        MODE: release
+        NAME: '{{.NAME}}'
+
   test:debug:
     aliases:
       - test
       - t
     deps:
-      - build:debug
-    cmd: stack build --test --keep-going
+      - :dev-gen:test:debug
 
   test:release:
     aliases:
       - tr
     deps:
-      - build:release
-    cmd: stack build --work-dir build/stack-work-release --test --keep-going {{.RELEASE_OPTIONS}}
+      - :dev-gen:test:release

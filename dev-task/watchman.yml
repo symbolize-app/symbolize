@@ -4,9 +4,29 @@ run: when_changed
 
 tasks:
   server:
-    cmd: watchman --unix-listener-path=$(realpath build/watchman-unix-listener) --pidfile=$(realpath build/watchman-pid) --statefile=$(realpath build/watchman-state) --foreground
+    cmd: >-
+      watchman
+      --unix-listener-path=$(realpath build/watchman-unix-listener)
+      --pidfile=$(realpath build/watchman-pid)
+      --statefile=$(realpath build/watchman-state)
+      --foreground
 
   client:
-    cmds:
-      - watchman --unix-listener-path=$(realpath build/watchman-unix-listener) --no-spawn --no-local watch .
-      - watchman --unix-listener-path=$(realpath build/watchman-unix-listener) --no-spawn --no-local -p subscribe . x {}
+    internal: true
+    requires:
+      vars:
+        - WATCH
+        - MODE
+        - RESTART
+        - COMMAND
+    deps:
+      - client:prep
+    cmd: >-
+      {{if eq .WATCH "true" -}}
+        build/target/release/intertwine-dev-watchman-client --mode {{.MODE}} {{if eq .RESTART "true"}}--restart{{end}} --
+      {{- end}}
+      {{.COMMAND}}
+
+  client:prep:
+    internal: true
+    cmd: cargo build --locked --release --package intertwine-dev-watchman-client

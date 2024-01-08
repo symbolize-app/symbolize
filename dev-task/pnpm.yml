@@ -33,10 +33,25 @@ tasks:
       - tsc:clean
 
   esbuild:build:debug:
+    aliases:
+      - esbuild:build
+      - esbuild:b
     cmd: dev-esbuild --mode development
 
   esbuild:build:debug:watch:
-    cmd: dev-esbuild --mode development --watch
+    aliases:
+      - esbuild:build:watch
+      - esbuild:bw
+    cmd:
+      task: :watchman:client
+      vars:
+        WATCH: true
+        RESTART: false
+        MODE: type-script
+        COMMAND: dev-esbuild --mode development
+
+  esbuild:build:release:
+    cmd: dev-esbuild --mode production
 
   esbuild:clean:debug:
     cmd: dev-esbuild --mode development --clean
@@ -44,11 +59,17 @@ tasks:
   esbuild:clean:release:
     cmd: dev-esbuild --mode production --clean
 
-  esbuild:build:release:
-    cmd: dev-esbuild --mode production
-
   eslint:lint:check:
     cmd: eslint {{.ESLINT_ARGS}}
+
+  eslint:lint:check:watch:
+    cmd:
+      task: :watchman:client
+      vars:
+        WATCH: true
+        RESTART: false
+        MODE: type-script
+        COMMAND: eslint {{.ESLINT_ARGS}}
 
   eslint:lint:fix:
     cmd: eslint {{.ESLINT_ARGS}} --fix
@@ -104,7 +125,26 @@ tasks:
   tsc:build:watch:
     aliases:
       - tsc:bw
-    cmd: tsc --build --verbose --watch
+    cmd:
+      task: :watchman:client
+      vars:
+        WATCH: true
+        RESTART: false
+        MODE: type-script
+        COMMAND: tsc --build --verbose
 
   test:
+    aliases:
+      - t
     cmd: dev-pnpm-test
+
+  test:watch:
+    aliases:
+      - tw
+    cmd:
+      task: :watchman:client
+      vars:
+        WATCH: true
+        RESTART: false
+        MODE: type-script
+        COMMAND: dev-pnpm-test

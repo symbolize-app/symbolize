@@ -59,7 +59,8 @@ spec = context "Gen" $ do
           ExecSpec.readJSON
             "a/package.json"
             ( FileFormat.PNPMPackageFile
-                { dependencies = Nothing,
+                { name = "@intertwine/a",
+                  dependencies = Nothing,
                   devDependencies =
                     Just
                       [ ("typescript", "*")
@@ -69,7 +70,8 @@ spec = context "Gen" $ do
           ExecSpec.readJSON
             "b/package.json"
             ( FileFormat.PNPMPackageFile
-                { dependencies =
+                { name = "@intertwine/b",
+                  dependencies =
                     Just
                       [ ("@intertwine/a", "*")
                       ],

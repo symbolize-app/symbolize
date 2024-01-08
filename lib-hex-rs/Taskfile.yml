@@ -3,35 +3,9 @@ version: '3'
 run: when_changed
 
 vars:
-  NAME: svc-gateway-host-run
+  NAME: lib-hex-rs
 
 tasks:
-  run:debug:
-    aliases:
-      - run
-      - r
-    cmd:
-      task: :cargo:execute-package:run:debug
-      vars:
-        NAME: '{{.NAME}}'
-
-  run:debug:watch:
-    aliases:
-      - run:watch
-      - rw
-    cmd:
-      task: :cargo:execute-package:run:debug:watch
-      vars:
-        NAME: '{{.NAME}}'
-
-  run:release:
-    aliases:
-      - rr
-    cmd:
-      task: :cargo:execute-package:run:release
-      vars:
-        NAME: '{{.NAME}}'
-
   test:debug:
     aliases:
       - test

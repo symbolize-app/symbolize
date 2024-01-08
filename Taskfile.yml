@@ -29,8 +29,10 @@ includes:
     taskfile: lib-concurrency
   lib-error:
     taskfile: lib-error
-  lib-hex:
-    taskfile: lib-hex
+  lib-hex-rs:
+    taskfile: lib-hex-rs
+  lib-hex-ts:
+    taskfile: lib-hex-ts
   lib-payload:
     taskfile: lib-payload
   lib-random:
@@ -127,21 +129,17 @@ tasks:
     aliases:
       - g
     cmd:
-      task: stack:execute-target
+      task: stack:execute-target:run:release
       vars:
-        MODE: release
         NAME: dev-gen
-        TARGET: exe
     deps:
       - stack:build:release
   gen:check:
     cmd:
-      task: stack:execute-target
+      task: stack:execute-target:run:release
       vars:
         ARGS: --check
-        MODE: release
         NAME: dev-gen
-        TARGET: exe
     deps:
       - stack:build:release
   install:
@@ -183,7 +181,7 @@ tasks:
       - lib-collection:link-build-dir
       - lib-concurrency:link-build-dir
       - lib-error:link-build-dir
-      - lib-hex:link-build-dir
+      - lib-hex-ts:link-build-dir
       - lib-payload:link-build-dir
       - lib-random:link-build-dir
       - lib-stream:link-build-dir

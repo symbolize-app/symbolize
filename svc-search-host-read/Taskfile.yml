@@ -11,9 +11,8 @@ tasks:
       - run
       - r
     cmd:
-      task: :cargo:execute-package
+      task: :cargo:execute-package:run:debug
       vars:
-        RELEASE: false
         NAME: '{{.NAME}}'
 
   run:debug:watch:
@@ -21,16 +20,40 @@ tasks:
       - run:watch
       - rw
     cmd:
-      task: :cargo:execute-package:watch
+      task: :cargo:execute-package:run:debug:watch
       vars:
-        RELEASE: false
         NAME: '{{.NAME}}'
 
   run:release:
     aliases:
       - rr
     cmd:
-      task: :cargo:execute-package
+      task: :cargo:execute-package:run:release
       vars:
-        RELEASE: true
+        NAME: '{{.NAME}}'
+
+  test:debug:
+    aliases:
+      - test
+      - t
+    cmd:
+      task: :cargo:execute-package:test:debug
+      vars:
+        NAME: '{{.NAME}}'
+
+  test:debug:watch:
+    aliases:
+      - test:watch
+      - tw
+    cmd:
+      task: :cargo:execute-package:test:debug:watch
+      vars:
+        NAME: '{{.NAME}}'
+
+  test:release:
+    aliases:
+      - tr
+    cmd:
+      task: :cargo:execute-package:test:release
+      vars:
         NAME: '{{.NAME}}'
