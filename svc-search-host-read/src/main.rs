@@ -1,4 +1,6 @@
+use std::thread;
+
 #[allow(clippy::print_stdout)]
 fn main() {
-  println!("Hello, World!",);
+  thread::park();
 }

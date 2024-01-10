@@ -1,11 +1,12 @@
 module Dev.Gen.Exec
   ( Exec (..),
+    ExecConcurrently (..),
     async,
     await,
-    await3,
     await_,
     readJSON,
     readLines,
+    readTOML,
     readYAML,
     writeJSON,
     writeLines,
@@ -19,12 +20,13 @@ import Data.Vector (Vector)
 import Dev.Gen.Command qualified as Command
 import Dev.Gen.FileFormat qualified as FileFormat
 import Dev.Gen.FilePath (FilePath)
-import Relude.Applicative (Applicative, liftA3, pass, pure, (<*>))
+import Relude.Applicative (Applicative, pass, pure, (<*>))
 import Relude.Base (Eq, Show, Type, Typeable)
 import Relude.Function (($), (.))
 import Relude.Functor (Functor, fmap, (<$>))
 import Relude.Monad (Monad, fail, (>>=))
 import Relude.String (String, Text)
+import Toml.FromValue qualified as Toml
 
 type Exec :: Type -> Type
 data Exec a where
@@ -85,6 +87,12 @@ readLines = _command1 Command.ReadLines
 writeLines :: FilePath -> Vector Text -> Exec ()
 writeLines = _command2 Command.WriteLines
 
+readTOML ::
+  (Toml.FromValue a, Eq a, Show a, Typeable a) =>
+  FilePath ->
+  Exec a
+readTOML = _command1 Command.ReadTOML
+
 _command1 :: (Typeable a) => (t1 -> Command.Command a) -> t1 -> Exec a
 _command1 command b = Command (command b)
 
@@ -115,13 +123,6 @@ instance Applicative ExecConcurrently where
 
 await :: ExecConcurrently a -> Exec a
 await (ExecConcurrently x) = x
-
-await3 ::
-  ExecConcurrently a ->
-  ExecConcurrently b ->
-  ExecConcurrently c ->
-  Exec (a, b, c)
-await3 a b c = await $ liftA3 (,,) a b c
 
 await_ :: ExecConcurrently a -> Exec ()
 await_ x = await x >> pass

@@ -4,73 +4,80 @@ module Dev.Gen
 where
 
 import Control.Applicative ((*>))
+import Data.Foldable (foldMap')
+import Data.Text qualified as Text
+import Data.Traversable (for)
 import Data.Vector (Vector)
 import Data.Vector qualified as Vector
 import Dev.Gen.Exec qualified as Exec
 import Dev.Gen.FileFormat qualified as FileFormat
 import Dev.Gen.FilePath (FilePath (FilePath))
 import Dev.Gen.Package qualified as Package
-import Relude.Applicative (pass, pure)
+import Relude.Applicative (pass, pure, (<*>))
+import Relude.Bool (Bool (False, True))
 import Relude.Container (fromList)
-import Relude.Foldable (for_, toList, traverse)
-import Relude.Function (($), (.))
+import Relude.Foldable (Foldable, for_, toList)
+import Relude.Function (const, ($), (.))
 import Relude.Functor ((<$>))
 import Relude.Monad (Maybe (Just, Nothing))
 import Relude.Monoid (maybeToMonoid, (<>))
+import Relude.String (Text)
 
 gen :: Exec.Exec ()
 gen = do
-  (gitIgnore, rootTaskfileInput, pnpmPackageFiles) <-
-    Exec.await3
-      ( Exec.async $
-          Exec.readLines ".gitignore"
-      )
-      ( Exec.async $
-          Exec.readYAML "Taskfile.in.yml"
-      )
-      ( Exec.async $ do
-          pnpmWorkspace <-
-            Exec.readYAML "pnpm-workspace.yaml" ::
-              Exec.Exec FileFormat.PNPMWorkspace
-          Exec.await
-            ( traverse
-                ( \package ->
-                    (package,)
-                      <$> Exec.async
-                        ( Exec.readJSON
-                            ( FilePath (package <> "/package.json")
-                            )
-                        )
-                )
-                pnpmWorkspace.packages
-            )
-      )
+  ( gitIgnore,
+    rootTaskfileInput,
+    pnpmPackageFiles,
+    cargoWorkspace,
+    procfileInput
+    ) <-
+    Exec.await $
+      (,,,,)
+        <$> Exec.async (Exec.readLines ".gitignore")
+        <*> Exec.async (Exec.readYAML "Taskfile.in.yml")
+        <*> Exec.async readPNPMPackageFiles
+        <*> Exec.async (Exec.readTOML "Cargo.toml")
+        <*> Exec.async (Exec.readLines "Procfile.in")
 
-  let pnpmPackages =
-        Package.transformPNPM (fromList (toList pnpmPackageFiles))
-  let packageTypeScriptConfigs =
-        Vector.mapMaybe genPackageTypeScriptConfig pnpmPackages
+  let pnpmPackages = Package.transformPNPM pnpmPackageFiles
+  let packageTypeScriptConfigs = genPackageTypeScriptConfigs pnpmPackages
   let rootTypeScriptConfig = genRootTypeScriptConfig pnpmPackages
   let esLintConfig = genESLintConfig pnpmPackages
-  let packageTaskfiles = genPNPMTaskfile <$> pnpmPackages
+  let packageTaskfiles = genPackageTaskfiles pnpmPackages
   let rootTaskfile = genRootTaskfile pnpmPackages rootTaskfileInput
+  let procfile = genProcfile cargoWorkspace procfileInput
 
   Exec.await_ $
     pass
       *> Exec.async (Exec.writeLines ".sqlfluffignore" gitIgnore)
-      *> for_
-        packageTypeScriptConfigs
-        ( \(filePath, packageTypeScriptConfig) ->
-            Exec.async (Exec.writeJSON filePath packageTypeScriptConfig)
-        )
+      *> asyncWriteAll Exec.writeJSON packageTypeScriptConfigs
       *> Exec.async (Exec.writeJSON "tsconfig.json" rootTypeScriptConfig)
       *> Exec.async (Exec.writeJSON ".eslintrc.json" esLintConfig)
-      *> for_
-        packageTaskfiles
-        ( \(filePath, packageTaskfile) ->
-            Exec.async (Exec.writeYAML filePath packageTaskfile)
-        )
+      *> asyncWriteAll Exec.writeYAML packageTaskfiles
       *> Exec.async (Exec.writeYAML "Taskfile.yml" rootTaskfile)
+      *> Exec.async (Exec.writeLines "Procfile" procfile)
+
+readPNPMPackageFiles ::
+  Exec.Exec (Vector (Text, FileFormat.PNPMPackageFile))
+readPNPMPackageFiles = do
+  pnpmWorkspace <-
+    Exec.readYAML "pnpm-workspace.yaml" ::
+      Exec.Exec FileFormat.PNPMWorkspace
+  Exec.await $
+    for
+      pnpmWorkspace.packages
+      ( \package ->
+          (package,)
+            <$> Exec.async
+              ( Exec.readJSON
+                  ( FilePath (package <> "/package.json")
+                  )
+              )
+      )
+
+genPackageTypeScriptConfigs ::
+  Vector Package.PNPM -> Vector (FilePath, FileFormat.TypeScriptConfig)
+genPackageTypeScriptConfigs = Vector.mapMaybe genPackageTypeScriptConfig
 
 genPackageTypeScriptConfig ::
   Package.PNPM ->
@@ -118,8 +125,12 @@ genESLintConfig pnpmPackages =
           }
     }
 
-genPNPMTaskfile :: Package.PNPM -> (FilePath, FileFormat.Taskfile)
-genPNPMTaskfile pnpmPackage =
+genPackageTaskfiles ::
+  Vector Package.PNPM -> Vector (FilePath, FileFormat.Taskfile)
+genPackageTaskfiles pnpmPackages = genPNPMPackageTaskfile <$> pnpmPackages
+
+genPNPMPackageTaskfile :: Package.PNPM -> (FilePath, FileFormat.Taskfile)
+genPNPMPackageTaskfile pnpmPackage =
   ( FilePath (pnpmPackage.name <> "/Taskfile.yml"),
     FileFormat.Taskfile
       { version = FileFormat.taskfileVersion,
@@ -183,3 +194,37 @@ genRootTaskfile pnpmPackages rootTaskfileInput =
           vars = rootTaskfileInput.vars,
           tasks = rootTaskfileInput.tasks <> newTasks
         }
+
+genProcfile ::
+  FileFormat.CargoWorkspace ->
+  Vector Text ->
+  Vector Text
+genProcfile cargoWorkspace procfileInput =
+  procfileInput
+    <> foldMap'
+      ( \member ->
+          Vector.catMaybes
+            [ Just $
+                member <> "__test: task " <> member <> ":test:watch",
+              whenTrue
+                (Text.isPrefixOf "svc-" member)
+                $ member <> "__run: task " <> member <> ":run:watch"
+            ]
+      )
+      cargoWorkspace.workspace.members
+
+asyncWriteAll ::
+  (Foldable t) =>
+  (FilePath -> a -> Exec.Exec ()) ->
+  t (FilePath, a) ->
+  Exec.ExecConcurrently ()
+asyncWriteAll write filePairs =
+  for_
+    filePairs
+    ( \(filePath, file) ->
+        Exec.async (write filePath file)
+    )
+
+whenTrue :: Bool -> a -> Maybe a
+whenTrue True = Just
+whenTrue False = const Nothing

@@ -12,6 +12,7 @@ import Relude.Base (Eq ((==)), Show, Type, Typeable)
 import Relude.Bool (Bool (False))
 import Relude.Monad (maybe)
 import Relude.String (Text)
+import Toml.FromValue qualified as Toml
 
 type Command :: Type -> Type
 data Command a where
@@ -26,6 +27,10 @@ data Command a where
     FilePath ->
     b ->
     Command ()
+  ReadTOML ::
+    (Toml.FromValue a, Eq a, Show a, Typeable a) =>
+    FilePath ->
+    Command a
   ReadLines :: FilePath -> Command (Vector Text)
   WriteLines :: FilePath -> Vector Text -> Command ()
 
@@ -47,6 +52,8 @@ instance Eq (Command a) where
     filePathX == filePathY
   (WriteLines filePathX valueX) == (WriteLines filePathY valueY) =
     (filePathX, valueX) == (filePathY, valueY)
+  (ReadTOML filePathX) == (ReadTOML filePathY) =
+    filePathX == filePathY
   _ == _ = False
 
 deriving stock instance Show (Command a)

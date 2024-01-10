@@ -1,6 +1,8 @@
 includes:
   cargo:
     taskfile: dev-task/cargo.yml
+  dev-cargo-build:
+    taskfile: dev-cargo-build
   dev-esbuild:
     taskfile: dev-esbuild
   dev-eslint:
@@ -23,6 +25,8 @@ includes:
     taskfile: dev-stack-bin
   dev-tsconfig:
     taskfile: dev-tsconfig
+  dev-watchman-client:
+    taskfile: dev-watchman-client
   lib-collection:
     taskfile: lib-collection
   lib-concurrency:
@@ -108,8 +112,10 @@ tasks:
   dev:
     aliases:
       - d
+    cmd:
+      task: overmind:start
     deps:
-      - overmind:start
+      - watchman:client:prep
   format:check:
     aliases:
       - fc
@@ -129,19 +135,15 @@ tasks:
     aliases:
       - g
     cmd:
-      task: stack:execute-target:run:release
+      task: stack:execute-target:run:{{.TASK_GEN_MODE}}
       vars:
         NAME: dev-gen
-    deps:
-      - stack:build:release
   gen:check:
     cmd:
-      task: stack:execute-target:run:release
+      task: stack:execute-target:run:{{.TASK_GEN_MODE}}
       vars:
         ARGS: --check
         NAME: dev-gen
-    deps:
-      - stack:build:release
   install:
     aliases:
       - i

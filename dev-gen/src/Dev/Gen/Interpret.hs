@@ -20,8 +20,8 @@ import Relude.Container (fromList)
 import Relude.File (readFileLBS)
 import Relude.Foldable (toList)
 import Relude.Function (const, ($), (.))
-import Relude.Functor (Bifunctor (bimap), first, (<$>))
-import Relude.Monad (Either, Maybe (Just, Nothing), either, fail, liftIO)
+import Relude.Functor (bimap, first, (<$>))
+import Relude.Monad (Either (Left, Right), Maybe (Just, Nothing), either, fail, liftIO, (<=<))
 import Relude.Monoid (Sum, mempty, (<>))
 import Relude.Numeric (Integer)
 import Relude.Print (putText)
@@ -43,6 +43,8 @@ import Relude.String
 import System.FilePath qualified as FilePath
 import System.IO (openTempFile)
 import System.Process.Typed qualified as Process
+import Toml qualified
+import Toml.FromValue qualified as Toml
 import UnliftIO.Async (concurrently)
 import UnliftIO.Directory (removeFile, renameFile)
 import UnliftIO.Exception (bracketOnError, catchAny, tryIO)
@@ -99,6 +101,8 @@ interpret (Exec.Command (Command.WriteLines filePath value)) mode =
     value
     mode
     (\handle bytes -> liftIO $ hPut handle bytes)
+interpret (Exec.Command (Command.ReadTOML filePath)) _ =
+  (0,) <$> _loadFromFile filePath _tomlEitherDecode
 
 _yamlEitherDecode :: (Aeson.FromJSON a) => LByteString -> Either String a
 _yamlEitherDecode = first show . Yaml.decodeEither' . toStrict
@@ -111,6 +115,20 @@ _linesEitherDecode = bimap show (fromList . lines) . decodeUtf8Strict
 
 _linesEncode :: Vector Text -> LByteString
 _linesEncode = encodeUtf8 . unlines . toList
+
+_tomlEitherDecode :: (Toml.FromValue a) => LByteString -> Either String a
+_tomlEitherDecode =
+  ( \string ->
+      case Toml.decode string of
+        Toml.Success _warnings value ->
+          -- Ignore warnings (includes "unexpected keys")
+          Right value
+        Toml.Failure errors ->
+          Left (show errors)
+  )
+    <=< ( first show
+            . decodeUtf8Strict
+        )
 
 _loadFromFile ::
   (MonadUnliftIO m) =>

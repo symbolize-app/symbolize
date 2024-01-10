@@ -19,7 +19,7 @@ spec = context "Gen.PackageSpec" $ do
         ( Package.transformPNPM
             [ ( "a",
                 FileFormat.PNPMPackageFile
-                  { name = "@intertwine/a",
+                  { name = "@proj/a",
                     dependencies = Nothing,
                     devDependencies =
                       Just
@@ -29,10 +29,10 @@ spec = context "Gen.PackageSpec" $ do
               ),
               ( "b",
                 FileFormat.PNPMPackageFile
-                  { name = "@intertwine/b",
+                  { name = "@proj/b",
                     dependencies =
                       Just
-                        [ ("@intertwine/a", "*")
+                        [ ("@proj/a", "*")
                         ],
                     devDependencies =
                       Just
@@ -66,7 +66,7 @@ spec = context "Gen.PackageSpec" $ do
         ( Package.transformPNPM
             [ ( "a",
                 FileFormat.PNPMPackageFile
-                  { name = "@intertwine/c",
+                  { name = "@proj/c",
                     dependencies = Nothing,
                     devDependencies =
                       Just
@@ -76,10 +76,10 @@ spec = context "Gen.PackageSpec" $ do
               ),
               ( "b",
                 FileFormat.PNPMPackageFile
-                  { name = "@intertwine/b",
+                  { name = "@proj/b",
                     dependencies =
                       Just
-                        [ ("@intertwine/c", "*")
+                        [ ("@proj/c", "*")
                         ],
                     devDependencies =
                       Just
@@ -113,17 +113,17 @@ spec = context "Gen.PackageSpec" $ do
         ( Package.transformPNPM
             [ ( "a",
                 FileFormat.PNPMPackageFile
-                  { name = "@intertwine/a",
+                  { name = "@proj/a",
                     dependencies = Nothing,
                     devDependencies = Nothing
                   }
               ),
               ( "b",
                 FileFormat.PNPMPackageFile
-                  { name = "@intertwine/b",
+                  { name = "@proj/b",
                     dependencies =
                       Just
-                        [ ("@intertwine/a", "*")
+                        [ ("@proj/a", "*")
                         ],
                     devDependencies =
                       Just

@@ -13,6 +13,7 @@ import Dev.Gen.FileFormat qualified as FileFormat
 import Relude.Applicative (empty, pure)
 import Relude.Base (Eq, Show, Type)
 import Relude.Container (Map, fromList, uncurry)
+import Relude.Foldable (toList)
 import Relude.Function (($), (.))
 import Relude.Functor ((<$>))
 import Relude.Monad (Maybe, isJust, mapMaybe)
@@ -32,10 +33,10 @@ newtype TypeScript = TypeScript
   }
   deriving stock (Show, Eq)
 
-transformPNPM :: Map Text FileFormat.PNPMPackageFile -> Vector PNPM
+transformPNPM :: Vector (Text, FileFormat.PNPMPackageFile) -> Vector PNPM
 transformPNPM pnpmPackageFiles =
   let packagesMap :: Map Text PNPM
-      packagesMap = Map.fromList $ uncurry transformOne <$> Map.toList pnpmPackageFiles
+      packagesMap = Map.fromList $ uncurry transformOne <$> toList pnpmPackageFiles
       transformOne :: Text -> FileFormat.PNPMPackageFile -> (Text, PNPM)
       transformOne name pnpmPackageFile =
         ( pnpmPackageFile.name,

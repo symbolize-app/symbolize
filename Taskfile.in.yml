@@ -6,6 +6,9 @@ includes:
   cargo:
     taskfile: dev-task/cargo.yml
 
+  dev-cargo-build:
+    taskfile: dev-cargo-build
+
   dev-gen:
     taskfile: dev-gen
 
@@ -16,6 +19,9 @@ includes:
   dev-stack-bin:
     internal: true
     taskfile: dev-stack-bin
+
+  dev-watchman-client:
+    taskfile: dev-watchman-client
 
   lib-hex-rs:
     taskfile: lib-hex-rs
@@ -88,7 +94,9 @@ tasks:
     aliases:
       - d
     deps:
-      - overmind:start
+      - watchman:client:prep
+    cmd:
+      task: overmind:start
 
   format:check:
     aliases:
@@ -110,18 +118,14 @@ tasks:
   gen:
     aliases:
       - g
-    deps:
-      - stack:build:release
     cmd:
-      task: stack:execute-target:run:release
+      task: stack:execute-target:run:{{.TASK_GEN_MODE}}
       vars:
         NAME: dev-gen
 
   gen:check:
-    deps:
-      - stack:build:release
     cmd:
-      task: stack:execute-target:run:release
+      task: stack:execute-target:run:{{.TASK_GEN_MODE}}
       vars:
         NAME: dev-gen
         ARGS: '--check'

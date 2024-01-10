@@ -23,10 +23,10 @@ tasks:
       - client:prep
     cmd: >-
       {{if eq .WATCH "true" -}}
-        build/target/release/intertwine-dev-watchman-client --mode {{.MODE}} {{if eq .RESTART "true"}}--restart{{end}} --
+        build/target/{{.TASK_WATCHMAN_CLIENT_MODE}}/intertwine-dev-watchman-client --mode {{.MODE}} {{if eq .RESTART "true"}}--restart{{end}} --
       {{- end}}
       {{.COMMAND}}
 
   client:prep:
     internal: true
-    cmd: cargo build --locked --release --package intertwine-dev-watchman-client
+    cmd: cargo build --locked {{if eq .TASK_WATCHMAN_CLIENT_MODE "release"}}--release{{end}} --package intertwine-dev-watchman-client

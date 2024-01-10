@@ -1,5 +1,7 @@
 module Dev.Gen.FileFormat
-  ( ESLintConfig (..),
+  ( CargoWorkspace (..),
+    CargoWorkspaceWorkspace (..),
+    ESLintConfig (..),
     ESLintConfigParserOptions (..),
     PNPMPackageFile (..),
     PNPMWorkspace (..),
@@ -28,9 +30,12 @@ import Data.Aeson qualified as Aeson
 import Data.Vector (Vector)
 import Relude.Base (Eq, Generic, Show, Type)
 import Relude.Bool (Bool (True))
-import Relude.Container (Map)
+import Relude.Container (Map, fromList)
+import Relude.Function ((.))
+import Relude.Functor ((<$>))
 import Relude.Monad (Maybe)
 import Relude.String (Text)
+import Toml.FromValue qualified as Toml
 
 type JSONStorage :: Type
 data JSONStorage where
@@ -219,3 +224,21 @@ instance Aeson.ToJSON TaskfileCommand where
   toEncoding = Aeson.genericToEncoding taskfileOptions
 
 instance Aeson.FromJSON TaskfileCommand
+
+type CargoWorkspace :: Type
+newtype CargoWorkspace = CargoWorkspace
+  { workspace :: CargoWorkspaceWorkspace
+  }
+  deriving stock (Show, Eq)
+
+instance Toml.FromValue CargoWorkspace where
+  fromValue = Toml.parseTableFromValue (CargoWorkspace <$> Toml.reqKey "workspace")
+
+type CargoWorkspaceWorkspace :: Type
+newtype CargoWorkspaceWorkspace = CargoWorkspaceWorkspace
+  { members :: Vector Text
+  }
+  deriving stock (Show, Eq)
+
+instance Toml.FromValue CargoWorkspaceWorkspace where
+  fromValue = Toml.parseTableFromValue (CargoWorkspaceWorkspace . fromList <$> Toml.reqKey "members")

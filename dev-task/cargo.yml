@@ -97,14 +97,14 @@ tasks:
       vars:
         WATCH: '{{.WATCH}}'
         RESTART: false
-        MODE: release
+        MODE: '{{.TASK_CARGO_BUILD_MODE}}'
         TEST: false
         NAME: dev-cargo-build
         ARGS: '--mode {{.MODE}}'
 
   execute-build:prep:
     internal: true
-    cmd: cargo build --locked --release --package intertwine-dev-cargo-build
+    cmd: cargo build --locked {{if eq .TASK_CARGO_BUILD_MODE "release"}}--release{{end}} --package intertwine-dev-cargo-build
 
   execute-package:
     internal: true
@@ -116,13 +116,16 @@ tasks:
         - TEST
         - NAME
         - ARGS
-    cmd:
-      task: :watchman:client
-      vars:
-        WATCH: '{{.WATCH}}'
-        RESTART: '{{.RESTART}}'
-        MODE: executable
-        COMMAND: build/target/{{.MODE}}/intertwine-{{.NAME | trimSuffix "-rs"}}{{if eq .TEST "true"}}-test{{end}} {{.ARGS}} {{.CLI_ARGS}}
+    cmds:
+      # HACK: Reference all variables here, so Task doesn't think they're unused
+      - cmd: 'true # /{{.WATCH}}/{{.RESTART}}/{{.MODE}}/{{.TEST}}/{{.NAME}}/{{.ARGS}}/'
+        silent: true
+      - task: :watchman:client
+        vars:
+          WATCH: '{{.WATCH}}'
+          RESTART: '{{.RESTART}}'
+          MODE: executable
+          COMMAND: build/target/{{.MODE}}/intertwine-{{.NAME | trimSuffix "-rs"}}{{if eq .TEST "true"}}-test{{end}} {{.ARGS}} {{.CLI_ARGS}}
 
   execute-package:run:debug:
     internal: true
