@@ -9,6 +9,8 @@
         - Control.Monad
         - Control.Monad.IO.Unlift
         - Data.ByteString.Lazy
+        - Data.Foldable
+        - Data.Traversable
         - Data.Typeable
         - Dev.Gen
         - Dev.Gen.FilePath
@@ -51,3 +53,5 @@
     - { name: Options.Applicative, as: Options }
     - { name: System.FilePath, as: FilePath }
     - { name: System.Process.Typed, as: Process }
+    - { name: Toml, as: Toml }
+    - { name: Toml.FromValue, as: Toml }

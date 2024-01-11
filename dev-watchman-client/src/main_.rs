@@ -5,6 +5,7 @@ use backon::Retryable as _;
 use clap;
 use clap::Parser as _;
 use nix::sys::signal::Signal;
+use std::future::ready;
 use std::path::Path;
 use std::process::ExitCode;
 use std::process::ExitStatus;
@@ -190,7 +191,10 @@ fn build_expr(cli: &Cli) -> Result<Expr> {
         wholename: false,
       }),
       Expr::Name(NameTerm {
-        paths: vec!["dev-task/stack.yml".into()],
+        paths: vec![
+          "dev-hlint/base.yaml".into(),
+          "dev-task/stack.yml".into(),
+        ],
         wholename: true,
       }),
     ],
@@ -242,74 +246,75 @@ async fn run_command(
   files_changed: Arc<Semaphore>,
 ) -> Result<!> {
   let mut child: Option<Child> = None;
-  let mut restart_pending = false;
   loop {
     select! {
       permit = files_changed.acquire(),
-      if (cli.restart && !restart_pending) || child.is_none() => {
+      if cli.restart || child.is_none() => {
         permit?.forget();
-        handle_files_changed(&cli, &mut child, &mut restart_pending)?;
+        child = Some(handle_files_changed(&cli, child).await?);
       }
       status = async {
         child.as_mut().map(Child::wait).expect("some child").await
       }, if child.is_some() => {
-        handle_child_done(
-          &cli, status?, &mut child, &mut restart_pending
-        )?;
+        child = handle_child_done(
+          &cli, status?
+        ).await?;
       }
     }
   }
 }
 
-fn handle_files_changed(
+async fn handle_files_changed(
   cli: &Cli,
-  child: &mut Option<Child>,
-  restart_pending: &mut bool,
-) -> Result<()> {
-  match &child {
+  child: Option<Child>,
+) -> Result<Child> {
+  match child {
     Some(child) => {
-      restart_child(child, restart_pending)?;
+      restart_child(&child)?;
+      Ok(child)
     }
-    None => {
-      start_child(cli, child)?;
-    }
+    None => Ok(start_child(cli).await?),
   }
-  Ok(())
 }
 
 #[allow(clippy::print_stdout)]
-fn handle_child_done(
+async fn handle_child_done(
   cli: &Cli,
   status: ExitStatus,
-  child: &mut Option<Child>,
-  restart_pending: &mut bool,
-) -> Result<()> {
+) -> Result<Option<Child>> {
   if let Some(code) = status.code() {
     println!("[watch] Exit code {code}");
   } else {
     println!("[watch] Unknown exit code");
   }
-  *child = None;
-  if *restart_pending {
-    start_child(cli, child)?;
-    *restart_pending = false;
+  if cli.restart {
+    Ok(Some(start_child(cli).await?))
+  } else {
+    Ok(None)
   }
-  Ok(())
 }
 
 #[allow(clippy::print_stdout)]
-fn start_child(cli: &Cli, child: &mut Option<Child>) -> Result<()> {
+async fn start_child(cli: &Cli) -> Result<Child> {
   let program = cli.program()?;
   let args = cli.args();
-  *child = Some(Command::new(program).args(args).spawn()?);
+  let child = { || ready(Command::new(program).args(args).spawn()) }
+    .retry(
+      // Retry in case an executable is still being written
+      &backon::ExponentialBuilder::default()
+        .with_jitter()
+        .with_min_delay(Duration::from_millis(10))
+        .with_min_delay(Duration::from_millis(200))
+        .with_max_times(10),
+    )
+    .await?;
   println!("[watch] Started {program}");
-  Ok(())
+  Ok(child)
 }
 
 #[allow(clippy::print_stdout)]
-fn restart_child(child: &Child, restart_pending: &mut bool) -> Result<()> {
+fn restart_child(child: &Child) -> Result<()> {
   child.signal_kill(Signal::SIGTERM)?;
-  *restart_pending = true;
   println!("[watch] Restarting");
   Ok(())
 }

@@ -42,6 +42,7 @@ library
     , filepath
     , optparse-applicative
     , relude
+    , toml-parser
     , typed-process
     , unliftio
     , unliftio-core
@@ -78,6 +79,7 @@ executable intertwine-dev-gen-exe
     , intertwine-dev-gen
     , optparse-applicative
     , relude
+    , toml-parser
     , typed-process
     , unliftio
     , unliftio-core
@@ -119,6 +121,7 @@ test-suite intertwine-dev-gen-test
     , intertwine-dev-gen
     , optparse-applicative
     , relude
+    , toml-parser
     , typed-process
     , unliftio
     , unliftio-core

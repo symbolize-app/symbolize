@@ -59,7 +59,7 @@ spec = context "Gen" $ do
           ExecSpec.readJSON
             "a/package.json"
             ( FileFormat.PNPMPackageFile
-                { name = "@intertwine/a",
+                { name = "@proj/a",
                   dependencies = Nothing,
                   devDependencies =
                     Just
@@ -70,10 +70,10 @@ spec = context "Gen" $ do
           ExecSpec.readJSON
             "b/package.json"
             ( FileFormat.PNPMPackageFile
-                { name = "@intertwine/b",
+                { name = "@proj/b",
                   dependencies =
                     Just
-                      [ ("@intertwine/a", "*")
+                      [ ("@proj/a", "*")
                       ],
                   devDependencies =
                     Just
@@ -81,6 +81,21 @@ spec = context "Gen" $ do
                       ]
                 }
             ),
+          ExecSpec.readTOML
+            "Cargo.toml"
+            ( FileFormat.CargoWorkspace
+                { workspace =
+                    FileFormat.CargoWorkspaceWorkspace
+                      { members =
+                          [ "dev-c",
+                            "svc-d"
+                          ]
+                      }
+                }
+            ),
+          ExecSpec.readLines
+            "Procfile.in"
+            ["y: task y"],
           ExecSpec.writeLines
             ".sqlfluffignore"
             ["a", "b"],
@@ -240,6 +255,13 @@ spec = context "Gen" $ do
                       )
                     ]
                 }
-            )
+            ),
+          ExecSpec.writeLines
+            "Procfile"
+            [ "y: task y",
+              "dev-c__test: task dev-c:test:watch",
+              "svc-d__test: task svc-d:test:watch",
+              "svc-d__run: task svc-d:run:watch"
+            ]
         ]
         ()

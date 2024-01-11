@@ -3,7 +3,7 @@ version: '3'
 run: when_changed
 
 vars:
-  NAME: dev-cargo-build
+  NAME: dev-watchman-client
 
 tasks:
   test:debug:

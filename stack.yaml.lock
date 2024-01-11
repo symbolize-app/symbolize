@@ -277,6 +277,13 @@ packages:
       size: 45527
   original:
     hackage: lsp-types-2.0.2.0
+- completed:
+    hackage: toml-parser-1.3.1.2@sha256:9d4c11d991417dfd87f9f795fe12897b5da12255e1d1ee65083cfa35b1d88469,3560
+    pantry-tree:
+      sha256: 4088a3e7372dd7bb096ad9a0c9622c9bf23eca957a6f277180eadcafce3f7fea
+      size: 2050
+  original:
+    hackage: toml-parser-1.3.1.2
 snapshots:
 - completed:
     sha256: 64d66303f927e87ffe6b8ccf736229bf608731e80d7afdf62bdd63c59f857740

@@ -6,7 +6,11 @@ pnpm__tsc__build: task pnpm:tsc:build:watch
 pnpm__eslint__lint__check: task pnpm:eslint:lint:check:watch
 stack__build: task stack:build:watch
 stack__lint: task stack:lint:watch
-
+dev-gen__test: task dev-gen:test:watch
+dev-cargo-build__test: task dev-cargo-build:test:watch
+dev-watchman-client__test: task dev-watchman-client:test:watch
 lib-hex-rs__test: task lib-hex-rs:test:watch
-svc-gateway-host__run: task svc-gateway-host-run:run:watch
-svc-gateway-host__test: task svc-gateway-host-run:test:watch
+svc-gateway-host-run__test: task svc-gateway-host-run:test:watch
+svc-gateway-host-run__run: task svc-gateway-host-run:run:watch
+svc-search-host-read__test: task svc-search-host-read:test:watch
+svc-search-host-read__run: task svc-search-host-read:run:watch

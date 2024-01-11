@@ -2,6 +2,7 @@ module Dev.Gen.ExecSpec
   ( Result (..),
     readJSON,
     readLines,
+    readTOML,
     readYAML,
     writeJSON,
     writeLines,
@@ -16,6 +17,7 @@ import Dev.Gen.FileFormat qualified as FileFormat
 import Dev.Gen.FilePath (FilePath)
 import Relude.Base (Eq, Show, Type, Typeable)
 import Relude.String (Text)
+import Toml.FromValue qualified as Toml
 
 type Result :: Type
 data Result where
@@ -35,9 +37,9 @@ readJSON ::
 readJSON = _result1 (Command.ReadJSON FileFormat.JSON)
 
 writeJSON ::
-  (Aeson.ToJSON b, Eq b, Show b, Typeable b) =>
+  (Aeson.ToJSON a, Eq a, Show a, Typeable a) =>
   FilePath ->
-  b ->
+  a ->
   Result
 writeJSON = _result2' (Command.WriteJSON FileFormat.JSON)
 
@@ -49,9 +51,9 @@ readYAML ::
 readYAML = _result1 (Command.ReadJSON FileFormat.YAML)
 
 writeYAML ::
-  (Aeson.ToJSON b, Eq b, Show b, Typeable b) =>
+  (Aeson.ToJSON a, Eq a, Show a, Typeable a) =>
   FilePath ->
-  b ->
+  a ->
   Result
 writeYAML = _result2' (Command.WriteJSON FileFormat.YAML)
 
@@ -61,13 +63,20 @@ readLines = _result1 Command.ReadLines
 writeLines :: FilePath -> Vector Text -> Result
 writeLines = _result2' Command.WriteLines
 
-_result1 ::
-  (Typeable a, Eq a, Show a) =>
-  (t1 -> Command.Command a) ->
-  t1 ->
+readTOML ::
+  (Toml.FromValue a, Eq a, Show a, Typeable a) =>
+  FilePath ->
   a ->
   Result
-_result1 command b = Result (command b)
+readTOML = _result1 Command.ReadTOML
 
-_result2' :: (t1 -> t2 -> Command.Command ()) -> t1 -> t2 -> Result
-_result2' command b c = Result (command b c) ()
+_result1 ::
+  (Typeable b, Eq b, Show b) =>
+  (a -> Command.Command b) ->
+  a ->
+  b ->
+  Result
+_result1 command a = Result (command a)
+
+_result2' :: (a -> b -> Command.Command ()) -> a -> b -> Result
+_result2' command a b = Result (command a b) ()
