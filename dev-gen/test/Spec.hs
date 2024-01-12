@@ -20,36 +20,21 @@ spec = context "Gen" $ do
     specify "OK" $
       InterpretSpec.interpret
         gen
-        [ ExecSpec.readLines
-            ".gitignore"
-            ["a", "b"],
-          ExecSpec.readYAML
-            "Taskfile.in.yml"
-            ( FileFormat.Taskfile
-                { version = FileFormat.taskfileVersion,
-                  run = FileFormat.taskfileRun,
-                  includes =
-                    Just
-                      [ ( "z",
-                          FileFormat.TaskfileInclude
-                            { internal = Just True,
-                              taskfile = "z"
-                            }
-                        )
-                      ],
-                  vars = Just [("v1", "v2")],
-                  tasks =
-                    [ ( "y",
-                        FileFormat.TaskfileTask
-                          { aliases = Nothing,
-                            deps = Just ["y"],
-                            cmd = Nothing,
-                            cmds = Nothing
-                          }
-                      )
-                    ]
+        [ ExecSpec.readTOML
+            "Cargo.toml"
+            ( FileFormat.CargoWorkspace
+                { workspace =
+                    FileFormat.CargoWorkspaceWorkspace
+                      { members =
+                          [ "dev-c",
+                            "svc-d"
+                          ]
+                      }
                 }
             ),
+          ExecSpec.readLines
+            ".gitignore"
+            ["build", "tmp"],
           ExecSpec.readYAML
             "pnpm-workspace.yaml"
             ( FileFormat.PNPMWorkspace
@@ -81,59 +66,33 @@ spec = context "Gen" $ do
                       ]
                 }
             ),
-          ExecSpec.readTOML
-            "Cargo.toml"
-            ( FileFormat.CargoWorkspace
-                { workspace =
-                    FileFormat.CargoWorkspaceWorkspace
-                      { members =
-                          [ "dev-c",
-                            "svc-d"
-                          ]
-                      }
-                }
-            ),
           ExecSpec.readLines
             "Procfile.in"
             ["y: task y"],
-          ExecSpec.writeLines
-            ".sqlfluffignore"
-            ["a", "b"],
-          ExecSpec.writeJSON
-            "a/tsconfig.json"
-            ( FileFormat.TypeScriptConfig
-                { extends = FileFormat.typeScriptConfigExtends,
-                  include = FileFormat.typeScriptConfigInclude,
-                  exclude = FileFormat.typeScriptConfigExclude,
-                  compilerOptions =
-                    FileFormat.typeScriptConfigCompilerOptions,
-                  references = []
-                }
-            ),
-          ExecSpec.writeJSON
-            "b/tsconfig.json"
-            ( FileFormat.TypeScriptConfig
-                { extends = FileFormat.typeScriptConfigExtends,
-                  include = FileFormat.typeScriptConfigInclude,
-                  exclude = FileFormat.typeScriptConfigExclude,
-                  compilerOptions =
-                    FileFormat.typeScriptConfigCompilerOptions,
-                  references =
-                    [ FileFormat.TypeScriptConfigReference {path = "../a"}
-                    ]
-                }
-            ),
-          ExecSpec.writeJSON
-            "tsconfig.json"
-            ( FileFormat.TypeScriptConfig
-                { extends = FileFormat.typeScriptConfigExtends,
-                  include = [],
-                  exclude = [],
-                  compilerOptions =
-                    FileFormat.typeScriptConfigCompilerOptions,
-                  references =
-                    [ FileFormat.TypeScriptConfigReference {path = "./a"},
-                      FileFormat.TypeScriptConfigReference {path = "./b"}
+          ExecSpec.readYAML
+            "Taskfile.in.yml"
+            ( FileFormat.Taskfile
+                { version = FileFormat.taskfileVersion,
+                  run = FileFormat.taskfileRun,
+                  includes =
+                    Just
+                      [ ( "z",
+                          FileFormat.TaskfileInclude
+                            { internal = Just True,
+                              taskfile = "z"
+                            }
+                        )
+                      ],
+                  vars = Just [("v1", "v2")],
+                  tasks =
+                    [ ( "y",
+                        FileFormat.TaskfileTask
+                          { aliases = Nothing,
+                            deps = Just ["y"],
+                            cmd = Nothing,
+                            cmds = Nothing
+                          }
+                      )
                     ]
                 }
             ),
@@ -205,6 +164,37 @@ spec = context "Gen" $ do
                     ]
                 }
             ),
+          ExecSpec.writeJSON
+            "a/tsconfig.json"
+            ( FileFormat.TypeScriptConfig
+                { extends = FileFormat.typeScriptConfigExtends,
+                  include = FileFormat.typeScriptConfigInclude,
+                  exclude = FileFormat.typeScriptConfigExclude,
+                  compilerOptions =
+                    FileFormat.typeScriptConfigCompilerOptions,
+                  references = []
+                }
+            ),
+          ExecSpec.writeJSON
+            "b/tsconfig.json"
+            ( FileFormat.TypeScriptConfig
+                { extends = FileFormat.typeScriptConfigExtends,
+                  include = FileFormat.typeScriptConfigInclude,
+                  exclude = FileFormat.typeScriptConfigExclude,
+                  compilerOptions =
+                    FileFormat.typeScriptConfigCompilerOptions,
+                  references =
+                    [ FileFormat.TypeScriptConfigReference {path = "../a"}
+                    ]
+                }
+            ),
+          ExecSpec.writeLines
+            "Procfile"
+            [ "y: task y",
+              "dev-c__test: task dev-c:test:watch",
+              "svc-d__test: task svc-d:test:watch",
+              "svc-d__run: task svc-d:run:watch"
+            ],
           ExecSpec.writeYAML
             "Taskfile.yml"
             ( FileFormat.Taskfile
@@ -256,12 +246,29 @@ spec = context "Gen" $ do
                     ]
                 }
             ),
+          ExecSpec.writeJSON
+            "tsconfig.json"
+            ( FileFormat.TypeScriptConfig
+                { extends = FileFormat.typeScriptConfigExtends,
+                  include = [],
+                  exclude = [],
+                  compilerOptions =
+                    FileFormat.typeScriptConfigCompilerOptions,
+                  references =
+                    [ FileFormat.TypeScriptConfigReference {path = "./a"},
+                      FileFormat.TypeScriptConfigReference {path = "./b"}
+                    ]
+                }
+            ),
           ExecSpec.writeLines
-            "Procfile"
-            [ "y: task y",
-              "dev-c__test: task dev-c:test:watch",
-              "svc-d__test: task svc-d:test:watch",
-              "svc-d__run: task svc-d:run:watch"
-            ]
+            ".sqlfluffignore"
+            ["build", "tmp"],
+          ExecSpec.writeJSON
+            ".watchmanconfig"
+            ( FileFormat.WatchmanConfig
+                { ignoreDirs =
+                    ["build", "tmp"]
+                }
+            )
         ]
         ()

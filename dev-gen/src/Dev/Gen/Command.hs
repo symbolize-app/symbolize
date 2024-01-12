@@ -1,12 +1,12 @@
 module Dev.Gen.Command
   ( Command (..),
+    JSONStorage (..),
   )
 where
 
 import Data.Aeson qualified as Aeson
 import Data.Typeable (cast)
 import Data.Vector (Vector)
-import Dev.Gen.FileFormat qualified as FileFormat
 import Dev.Gen.FilePath (FilePath)
 import Relude.Base (Eq ((==)), Show, Type, Typeable)
 import Relude.Bool (Bool (False))
@@ -18,12 +18,12 @@ type Command :: Type -> Type
 data Command a where
   ReadJSON ::
     (Aeson.FromJSON a, Eq a, Show a, Typeable a) =>
-    FileFormat.JSONStorage ->
+    JSONStorage ->
     FilePath ->
     Command a
   WriteJSON ::
     (Aeson.ToJSON b, Eq b, Show b, Typeable b) =>
-    FileFormat.JSONStorage ->
+    JSONStorage ->
     FilePath ->
     b ->
     Command ()
@@ -57,3 +57,12 @@ instance Eq (Command a) where
   _ == _ = False
 
 deriving stock instance Show (Command a)
+
+type JSONStorage :: Type
+data JSONStorage where
+  JSON :: JSONStorage
+  YAML :: JSONStorage
+
+deriving stock instance Eq JSONStorage
+
+deriving stock instance Show JSONStorage

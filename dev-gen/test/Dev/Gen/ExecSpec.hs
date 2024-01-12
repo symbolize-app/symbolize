@@ -13,7 +13,6 @@ where
 import Data.Aeson qualified as Aeson
 import Data.Vector (Vector)
 import Dev.Gen.Command qualified as Command
-import Dev.Gen.FileFormat qualified as FileFormat
 import Dev.Gen.FilePath (FilePath)
 import Relude.Base (Eq, Show, Type, Typeable)
 import Relude.String (Text)
@@ -34,28 +33,28 @@ readJSON ::
   FilePath ->
   a ->
   Result
-readJSON = _result1 (Command.ReadJSON FileFormat.JSON)
+readJSON = _result1 (Command.ReadJSON Command.JSON)
 
 writeJSON ::
   (Aeson.ToJSON a, Eq a, Show a, Typeable a) =>
   FilePath ->
   a ->
   Result
-writeJSON = _result2' (Command.WriteJSON FileFormat.JSON)
+writeJSON = _result2' (Command.WriteJSON Command.JSON)
 
 readYAML ::
   (Aeson.FromJSON a, Eq a, Show a, Typeable a) =>
   FilePath ->
   a ->
   Result
-readYAML = _result1 (Command.ReadJSON FileFormat.YAML)
+readYAML = _result1 (Command.ReadJSON Command.YAML)
 
 writeYAML ::
   (Aeson.ToJSON a, Eq a, Show a, Typeable a) =>
   FilePath ->
   a ->
   Result
-writeYAML = _result2' (Command.WriteJSON FileFormat.YAML)
+writeYAML = _result2' (Command.WriteJSON Command.YAML)
 
 readLines :: FilePath -> Vector Text -> Result
 readLines = _result1 Command.ReadLines

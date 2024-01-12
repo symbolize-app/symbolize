@@ -18,7 +18,6 @@ import Control.Monad (MonadFail, ap, liftM, (>>))
 import Data.Aeson qualified as Aeson
 import Data.Vector (Vector)
 import Dev.Gen.Command qualified as Command
-import Dev.Gen.FileFormat qualified as FileFormat
 import Dev.Gen.FilePath (FilePath)
 import Relude.Applicative (Applicative, pass, pure, (<*>))
 import Relude.Base (Eq, Show, Type, Typeable)
@@ -59,27 +58,27 @@ readJSON ::
   (Aeson.FromJSON a, Eq a, Show a, Typeable a) =>
   FilePath ->
   Exec a
-readJSON = _command1 (Command.ReadJSON FileFormat.JSON)
+readJSON = _command1 (Command.ReadJSON Command.JSON)
 
 writeJSON ::
   (Aeson.ToJSON b, Eq b, Show b, Typeable b) =>
   FilePath ->
   b ->
   Exec ()
-writeJSON = _command2 (Command.WriteJSON FileFormat.JSON)
+writeJSON = _command2 (Command.WriteJSON Command.JSON)
 
 readYAML ::
   (Aeson.FromJSON a, Eq a, Show a, Typeable a) =>
   FilePath ->
   Exec a
-readYAML = _command1 (Command.ReadJSON FileFormat.YAML)
+readYAML = _command1 (Command.ReadJSON Command.YAML)
 
 writeYAML ::
   (Aeson.ToJSON b, Eq b, Show b, Typeable b) =>
   FilePath ->
   b ->
   Exec ()
-writeYAML = _command2 (Command.WriteJSON FileFormat.YAML)
+writeYAML = _command2 (Command.WriteJSON Command.YAML)
 
 readLines :: FilePath -> Exec (Vector Text)
 readLines = _command1 Command.ReadLines
