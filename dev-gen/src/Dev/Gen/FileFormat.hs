@@ -5,7 +5,6 @@ module Dev.Gen.FileFormat
     ESLintConfigParserOptions (..),
     PNPMPackageFile (..),
     PNPMWorkspace (..),
-    JSONStorage (..),
     Taskfile (..),
     TaskfileCommand (..),
     TaskfileInclude (..),
@@ -13,6 +12,7 @@ module Dev.Gen.FileFormat
     TypeScriptConfig (..),
     TypeScriptConfigCompilerOptions (..),
     TypeScriptConfigReference (..),
+    WatchmanConfig (..),
     esLintConfigExtends,
     esLintConfigParserOptionsTsconfigRootDir,
     taskfileRun,
@@ -37,92 +37,23 @@ import Relude.Monad (Maybe)
 import Relude.String (Text)
 import Toml.FromValue qualified as Toml
 
-type JSONStorage :: Type
-data JSONStorage where
-  JSON :: JSONStorage
-  YAML :: JSONStorage
-
-deriving stock instance Eq JSONStorage
-
-deriving stock instance Show JSONStorage
-
-type PNPMWorkspace :: Type
-newtype PNPMWorkspace = PNPMWorkspace
-  { packages :: Vector Text
+type CargoWorkspace :: Type
+newtype CargoWorkspace = CargoWorkspace
+  { workspace :: CargoWorkspaceWorkspace
   }
-  deriving stock (Show, Eq, Generic)
+  deriving stock (Show, Eq)
 
-instance Aeson.FromJSON PNPMWorkspace
+instance Toml.FromValue CargoWorkspace where
+  fromValue = Toml.parseTableFromValue (CargoWorkspace <$> Toml.reqKey "workspace")
 
-type PNPMPackageFile :: Type
-data PNPMPackageFile = PNPMPackageFile
-  { name :: Text,
-    dependencies :: Maybe (Map Text Text),
-    devDependencies :: Maybe (Map Text Text)
+type CargoWorkspaceWorkspace :: Type
+newtype CargoWorkspaceWorkspace = CargoWorkspaceWorkspace
+  { members :: Vector Text
   }
-  deriving stock (Show, Eq, Generic)
+  deriving stock (Show, Eq)
 
-instance Aeson.FromJSON PNPMPackageFile
-
-type TypeScriptConfig :: Type
-data TypeScriptConfig = TypeScriptConfig
-  { extends :: Text,
-    include :: Vector Text,
-    exclude :: Vector Text,
-    compilerOptions :: TypeScriptConfigCompilerOptions,
-    references :: Vector TypeScriptConfigReference
-  }
-  deriving stock (Show, Eq, Generic)
-
-instance Aeson.ToJSON TypeScriptConfig
-
-typeScriptConfigExtends :: Text
-typeScriptConfigExtends = "@intertwine/dev-tsconfig/tsconfig.json"
-
-typeScriptConfigInclude :: Vector Text
-typeScriptConfigInclude = ["./**/*.ts", "./**/*.js", "./**/*.cjs"]
-
-typeScriptConfigExclude :: Vector Text
-typeScriptConfigExclude = ["build/**", "node_modules/**"]
-
-type TypeScriptConfigCompilerOptions :: Type
-data TypeScriptConfigCompilerOptions = TypeScriptConfigCompilerOptions
-  { declarationDir :: Text,
-    paths :: Map Text (Vector Text),
-    tsBuildInfoFile :: Text
-  }
-  deriving stock (Show, Eq, Generic)
-
-instance Aeson.ToJSON TypeScriptConfigCompilerOptions
-
-typeScriptConfigCompilerOptions :: TypeScriptConfigCompilerOptions
-typeScriptConfigCompilerOptions =
-  TypeScriptConfigCompilerOptions
-    { declarationDir = typeScriptConfigCompilerOptionsDeclarationDir,
-      paths = typeScriptConfigCompilerOptionsPaths,
-      tsBuildInfoFile = typeScriptConfigCompilerOptionsTSBuildInfoFile
-    }
-
-typeScriptConfigCompilerOptionsDeclarationDir :: Text
-typeScriptConfigCompilerOptionsDeclarationDir = "./build/tsc"
-
-typeScriptConfigCompilerOptionsPaths :: Map Text (Vector Text)
-typeScriptConfigCompilerOptionsPaths =
-  [ ("@/*.ts", ["./*.ts"]),
-    ("@/*.sql", ["./*.sql"])
-  ]
-
-typeScriptConfigCompilerOptionsTSBuildInfoFile :: Text
-typeScriptConfigCompilerOptionsTSBuildInfoFile =
-  "build/tsc/tsconfig.tsbuildinfo"
-
-type TypeScriptConfigReference :: Type
-newtype TypeScriptConfigReference = TypeScriptConfigReference
-  { path :: Text
-  }
-  deriving stock (Show, Eq, Generic)
-
-instance Aeson.ToJSON TypeScriptConfigReference
+instance Toml.FromValue CargoWorkspaceWorkspace where
+  fromValue = Toml.parseTableFromValue (CargoWorkspaceWorkspace . fromList <$> Toml.reqKey "members")
 
 type ESLintConfig :: Type
 data ESLintConfig = ESLintConfig
@@ -147,6 +78,36 @@ instance Aeson.ToJSON ESLintConfigParserOptions
 
 esLintConfigParserOptionsTsconfigRootDir :: Text
 esLintConfigParserOptionsTsconfigRootDir = "."
+
+type PNPMPackageFile :: Type
+data PNPMPackageFile = PNPMPackageFile
+  { name :: Text,
+    dependencies :: Maybe (Map Text Text),
+    devDependencies :: Maybe (Map Text Text)
+  }
+  deriving stock (Show, Eq, Generic)
+
+instance Aeson.FromJSON PNPMPackageFile
+
+type TypeScriptConfig :: Type
+data TypeScriptConfig = TypeScriptConfig
+  { extends :: Text,
+    include :: Vector Text,
+    exclude :: Vector Text,
+    compilerOptions :: TypeScriptConfigCompilerOptions,
+    references :: Vector TypeScriptConfigReference
+  }
+  deriving stock (Show, Eq, Generic)
+
+instance Aeson.ToJSON TypeScriptConfig
+
+type PNPMWorkspace :: Type
+newtype PNPMWorkspace = PNPMWorkspace
+  { packages :: Vector Text
+  }
+  deriving stock (Show, Eq, Generic)
+
+instance Aeson.FromJSON PNPMWorkspace
 
 taskfileOptions :: Aeson.Options
 taskfileOptions =
@@ -225,20 +186,68 @@ instance Aeson.ToJSON TaskfileCommand where
 
 instance Aeson.FromJSON TaskfileCommand
 
-type CargoWorkspace :: Type
-newtype CargoWorkspace = CargoWorkspace
-  { workspace :: CargoWorkspaceWorkspace
+typeScriptConfigExtends :: Text
+typeScriptConfigExtends = "@intertwine/dev-tsconfig/tsconfig.json"
+
+typeScriptConfigInclude :: Vector Text
+typeScriptConfigInclude = ["./**/*.ts", "./**/*.js", "./**/*.cjs"]
+
+typeScriptConfigExclude :: Vector Text
+typeScriptConfigExclude = ["build/**", "node_modules/**"]
+
+type TypeScriptConfigCompilerOptions :: Type
+data TypeScriptConfigCompilerOptions = TypeScriptConfigCompilerOptions
+  { declarationDir :: Text,
+    paths :: Map Text (Vector Text),
+    tsBuildInfoFile :: Text
   }
-  deriving stock (Show, Eq)
+  deriving stock (Show, Eq, Generic)
 
-instance Toml.FromValue CargoWorkspace where
-  fromValue = Toml.parseTableFromValue (CargoWorkspace <$> Toml.reqKey "workspace")
+instance Aeson.ToJSON TypeScriptConfigCompilerOptions
 
-type CargoWorkspaceWorkspace :: Type
-newtype CargoWorkspaceWorkspace = CargoWorkspaceWorkspace
-  { members :: Vector Text
+typeScriptConfigCompilerOptions :: TypeScriptConfigCompilerOptions
+typeScriptConfigCompilerOptions =
+  TypeScriptConfigCompilerOptions
+    { declarationDir = typeScriptConfigCompilerOptionsDeclarationDir,
+      paths = typeScriptConfigCompilerOptionsPaths,
+      tsBuildInfoFile = typeScriptConfigCompilerOptionsTSBuildInfoFile
+    }
+
+typeScriptConfigCompilerOptionsDeclarationDir :: Text
+typeScriptConfigCompilerOptionsDeclarationDir = "./build/tsc"
+
+typeScriptConfigCompilerOptionsPaths :: Map Text (Vector Text)
+typeScriptConfigCompilerOptionsPaths =
+  [ ("@/*.ts", ["./*.ts"]),
+    ("@/*.sql", ["./*.sql"])
+  ]
+
+typeScriptConfigCompilerOptionsTSBuildInfoFile :: Text
+typeScriptConfigCompilerOptionsTSBuildInfoFile =
+  "build/tsc/tsconfig.tsbuildinfo"
+
+type TypeScriptConfigReference :: Type
+newtype TypeScriptConfigReference = TypeScriptConfigReference
+  { path :: Text
   }
-  deriving stock (Show, Eq)
+  deriving stock (Show, Eq, Generic)
 
-instance Toml.FromValue CargoWorkspaceWorkspace where
-  fromValue = Toml.parseTableFromValue (CargoWorkspaceWorkspace . fromList <$> Toml.reqKey "members")
+instance Aeson.ToJSON TypeScriptConfigReference
+
+watchmanConfigOptions :: Aeson.Options
+watchmanConfigOptions =
+  Aeson.defaultOptions
+    { Aeson.fieldLabelModifier = Aeson.camelTo2 '_'
+    }
+
+type WatchmanConfig :: Type
+newtype WatchmanConfig = WatchmanConfig
+  { ignoreDirs :: Vector Text
+  }
+  deriving stock (Show, Eq, Generic)
+
+instance Aeson.ToJSON WatchmanConfig where
+  toJSON :: WatchmanConfig -> Aeson.Value
+  toJSON = Aeson.genericToJSON watchmanConfigOptions
+  toEncoding :: WatchmanConfig -> Aeson.Encoding
+  toEncoding = Aeson.genericToEncoding watchmanConfigOptions

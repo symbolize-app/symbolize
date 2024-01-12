@@ -11,7 +11,6 @@ import Data.Vector (Vector)
 import Data.Yaml qualified as Yaml
 import Dev.Gen.Command qualified as Command
 import Dev.Gen.Exec qualified as Exec
-import Dev.Gen.FileFormat qualified as FileFormat
 import Dev.Gen.FilePath (FilePath (FilePath))
 import Relude.Applicative (pure)
 import Relude.Base (Eq, Type, (==))
@@ -67,12 +66,12 @@ interpret (Exec.Concurrently x y) mode = do
   pure (t <> t', (x', y'))
 interpret (Exec.Fail s) _ =
   liftIO $ fail s
-interpret (Exec.Command (Command.ReadJSON FileFormat.YAML filePath)) _ =
+interpret (Exec.Command (Command.ReadJSON Command.YAML filePath)) _ =
   (0,) <$> _loadFromFile filePath _yamlEitherDecode
-interpret (Exec.Command (Command.ReadJSON FileFormat.JSON filePath)) _ =
+interpret (Exec.Command (Command.ReadJSON Command.JSON filePath)) _ =
   (0,) <$> _loadFromFile filePath Aeson.eitherDecode
 interpret
-  (Exec.Command (Command.WriteJSON FileFormat.YAML filePath value))
+  (Exec.Command (Command.WriteJSON Command.YAML filePath value))
   mode =
     _dumpToFile
       filePath
@@ -82,7 +81,7 @@ interpret
       mode
       (_formatWithPrettier filePath)
 interpret
-  (Exec.Command (Command.WriteJSON FileFormat.JSON filePath value))
+  (Exec.Command (Command.WriteJSON Command.JSON filePath value))
   mode =
     _dumpToFile
       filePath
