@@ -4,8 +4,6 @@ run: when_changed
 
 vars:
   CLIPPY_ARGS: >-
-    --locked --release
-    --all-targets
     --
     -W clippy::cargo
     -W clippy::pedantic
@@ -52,16 +50,18 @@ tasks:
       vars:
         WATCH: false
         MODE: debug
+        CLIPPY: false
 
-  build:debug:watch:
+  build:clippy:debug:watch:
     aliases:
-      - build:watch
-      - bw
+      - build:clippy:watch
+      - bcw
     cmd:
       task: execute-build
       vars:
         WATCH: true
         MODE: debug
+        CLIPPY: true
 
   build:release:
     aliases:
@@ -71,15 +71,20 @@ tasks:
       vars:
         WATCH: false
         MODE: release
+        CLIPPY: false
 
   clean:
     cmd: cargo clean
 
   clippy:lint:check:
-    cmd: cargo clippy {{.CLIPPY_ARGS}}
+    deps:
+      - build:release
+    cmd: cargo clippy --all-targets --offline --locked --release {{.CLIPPY_ARGS}}
 
   clippy:lint:fix:
-    cmd: cargo clippy --fix --allow-dirty --allow-staged {{.CLIPPY_ARGS}}
+    deps:
+      - build:release
+    cmd: cargo clippy --all-targets --offline --locked --release --fix --allow-dirty --allow-staged {{.CLIPPY_ARGS}}
 
   deny:lint:
     cmd: cargo deny check
@@ -90,17 +95,16 @@ tasks:
       vars:
         - WATCH
         - MODE
+        - CLIPPY
     deps:
       - execute-build:prep
     cmd:
-      task: execute-package
+      task: :watchman:client
       vars:
         WATCH: '{{.WATCH}}'
         RESTART: false
-        MODE: '{{.TASK_CARGO_BUILD_MODE}}'
-        TEST: false
-        NAME: dev-cargo-build
-        ARGS: '--mode {{.MODE}}'
+        MODE: rust
+        COMMAND: build/target/{{.TASK_CARGO_BUILD_MODE}}/intertwine-dev-cargo-build --mode {{.MODE}} {{if eq .CLIPPY "true"}}--clippy="{{.CLIPPY_ARGS}}"{{end}}
 
   execute-build:prep:
     internal: true

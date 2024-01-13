@@ -19,6 +19,9 @@ use tokio::process::Command;
 struct Cli {
   #[arg(short, long)]
   mode: Mode,
+
+  #[arg(short, long)]
+  clippy: Option<String>,
 }
 
 #[derive(
@@ -81,20 +84,35 @@ pub async fn main() -> Result<ExitCode> {
           "--quiet",
           "--message-format=json-diagnostic-rendered-ansi",
         ])
-        .args((cli.mode == Mode::Release).then_some("--release"))
+        .args(
+          (cli.mode == Mode::Release)
+            .then_some(vec!["--locked", "--release"])
+            .unwrap_or_default(),
+        )
         .stdout(Stdio::piped())
         .spawn()?;
-      let read_error = process_events(&mut child).await.map_or_else(
-        |err| {
-          eprintln!("Read error {err:?}");
+      let events_error =
+        process_events(&mut child).await.is_err_and(|err| {
+          eprintln!("Build event error: {err:?}");
           true
-        },
-        |()| false,
-      );
-      let status = child.wait().await?;
-      Ok(ExitCode::from(u8::from(
-        read_error || status.exit_ok().is_err(),
-      )))
+        });
+      let exit_error = child.wait().await?.exit_ok().is_err();
+      let mut error = events_error || exit_error;
+      if !error && let Some(clippy) = cli.clippy {
+        error = Command::new("cargo")
+          .args(["clippy", "--all-targets", "--quiet", "--offline"])
+          .args(
+            (cli.mode == Mode::Release)
+              .then_some(vec!["--locked", "--release"])
+              .unwrap_or_default(),
+          )
+          .args(clippy.split(' '))
+          .status()
+          .await?
+          .exit_ok()
+          .is_err();
+      }
+      Ok(ExitCode::from(u8::from(error)))
     }
     Err(err) => {
       err.print()?;
