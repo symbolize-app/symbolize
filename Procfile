@@ -1,5 +1,5 @@
 watchman__server: task watchman:server
-cargo__build: task cargo:build:watch
+cargo__build__clippy: task cargo:build:clippy:watch
 pnpm__esbuild__build: task pnpm:esbuild:build:watch
 pnpm__test: task pnpm:test:watch
 pnpm__tsc__build: task pnpm:tsc:build:watch
