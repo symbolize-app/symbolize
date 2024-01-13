@@ -1,10 +1,4 @@
-version: '3'
-
 run: when_changed
-
-vars:
-  NAME: svc-gateway-host-run
-
 tasks:
   run:debug:
     aliases:
@@ -14,7 +8,6 @@ tasks:
       task: :cargo:execute-package:run:debug
       vars:
         NAME: '{{.NAME}}'
-
   run:debug:watch:
     aliases:
       - run:watch
@@ -23,7 +16,6 @@ tasks:
       task: :cargo:execute-package:run:debug:watch
       vars:
         NAME: '{{.NAME}}'
-
   run:release:
     aliases:
       - rr
@@ -31,7 +23,6 @@ tasks:
       task: :cargo:execute-package:run:release
       vars:
         NAME: '{{.NAME}}'
-
   test:debug:
     aliases:
       - test
@@ -40,7 +31,6 @@ tasks:
       task: :cargo:execute-package:test:debug
       vars:
         NAME: '{{.NAME}}'
-
   test:debug:watch:
     aliases:
       - test:watch
@@ -49,7 +39,6 @@ tasks:
       task: :cargo:execute-package:test:debug:watch
       vars:
         NAME: '{{.NAME}}'
-
   test:release:
     aliases:
       - tr
@@ -57,3 +46,6 @@ tasks:
       task: :cargo:execute-package:test:release
       vars:
         NAME: '{{.NAME}}'
+vars:
+  NAME: svc-gateway-host-run
+version: '3'

@@ -6,9 +6,6 @@ includes:
   cargo:
     taskfile: dev-task/cargo.yml
 
-  dev-cargo-build:
-    taskfile: dev-cargo-build
-
   dev-gen:
     taskfile: dev-gen
 
@@ -19,12 +16,6 @@ includes:
   dev-stack-bin:
     internal: true
     taskfile: dev-stack-bin
-
-  dev-watchman-client:
-    taskfile: dev-watchman-client
-
-  lib-hex-rs:
-    taskfile: lib-hex-rs
 
   nix:
     taskfile: dev-task/nix.yml
@@ -41,14 +32,8 @@ includes:
   stack:
     taskfile: dev-task/stack.yml
 
-  svc-gateway-host-run:
-    taskfile: svc-gateway-host-run
-
   svc-gateway-host-store:
     taskfile: svc-gateway-host-store
-
-  svc-search-host-read:
-    taskfile: svc-search-host-read
 
   tmpfs:
     taskfile: dev-task/tmpfs.yml

@@ -5,7 +5,6 @@ where
 
 import Control.Applicative ((*>))
 import Data.Foldable (foldMap')
-import Data.Text qualified as Text
 import Data.Traversable (for)
 import Data.Vector (Vector)
 import Data.Vector qualified as Vector
@@ -16,7 +15,7 @@ import Dev.Gen.Package qualified as Package
 import Relude.Applicative (pass, pure, (<*>))
 import Relude.Base (Type)
 import Relude.Bool (Bool (False, True))
-import Relude.Container (fromList)
+import Relude.Container (fromList, uncurry)
 import Relude.Foldable (Foldable, for_, toList)
 import Relude.Function (const, ($), (.))
 import Relude.Functor ((<$>))
@@ -61,10 +60,14 @@ genFiles :: Input -> Output
 genFiles i =
   Output
     { esLintConfig = genESLintConfig pnpmPackages,
-      packageTaskfiles = genPackageTaskfiles pnpmPackages,
+      packageTaskfiles = genPackageTaskfiles i.cargoWorkspace pnpmPackages,
       packageTypeScriptConfigs = genPackageTypeScriptConfigs pnpmPackages,
       procfile = genProcfile i.cargoWorkspace i.procfileInput,
-      rootTaskfile = genRootTaskfile pnpmPackages i.rootTaskfileInput,
+      rootTaskfile =
+        genRootTaskfile
+          i.cargoWorkspace
+          pnpmPackages
+          i.rootTaskfileInput,
       rootTypeScriptConfig = genRootTypeScriptConfig pnpmPackages,
       sqlFluffIgnore = i.gitIgnore,
       watchmanConfig = genWatchmanConfig i.gitIgnore
@@ -117,8 +120,53 @@ genESLintConfig pnpmPackages =
     }
 
 genPackageTaskfiles ::
-  Vector Package.PNPM -> Vector (FilePath, FileFormat.Taskfile)
-genPackageTaskfiles pnpmPackages = genPNPMPackageTaskfile <$> pnpmPackages
+  FileFormat.CargoWorkspace ->
+  Vector Package.PNPM ->
+  Vector (FilePath, FileFormat.Taskfile)
+genPackageTaskfiles cargoWorkspace pnpmPackages =
+  (genCargoPackageTaskfile <$> cargoWorkspace.workspace.members)
+    <> (genPNPMPackageTaskfile <$> pnpmPackages)
+
+genCargoPackageTaskfile :: Text -> (FilePath, FileFormat.Taskfile)
+genCargoPackageTaskfile cargoPackageName =
+  ( FilePath (cargoPackageName <> "/Taskfile.yml"),
+    FileFormat.Taskfile
+      { version = FileFormat.taskfileVersion,
+        run = FileFormat.taskfileRun,
+        includes = Nothing,
+        vars = Just [("NAME", cargoPackageName)],
+        tasks =
+          fromList . toList $
+            uncurry genCargoTask
+              <$> Vector.catMaybes
+                [ whenService ("run:debug", ["run", "r"]),
+                  whenService ("run:debug:watch", ["run:watch", "rw"]),
+                  whenService ("run:release", ["rr"]),
+                  Just ("test:debug", ["test", "t"]),
+                  Just ("test:debug:watch", ["test:watch", "tw"]),
+                  Just ("test:release", ["tr"])
+                ]
+      }
+  )
+  where
+    whenService = whenTrue $ Package.isCargoService cargoPackageName
+
+genCargoTask :: Text -> Vector Text -> (Text, FileFormat.TaskfileTask)
+genCargoTask name aliases =
+  ( name,
+    FileFormat.TaskfileTask
+      { aliases = Just aliases,
+        deps = Nothing,
+        cmd =
+          Just
+            ( FileFormat.TaskfileCommand
+                { task = ":cargo:execute-package:" <> name,
+                  vars = Just [("NAME", "{{.NAME}}")]
+                }
+            ),
+        cmds = Nothing
+      }
+  )
 
 genPNPMPackageTaskfile :: Package.PNPM -> (FilePath, FileFormat.Taskfile)
 genPNPMPackageTaskfile pnpmPackage =
@@ -181,36 +229,61 @@ genProcfile cargoWorkspace procfileInput =
             [ Just $
                 member <> "__test: task " <> member <> ":test:watch",
               whenTrue
-                (Text.isPrefixOf "svc-" member)
+                (Package.isCargoService member)
                 $ member <> "__run: task " <> member <> ":run:watch"
             ]
       )
       cargoWorkspace.workspace.members
 
 genRootTaskfile ::
+  FileFormat.CargoWorkspace ->
   Vector Package.PNPM ->
   FileFormat.Taskfile ->
   FileFormat.Taskfile
-genRootTaskfile pnpmPackages rootTaskfileInput =
-  let newIncludes =
+genRootTaskfile cargoWorkspace pnpmPackages rootTaskfileInput =
+  let cargoPackageNames = cargoWorkspace.workspace.members
+      pnpmPackageNames = (.name) <$> pnpmPackages
+      newIncludes =
         fromList
           . toList
-          $ ( \pnpmPackage ->
-                ( pnpmPackage.name,
+          $ ( \name ->
+                ( name,
                   FileFormat.TaskfileInclude
                     { internal = Nothing,
-                      taskfile = pnpmPackage.name
+                      taskfile = name
                     }
                 )
             )
-            <$> pnpmPackages
+            <$> (cargoPackageNames <> pnpmPackageNames)
       newTasks =
-        [ ( "pnpm:link-build-dirs",
+        [ ( "cargo:test:debug",
+            FileFormat.TaskfileTask
+              { aliases = Just ["cargo:test", "cargo:t"],
+                deps =
+                  Just
+                    ( (<> ":test:debug") <$> cargoPackageNames
+                    ),
+                cmd = Nothing,
+                cmds = Nothing
+              }
+          ),
+          ( "cargo:test:release",
+            FileFormat.TaskfileTask
+              { aliases = Just ["cargo:tr"],
+                deps =
+                  Just
+                    ( (<> ":test:release") <$> cargoPackageNames
+                    ),
+                cmd = Nothing,
+                cmds = Nothing
+              }
+          ),
+          ( "pnpm:link-build-dirs",
             FileFormat.TaskfileTask
               { aliases = Nothing,
                 deps =
                   Just
-                    ( (<> ":link-build-dir") . (.name) <$> pnpmPackages
+                    ( (<> ":link-build-dir") <$> pnpmPackageNames
                     ),
                 cmd = Nothing,
                 cmds = Nothing
