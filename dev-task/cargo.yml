@@ -134,15 +134,18 @@ tasks:
         - NAME
     deps:
       - build:debug
-    cmd:
-      task: execute-package
-      vars:
-        WATCH: false
-        RESTART: true
-        MODE: debug
-        TEST: false
-        NAME: '{{.NAME}}'
-        ARGS: '{{.ARGS}}'
+    cmds:
+      # HACK: Reference all variables here, so Task doesn't think they're unused
+      - cmd: 'true # /{{.NAME}}/{{.ARGS}}/'
+        silent: true
+      - task: execute-package
+        vars:
+          WATCH: false
+          RESTART: true
+          MODE: debug
+          TEST: false
+          NAME: '{{.NAME}}'
+          ARGS: '{{.ARGS}}'
 
   execute-package:run:debug:watch:
     internal: true
@@ -151,15 +154,18 @@ tasks:
         - NAME
     deps:
       - build:debug
-    cmd:
-      task: execute-package
-      vars:
-        WATCH: true
-        RESTART: true
-        MODE: debug
-        TEST: false
-        NAME: '{{.NAME}}'
-        ARGS: '{{.ARGS}}'
+    cmds:
+      # HACK: Reference all variables here, so Task doesn't think they're unused
+      - cmd: 'true # /{{.NAME}}/{{.ARGS}}/'
+        silent: true
+      - task: execute-package
+        vars:
+          WATCH: true
+          RESTART: true
+          MODE: debug
+          TEST: false
+          NAME: '{{.NAME}}'
+          ARGS: '{{.ARGS}}'
 
   execute-package:run:release:
     internal: true
@@ -168,15 +174,18 @@ tasks:
         - NAME
     deps:
       - build:release
-    cmd:
-      task: execute-package
-      vars:
-        WATCH: false
-        RESTART: false
-        MODE: release
-        TEST: false
-        NAME: '{{.NAME}}'
-        ARGS: '{{.ARGS}}'
+    cmds:
+      # HACK: Reference all variables here, so Task doesn't think they're unused
+      - cmd: 'true # /{{.NAME}}/{{.ARGS}}/'
+        silent: true
+      - task: execute-package
+        vars:
+          WATCH: false
+          RESTART: false
+          MODE: release
+          TEST: false
+          NAME: '{{.NAME}}'
+          ARGS: '{{.ARGS}}'
 
   execute-package:test:debug:
     internal: true
@@ -185,15 +194,18 @@ tasks:
         - NAME
     deps:
       - build:debug
-    cmd:
-      task: execute-package
-      vars:
-        WATCH: false
-        RESTART: false
-        MODE: debug
-        TEST: true
-        NAME: '{{.NAME}}'
-        ARGS: '{{.ARGS}}'
+    cmds:
+      # HACK: Reference all variables here, so Task doesn't think they're unused
+      - cmd: 'true # /{{.NAME}}/{{.ARGS}}/'
+        silent: true
+      - task: execute-package
+        vars:
+          WATCH: false
+          RESTART: false
+          MODE: debug
+          TEST: true
+          NAME: '{{.NAME}}'
+          ARGS: '{{.ARGS}}'
 
   execute-package:test:debug:watch:
     internal: true
@@ -202,15 +214,18 @@ tasks:
         - NAME
     deps:
       - build:debug
-    cmd:
-      task: execute-package
-      vars:
-        WATCH: true
-        RESTART: false
-        MODE: debug
-        TEST: true
-        NAME: '{{.NAME}}'
-        ARGS: '{{.ARGS}}'
+    cmds:
+      # HACK: Reference all variables here, so Task doesn't think they're unused
+      - cmd: 'true # /{{.NAME}}/{{.ARGS}}/'
+        silent: true
+      - task: execute-package
+        vars:
+          WATCH: true
+          RESTART: false
+          MODE: debug
+          TEST: true
+          NAME: '{{.NAME}}'
+          ARGS: '{{.ARGS}}'
 
   execute-package:test:release:
     internal: true
@@ -219,15 +234,18 @@ tasks:
         - NAME
     deps:
       - build:release
-    cmd:
-      task: execute-package
-      vars:
-        WATCH: false
-        RESTART: false
-        MODE: release
-        TEST: true
-        NAME: '{{.NAME}}'
-        ARGS: '{{.ARGS}}'
+    cmds:
+      # HACK: Reference all variables here, so Task doesn't think they're unused
+      - cmd: 'true # /{{.NAME}}/{{.ARGS}}/'
+        silent: true
+      - task: execute-package
+        vars:
+          WATCH: false
+          RESTART: false
+          MODE: release
+          TEST: true
+          NAME: '{{.NAME}}'
+          ARGS: '{{.ARGS}}'
 
   fetch:
     cmd: cargo fetch --locked
@@ -268,18 +286,3 @@ tasks:
 
   lock:check:
     cmd: cargo metadata --locked --format-version=1 >/dev/null
-
-  test:debug:
-    aliases:
-      - test
-      - t
-    deps:
-      - :lib-hex-rs:test:debug
-      - :svc-gateway-host-run:test:debug
-
-  test:release:
-    aliases:
-      - tr
-    deps:
-      - :lib-hex-rs:test:release
-      - :svc-gateway-host-run:test:release

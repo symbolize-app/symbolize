@@ -1,17 +1,20 @@
 module Dev.Gen.Package
   ( PNPM (..),
     TypeScript (..),
+    isCargoService,
     transformPNPM,
     foldTypeScriptPackageNames,
   )
 where
 
 import Data.Map.Strict qualified as Map
+import Data.Text qualified as Text
 import Data.Vector (Vector)
 import Data.Vector qualified as Vector
 import Dev.Gen.FileFormat qualified as FileFormat
 import Relude.Applicative (empty, pure)
 import Relude.Base (Eq, Show, Type)
+import Relude.Bool (Bool)
 import Relude.Container (Map, fromList, uncurry)
 import Relude.Foldable (toList)
 import Relude.Function (($), (.))
@@ -32,6 +35,9 @@ newtype TypeScript = TypeScript
   { dependencies :: Vector Text
   }
   deriving stock (Show, Eq)
+
+isCargoService :: Text -> Bool
+isCargoService = Text.isPrefixOf "svc-"
 
 transformPNPM :: Vector (Text, FileFormat.PNPMPackageFile) -> Vector PNPM
 transformPNPM pnpmPackageFiles =

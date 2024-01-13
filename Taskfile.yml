@@ -94,6 +94,25 @@ tasks:
       - cargo:build:release
       - pnpm:build:release
       - stack:build:release
+  cargo:test:debug:
+    aliases:
+      - cargo:test
+      - cargo:t
+    deps:
+      - dev-cargo-build:test:debug
+      - dev-watchman-client:test:debug
+      - lib-hex-rs:test:debug
+      - svc-gateway-host-run:test:debug
+      - svc-search-host-read:test:debug
+  cargo:test:release:
+    aliases:
+      - cargo:tr
+    deps:
+      - dev-cargo-build:test:release
+      - dev-watchman-client:test:release
+      - lib-hex-rs:test:release
+      - svc-gateway-host-run:test:release
+      - svc-search-host-read:test:release
   check:
     aliases:
       - c
