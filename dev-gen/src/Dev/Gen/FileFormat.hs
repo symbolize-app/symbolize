@@ -1,8 +1,6 @@
 module Dev.Gen.FileFormat
   ( CargoWorkspace (..),
     CargoWorkspaceWorkspace (..),
-    ESLintConfig (..),
-    ESLintConfigParserOptions (..),
     PNPMPackageFile (..),
     PNPMWorkspace (..),
     Taskfile (..),
@@ -13,8 +11,6 @@ module Dev.Gen.FileFormat
     TypeScriptConfigCompilerOptions (..),
     TypeScriptConfigReference (..),
     WatchmanConfig (..),
-    esLintConfigExtends,
-    esLintConfigParserOptionsTsconfigRootDir,
     taskfileRun,
     taskfileVersion,
     typeScriptConfigCompilerOptions,
@@ -54,30 +50,6 @@ newtype CargoWorkspaceWorkspace = CargoWorkspaceWorkspace
 
 instance Toml.FromValue CargoWorkspaceWorkspace where
   fromValue = Toml.parseTableFromValue (CargoWorkspaceWorkspace . fromList <$> Toml.reqKey "members")
-
-type ESLintConfig :: Type
-data ESLintConfig = ESLintConfig
-  { extends :: Vector Text,
-    parserOptions :: ESLintConfigParserOptions
-  }
-  deriving stock (Show, Eq, Generic)
-
-instance Aeson.ToJSON ESLintConfig
-
-esLintConfigExtends :: Vector Text
-esLintConfigExtends = ["@intertwine"]
-
-type ESLintConfigParserOptions :: Type
-data ESLintConfigParserOptions = ESLintConfigParserOptions
-  { tsconfigRootDir :: Text,
-    project :: Vector Text
-  }
-  deriving stock (Show, Eq, Generic)
-
-instance Aeson.ToJSON ESLintConfigParserOptions
-
-esLintConfigParserOptionsTsconfigRootDir :: Text
-esLintConfigParserOptionsTsconfigRootDir = "."
 
 type PNPMPackageFile :: Type
 data PNPMPackageFile = PNPMPackageFile

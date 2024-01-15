@@ -96,18 +96,6 @@ spec = context "Gen" $ do
                     ]
                 }
             ),
-          ExecSpec.writeJSON
-            ".eslintrc.json"
-            ( FileFormat.ESLintConfig
-                { extends = FileFormat.esLintConfigExtends,
-                  parserOptions =
-                    FileFormat.ESLintConfigParserOptions
-                      { tsconfigRootDir =
-                          FileFormat.esLintConfigParserOptionsTsconfigRootDir,
-                        project = ["a/tsconfig.json", "b/tsconfig.json"]
-                      }
-                }
-            ),
           ExecSpec.writeYAML
             "dev-c/Taskfile.yml"
             ( FileFormat.Taskfile
