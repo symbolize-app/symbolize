@@ -1,26 +1,7 @@
 {
   "extends": ["@intertwine"],
   "parserOptions": {
-    "project": [
-      "dev-esbuild/tsconfig.json",
-      "dev-node-loader/tsconfig.json",
-      "dev-node-suppress/tsconfig.json",
-      "dev-pnpm-test/tsconfig.json",
-      "lib-collection/tsconfig.json",
-      "lib-concurrency/tsconfig.json",
-      "lib-error/tsconfig.json",
-      "lib-hex-ts/tsconfig.json",
-      "lib-payload/tsconfig.json",
-      "lib-random/tsconfig.json",
-      "lib-stream/tsconfig.json",
-      "lib-style/tsconfig.json",
-      "lib-test/tsconfig.json",
-      "lib-time/tsconfig.json",
-      "lib-widget/tsconfig.json",
-      "svc-auth-guest-read/tsconfig.json",
-      "svc-auth-guest-view/tsconfig.json",
-      "svc-gateway-guest-run/tsconfig.json"
-    ],
+    "EXPERIMENTAL_useProjectService": true,
     "tsconfigRootDir": "."
   }
 }

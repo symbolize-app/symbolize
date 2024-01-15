@@ -34,8 +34,7 @@ data Input = Input
 
 type Output :: Type
 data Output = Output
-  { esLintConfig :: FileFormat.ESLintConfig,
-    packageTaskfiles :: Vector (FilePath, FileFormat.Taskfile),
+  { packageTaskfiles :: Vector (FilePath, FileFormat.Taskfile),
     packageTypeScriptConfigs :: Vector (FilePath, FileFormat.TypeScriptConfig),
     procfile :: Vector Text,
     rootTaskfile :: FileFormat.Taskfile,
@@ -59,8 +58,7 @@ asyncReadFiles =
 genFiles :: Input -> Output
 genFiles i =
   Output
-    { esLintConfig = genESLintConfig pnpmPackages,
-      packageTaskfiles = genPackageTaskfiles i.cargoWorkspace pnpmPackages,
+    { packageTaskfiles = genPackageTaskfiles i.cargoWorkspace pnpmPackages,
       packageTypeScriptConfigs = genPackageTypeScriptConfigs pnpmPackages,
       procfile = genProcfile i.cargoWorkspace i.procfileInput,
       rootTaskfile =
@@ -78,7 +76,6 @@ genFiles i =
 writeFiles :: Output -> Exec.ExecConcurrently ()
 writeFiles o =
   pass
-    *> Exec.async (Exec.writeJSON ".eslintrc.json" o.esLintConfig)
     *> asyncWriteAll Exec.writeYAML o.packageTaskfiles
     *> asyncWriteAll Exec.writeJSON o.packageTypeScriptConfigs
     *> Exec.async (Exec.writeLines "Procfile" o.procfile)
@@ -104,20 +101,6 @@ readPNPMPackageFiles = do
                   )
               )
       )
-
-genESLintConfig :: Vector Package.PNPM -> FileFormat.ESLintConfig
-genESLintConfig pnpmPackages =
-  FileFormat.ESLintConfig
-    { extends = FileFormat.esLintConfigExtends,
-      parserOptions =
-        FileFormat.ESLintConfigParserOptions
-          { tsconfigRootDir =
-              FileFormat.esLintConfigParserOptionsTsconfigRootDir,
-            project =
-              (<> "/tsconfig.json")
-                <$> Package.foldTypeScriptPackageNames pnpmPackages
-          }
-    }
 
 genPackageTaskfiles ::
   FileFormat.CargoWorkspace ->
