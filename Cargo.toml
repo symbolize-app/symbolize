@@ -13,6 +13,7 @@ anyhow = { version = "1.0.75", features = ["std"] }
 backon = { version = "0.4.1", features = [] }
 bytes = { version = "1.5.0", features = [] }
 clap = { version = "4.4.12", features = ["color", "derive", "error-context", "help", "std", "suggestions", "usage"] }
+futures = { version = "0.3.30", features = [] }
 http = { version = "1.0.0", features = [] }
 http-body-util = { version = "0.1.0", features = [] }
 hyper = { version = "1.0.1", features = ["http1", "server"] }
@@ -27,6 +28,7 @@ serde_json = { version = "1.0.110", features = [] }
 self_cell = { version = "1.0.3", features = [] }
 thiserror = { version = "1.0.51", features = [] }
 tokio = { version = "1.35.0", features = ["fs", "io-util", "macros", "net", "process", "rt-multi-thread"] }
+tokio-stream = { version = "0.1.14", features = ["net"] }
 watchman_client = { version = "0.8.0", features = [] }
 
 [patch.crates-io]

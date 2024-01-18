@@ -2,7 +2,6 @@ use crate::db as svc_db;
 #[cfg(test)]
 use mockall::mock;
 
-#[derive(Clone)]
 pub struct MainContext {
   pub db: svc_db::MainContext,
 }

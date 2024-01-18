@@ -73,7 +73,7 @@ pub async fn main() -> Result<ExitCode> {
         .join_next()
         .await
         .ok_or(anyhow!("empty join set"))?
-        .map_err(anyhow::Error::from)
+        .map_err(Into::into)
         .and_then(|inner_result| inner_result)
         .expect_err("join error");
       eprintln!("[watch] {err:?}");
