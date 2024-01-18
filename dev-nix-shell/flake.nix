@@ -5,6 +5,7 @@
     curl.url = "path:./curl";
     dasel.url = "path:./dasel";
     dbmate.url = "path:./dbmate";
+    easyrsa.url = "path:./easyrsa";
     fd.url = "path:./fd";
     haskell.url = "path:./haskell";
     node.url = "path:./node";
@@ -16,7 +17,7 @@
     watchman.url = "path:./watchman";
   };
 
-  outputs = { nixpkgs, flake-utils, curl, dasel, dbmate, fd, haskell, node, overmind, rust, sqlfluff, sqlite, task, watchman, ... }:
+  outputs = { nixpkgs, flake-utils, curl, dasel, dbmate, easyrsa, fd, haskell, node, overmind, rust, sqlfluff, sqlite, task, watchman, ... }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs { inherit system; };
@@ -26,6 +27,7 @@
             inputsFrom = [
               curl.packages.${system}.default
               dasel.packages.${system}.default
+              easyrsa.packages.${system}.default
               fd.packages.${system}.default
               haskell.packages.${system}.default
               node.packages.${system}.default
@@ -49,6 +51,7 @@
               curl --version | head -n 1
               dasel --version
               dbmate --version
+              echo $(easyrsa --version | head -n 4)
               fd --version
               ghc --version
               echo "stack $(stack --version)"

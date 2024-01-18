@@ -27,6 +27,8 @@ includes:
     taskfile: dev-tsconfig
   dev-watchman-client:
     taskfile: dev-watchman-client
+  easyrsa:
+    taskfile: dev-task/easyrsa.yml
   lib-collection:
     taskfile: lib-collection
   lib-concurrency:

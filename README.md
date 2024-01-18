@@ -41,6 +41,25 @@ echo 'source $HOME/.nix-profile/share/nix-direnv/direnvrc' >> $HOME/.config/dire
 
 1. Installed by Nix
 
+## Easy-RSA
+
+General:
+
+```sh
+task easyrsa:server:build
+```
+
+Ubuntu:
+
+```sh
+sudo cp .pki/ca.crt /usr/local/share/ca-certificates
+sudo update-ca-certificates
+```
+
+Chrome & Firefox:
+
+- Navigate settings UI to manually import `.pki/ca.crt`
+
 ## Visual Studio Code
 
 1. Install [Visual Studio Code](https://code.visualstudio.com/docs/setup/setup-overview)
