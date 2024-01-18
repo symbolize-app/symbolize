@@ -91,11 +91,12 @@ pub async fn main() -> Result<ExitCode> {
         )
         .stdout(Stdio::piped())
         .spawn()?;
-      let events_error =
-        process_events(&mut child).await.is_err_and(|err| {
+      let events_error = process_events(&mut child)
+        .await
+        .inspect_err(|err| {
           eprintln!("Build event error: {err:?}");
-          true
-        });
+        })
+        .is_err();
       let exit_error = child.wait().await?.exit_ok().is_err();
       let mut error = events_error || exit_error;
       if !error && let Some(clippy) = cli.clippy {

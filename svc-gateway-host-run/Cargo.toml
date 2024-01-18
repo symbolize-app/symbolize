@@ -11,6 +11,7 @@ path = "src/mod.rs"
 [dependencies]
 anyhow = { workspace = true }
 bytes = { workspace = true }
+futures = { workspace = true }
 http = { workspace = true }
 http-body-util = { workspace = true }
 hyper = { workspace = true }
@@ -21,6 +22,7 @@ rusqlite = { workspace = true }
 self_cell = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true }
+tokio-stream = { workspace = true }
 
 [dev-dependencies]
 mockall = { workspace = true }
