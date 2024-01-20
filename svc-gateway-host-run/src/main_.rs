@@ -13,5 +13,9 @@ pub async fn main() -> Result<()> {
   });
   println!("Context intialized");
 
-  svc_serve::serve(ctx).await
+  svc_serve::serve(ctx.clone()).await?;
+
+  ctx.wait().await;
+
+  Ok(())
 }

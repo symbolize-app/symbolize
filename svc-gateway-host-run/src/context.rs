@@ -6,6 +6,12 @@ pub struct MainContext {
   pub db: svc_db::MainContext,
 }
 
+impl MainContext {
+  pub async fn wait(&self) {
+    self.db.wait().await;
+  }
+}
+
 pub trait DbContext
 where
   Self::Inner: svc_db::Context,
