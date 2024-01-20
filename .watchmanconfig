@@ -3,6 +3,7 @@
     ".cargo",
     ".direnv",
     ".env",
+    ".pki",
     ".stack-bin",
     ".tantivy",
     "build",

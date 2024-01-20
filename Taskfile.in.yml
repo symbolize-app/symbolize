@@ -17,6 +17,9 @@ includes:
     internal: true
     taskfile: dev-stack-bin
 
+  easyrsa:
+    taskfile: dev-task/easyrsa.yml
+
   nix:
     taskfile: dev-task/nix.yml
 

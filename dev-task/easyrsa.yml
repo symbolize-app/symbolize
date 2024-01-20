@@ -1,0 +1,26 @@
+version: '3'
+
+run: when_changed
+
+tasks:
+  server:build:
+    status:
+      - easyrsa verify-cert intertwine-gateway
+    deps:
+      - ca:build
+    cmds:
+      - easyrsa --san=IP:::1 build-server-full intertwine-gateway
+
+  ca:build:
+    status:
+      - easyrsa show-ca
+    deps:
+      - init
+    cmds:
+      - easyrsa build-ca
+
+  init:
+    status:
+      - test -d .pki
+    cmds:
+      - easyrsa init-pki

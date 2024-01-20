@@ -12,19 +12,20 @@ use hyper::body::Incoming as IncomingBody;
 use hyper::Request;
 use hyper::Response;
 use intertwine_lib_hex::FromHex as _;
+use std::sync::Arc;
 
 const CODE_ID_PREFIX: &str = "/.code/.id/";
 const CODE_PREFIX: &str = "/.code/";
 const INIT_HTML_PATH: &str = "svc-gateway-guest-run/init.html";
 
 pub async fn handle<TContext>(
-  ctx: &TContext,
+  ctx: Arc<TContext>,
   req: Request<IncomingBody>,
 ) -> Result<Response<FullBody<Bytes>>>
 where
   TContext: svc_context::DbContext,
 {
-  handle_paths(ctx, &svc_request::SimpleRequest::new(&req))
+  handle_paths(ctx.as_ref(), &svc_request::SimpleRequest::new(&req))
     .await
     .unwrap_or_else(handle_error)
     .into_response()

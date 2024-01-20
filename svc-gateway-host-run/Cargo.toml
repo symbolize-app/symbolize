@@ -19,10 +19,14 @@ hyper-util = { workspace = true }
 intertwine-lib-hex = { workspace = true }
 mime = { workspace = true }
 rusqlite = { workspace = true }
+rustls = { workspace = true }
+rustls-pemfile = { workspace = true }
 self_cell = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true }
+tokio-rustls = { workspace = true }
 tokio-stream = { workspace = true }
+tokio-util = { workspace = true }
 
 [dev-dependencies]
 mockall = { workspace = true }
