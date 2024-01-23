@@ -13,6 +13,7 @@ anyhow = { version = "1.0.75", features = ["std"] }
 backon = { version = "0.4.1", features = [] }
 bytes = { version = "1.5.0", features = [] }
 clap = { version = "4.4.12", features = ["color", "derive", "error-context", "help", "std", "suggestions", "usage"] }
+crossbeam = { version = "0.8.4", features = ["crossbeam-queue", "std"] }
 futures = { version = "0.3.30", features = [] }
 http = { version = "1.0.0", features = [] }
 http-body-util = { version = "0.1.0", features = [] }
@@ -27,7 +28,6 @@ rustls = { version = "0.22.2", features = ["logging", "ring", "tls12"] }
 rustls-pemfile = { version = "2.0.0", features = ["std"] }
 serde = { version = "1.0.194", features = ["derive", "std"] }
 serde_json = { version = "1.0.110", features = [] }
-self_cell = { version = "1.0.3", features = [] }
 thiserror = { version = "1.0.51", features = [] }
 tokio = { version = "1.35.0", features = ["fs", "io-util", "macros", "net", "process", "rt-multi-thread"] }
 tokio-rustls = { version = "0.25.0", features = ["logging", "ring", "tls12"] }

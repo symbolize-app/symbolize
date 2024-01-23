@@ -1,4 +1,5 @@
 #![feature(imported_main)]
+#![feature(trait_alias)]
 
 mod context;
 mod db;

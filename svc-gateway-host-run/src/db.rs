@@ -1,14 +1,23 @@
+use crate::task_tracker::TaskTrackerExt as _;
 use anyhow::anyhow;
+use anyhow::Error;
 use anyhow::Result;
+use crossbeam::queue::ArrayQueue;
 #[cfg(test)]
 use mockall::automock;
 use rusqlite;
 use rusqlite::OptionalExtension as _;
-use self_cell::self_cell;
 use std::sync::Arc;
-use std::sync::Mutex;
+use std::time::Duration;
 use tokio::process::Command;
-use tokio::task::spawn_blocking;
+use tokio::runtime::Handle as TokioHandle;
+use tokio::select;
+use tokio::sync::oneshot;
+use tokio::time::sleep;
+use tokio_util::task::TaskTracker;
+
+const MAX_IDLE_CONNECTIONS: usize = 512;
+const IDLE_CONNECTION_TIMEOUT: Duration = Duration::from_secs(30);
 
 #[cfg_attr(test, automock)]
 pub trait Context {
@@ -23,38 +32,40 @@ pub trait Context {
   ) -> Result<Option<ContentRowWithId>>;
 }
 
-#[derive(Clone)]
-pub struct MainContext(pub Arc<Mutex<MainContextCell>>);
-
-self_cell!(
-  pub struct MainContextCell {
-    owner: rusqlite::Connection,
-
-    #[covariant]
-    dependent: MainQueryContext,
-  }
-);
-
-pub struct MainQueryContext<'connection> {
-  pub get_content_by_id: rusqlite::Statement<'connection>,
-  pub get_content_by_path: rusqlite::Statement<'connection>,
+pub struct MainContext {
+  connection_task_tracker: TaskTracker,
+  idle_connections: Arc<ArrayQueue<oneshot::Sender<QueryRequest>>>,
 }
 
-// Assumed safe since owner and dependent are sent together
-unsafe impl Send for MainContextCell {}
+struct MainQueryContext<'connection> {
+  get_content_by_id: rusqlite::Statement<'connection>,
+  get_content_by_path: rusqlite::Statement<'connection>,
+}
 
 pub struct ContentRowWithId {
   pub id: Vec<u8>,
   pub original: Vec<u8>,
 }
 
+trait QueryFunction = for<'a> FnOnce(
+  Result<(&'a rusqlite::Connection, &mut MainQueryContext<'a>)>,
+) -> Result<()>;
+
+struct QueryRequest(Box<dyn QueryFunction + Send>);
+
 impl MainContext {
   pub async fn init() -> Result<Self> {
     Self::run_migrations().await?;
-    let connection = Self::open_db_connection()?;
-    let cell =
-      MainContextCell::try_new(connection, Self::prepare_statements)?;
-    Ok(MainContext(Arc::new(Mutex::new(cell))))
+    Ok(MainContext {
+      connection_task_tracker: TaskTracker::new(),
+      idle_connections: Arc::new(ArrayQueue::new(MAX_IDLE_CONNECTIONS)),
+    })
+  }
+
+  pub async fn wait(&self) {
+    // Drop all TXs, will raise RX errors
+    while self.idle_connections.pop().is_some() {}
+    self.connection_task_tracker.wait().await;
   }
 
   async fn run_migrations() -> Result<()> {
@@ -85,24 +96,122 @@ impl MainContext {
     })
   }
 
-  async fn spawn_blocking<T, F>(&self, func: F) -> Result<T>
+  #[allow(clippy::print_stdout)]
+  #[allow(clippy::print_stderr)]
+  async fn run_query<T, F>(&self, func: F) -> Result<T>
   where
     T: Send + 'static,
     F: for<'a> FnOnce(
-        &'a rusqlite::Connection,
-        &mut MainQueryContext<'a>,
-      ) -> T
-      + Send
-      + 'static,
+      &'a rusqlite::Connection,
+      &mut MainQueryContext<'a>,
+    ) -> Result<T>,
+    F: Send + 'static,
   {
-    let cell = self.0.clone();
-    Ok(
-      spawn_blocking(move || {
-        let mut db = cell.lock().expect("failed to lock db");
-        db.with_dependent_mut(func)
+    let (response_tx, response_rx) = oneshot::channel();
+
+    let mut request = QueryRequest(Box::new(|context| {
+      context.and_then(|(connection, query)| {
+        let result = func(connection, query);
+        response_tx.send(result).map_err(|_| anyhow!("send error"))
       })
-      .await?,
-    )
+    }));
+
+    while let Some(idle_request_tx) = self.idle_connections.pop() {
+      match idle_request_tx.send(request) {
+        Ok(()) => {
+          println!("  DB old thread");
+          return response_rx.await?;
+        }
+        Err(send_failed) => {
+          eprintln!("Idle request send error");
+          request = send_failed;
+        }
+      }
+    }
+
+    let handle = TokioHandle::current();
+    let idle_connections = self.idle_connections.clone();
+    self.connection_task_tracker.spawn_thread(move || {
+      if let Err(err) =
+        Self::run_thread(&handle, &idle_connections, request)
+      {
+        eprintln!("Thread error: {err:?}");
+      }
+    });
+
+    println!("  DB new thread");
+    response_rx.await?
+  }
+
+  #[allow(clippy::print_stderr)]
+  fn run_thread(
+    handle: &TokioHandle,
+    idle_connections: &ArrayQueue<oneshot::Sender<QueryRequest>>,
+    init_request: QueryRequest,
+  ) -> Result<()> {
+    let connection = match Self::open_db_connection() {
+      Ok(connection) => connection,
+      Err(err) => {
+        init_request.err(err);
+        return Err(anyhow!("open DB error"));
+      }
+    };
+    let mut query = match Self::prepare_statements(&connection) {
+      Ok(query) => query,
+      Err(err) => {
+        init_request.err(err);
+        return Err(anyhow!("prepare statements error"));
+      }
+    };
+    init_request.query(&connection, &mut query)?;
+
+    loop {
+      let (idle_request_tx, mut idle_request_rx) = oneshot::channel();
+
+      // Drop any old/replaced TX, will raise an RX error
+      idle_connections.force_push(idle_request_tx);
+
+      let idle_request_result = handle.block_on(async {
+        select! {
+          idle_request = (&mut idle_request_rx) =>
+            idle_request.map_err(
+              |_| oneshot::error::TryRecvError::Closed
+            ),
+          () = sleep(IDLE_CONNECTION_TIMEOUT) => {
+            idle_request_rx.close();
+            idle_request_rx.try_recv()
+          }
+        }
+      });
+
+      match idle_request_result {
+        Err(oneshot::error::TryRecvError::Closed) => {
+          break;
+        }
+        idle_request_result => {
+          idle_request_result?.query(&connection, &mut query)?;
+        }
+      }
+    }
+
+    Ok(())
+  }
+}
+
+impl QueryRequest {
+  #[allow(clippy::print_stderr)]
+  fn err(self, err: Error) {
+    if let Err(err) = (self.0)(Err(err)) {
+      eprintln!("Send error: {err:?}");
+    }
+  }
+
+  fn query<'a>(
+    self,
+    connection: &'a rusqlite::Connection,
+    query: &mut MainQueryContext<'a>,
+  ) -> Result<()> {
+    (self.0)(Ok((connection, query)))
   }
 }
 
@@ -111,28 +220,28 @@ impl Context for MainContext {
     &self,
     content_id: Vec<u8>,
   ) -> Result<Option<Vec<u8>>> {
-    Ok(
-      self
-        .spawn_blocking(move |_, query| {
+    self
+      .run_query(move |_, query| {
+        Ok(
           query
             .get_content_by_id
             .query_row(
               rusqlite::named_params! {":content_id": content_id},
               |row| row.get("original"),
             )
-            .optional()
-        })
-        .await??,
-    )
+            .optional()?,
+        )
+      })
+      .await
   }
 
   async fn get_content_by_path(
     &self,
     path_id: String,
   ) -> Result<Option<ContentRowWithId>> {
-    Ok(
-      self
-        .spawn_blocking(move |_, query| {
+    self
+      .run_query(move |_, query| {
+        Ok(
           query
             .get_content_by_path
             .query_row(
@@ -144,9 +253,9 @@ impl Context for MainContext {
                 })
               },
             )
-            .optional()
-        })
-        .await??,
-    )
+            .optional()?,
+        )
+      })
+      .await
   }
 }

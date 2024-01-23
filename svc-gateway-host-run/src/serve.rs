@@ -112,7 +112,10 @@ async fn serve_http2(
 ) {
   let tcp_io = TokioIo::new(tls_stream);
   let request_task_tracker = TaskTracker::new();
-  let service = service_fn(|req| svc_handle::handle(ctx.clone(), req));
+  let service = service_fn(|req| {
+    let ctx = ctx.clone();
+    async move { svc_handle::handle(ctx.as_ref(), req).await }
+  });
   let executor =
     svc_task_tracker::TaskTrackerExecutor::new(&request_task_tracker);
   let connection_result = http2::Builder::new(executor)
