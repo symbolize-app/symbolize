@@ -44,8 +44,9 @@
 - https://www.sqlite.org/index.html
   - https://www.sqlite.org/whentouse.html
 - https://github.com/amacneil/dbmate
-- https://sqlfluff.com/
-- https://www.dragonflydb.io/
+- https://github.com/sqlfluff/sqlfluff
+- https://github.com/apple/foundationdb
+- https://www.tigrisdata.com/
 
 ## Hosting
 
