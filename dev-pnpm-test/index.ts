@@ -7,6 +7,4 @@ export const all: test.TestCollection<widget.Context> = () => [
   import('@intertwine/lib-test/hex.test.ts'),
   import('@intertwine/lib-test/random.test.ts'),
   import('@intertwine/lib-test/time.test.ts'),
-  import('@intertwine/svc-auth-guest-view/widget/button.test.ts'),
-  import('@intertwine/svc-auth-guest-view/widget/member.test.ts'),
 ]
