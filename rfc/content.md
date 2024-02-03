@@ -209,7 +209,7 @@ Sub-object anchor IDs are auto-generated "slugs" (same as other slugs in Intertw
 
 ## Headers
 
-Content header levels will get translated to the view levels, and all view levels will get translated to proper HTML levels using widget context.
+Content header levels will get translated to the view levels, and all view levels will get translated to proper HTML levels using page context.
 
 ## Collections
 

@@ -56,12 +56,11 @@ Read/write switch to...
 
 ## Libraries
 
-- lib-content-guest (schema, review, scheduling, blocks)
-- lib-store-guest
-- lib-store-host
-- lib-http-guest
-- lib-http-host
-- lib-stream-guest
-- lib-stream-host
-- lib-style-guest
-- lib-widget-guest
+- lib-content (schema, review, scheduling, blocks)
+- lib-store-rs
+- lib-store-ts
+- lib-http-rs
+- lib-http-ts
+- lib-stream-rs
+- lib-stream-ts
+- lib-style

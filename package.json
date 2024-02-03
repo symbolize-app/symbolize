@@ -18,7 +18,6 @@
     "@intertwine/lib-style": "workspace:*",
     "@intertwine/lib-test": "workspace:*",
     "@intertwine/lib-time": "workspace:*",
-    "@intertwine/lib-widget": "workspace:*",
     "@intertwine/svc-auth-guest-read": "workspace:*",
     "@intertwine/svc-auth-guest-view": "workspace:*",
     "@intertwine/svc-gateway-guest-run": "workspace:*",
