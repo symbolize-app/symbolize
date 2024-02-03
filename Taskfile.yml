@@ -51,8 +51,6 @@ includes:
     taskfile: lib-test
   lib-time:
     taskfile: lib-time
-  lib-widget:
-    taskfile: lib-widget
   nix:
     taskfile: dev-task/nix.yml
   overmind:
@@ -211,7 +209,6 @@ tasks:
       - lib-style:link-build-dir
       - lib-test:link-build-dir
       - lib-time:link-build-dir
-      - lib-widget:link-build-dir
       - svc-auth-guest-read:link-build-dir
       - svc-auth-guest-view:link-build-dir
       - svc-gateway-guest-run:link-build-dir

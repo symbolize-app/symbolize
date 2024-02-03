@@ -2,10 +2,10 @@
 
 ## Goals
 
-- Completely independent from widget
-  - Widget should be able to consume the basic API
+- Completely independent from fragments
+  - Fragment should be able to consume the basic API
 - Typed properties and fluent values
-- Use style declarations inline with widgets
+- Use style declarations inline with fragments
 - Physics-based animations
 
 ## Objects
