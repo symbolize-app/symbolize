@@ -1,4 +1,4 @@
-export type Context = {
+export interface Context {
   time: {
     performanceNow(): number
     setTimeout(callback: () => void, ms: number): unknown
@@ -7,7 +7,9 @@ export type Context = {
 
 export async function delay(ctx: Context, ms: number): Promise<void> {
   return new Promise((resolve) => {
-    ctx.time.setTimeout(() => resolve(), ms)
+    ctx.time.setTimeout(() => {
+      resolve()
+    }, ms)
   })
 }
 
@@ -19,9 +21,9 @@ const conversionTable = {
 
 export function interval(parts: {
   hours?: number
+  milliseconds?: number
   minutes?: number
   seconds?: number
-  milliseconds?: number
 }): number {
   return (
     (parts.hours ?? 0) * conversionTable.hours +

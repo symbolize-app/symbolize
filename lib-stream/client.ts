@@ -2,12 +2,12 @@ import type * as streamConnection from '@/connection.ts'
 import * as streamSink from '@/sink.ts'
 import * as streamSource from '@/source.ts'
 
-export type ClientContext = {
+export interface ClientContext {
   streamClient: {
-    worker: Worker
     resolveServerStream: ((
       serverStream: ReadableStream<unknown>
     ) => void)[]
+    worker: Worker
   }
 }
 
@@ -17,16 +17,22 @@ export function initClientContext(worker: Worker): ClientContext {
   ) => void)[] = []
 
   worker.addEventListener('message', (event) => {
+    // eslint-disable-next-line no-console
     console.log('worker message', event)
     const connectionResponse =
       event.data as streamConnection.ConnectionResponse
-    resolveServerStream[connectionResponse.connectionId]!(
-      connectionResponse.serverStream
-    )
+    const resolve = resolveServerStream[connectionResponse.connectionId]
+    if (!resolve) {
+      throw new Error(
+        `Invalid connection ID ${connectionResponse.connectionId}`
+      )
+    }
+    resolve(connectionResponse.serverStream)
   })
+  // eslint-disable-next-line no-console
   console.log('worker', worker)
 
-  return { streamClient: { worker, resolveServerStream } }
+  return { streamClient: { resolveServerStream, worker } }
 }
 
 export function connect(
@@ -36,16 +42,19 @@ export function connect(
 ): streamSource.Source<unknown> {
   const clientSource = new streamSource.Source()
   const connectionRequest: streamConnection.ConnectionRequest = {
-    type: 'ConnectionRequest',
+    clientStream: clientSource.readable,
     connectionId: ctx.streamClient.resolveServerStream.length,
     service,
-    clientStream: clientSource.readable,
+    type: 'ConnectionRequest',
   }
   let resolveServerStream: (serverStream: ReadableStream<unknown>) => void
   const serverStreamPromise = new Promise<ReadableStream<unknown>>(
     (resolve) => (resolveServerStream = resolve)
   )
-  ctx.streamClient.resolveServerStream.push(resolveServerStream!)
+  ctx.streamClient.resolveServerStream.push(
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    resolveServerStream!
+  )
   ctx.streamClient.worker.postMessage(connectionRequest, [
     connectionRequest.clientStream,
   ])

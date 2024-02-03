@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import * as testIsDeepEqual from '@/isDeepEqual.ts'
 import * as testRandom from '@/random.ts'
 import * as testTime from '@/time.ts'
@@ -7,32 +8,30 @@ import * as diff from 'diff'
 import ms from 'ms'
 
 export type Test<CustomContext = unknown> = (
-  ctx: CustomContext & Context
-) => void | Promise<void>
+  ctx: Context & CustomContext
+) => Promise<void> | void
 
-export type Context = testTime.Context & random.Context
+export type Context = random.Context & testTime.Context
 
 export type RunContext = time.Context
 
-type TestModule<CustomContext = unknown> = {
+interface TestModule<CustomContext = unknown> {
+  tests: Record<string, Test<CustomContext>>
   url: string
-  tests: {
-    [testName: string]: Test<CustomContext>
-  }
 }
 
 export type TestCollection<CustomContext = unknown> = () => Promise<
   TestModule<CustomContext>
 >[]
 
-type TestCollectionModule<CustomContext = unknown> = {
+interface TestCollectionModule<CustomContext = unknown> {
   all: TestCollection<CustomContext>
 }
 
 class AssertionError extends Error {
   actual: unknown
-  expected: unknown
   diff: boolean
+  expected: unknown
 
   constructor(
     message: string,
@@ -47,9 +46,7 @@ class AssertionError extends Error {
   }
 }
 
-export async function runAll<
-  CustomContext extends Record<string, unknown> = Record<string, unknown>,
->(
+export async function runAll<CustomContext = unknown>(
   ctx: CustomContext & RunContext,
   testCollectionModules: Promise<TestCollectionModule<CustomContext>>[]
 ): Promise<boolean> {
@@ -68,7 +65,7 @@ export async function runAll<
     let testUrlPrinted = false
     for (const [testName, test] of Object.entries(tests)) {
       try {
-        const testContext: CustomContext & Context = {
+        const testContext: Context & CustomContext = {
           ...ctx,
           ...testTime.initContext(),
           ...testRandom.initContext(),
@@ -88,15 +85,15 @@ export async function runAll<
               }
 
         const assertionInfo =
-          typeof error == 'object' &&
+          typeof error === 'object' &&
           error !== null &&
           'actual' in error &&
           'expected' in error &&
           'diff' in error
             ? {
                 actual: (error as { actual: unknown }).actual,
-                expected: (error as { expected: unknown }).expected,
                 diff: (error as { diff: unknown }).diff,
+                expected: (error as { expected: unknown }).expected,
               }
             : undefined
 
@@ -120,8 +117,8 @@ export async function runAll<
           console.log('%cActual', 'color: crimson', assertionInfo.actual)
           if (assertionInfo.diff) {
             const diffSections = diff.diffJson(
-              assertionInfo.expected as string | object,
-              assertionInfo.actual as string | object
+              assertionInfo.expected as object | string,
+              assertionInfo.actual as object | string
             )
             const outputLines = []
             for (const diffSection of diffSections) {
@@ -166,7 +163,7 @@ export async function runAll<
   )
   console.log(`Elapsed: ${elapsed}`)
   console.groupEnd()
-  return fail == 0
+  return fail === 0
 }
 
 export const mockHistory = Symbol('mockHistory')
@@ -182,6 +179,7 @@ export function mock<
     if (i === returnValues.length) {
       throw new Error('called too many times')
     } else {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const result = returnValues[i]!()
       callback[mockHistory].push(args)
       i += 1
@@ -192,14 +190,14 @@ export function mock<
   return callback
 }
 
-export type SyncPromise<Value> = {
+export interface SyncPromise<Value> {
   isSettled: boolean
-  resolvedValue: Value
   rejectedValue: unknown
+  resolvedValue: Value
 }
 
 export function sync<Value>(
-  promise: Value | Promise<Value>
+  promise: Promise<Value> | Value
 ): SyncPromise<Value> {
   let isResolved = false
   let resolvedValue: Value | undefined = undefined
@@ -209,15 +207,6 @@ export function sync<Value>(
     get isSettled() {
       return isResolved || isRejected
     },
-    get resolvedValue() {
-      if (isRejected) {
-        throw rejectedValue
-      } else if (!isResolved) {
-        throw new Error('Promise not resolved yet')
-      } else {
-        return resolvedValue as Value
-      }
-    },
     get rejectedValue() {
       if (isResolved) {
         throw new AssertionError('Promise resolved', result, '<rejected>')
@@ -225,6 +214,15 @@ export function sync<Value>(
         throw new Error('Promise not rejected yet')
       } else {
         return rejectedValue
+      }
+    },
+    get resolvedValue() {
+      if (isRejected) {
+        throw rejectedValue
+      } else if (!isResolved) {
+        throw new Error('Promise not resolved yet')
+      } else {
+        return resolvedValue as Value
       }
     },
   }
@@ -264,7 +262,7 @@ export function assertInstanceOf<
     throw new AssertionError(
       'Not instance of',
       (typeof actual === 'object'
-        ? actual?.constructor?.name
+        ? actual?.constructor.name
         : undefined) ?? typeof actual,
       expectedType.name
     )

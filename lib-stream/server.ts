@@ -6,7 +6,7 @@ import type * as time from '@intertwine/lib-time'
 
 declare const self: DedicatedWorkerGlobalScope
 
-export type ServerContext = {
+export interface ServerContext {
   streamServer: {
     connectionRequestSources: collection.Memo<
       string,
@@ -22,6 +22,7 @@ export function initServerContext(ctx: time.Context): ServerContext {
   >(() => new streamSource.Source())
 
   self.addEventListener('message', (event) => {
+    // eslint-disable-next-line no-console
     console.log('message', event)
     const connectionRequest =
       event.data as streamConnection.ConnectionRequest
@@ -32,7 +33,7 @@ export function initServerContext(ctx: time.Context): ServerContext {
 
   return {
     streamServer: {
-      connectionRequestSources: connectionRequestSources,
+      connectionRequestSources,
     },
   }
 }
@@ -41,7 +42,7 @@ export function serve(
   ctx: ServerContext,
   service: string,
   onConnect: (serverSource: streamSource.Source<unknown>) => Promise<{
-    onData: (data: unknown) => Promise<void>
+    onData(data: unknown): Promise<void>
   }>
 ): void {
   const connectionRequestStream =
@@ -51,16 +52,18 @@ export function serve(
     new streamSink.Sink<streamConnection.ConnectionRequest>(
       async (connectionRequest) => {
         const serverSource = new streamSource.Source<unknown>()
-        const { onData } = await onConnect(serverSource)
+        const connectResult = await onConnect(serverSource)
         const connectionResponse: streamConnection.ConnectionResponse = {
-          type: 'ConnectionResponse',
           connectionId: connectionRequest.connectionId,
           serverStream: serverSource.readable,
+          type: 'ConnectionResponse',
         }
         self.postMessage(connectionResponse, [
           connectionResponse.serverStream,
         ])
-        const serverSink = new streamSink.Sink(onData)
+        const serverSink = new streamSink.Sink(async (data) =>
+          connectResult.onData(data)
+        )
         void connectionRequest.clientStream.pipeTo(serverSink.writable)
         return Promise.resolve()
       }

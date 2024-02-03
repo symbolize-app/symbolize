@@ -5,13 +5,13 @@ import * as nodePath from 'node:path'
 export interface BuildOptions
   extends Omit<
     esbuild.BuildOptions,
-    | 'metafile'
-    | 'mangleCache'
-    | 'entryPoints'
-    | 'stdin'
     | 'bundle'
+    | 'entryPoints'
+    | 'mangleCache'
+    | 'metafile'
     | 'outbase'
     | 'outExtensions'
+    | 'stdin'
   > {
   entryPoints: string[]
   outbase: string
@@ -21,7 +21,7 @@ export interface BuildResult<
   ProvidedOptions extends BuildOptions = BuildOptions,
 > extends Omit<
     esbuild.BuildResult<ProvidedOptions>,
-    'metafile' | 'mangleCache' | 'outputFiles'
+    'mangleCache' | 'metafile' | 'outputFiles'
   > {
   outputFiles: esbuild.OutputFile[]
 }
@@ -33,8 +33,8 @@ export async function build<T extends BuildOptions>(
 ): Promise<BuildResult<T>> {
   const result: BuildResult<T> = {
     errors: [],
-    warnings: [],
     outputFiles: [],
+    warnings: [],
   }
 
   const pnpmPackageVersions = new Map<string, string>()
@@ -53,7 +53,7 @@ export async function build<T extends BuildOptions>(
     const plugin: esbuild.Plugin = {
       name: 'buildModules',
       setup(build) {
-        build.onResolve({ filter: /.*/ }, (args) =>
+        build.onResolve({ filter: /.*/ }, async (args) =>
           resolve(
             build,
             convertToOutPathMemo,
@@ -94,10 +94,10 @@ async function resolve(
   }
   const resolveResult = await build.resolve(args.path, {
     importer: args.importer,
-    namespace: args.namespace,
-    resolveDir: args.resolveDir,
     kind: args.kind,
+    namespace: args.namespace,
     pluginData: resolveBase,
+    resolveDir: args.resolveDir,
   })
   if (
     !resolveResult.errors.length &&
@@ -118,11 +118,11 @@ async function resolve(
     )}.mjs`
     return {
       ...resolveResult,
+      external: true,
+      namespace: 'buildModules',
       path: relativePath.startsWith('.')
         ? relativePath
         : `./${relativePath}`,
-      namespace: 'buildModules',
-      external: true,
     }
   } else {
     return resolveResult
@@ -150,7 +150,7 @@ function convertToOutPath(
     const previousVersion = pnpmPackageVersions.get(package_)
     if (previousVersion === undefined) {
       pnpmPackageVersions.set(package_, version)
-    } else if (previousVersion != version) {
+    } else if (previousVersion !== version) {
       throw new Error(
         `Ambiguous versions found for ${package_}: ${previousVersion} / ${version}`
       )

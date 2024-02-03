@@ -16,6 +16,7 @@ const localMatcher = /^node:|\/node_modules\//
 /**
  * @type {LoadHook}
  */
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/explicit-function-return-type, @typescript-eslint/promise-function-async
 export const load = (url, context, defaultLoad) => {
   // Defer to Node.js for all other sources.
   const ext = nodePath.extname(url)
@@ -28,22 +29,22 @@ export const load = (url, context, defaultLoad) => {
         )
         return {
           format: 'module',
+          shortCircuit: true,
           source: `const text = ${JSON.stringify(
             source
           )}\nexport default text`,
-          shortCircuit: true,
         }
       } else {
         const result = await esbuild.build({
-          entryPoints: [fullPath],
           absWorkingDir: nodePath.dirname(fullPath),
           bundle: true,
-          write: false,
+          entryPoints: [fullPath],
+          external: ['/*', 'node:*'],
           format: 'esm',
+          logLevel: 'warning',
           platform: 'node',
           target: [`node${process.versions.node}`],
-          external: ['/*', 'node:*'],
-          logLevel: 'warning',
+          write: false,
         })
         const outputFile = result.outputFiles[0]
         if (!outputFile) {
@@ -51,8 +52,8 @@ export const load = (url, context, defaultLoad) => {
         }
         return {
           format: 'module',
-          source: outputFile.contents,
           shortCircuit: true,
+          source: outputFile.contents,
         }
       }
     })()

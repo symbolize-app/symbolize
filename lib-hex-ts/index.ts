@@ -7,7 +7,10 @@ export function uint8ArrayToHex(input: Uint8Array): string {
 export function uint8ArrayFromHex(input: string): Uint8Array {
   return new Uint8Array(
     input
-      .split(/(..)/)
+      .split(
+        // eslint-disable-next-line prefer-named-capture-group
+        /(..)/
+      )
       .filter(Boolean)
       .map((byte) => parseInt(byte, 16))
   )

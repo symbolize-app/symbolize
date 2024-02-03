@@ -4,8 +4,8 @@ const highWaterMark = 16
 const timeoutMs = 1_000
 
 export class Source<T> {
-  private readonly writer: WritableStreamDefaultWriter<T>
   readonly readable: ReadableStream<T>
+  private readonly writer: WritableStreamDefaultWriter<T>
 
   constructor() {
     const transform = new TransformStream<T, T>(undefined, {

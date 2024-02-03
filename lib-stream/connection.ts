@@ -1,12 +1,12 @@
-export type ConnectionRequest = {
-  type: 'ConnectionRequest'
+export interface ConnectionRequest {
+  clientStream: ReadableStream<unknown>
   connectionId: number
   service: string
-  clientStream: ReadableStream<unknown>
+  type: 'ConnectionRequest'
 }
 
-export type ConnectionResponse = {
-  type: 'ConnectionResponse'
+export interface ConnectionResponse {
   connectionId: number
   serverStream: ReadableStream<unknown>
+  type: 'ConnectionResponse'
 }

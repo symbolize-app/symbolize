@@ -1,22 +1,22 @@
 import * as hex from '@intertwine/lib-hex'
 
-export type Context = {
+export interface Context {
   random: {
-    number(): number
     cryptoBits(bits: number): Uint8Array
+    number(): number
   }
 }
 
 export function initContext(): Context {
   return {
     random: {
-      number() {
-        return Math.random()
-      },
       cryptoBits(bits) {
         const result = new Uint8Array(bits / 8)
         crypto.getRandomValues(result)
         return result
+      },
+      number() {
+        return Math.random()
       },
     },
   }

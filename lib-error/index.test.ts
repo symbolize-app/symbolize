@@ -14,7 +14,7 @@ export const tests = {
   ['one attempt, pass']: async (
     baseContext: test.Context
   ): Promise<void> => {
-    const ctx: test.Context & error.Context = {
+    const ctx: error.Context & test.Context = {
       ...baseContext,
       random: {
         ...baseContext.random,
@@ -24,22 +24,23 @@ export const tests = {
     const expectedResult = {}
     const onError = test.mock([])
     const actualResult = test.sync(
-      error.retry(ctx, () => Promise.resolve(expectedResult), {
+      error.retry(ctx, async () => Promise.resolve(expectedResult), {
+        maxAttempts: 10,
         minDelayMs: time.interval({
           milliseconds: 10,
         }),
-        windowMs: time.interval({ seconds: 10 }),
-        maxAttempts: 10,
         onError,
+        windowMs: time.interval({ seconds: 10 }),
       })
     )
     await ctx.time.clock.tickAsync(0)
     test.assertEquals(actualResult.resolvedValue, expectedResult)
   },
+
   ['two attempts, count limit']: async (
     baseContext: test.Context
   ): Promise<void> => {
-    const ctx: test.Context & error.Context = {
+    const ctx: error.Context & test.Context = {
       ...baseContext,
       random: {
         ...baseContext.random,
@@ -49,13 +50,13 @@ export const tests = {
     const expectedResult = new Error('TEST')
     const onError = test.mock([() => undefined])
     const actualResult = test.sync(
-      error.retry(ctx, () => Promise.reject(expectedResult), {
+      error.retry(ctx, async () => Promise.reject(expectedResult), {
+        maxAttempts: 2,
         minDelayMs: time.interval({
           milliseconds: 10,
         }),
-        windowMs: time.interval({ seconds: 10 }),
-        maxAttempts: 2,
         onError,
+        windowMs: time.interval({ seconds: 10 }),
       })
     )
     await ctx.time.clock.tickAsync(0)
@@ -66,10 +67,11 @@ export const tests = {
     await ctx.time.clock.tickAsync(10)
     test.assertEquals(actualResult.rejectedValue, expectedResult)
   },
+
   ['three attempts, count limit']: async (
     baseContext: test.Context
   ): Promise<void> => {
-    const ctx: test.Context & error.Context = {
+    const ctx: error.Context & test.Context = {
       ...baseContext,
       random: {
         ...baseContext.random,
@@ -79,13 +81,13 @@ export const tests = {
     const expectedResult = new Error('TEST')
     const onError = test.mock([() => undefined, () => undefined])
     const actualResult = test.sync(
-      error.retry(ctx, () => Promise.reject(expectedResult), {
+      error.retry(ctx, async () => Promise.reject(expectedResult), {
+        maxAttempts: 3,
         minDelayMs: time.interval({
           milliseconds: 10,
         }),
-        windowMs: time.interval({ seconds: 10 }),
-        maxAttempts: 3,
         onError,
+        windowMs: time.interval({ seconds: 10 }),
       })
     )
     await ctx.time.clock.tickAsync(0)
@@ -102,10 +104,11 @@ export const tests = {
     await ctx.time.clock.tickAsync(16)
     test.assertEquals(actualResult.rejectedValue, expectedResult)
   },
+
   ['one attempt, window limit']: async (
     baseContext: test.Context
   ): Promise<void> => {
-    const ctx: test.Context & error.Context = {
+    const ctx: error.Context & test.Context = {
       ...baseContext,
       random: {
         ...baseContext.random,
@@ -122,10 +125,10 @@ export const tests = {
           throw expectedResult
         },
         {
-          minDelayMs: time.interval({ seconds: 1 }),
-          windowMs: time.interval({ seconds: 10 }),
           maxAttempts: 10,
+          minDelayMs: time.interval({ seconds: 1 }),
           onError,
+          windowMs: time.interval({ seconds: 10 }),
         }
       )
     )
@@ -134,10 +137,11 @@ export const tests = {
     await ctx.time.clock.tickAsync(9_000)
     test.assertEquals(actualResult.rejectedValue, expectedResult)
   },
+
   ['three attempts, window limit']: async (
     baseContext: test.Context
   ): Promise<void> => {
-    const ctx: test.Context & error.Context = {
+    const ctx: error.Context & test.Context = {
       ...baseContext,
       random: {
         ...baseContext.random,
@@ -147,14 +151,14 @@ export const tests = {
     const expectedResult = new Error('TEST')
     const onError = test.mock([() => undefined, () => undefined])
     const actualResult = test.sync(
-      error.retry(ctx, () => Promise.reject(expectedResult), {
-        minDelayMs: time.interval({ seconds: 1 }),
-        windowMs: time.interval({
-          seconds: 2,
-          milliseconds: 201,
-        }),
+      error.retry(ctx, async () => Promise.reject(expectedResult), {
         maxAttempts: 10,
+        minDelayMs: time.interval({ seconds: 1 }),
         onError,
+        windowMs: time.interval({
+          milliseconds: 201,
+          seconds: 2,
+        }),
       })
     )
     await ctx.time.clock.tickAsync(0)
@@ -171,10 +175,11 @@ export const tests = {
     await ctx.time.clock.tickAsync(1200)
     test.assertEquals(actualResult.rejectedValue, expectedResult)
   },
+
   ['three attempts, pass']: async (
     baseContext: test.Context
   ): Promise<void> => {
-    const ctx: test.Context & error.Context = {
+    const ctx: error.Context & test.Context = {
       ...baseContext,
       random: {
         ...baseContext.random,
@@ -184,17 +189,17 @@ export const tests = {
     const expectedResult = {}
     const expectedError = new Error('TEST')
     const callback = test.mock([
-      () => Promise.reject(expectedError),
-      () => Promise.reject(expectedError),
-      () => Promise.resolve(expectedResult),
+      async () => Promise.reject(expectedError),
+      async () => Promise.reject(expectedError),
+      async () => Promise.resolve(expectedResult),
     ])
     const onError = test.mock([() => undefined, () => undefined])
     const actualResult = test.sync(
       error.retry(ctx, callback, {
-        minDelayMs: time.interval({ milliseconds: 10 }),
-        windowMs: time.interval({ seconds: 10 }),
         maxAttempts: 3,
+        minDelayMs: time.interval({ milliseconds: 10 }),
         onError,
+        windowMs: time.interval({ seconds: 10 }),
       })
     )
     await ctx.time.clock.tickAsync(0)

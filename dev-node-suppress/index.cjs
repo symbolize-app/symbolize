@@ -17,5 +17,5 @@ process.emitWarning = (warning, ...args) => {
     return
   }
 
-  return originalEmitWarning(warning, .../** @type any */ (args))
+  originalEmitWarning(warning, .../** @type any */ (args))
 }

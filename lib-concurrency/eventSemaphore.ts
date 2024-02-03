@@ -7,19 +7,19 @@ export class EventSemaphore {
     this.clear()
   }
 
-  set(): void {
-    if (!this.resolved) {
-      this.resolve()
-      this.resolved = true
-    }
-  }
-
   clear(): void {
     if (this.resolved) {
       this.ready = new Promise((resolve) => {
         this.resolve = resolve
       })
       this.resolved = false
+    }
+  }
+
+  set(): void {
+    if (!this.resolved) {
+      this.resolve()
+      this.resolved = true
     }
   }
 

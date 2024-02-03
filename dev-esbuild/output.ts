@@ -6,15 +6,15 @@ import * as nodeCrypto from 'node:crypto'
 import * as nodePath from 'node:path'
 import * as nodeZlib from 'node:zlib'
 
-type OutputFile = {
-  pathId: string
+interface OutputFile {
   original: Uint8Array
+  pathId: string
 }
 
-type ContentFile = {
-  pathId: string
-  original: Uint8Array
+interface ContentFile {
   contentId: Uint8Array
+  original: Uint8Array
+  pathId: string
 }
 
 const serviceWorkerMainPath = 'svc-gateway-guest-run/serviceWorker.ts.js'
@@ -57,8 +57,8 @@ export function write(
     ) {
       const compressed = compressContent(contentFile.original)
       ctx.db.query.updateContentCompressed.run({
-        id: contentFile.contentId,
         compressed,
+        id: contentFile.contentId,
       })
     }
   }
@@ -67,9 +67,9 @@ export function write(
     ctx.db.query.insertVersion.run({ id: versionId })
     for (const contentFile of allContentFiles) {
       ctx.db.query.insertPath.run({
+        content_id: contentFile.contentId,
         id: contentFile.pathId,
         version_id: versionId,
-        content_id: contentFile.contentId,
       })
     }
   })
@@ -103,7 +103,7 @@ function buildManifest(
   const pathId = `.manifest/${name}.js`
   const text = `Object.assign(manifest,${JSON.stringify(data)})`
   const original = Buffer.from(text, 'utf8')
-  return { pathId, original }
+  return { original, pathId }
 }
 
 function buildServiceWorkerShell(
@@ -113,7 +113,10 @@ function buildServiceWorkerShell(
 ): OutputFile {
   const serviceWorkerMain = mainContentFiles.find(
     (item) => item.pathId === serviceWorkerMainPath
-  )!
+  )
+  if (!serviceWorkerMain) {
+    throw new Error('Service worker main not found')
+  }
   const scripts = [...manifestFiles, serviceWorkerMain]
     .map(
       (item) => `"/.code/.id/${hex.uint8ArrayToHex(item.contentId)}.js"`
@@ -126,7 +129,7 @@ function buildServiceWorkerShell(
     `importScripts(${scripts})`,
   ].join(';')
   const original = Buffer.from(text, 'utf8')
-  return { pathId, original }
+  return { original, pathId }
 }
 
 function compressContent(original: Uint8Array): Uint8Array {

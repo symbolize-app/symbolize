@@ -2,8 +2,8 @@ const highWaterMark = 16
 const limit = 8
 
 export class Sink<T> {
-  private readonly active: Set<Promise<void>> = new Set()
   readonly writable: WritableStream<T>
+  private readonly active: Set<Promise<void>> = new Set<Promise<void>>()
 
   constructor(onData: (data: T) => Promise<void>) {
     const active = this.active

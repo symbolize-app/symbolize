@@ -1,9 +1,9 @@
-export type Context = {
+export interface Context {
   style: {
     element: HTMLStyleElement
-    sheet: CSSStyleSheet
-    renderMap: Map<string, Map<Style, string[]>>
     renderCount: number
+    renderMap: Map<string, Map<Style, string[]>>
+    sheet: CSSStyleSheet
   }
 }
 
@@ -21,9 +21,9 @@ export function initContext(document: Document): Context {
   return {
     style: {
       element,
-      sheet,
-      renderMap,
       renderCount,
+      renderMap,
+      sheet,
     },
   }
 }
@@ -37,8 +37,8 @@ type StyleProps = {
 }
 
 enum StyleNesting {
-  selector,
-  combinatorSelector,
+  combinatorSelector = 0,
+  selector = 1,
 }
 
 type StyleSelector = [
@@ -51,30 +51,30 @@ type StyleSelector = [
 
 type StyleCombinatorSelector = [
   {
-    nesting: StyleNesting.combinatorSelector
     combinatorSelector: string
+    nesting: StyleNesting.combinatorSelector
   },
   StyleBody,
 ]
 
 type StyleBody = (
+  | Style
+  | StyleCombinatorSelector
   | StyleProps
   | StyleSelector
-  | StyleCombinatorSelector
-  | Style
 )[]
 
-export type Style = {
-  name: string
+export interface Style {
   body: StyleBody
+  name: string
 }
 
 export function build(body: StyleBody): Style {
   const styleNameClass = `s${globalStyleNameCount.toString(styleNameBase)}`
   globalStyleNameCount += 1
   return {
+    body,
     name: styleNameClass,
-    body: body,
   }
 }
 
@@ -97,8 +97,8 @@ export function useCombinatorSelector(
 ): StyleCombinatorSelector {
   return [
     {
-      nesting: StyleNesting.combinatorSelector,
       combinatorSelector: combinatorSelectorValue,
+      nesting: StyleNesting.combinatorSelector,
     },
     body,
   ]
@@ -196,7 +196,7 @@ function renderStyleSelector(
 ): string[] {
   return renderNestedStyle(
     ctx,
-    { name: styleName, body: style[1] },
+    { body: style[1], name: styleName },
     combinatorSelectorValue,
     selectorValue
       ? `${selectorValue}${style[0].selector.substring(1)}`
@@ -219,7 +219,7 @@ function renderStyleCombinatorSelector(
   }
   return renderNestedStyle(
     ctx,
-    { name: styleName, body: style[1] },
+    { body: style[1], name: styleName },
     style[0].combinatorSelector,
     selectorValue,
     false

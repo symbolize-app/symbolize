@@ -11,9 +11,13 @@ export function initContext(): Context {
   const clock = fakeTimers.createClock(1616952581493)
   return {
     time: {
-      performanceNow: () => clock.now,
-      setTimeout: (...args) => clock.setTimeout(...args),
       clock,
+      performanceNow() {
+        return clock.now
+      },
+      setTimeout(callback, ms) {
+        return clock.setTimeout(callback, ms)
+      },
     },
   }
 }
