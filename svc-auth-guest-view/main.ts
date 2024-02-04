@@ -5,7 +5,8 @@ export function main(ctx: error.Context & stream.ClientContext): void {
   const clientSource = stream.connect(
     ctx,
     'svc-auth-guest-read',
-    (data) => {
+    async (data) => {
+      // eslint-disable-next-line no-console
       console.log('client data', data)
       return Promise.resolve()
     }

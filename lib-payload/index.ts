@@ -1,6 +1,6 @@
 export type JsonValue =
-  | JsonObject
   | JsonArray
+  | JsonObject
   | boolean
   | number
   | string
@@ -13,12 +13,12 @@ export type JsonArray = JsonValue[]
 export type JsonPayload<CustomTransformer> =
   CustomTransformer extends JsonPayloadTransformer<infer T> ? T : never
 
-export type JsonPayloadTransformer<Value> = {
-  fromJson: (input: JsonValue, path?: Path) => Value
-  toJson: (output: Value, path?: Path) => JsonValue
+export interface JsonPayloadTransformer<Value> {
+  fromJson(input: JsonValue, path?: Path): Value
+  toJson(output: Value, path?: Path): JsonValue
 }
 
-export type Path = undefined | (() => (string | number)[])
+export type Path = (() => (number | string)[]) | undefined
 
 export class PayloadError extends Error {
   constructor(message: string, path: Path) {
@@ -85,7 +85,7 @@ export function object<Value extends Record<never, never>>(config: {
 function checkObject(
   value: unknown,
   path: Path
-): asserts value is Record<string | symbol | number, unknown> {
+): asserts value is Record<number | string | symbol, unknown> {
   if (
     value === null ||
     typeof value !== 'object' ||
@@ -119,6 +119,7 @@ export function array<Value>(
       checkArray(input, path)
       const result = [] as Value[]
       for (let i = 0; i < input.length; i++) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const item = input[i]!
         result[i] = config.fromJson(item, buildPath(i, path))
       }
@@ -128,6 +129,7 @@ export function array<Value>(
       checkArray(output, path)
       const result = [] as JsonArray
       for (let i = 0; i < output.length; i++) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const item = output[i]!
         result[i] = config.toJson(item, buildPath(i, path))
       }
@@ -173,8 +175,8 @@ function checkString(value: unknown, path: Path): asserts value is string {
 }
 
 export function stringLength(config: {
-  min: number
   max: number
+  min: number
 }): JsonPayloadTransformer<string> {
   function check(value: string, path: Path): void {
     if (value.length < config.min) {
@@ -236,9 +238,9 @@ export function stringOption<Options extends string>(
 }
 
 export function stringLengthMatch(config: {
-  min: number
-  max: number
   match: RegExp
+  max: number
+  min: number
 }): JsonPayloadTransformer<string> {
   function check(value: string, path: Path): void {
     if (!config.match.exec(value)) {
@@ -292,8 +294,8 @@ function checkNumber(value: unknown, path: Path): asserts value is number {
 }
 
 export function numberRange(config: {
-  min: number
   max: number
+  min: number
 }): JsonPayloadTransformer<number> {
   function check(value: number, path: Path): void {
     if (value < config.min) {
@@ -324,8 +326,8 @@ export function numberRange(config: {
 }
 
 export function integerRange(config: {
-  min: number
   max: number
+  min: number
 }): JsonPayloadTransformer<number> {
   function check(value: number, path: Path): void {
     if ((value | 0) !== value) {
@@ -373,7 +375,7 @@ function checkBoolean(
   }
 }
 
-export function buildPath(part: string | number, parentPath: Path): Path {
+export function buildPath(part: number | string, parentPath: Path): Path {
   return () => [...(parentPath ? parentPath() : []), part]
 }
 

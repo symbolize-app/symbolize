@@ -16,7 +16,7 @@ export type Database = sqlite.Database
 
 export type Statement = sqlite.Statement
 
-export type Context = {
+export interface Context {
   db: {
     connection: Database
     query: {
@@ -48,8 +48,8 @@ async function runMigrations(): Promise<void> {
 
 function open(): Database {
   return sqlite('svc-gateway-host-store/build/manifest.sqlite3', {
-    readonly: false,
     fileMustExist: true,
+    readonly: false,
   })
 }
 

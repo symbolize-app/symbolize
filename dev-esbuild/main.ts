@@ -30,15 +30,15 @@ async function main(): Promise<void> {
   const outdir = nodePath.resolve(`build/guest/${mode}`)
   if (clean) {
     await nodeFsPromises.rm(outdir, {
-      recursive: true,
       force: true,
+      recursive: true,
     })
   } else {
     const ctx = {
       ...timeNode.initContext(),
       ...(await devDatabase.initContext()),
-      outdir,
       mode,
+      outdir,
     }
     await nodeFsPromises.mkdir(outdir, {
       recursive: true,
@@ -57,6 +57,7 @@ async function build(ctx: devContext.Context): Promise<void> {
       outputFiles = buildResult.outputFiles
     }
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error(error)
   }
   if (outputFiles) {
@@ -64,8 +65,8 @@ async function build(ctx: devContext.Context): Promise<void> {
       ctx,
       versionId,
       outputFiles.map((item) => ({
-        pathId: item.path.substring(ctx.outdir.length + 1),
         original: item.contents,
+        pathId: item.path.substring(ctx.outdir.length + 1),
       }))
     )
   } else {
@@ -73,6 +74,7 @@ async function build(ctx: devContext.Context): Promise<void> {
   }
   const end = ctx.time.performanceNow()
   const elapsed = ms(Math.round(end - start))
+  // eslint-disable-next-line no-console
   console.log(`Done build ${versionId}: ${elapsed}`)
 }
 
@@ -90,37 +92,31 @@ async function buildFiles(
     './svc-gateway-guest-run/serviceWorkerRegister.ts',
   ]
   const commonOptions = {
-    platform: 'browser' as const,
-    outdir: ctx.outdir,
-    outbase: nodePath.resolve('.'),
-    define: {
-      ['import.meta.env.NODE_ENV']: JSON.stringify(ctx.mode),
-    },
+    define: { ['import.meta.env.NODE_ENV']: JSON.stringify(ctx.mode) },
+    external: ['timers', 'util'],
     logLevel: 'warning' as const,
     minify: ctx.mode === devContext.Mode.production,
+    outbase: nodePath.resolve('.'),
+    outdir: ctx.outdir,
+    platform: 'browser' as const,
     write: false,
-    external: ['timers', 'util'],
   }
   const classicResultPromise = esbuild.build({
     ...commonOptions,
-    format: 'iife',
     bundle: true,
     entryPoints: classicEntryPoints.map((entryPoint) =>
       nodePath.resolve(entryPoint)
     ),
-    loader: {
-      ['.html']: 'copy',
-    },
-    outExtension: {
-      ['.js']: '.ts.js',
-    },
+    format: 'iife',
+    loader: { ['.html']: 'copy' },
+    outExtension: { ['.js']: '.ts.js' },
   })
   const moduleResultPromise = devModules.build({
     ...commonOptions,
-    format: 'esm',
     entryPoints: moduleEntryPoints.map((entryPoint) =>
       nodePath.resolve(entryPoint)
     ),
+    format: 'esm',
   })
   const [classicResult, moduleResult] = await Promise.all([
     classicResultPromise,
@@ -128,11 +124,11 @@ async function buildFiles(
   ])
   return {
     errors: [...classicResult.errors, ...moduleResult.errors],
-    warnings: [...classicResult.warnings, ...moduleResult.warnings],
     outputFiles: [
       ...(classicResult.outputFiles ?? []),
       ...moduleResult.outputFiles,
     ],
+    warnings: [...classicResult.warnings, ...moduleResult.warnings],
   }
 }
 

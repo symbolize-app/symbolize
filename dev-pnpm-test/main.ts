@@ -11,7 +11,7 @@ export async function run(baseContext: time.Context): Promise<boolean> {
   const ctx = {
     ...baseContext,
   }
-  return await test.runAll(ctx, [import('@/index.ts')])
+  return test.runAll(ctx, [import('@/index.ts')])
 }
 
 if (

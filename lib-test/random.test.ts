@@ -4,7 +4,7 @@ import * as random from '@intertwine/lib-random'
 export const url = import.meta.url
 
 export const tests = {
-  ['requestId']: (ctx: test.Context): void => {
+  ['requestId'](ctx: test.Context): void {
     test.assertDeepEquals(
       random.requestId(ctx),
       new Uint8Array([
@@ -14,7 +14,8 @@ export const tests = {
       ])
     )
   },
-  ['requestIdHex']: (ctx: test.Context): void => {
+
+  ['requestIdHex'](ctx: test.Context): void {
     test.assertEquals(
       random.requestIdHex(ctx),
       '94194353ecc2a1448503e12775b8a20dc956a9ca26ef10f2fa930be7931bfa74'

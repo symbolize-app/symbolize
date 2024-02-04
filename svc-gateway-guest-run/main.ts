@@ -4,7 +4,7 @@ import * as random from '@intertwine/lib-random'
 import * as stream from '@intertwine/lib-stream'
 import * as timeBrowser from '@intertwine/lib-time/index.browser.ts'
 
-function main() {
+function main(): void {
   svcReload.listenForMessage()
   svcReload.listenForKeyboardShortcut()
 

@@ -6,6 +6,7 @@ export function groupBy<T, K>(
   for (const item of items) {
     const key = selector(item)
     if (groups.has(key)) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       groups.get(key)!.push(item)
     } else {
       groups.set(key, [item])

@@ -14,18 +14,22 @@ const mainHtmlPath = 'svc-gateway-guest-run/main.html'
 const cachePromise = self.caches.open(cacheName)
 
 function main(): void {
+  // eslint-disable-next-line no-console
   console.log(version, 'loading', self, manifest)
 
   self.addEventListener('message', (event) => {
+    // eslint-disable-next-line no-console
     console.log(version, 'message', event)
   })
 
   self.addEventListener('install', () => {
+    // eslint-disable-next-line no-console
     console.log(version, 'install')
     void self.skipWaiting()
   })
 
   self.addEventListener('activate', () => {
+    // eslint-disable-next-line no-console
     console.log(version, 'activate')
     void resetClients()
     void prepareCache()
@@ -39,7 +43,7 @@ function main(): void {
   })
 }
 
-function handle(event: FetchEvent, url: URL) {
+function handle(event: FetchEvent, url: URL): void {
   const path = url.pathname
   const codeIdPath = collection.stripPrefix(path, codeIdPrefix)
   const codePath = codeIdPath ?? collection.stripPrefix(path, codePrefix)
@@ -56,7 +60,7 @@ function handleContentById(
   event: FetchEvent,
   contentPath: string,
   sandbox: boolean
-) {
+): void {
   event.respondWith(patchFetchContent(contentPath, sandbox))
 }
 
@@ -64,9 +68,10 @@ function handleContentByPath(
   event: FetchEvent,
   path: string,
   sandbox: boolean
-) {
+): void {
   const contentPath = manifest[path] ?? null
   if (!contentPath) {
+    // eslint-disable-next-line no-console
     console.error(version, 'manifest error', path)
     event.respondWith(
       new Response('Path missing from manifest', { status: 404 })
@@ -86,6 +91,7 @@ const fetchContentMemo = new collection.Memo(
       if (cacheResponse) {
         return cacheResponse
       } else {
+        // eslint-disable-next-line no-console
         console.log(version, 'cache miss', contentPath)
         const response = await fetch(request)
         ok = response.ok
@@ -142,12 +148,14 @@ async function prepareCache(): Promise<void> {
       !contentPath ||
       !contentPaths.delete(contentPath)
     ) {
+      // eslint-disable-next-line no-console
       console.log(version, 'evict', key.method, key.url)
       await cache.delete(key)
     }
   }
 
   for (const contentPath of contentPaths) {
+    // eslint-disable-next-line no-console
     console.log(version, 'prepare', contentPath)
     await fetchContentMemo.get(contentPath)
   }
@@ -159,6 +167,7 @@ async function resetClients(): Promise<void> {
   })
   for (const client of clients) {
     if (client instanceof WindowClient) {
+      // eslint-disable-next-line no-console
       console.log(version, 'reloading window', client.id)
       client.postMessage('reload')
     }
