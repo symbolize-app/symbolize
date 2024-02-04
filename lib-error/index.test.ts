@@ -11,9 +11,7 @@ export const retryConfig: Omit<error.RetryConfig, 'onError'> = {
 export const url = import.meta.url
 
 export const tests = {
-  ['one attempt, pass']: async (
-    baseContext: test.Context
-  ): Promise<void> => {
+  async ['one attempt, pass'](baseContext: test.Context): Promise<void> {
     const ctx: error.Context & test.Context = {
       ...baseContext,
       random: {
@@ -37,9 +35,9 @@ export const tests = {
     test.assertEquals(actualResult.resolvedValue, expectedResult)
   },
 
-  ['two attempts, count limit']: async (
+  async ['two attempts, count limit'](
     baseContext: test.Context
-  ): Promise<void> => {
+  ): Promise<void> {
     const ctx: error.Context & test.Context = {
       ...baseContext,
       random: {
@@ -68,9 +66,9 @@ export const tests = {
     test.assertEquals(actualResult.rejectedValue, expectedResult)
   },
 
-  ['three attempts, count limit']: async (
+  async ['three attempts, count limit'](
     baseContext: test.Context
-  ): Promise<void> => {
+  ): Promise<void> {
     const ctx: error.Context & test.Context = {
       ...baseContext,
       random: {
@@ -105,9 +103,9 @@ export const tests = {
     test.assertEquals(actualResult.rejectedValue, expectedResult)
   },
 
-  ['one attempt, window limit']: async (
+  async ['one attempt, window limit'](
     baseContext: test.Context
-  ): Promise<void> => {
+  ): Promise<void> {
     const ctx: error.Context & test.Context = {
       ...baseContext,
       random: {
@@ -138,9 +136,9 @@ export const tests = {
     test.assertEquals(actualResult.rejectedValue, expectedResult)
   },
 
-  ['three attempts, window limit']: async (
+  async ['three attempts, window limit'](
     baseContext: test.Context
-  ): Promise<void> => {
+  ): Promise<void> {
     const ctx: error.Context & test.Context = {
       ...baseContext,
       random: {
@@ -176,9 +174,9 @@ export const tests = {
     test.assertEquals(actualResult.rejectedValue, expectedResult)
   },
 
-  ['three attempts, pass']: async (
+  async ['three attempts, pass'](
     baseContext: test.Context
-  ): Promise<void> => {
+  ): Promise<void> {
     const ctx: error.Context & test.Context = {
       ...baseContext,
       random: {

@@ -27,7 +27,11 @@
     "no-new": "warn",
     "no-new-wrappers": "warn",
     "prefer-arrow-callback": "warn",
-    "object-shorthand": "warn",
+    "object-shorthand": [
+      "warn",
+      "always",
+      { "avoidExplicitReturnArrows": true }
+    ],
     "prefer-named-capture-group": "warn",
     "sort-keys": ["warn", "asc", { "allowLineSeparatedGroups": true }],
     "import/first": "warn",
