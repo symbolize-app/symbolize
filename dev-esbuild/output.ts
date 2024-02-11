@@ -7,14 +7,14 @@ import * as nodePath from 'node:path'
 import * as nodeZlib from 'node:zlib'
 
 interface OutputFile {
-  original: Uint8Array
-  pathId: string
+  readonly original: Uint8Array
+  readonly pathId: string
 }
 
 interface ContentFile {
-  contentId: Uint8Array
-  original: Uint8Array
-  pathId: string
+  readonly contentId: Uint8Array
+  readonly original: Uint8Array
+  readonly pathId: string
 }
 
 const serviceWorkerMainPath = 'svc-gateway-guest-run/serviceWorker.ts.js'
@@ -28,7 +28,7 @@ export function createVersion(): bigint {
 export function write(
   ctx: devContext.Context,
   versionId: bigint,
-  outputFiles: OutputFile[]
+  outputFiles: readonly OutputFile[]
 ): void {
   const mainContentFiles = outputFiles.map(convertToContentFile)
   const manifestFiles = collection
@@ -90,7 +90,7 @@ function getContentId(original: Uint8Array): Uint8Array {
 
 function buildManifest(
   name: string,
-  contentFiles: ContentFile[]
+  contentFiles: readonly ContentFile[]
 ): OutputFile {
   const data = Object.fromEntries(
     contentFiles.map((item) => [
@@ -108,8 +108,8 @@ function buildManifest(
 
 function buildServiceWorkerShell(
   versionId: bigint,
-  mainContentFiles: ContentFile[],
-  manifestFiles: ContentFile[]
+  mainContentFiles: readonly ContentFile[],
+  manifestFiles: readonly ContentFile[]
 ): OutputFile {
   const serviceWorkerMain = mainContentFiles.find(
     (item) => item.pathId === serviceWorkerMainPath

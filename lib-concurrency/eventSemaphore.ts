@@ -1,29 +1,29 @@
 export class EventSemaphore {
-  private ready!: Promise<void>
-  private resolve!: () => void
-  private resolved: boolean = true
+  private mutableReady!: Promise<void>
+  private mutableResolve!: () => void
+  private mutableResolved: boolean = true
 
   constructor() {
     this.clear()
   }
 
   clear(): void {
-    if (this.resolved) {
-      this.ready = new Promise((resolve) => {
-        this.resolve = resolve
+    if (this.mutableResolved) {
+      this.mutableReady = new Promise((resolve) => {
+        this.mutableResolve = resolve
       })
-      this.resolved = false
+      this.mutableResolved = false
     }
   }
 
   set(): void {
-    if (!this.resolved) {
-      this.resolve()
-      this.resolved = true
+    if (!this.mutableResolved) {
+      this.mutableResolve()
+      this.mutableResolved = true
     }
   }
 
   async wait(): Promise<void> {
-    await this.ready
+    await this.mutableReady
   }
 }

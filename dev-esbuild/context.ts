@@ -3,8 +3,8 @@ import type * as time from '@intertwine/lib-time'
 
 export type Context = devDatabase.Context &
   time.Context & {
-    mode: Mode
-    outdir: string
+    readonly mode: Mode
+    readonly outdir: string
   }
 
 export enum Mode {

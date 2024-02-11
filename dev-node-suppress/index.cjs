@@ -1,4 +1,5 @@
 /* eslint-env node */
+/* eslint-disable functional/immutable-data */
 /* eslint-disable @typescript-eslint/unbound-method */
 'use strict'
 

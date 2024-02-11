@@ -1,7 +1,7 @@
 import * as hex from '@intertwine/lib-hex'
 
 export interface Context {
-  random: {
+  readonly random: {
     cryptoBits(bits: number): Uint8Array
     number(): number
   }

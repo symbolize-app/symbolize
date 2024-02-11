@@ -3,10 +3,12 @@ const limit = 8
 
 export class Sink<T> {
   readonly writable: WritableStream<T>
-  private readonly active: Set<Promise<void>> = new Set<Promise<void>>()
+  private readonly mutableActive: Set<Promise<void>> = new Set<
+    Promise<void>
+  >()
 
   constructor(onData: (data: T) => Promise<void>) {
-    const active = this.active
+    const active = this.mutableActive
     this.writable = new WritableStream(
       {
         async write(data) {

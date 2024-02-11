@@ -1,19 +1,19 @@
 export class Memo<K, V> {
-  private readonly results = new Map<K, V>()
+  private readonly mutableResults = new Map<K, V>()
 
   constructor(private readonly builder: (key: K) => V) {}
 
   delete(key: K): void {
-    this.results.delete(key)
+    this.mutableResults.delete(key)
   }
 
   get(key: K): V {
-    if (this.results.has(key)) {
+    if (this.mutableResults.has(key)) {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      return this.results.get(key)!
+      return this.mutableResults.get(key)!
     } else {
       const value = this.builder(key)
-      this.results.set(key, value)
+      this.mutableResults.set(key, value)
       return value
     }
   }

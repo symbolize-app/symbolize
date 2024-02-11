@@ -1,5 +1,5 @@
 export interface Context {
-  time: {
+  readonly time: {
     performanceNow(): number
     setTimeout(callback: () => void, ms: number): unknown
   }
@@ -20,10 +20,10 @@ const conversionTable = {
 } as const
 
 export function interval(parts: {
-  hours?: number
-  milliseconds?: number
-  minutes?: number
-  seconds?: number
+  readonly hours?: number
+  readonly milliseconds?: number
+  readonly minutes?: number
+  readonly seconds?: number
 }): number {
   return (
     (parts.hours ?? 0) * conversionTable.hours +
@@ -40,10 +40,16 @@ export function convert(
   return ms / conversionTable[unit]
 }
 
-export function subtract(to: Date, from: Date): number {
+export function subtract(
+  to: Readonly<Date>,
+  from: Readonly<Date>
+): number {
   return to.getTime() - from.getTime()
 }
 
-export function add(initial: Date, ms: number): Date {
+export function add(
+  initial: Readonly<Date>,
+  ms: Readonly<number>
+): Readonly<Date> {
   return new Date(initial.getTime() + ms)
 }

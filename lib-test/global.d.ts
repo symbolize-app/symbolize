@@ -1,3 +1,4 @@
+/* eslint-disable functional/prefer-immutable-types */
 /* eslint-disable @typescript-eslint/naming-convention */
 
 declare module 'fast-mersenne-twister' {

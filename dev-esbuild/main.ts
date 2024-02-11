@@ -70,6 +70,7 @@ async function build(ctx: devContext.Context): Promise<void> {
       }))
     )
   } else {
+    // eslint-disable-next-line functional/immutable-data
     process.exitCode = 1
   }
   const end = ctx.time.performanceNow()

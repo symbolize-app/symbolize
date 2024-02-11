@@ -2,6 +2,7 @@ import * as collection from '@intertwine/lib-collection'
 import * as esbuild from 'esbuild'
 import * as nodePath from 'node:path'
 
+// eslint-disable-next-line functional/type-declaration-immutability
 export interface BuildOptions
   extends Omit<
     esbuild.BuildOptions,
@@ -17,6 +18,7 @@ export interface BuildOptions
   outbase: string
 }
 
+// eslint-disable-next-line functional/type-declaration-immutability
 export interface BuildResult<
   ProvidedOptions extends BuildOptions = BuildOptions,
 > extends Omit<
@@ -29,9 +31,10 @@ export interface BuildResult<
 const resolveBase = Symbol('resolveBase')
 
 export async function build<T extends BuildOptions>(
+  // eslint-disable-next-line functional/prefer-immutable-types
   options: esbuild.SameShape<BuildOptions, T>
 ): Promise<BuildResult<T>> {
-  const result: BuildResult<T> = {
+  const mutableResult: BuildResult<T> = {
     errors: [],
     outputFiles: [],
     warnings: [],
@@ -73,21 +76,21 @@ export async function build<T extends BuildOptions>(
       plugins: [...(options.plugins ?? []), plugin],
     })
 
-    result.errors.push(...moduleResult.errors)
-    result.warnings.push(...moduleResult.warnings)
-    result.outputFiles.push(...(moduleResult.outputFiles ?? []))
+    mutableResult.errors.push(...moduleResult.errors)
+    mutableResult.warnings.push(...moduleResult.warnings)
+    mutableResult.outputFiles.push(...(moduleResult.outputFiles ?? []))
     entryPoints = newEntryPoints
   }
 
-  return result
+  return mutableResult
 }
 
 async function resolve(
-  build: esbuild.PluginBuild,
+  build: Readonly<esbuild.PluginBuild>,
   convertToOutPathMemo: collection.Memo<string, string>,
-  allEntryPoints: Set<string>,
-  newEntryPoints: { in: string; out: string }[],
-  args: esbuild.OnResolveArgs
+  mutableAllEntryPoints: Set<string>,
+  mutableNewEntryPoints: { in: string; out: string }[],
+  args: Readonly<esbuild.OnResolveArgs>
 ): Promise<esbuild.OnResolveResult | undefined> {
   if (args.pluginData === resolveBase) {
     return undefined
@@ -105,12 +108,12 @@ async function resolve(
     ['import-statement', 'dynamic-import'].includes(args.kind)
   ) {
     const outPath = convertToOutPathMemo.get(resolveResult.path)
-    if (!allEntryPoints.has(resolveResult.path)) {
-      newEntryPoints.push({
+    if (!mutableAllEntryPoints.has(resolveResult.path)) {
+      mutableNewEntryPoints.push({
         in: resolveResult.path,
         out: outPath,
       })
-      allEntryPoints.add(resolveResult.path)
+      mutableAllEntryPoints.add(resolveResult.path)
     }
     const relativePath = `${nodePath.relative(
       nodePath.dirname(convertToOutPathMemo.get(args.importer)),
@@ -129,14 +132,14 @@ async function resolve(
   }
 }
 
-const pnpmPattern = new RegExp(
+const pnpmPattern: Readonly<RegExp> = new RegExp(
   /^node_modules\/\.pnpm\/(?<package_>[^/]+)@(?<version>[^/]+)\/node_modules\/[^/]+\//
 )
 
 function convertToOutPath(
   inPath: string,
   outbase: string,
-  pnpmPackageVersions: Map<string, string>
+  mutablePnpmPackageVersions: Map<string, string>
 ): string {
   const relative = nodePath.relative(outbase, inPath)
   const pnpmMatch = pnpmPattern.exec(relative)
@@ -147,9 +150,9 @@ function convertToOutPath(
       package_: string
       version: string
     }
-    const previousVersion = pnpmPackageVersions.get(package_)
+    const previousVersion = mutablePnpmPackageVersions.get(package_)
     if (previousVersion === undefined) {
-      pnpmPackageVersions.set(package_, version)
+      mutablePnpmPackageVersions.set(package_, version)
     } else if (previousVersion !== version) {
       throw new Error(
         `Ambiguous versions found for ${package_}: ${previousVersion} / ${version}`

@@ -2,13 +2,13 @@ import * as collection from '@intertwine/lib-collection'
 import * as time from '@intertwine/lib-time'
 import * as timeBrowser from '@intertwine/lib-time/index.browser.ts'
 
-declare const self: ServiceWorkerGlobalScope
+declare const self: Readonly<ServiceWorkerGlobalScope>
 declare const version: bigint
-declare const manifest: Record<string, string>
+declare const manifest: Readonly<Record<string, string>>
 
 const cacheName = 'code-v1'
-const codeIdPrefix = /^\/\.code\/\.id\//
-const codePrefix = /\/\.code\//
+const codeIdPrefix: Readonly<RegExp> = /^\/\.code\/\.id\//
+const codePrefix: Readonly<RegExp> = /\/\.code\//
 const mainHtmlPath = 'svc-gateway-guest-run/main.html'
 
 const cachePromise = self.caches.open(cacheName)
@@ -43,7 +43,7 @@ function main(): void {
   })
 }
 
-function handle(event: FetchEvent, url: URL): void {
+function handle(event: Readonly<FetchEvent>, url: Readonly<URL>): void {
   const path = url.pathname
   const codeIdPath = collection.stripPrefix(path, codeIdPrefix)
   const codePath = codeIdPath ?? collection.stripPrefix(path, codePrefix)
@@ -57,7 +57,7 @@ function handle(event: FetchEvent, url: URL): void {
 }
 
 function handleContentById(
-  event: FetchEvent,
+  event: Readonly<FetchEvent>,
   contentPath: string,
   sandbox: boolean
 ): void {
@@ -65,7 +65,7 @@ function handleContentById(
 }
 
 function handleContentByPath(
-  event: FetchEvent,
+  event: Readonly<FetchEvent>,
   path: string,
   sandbox: boolean
 ): void {

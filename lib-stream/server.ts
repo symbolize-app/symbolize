@@ -4,11 +4,11 @@ import * as streamSource from '@/source.ts'
 import * as collection from '@intertwine/lib-collection'
 import type * as time from '@intertwine/lib-time'
 
-declare const self: DedicatedWorkerGlobalScope
+declare const self: Readonly<DedicatedWorkerGlobalScope>
 
 export interface ServerContext {
-  streamServer: {
-    connectionRequestSources: collection.Memo<
+  readonly streamServer: {
+    readonly connectionRequestSources: collection.Memo<
       string,
       streamSource.Source<streamConnection.ConnectionRequest>
     >

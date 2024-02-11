@@ -4,9 +4,9 @@ import * as time from '@intertwine/lib-time'
 export type Context = random.Context & time.Context
 
 export interface RetryConfig {
-  maxAttempts: number
-  minDelayMs: number
-  windowMs: number
+  readonly maxAttempts: number
+  readonly minDelayMs: number
+  readonly windowMs: number
   onError(error: unknown, attempt: number, nextDelayMs: number): void
 }
 
