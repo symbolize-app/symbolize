@@ -2,7 +2,7 @@ import * as collection from '@intertwine/lib-collection'
 import * as esbuild from 'esbuild'
 import * as nodePath from 'node:path'
 
-// eslint-disable-next-line functional/type-declaration-immutability
+// eslint-disable-next-line functional/type-declaration-immutability -- library compatibility
 export interface BuildOptions
   extends Omit<
     esbuild.BuildOptions,
@@ -18,7 +18,7 @@ export interface BuildOptions
   outbase: string
 }
 
-// eslint-disable-next-line functional/type-declaration-immutability
+// eslint-disable-next-line functional/type-declaration-immutability -- library compatibility
 export interface BuildResult<
   ProvidedOptions extends BuildOptions = BuildOptions,
 > extends Omit<
@@ -31,7 +31,7 @@ export interface BuildResult<
 const resolveBase = Symbol('resolveBase')
 
 export async function build<T extends BuildOptions>(
-  // eslint-disable-next-line functional/prefer-immutable-types
+  // eslint-disable-next-line functional/prefer-immutable-types -- library compatibility
   options: esbuild.SameShape<BuildOptions, T>
 ): Promise<BuildResult<T>> {
   const mutableResult: BuildResult<T> = {

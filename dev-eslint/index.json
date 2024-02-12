@@ -13,6 +13,7 @@
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/strict-type-checked",
     "plugin:@typescript-eslint/stylistic-type-checked",
+    "plugin:deprecation/recommended",
     "plugin:functional/external-vanilla-recommended",
     "plugin:functional/external-typescript-recommended",
     "plugin:functional/no-mutations",

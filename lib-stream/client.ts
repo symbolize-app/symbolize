@@ -59,7 +59,7 @@ export function connect(
     (resolve) => (resolveServerStream = resolve)
   )
   ctx.streamClient.mutableResolveServerStream.push(
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- set by promise constructor
     resolveServerStream!
   )
   ctx.streamClient.worker.postMessage(connectionRequest, [

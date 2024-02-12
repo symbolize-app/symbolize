@@ -175,7 +175,7 @@ export function mock<
     if (i === returnValues.length) {
       throw new Error('called too many times')
     } else {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- already checked
       const result = returnValues[i]!()
       mutableCallback[mockHistory].push(args)
       i += 1
@@ -247,13 +247,10 @@ export function assertEquals<Value>(actual: Value, expected: Value): void {
   }
 }
 
-export function assertInstanceOf<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  Constructor extends new (...args: any) => any,
->(
+export function assertInstanceOf<Result, Args extends unknown[]>(
   actual: unknown,
-  expectedType: Constructor
-): asserts actual is InstanceType<Constructor> {
+  expectedType: abstract new (...args: Args) => Result
+): asserts actual is Result {
   if (!(actual instanceof expectedType)) {
     throw new AssertionError(
       'Not instance of',
