@@ -25,13 +25,13 @@ export const load = (url, context, defaultLoad) => {
     return (async () => {
       if (ext === '.sql') {
         const source = (await nodeFsPromises.readFile(fullPath)).toString(
-          'utf-8'
+          'utf-8',
         )
         return {
           format: 'module',
           shortCircuit: true,
           source: `const text = ${JSON.stringify(
-            source
+            source,
           )}\nexport default text`,
         }
       } else {
@@ -60,9 +60,9 @@ export const load = (url, context, defaultLoad) => {
   } else {
     return defaultLoad(url, {
       ...context,
-      ...(ext === '.json'
-        ? { importAssertions: { type: 'json' } }
-        : undefined),
+      ...(ext === '.json' ?
+        { importAssertions: { type: 'json' } }
+      : undefined),
     })
   }
 }

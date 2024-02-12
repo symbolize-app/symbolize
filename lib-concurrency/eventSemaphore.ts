@@ -3,8 +3,14 @@ export class EventSemaphore {
   private mutableResolve!: () => void
   private mutableResolved: boolean = true
 
-  constructor() {
-    this.clear()
+  private constructor() {
+    // Private
+  }
+
+  static build(): Readonly<EventSemaphore> {
+    const eventSemaphore = new EventSemaphore()
+    eventSemaphore.clear()
+    return eventSemaphore
   }
 
   clear(): void {

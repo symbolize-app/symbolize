@@ -14,6 +14,8 @@ const mainHtmlPath = 'svc-gateway-guest-run/main.html'
 const cachePromise = self.caches.open(cacheName)
 
 function main(): void {
+  const ctx = { time: new timeBrowser.TimeImpl() }
+
   // eslint-disable-next-line no-console
   console.log(version, 'loading', self, manifest)
 
@@ -32,7 +34,7 @@ function main(): void {
     // eslint-disable-next-line no-console
     console.log(version, 'activate')
     void resetClients()
-    void prepareCache()
+    void prepareCache(ctx)
   })
 
   self.addEventListener('fetch', (event) => {
@@ -59,7 +61,7 @@ function handle(event: Readonly<FetchEvent>, url: Readonly<URL>): void {
 function handleContentById(
   event: Readonly<FetchEvent>,
   contentPath: string,
-  sandbox: boolean
+  sandbox: boolean,
 ): void {
   event.respondWith(patchFetchContent(contentPath, sandbox))
 }
@@ -67,14 +69,14 @@ function handleContentById(
 function handleContentByPath(
   event: Readonly<FetchEvent>,
   path: string,
-  sandbox: boolean
+  sandbox: boolean,
 ): void {
   const contentPath = manifest[path] ?? null
   if (!contentPath) {
     // eslint-disable-next-line no-console
     console.error(version, 'manifest error', path)
     event.respondWith(
-      new Response('Path missing from manifest', { status: 404 })
+      new Response('Path missing from manifest', { status: 404 }),
     )
   } else {
     handleContentById(event, contentPath, sandbox)
@@ -105,12 +107,12 @@ const fetchContentMemo = new collection.Memo(
         fetchContentMemo.delete(contentPath)
       }
     }
-  }
+  },
 )
 
 async function patchFetchContent(
   contentPath: string,
-  sandbox: boolean
+  sandbox: boolean,
 ): Promise<Response> {
   const response = (await fetchContentMemo.get(contentPath)).clone()
   const headers = new Headers(response.headers)
@@ -121,7 +123,7 @@ async function patchFetchContent(
       contentSecurityPolicy
         .split(';')
         .filter((item) => item !== 'sandbox')
-        .join(';')
+        .join(';'),
     )
   }
   return new Response(response.body, {
@@ -131,9 +133,8 @@ async function patchFetchContent(
   })
 }
 
-async function prepareCache(): Promise<void> {
+async function prepareCache(ctx: time.Context): Promise<void> {
   const cache = await cachePromise
-  const ctx = timeBrowser.initContext()
 
   await time.delay(ctx, 5_000)
 

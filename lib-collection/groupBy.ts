@@ -1,6 +1,6 @@
 export function groupBy<T, K>(
   items: readonly T[],
-  selector: (item: T) => K
+  selector: (item: T) => K,
 ): readonly [key: K, groupItems: T[]][] {
   const mutableGroups = new Map<K, T[]>()
   for (const item of items) {

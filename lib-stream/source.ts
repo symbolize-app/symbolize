@@ -4,15 +4,19 @@ const highWaterMark = 16
 const timeoutMs = 1_000
 
 export class Source<T> {
-  readonly readable: ReadableStream<T>
-  private readonly writer: WritableStreamDefaultWriter<T>
+  private constructor(
+    private readonly writer: WritableStreamDefaultWriter<T>,
+    readonly readable: ReadableStream<T>,
+  ) {}
 
-  constructor() {
+  static build<T>(): Source<T> {
     const transform = new TransformStream<T, T>(undefined, {
       highWaterMark,
     })
-    this.writer = transform.writable.getWriter()
-    this.readable = transform.readable
+    return new Source<T>(
+      transform.writable.getWriter(),
+      transform.readable,
+    )
   }
 
   async send(ctx: time.Context, data: T): Promise<void> {

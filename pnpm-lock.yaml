@@ -141,8 +141,8 @@ importers:
         specifier: 3.3.2
         version: 3.3.2
       prettier:
-        specifier: 3.0.3
-        version: 3.0.3
+        specifier: 3.2.5
+        version: 3.2.5
       syncpack:
         specifier: 11.2.1
         version: 11.2.1
@@ -184,11 +184,7 @@ importers:
         specifier: 5.2.2
         version: 5.2.2
 
-  dev-eslint:
-    devDependencies:
-      prettier:
-        specifier: 3.0.3
-        version: 3.0.3
+  dev-eslint: {}
 
   dev-node-loader:
     dependencies:
@@ -265,17 +261,9 @@ importers:
         specifier: 5.2.2
         version: 5.2.2
 
-  dev-prettier:
-    devDependencies:
-      prettier:
-        specifier: 3.0.3
-        version: 3.0.3
+  dev-prettier: {}
 
-  dev-tsconfig:
-    devDependencies:
-      prettier:
-        specifier: 3.0.3
-        version: 3.0.3
+  dev-tsconfig: {}
 
   lib-collection:
     dependencies:
@@ -2746,8 +2734,8 @@ packages:
     engines: {node: '>= 0.8.0'}
     dev: true
 
-  /prettier@3.0.3:
-    resolution: {integrity: sha512-L/4pUDMxcNa8R/EthV08Zt42WBO4h1rarVtK0K+QJG0X187OLo7l699jWw0GKuwzkPQ//jMFA/8Xm6Fh3J/DAg==}
+  /prettier@3.2.5:
+    resolution: {integrity: sha512-3/GWa9aOC0YeD7LUfvOG2NiDyhOWRvt1k+rcKhOuYnMY24iiCphgneUfJDyFXd6rZCAnuLBv6UeAULtrhT/F4A==}
     engines: {node: '>=14'}
     hasBin: true
     dev: true

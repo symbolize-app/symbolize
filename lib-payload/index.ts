@@ -25,17 +25,17 @@ export class PayloadError extends Error {
     super(
       `${message} at (root)${(path ? path() : [])
         .map((part) =>
-          /^[A-Za-z_]\S*$/.exec(part.toString())
-            ? `.${part}`
-            : `[${JSON.stringify(part)}]`
+          /^[A-Za-z_]\S*$/.exec(part.toString()) ?
+            `.${part}`
+          : `[${JSON.stringify(part)}]`,
         )
-        .join('')}`
+        .join('')}`,
     )
   }
 }
 
 export function nullOr<Value>(
-  config: JsonPayloadTransformer<Value>
+  config: JsonPayloadTransformer<Value>,
 ): JsonPayloadTransformer<Value | null> {
   return {
     fromJson(input, path) {
@@ -69,7 +69,7 @@ export function object<
         checkValue(value, key, path)
         mutableResult[key] = config[key].fromJson(
           value,
-          buildPath(key, path)
+          buildPath(key, path),
         )
       }
       return mutableResult
@@ -82,7 +82,7 @@ export function object<
         checkValue(value, key, path)
         mutableResult[key] = config[key].toJson(
           value,
-          buildPath(key, path)
+          buildPath(key, path),
         )
       }
       return mutableResult
@@ -92,7 +92,7 @@ export function object<
 
 function checkObject(
   value: unknown,
-  path: Path
+  path: Path,
 ): asserts value is Record<number | string | symbol, unknown> {
   if (
     value === null ||
@@ -101,7 +101,7 @@ function checkObject(
   ) {
     throw new PayloadError(
       `Invalid object (wrong type ${getTypeName(value)})`,
-      path
+      path,
     )
   }
 }
@@ -109,18 +109,18 @@ function checkObject(
 function checkValue<T>(
   value: T,
   key: string,
-  path: Path
+  path: Path,
 ): asserts value is Exclude<T, undefined> {
   if (value === undefined) {
     throw new PayloadError(
       `Invalid object (missing key ${JSON.stringify(key)})`,
-      path
+      path,
     )
   }
 }
 
 export function array<Value>(
-  config: JsonPayloadTransformer<Value>
+  config: JsonPayloadTransformer<Value>,
 ): JsonPayloadTransformer<readonly Value[]> {
   return {
     fromJson(input, path) {
@@ -147,7 +147,7 @@ export function array<Value>(
 
 function checkArray(
   value: unknown,
-  path: Path
+  path: Path,
 ): asserts value is unknown[] {
   if (
     value === null ||
@@ -156,7 +156,7 @@ function checkArray(
   ) {
     throw new PayloadError(
       `Invalid array (wrong type ${getTypeName(value)})`,
-      path
+      path,
     )
   }
 }
@@ -176,7 +176,7 @@ function checkString(value: unknown, path: Path): asserts value is string {
   if (typeof value !== 'string') {
     throw new PayloadError(
       `Invalid string (wrong type ${getTypeName(value)})`,
-      path
+      path,
     )
   }
 }
@@ -189,12 +189,12 @@ export function stringLength(config: {
     if (value.length < config.min) {
       throw new PayloadError(
         `Invalid string (too short, min ${config.min})`,
-        path
+        path,
       )
     } else if (value.length > config.max) {
       throw new PayloadError(
         `Invalid string (too long, max ${config.max})`,
-        path
+        path,
       )
     }
   }
@@ -226,7 +226,7 @@ export function stringOption<Options extends string>(
       `Invalid string option (not ${options
         .map((option) => JSON.stringify(option))
         .join(' | ')})`,
-      path
+      path,
     )
   }
   const base = string
@@ -253,9 +253,9 @@ export function stringLengthMatch(config: {
     if (!config.match.exec(value)) {
       throw new PayloadError(
         `Invalid string match (for ${JSON.stringify(
-          config.match.toString()
+          config.match.toString(),
         )})`,
-        path
+        path,
       )
     }
   }
@@ -275,7 +275,7 @@ export function stringLengthMatch(config: {
 }
 
 export function stringEnum<Value extends string>(
-  mapping: Record<string, Value>
+  mapping: Record<string, Value>,
 ): JsonPayloadTransformer<Value> {
   return stringOption(...Object.values(mapping))
 }
@@ -295,7 +295,7 @@ function checkNumber(value: unknown, path: Path): asserts value is number {
   if (typeof value !== 'number') {
     throw new PayloadError(
       `Invalid number (wrong type ${getTypeName(value)})`,
-      path
+      path,
     )
   }
 }
@@ -308,12 +308,12 @@ export function numberRange(config: {
     if (value < config.min) {
       throw new PayloadError(
         `Invalid number (too small, min ${config.min})`,
-        path
+        path,
       )
     } else if (value > config.max) {
       throw new PayloadError(
         `Invalid number (too large, max ${config.max})`,
-        path
+        path,
       )
     }
   }
@@ -340,7 +340,7 @@ export function integerRange(config: {
     if ((value | 0) !== value) {
       throw new PayloadError(
         'Invalid integer (includes fractional component)',
-        path
+        path,
       )
     }
   }
@@ -372,12 +372,12 @@ export const boolean: JsonPayloadTransformer<boolean> = {
 
 function checkBoolean(
   value: unknown,
-  path: Path
+  path: Path,
 ): asserts value is boolean {
   if (typeof value !== 'boolean') {
     throw new PayloadError(
       `Invalid boolean (wrong type ${getTypeName(value)})`,
-      path
+      path,
     )
   }
 }

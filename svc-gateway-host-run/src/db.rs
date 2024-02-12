@@ -5,6 +5,8 @@ use anyhow::Result;
 use crossbeam::queue::ArrayQueue;
 #[cfg(test)]
 use mockall::automock;
+#[cfg(test)]
+use mockall::mock;
 use rusqlite;
 use rusqlite::OptionalExtension as _;
 use std::sync::Arc;
@@ -19,8 +21,26 @@ use tokio_util::task::TaskTracker;
 const MAX_IDLE_CONNECTIONS: usize = 512;
 const IDLE_CONNECTION_TIMEOUT: Duration = Duration::from_secs(30);
 
+pub trait Context
+where
+  Self::Impl: Db,
+{
+  type Impl;
+
+  fn db(&self) -> &Self::Impl;
+}
+
+#[cfg(test)]
+mock! {
+  pub Context {}
+  impl Context for Context {
+      type Impl = MockDb;
+      fn db(&self) -> &<Self as Context>::Impl;
+  }
+}
+
 #[cfg_attr(test, automock)]
-pub trait Context {
+pub trait Db {
   async fn get_content_by_id(
     &self,
     content_id: Vec<u8>,
@@ -32,7 +52,7 @@ pub trait Context {
   ) -> Result<Option<ContentRowWithId>>;
 }
 
-pub struct MainContext {
+pub struct DbImpl {
   connection_task_tracker: TaskTracker,
   idle_connections: Arc<ArrayQueue<oneshot::Sender<QueryRequest>>>,
 }
@@ -53,10 +73,10 @@ trait QueryFunction = for<'a> FnOnce(
 
 struct QueryRequest(Box<dyn QueryFunction + Send>);
 
-impl MainContext {
+impl DbImpl {
   pub async fn init() -> Result<Self> {
     Self::run_migrations().await?;
-    Ok(MainContext {
+    Ok(DbImpl {
       connection_task_tracker: TaskTracker::new(),
       idle_connections: Arc::new(ArrayQueue::new(MAX_IDLE_CONNECTIONS)),
     })
@@ -215,7 +235,7 @@ impl QueryRequest {
   }
 }
 
-impl Context for MainContext {
+impl Db for DbImpl {
   async fn get_content_by_id(
     &self,
     content_id: Vec<u8>,

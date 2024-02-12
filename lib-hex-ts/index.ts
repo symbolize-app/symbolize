@@ -9,6 +9,6 @@ export function uint8ArrayFromHex(input: string): Uint8Array {
     input
       .split(/(?<pair>..)/)
       .filter(Boolean)
-      .map((byte) => parseInt(byte, 16))
+      .map((byte) => parseInt(byte, 16)),
   )
 }

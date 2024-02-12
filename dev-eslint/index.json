@@ -62,14 +62,13 @@
       "error",
       {
         "enforcement": "ReadonlyShallow",
+        "ignoreNamePattern": ["^mutable.*"],
         "ignoreInferredTypes": true,
         "parameters": {
-          "ignoreInferredTypes": true,
-          "ignoreNamePattern": ["^mutable.*"]
+          "ignoreInferredTypes": true
         },
         "variables": {
-          "ignoreInFunctions": true,
-          "ignoreNamePattern": ["^mutable.*"]
+          "ignoreInFunctions": true
         }
       }
     ],
@@ -166,7 +165,7 @@
     ],
     "@typescript-eslint/parameter-properties": [
       "warn",
-      { "prefer": "parameter-property" }
+      { "allow": [], "prefer": "parameter-property" }
     ],
     "@typescript-eslint/prefer-enum-initializers": "warn",
     "@typescript-eslint/prefer-readonly": "warn",

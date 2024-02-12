@@ -7,51 +7,50 @@ import type * as time from '@intertwine/lib-time'
 declare const self: Readonly<DedicatedWorkerGlobalScope>
 
 export interface ServerContext {
-  readonly streamServer: {
-    readonly connectionRequestSources: collection.Memo<
-      string,
-      streamSource.Source<streamConnection.ConnectionRequest>
-    >
-  }
+  readonly streamServer: Server
 }
 
-export function initServerContext(ctx: time.Context): ServerContext {
-  const connectionRequestSources = new collection.Memo<
+export class Server {
+  private readonly connectionRequestSources: collection.Memo<
     string,
     streamSource.Source<streamConnection.ConnectionRequest>
-  >(() => new streamSource.Source())
+  > = new collection.Memo<
+    string,
+    streamSource.Source<streamConnection.ConnectionRequest>
+  >(() => streamSource.Source.build())
 
-  self.addEventListener('message', (event) => {
-    // eslint-disable-next-line no-console
-    console.log('message', event)
-    const connectionRequest =
-      event.data as streamConnection.ConnectionRequest
-    void connectionRequestSources
-      .get(connectionRequest.service)
-      .send(ctx, connectionRequest)
-  })
-
-  return {
-    streamServer: {
-      connectionRequestSources,
-    },
+  private constructor() {
+    // Private
   }
-}
 
-export function serve(
-  ctx: ServerContext,
-  service: string,
-  onConnect: (serverSource: streamSource.Source<unknown>) => Promise<{
-    onData(data: unknown): Promise<void>
-  }>
-): void {
-  const connectionRequestStream =
-    ctx.streamServer.connectionRequestSources.get(service).readable
+  static init(ctx: time.Context): Server {
+    const server = new Server()
 
-  const connectionRequestSink =
-    new streamSink.Sink<streamConnection.ConnectionRequest>(
-      async (connectionRequest) => {
-        const serverSource = new streamSource.Source<unknown>()
+    self.addEventListener('message', (event) => {
+      // eslint-disable-next-line no-console
+      console.log('message', event)
+      const connectionRequest =
+        event.data as streamConnection.ConnectionRequest
+      void server.connectionRequestSources
+        .get(connectionRequest.service)
+        .send(ctx, connectionRequest)
+    })
+
+    return server
+  }
+
+  serve(
+    service: string,
+    onConnect: (serverSource: streamSource.Source<unknown>) => Promise<{
+      onData(data: unknown): Promise<void>
+    }>,
+  ): void {
+    const connectionRequestStream =
+      this.connectionRequestSources.get(service).readable
+
+    const connectionRequestSink = streamSink.Sink.build(
+      async (connectionRequest: streamConnection.ConnectionRequest) => {
+        const serverSource = streamSource.Source.build()
         const connectResult = await onConnect(serverSource)
         const connectionResponse: streamConnection.ConnectionResponse = {
           connectionId: connectionRequest.connectionId,
@@ -61,12 +60,13 @@ export function serve(
         self.postMessage(connectionResponse, [
           connectionResponse.serverStream,
         ])
-        const serverSink = new streamSink.Sink(async (data) =>
-          connectResult.onData(data)
+        const serverSink = streamSink.Sink.build(async (data) =>
+          connectResult.onData(data),
         )
         void connectionRequest.clientStream.pipeTo(serverSink.writable)
         return Promise.resolve()
-      }
+      },
     )
-  void connectionRequestStream.pipeTo(connectionRequestSink.writable)
+    void connectionRequestStream.pipeTo(connectionRequestSink.writable)
+  }
 }

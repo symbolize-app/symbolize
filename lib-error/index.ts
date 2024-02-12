@@ -13,7 +13,7 @@ export interface RetryConfig {
 export async function retry<Result>(
   ctx: Context,
   callback: () => Promise<Result> | Result,
-  config: RetryConfig
+  config: RetryConfig,
 ): Promise<Result> {
   const startMs = ctx.time.performanceNow()
   let attempt = 0
@@ -29,7 +29,7 @@ export async function retry<Result>(
       const nowMs = ctx.time.performanceNow()
       const delayMs = Math.max(
         config.minDelayMs,
-        ctx.random.number() * config.minDelayMs * Math.pow(2, attempt)
+        ctx.random.number() * config.minDelayMs * Math.pow(2, attempt),
       )
       if (nowMs + delayMs >= startMs + config.windowMs) {
         throw error

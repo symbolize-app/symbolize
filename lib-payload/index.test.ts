@@ -27,7 +27,7 @@ export const tests = {
     test.assertInstanceOf(error, payload.PayloadError)
     test.assertEquals(
       error.message,
-      'Invalid object (wrong type null) at (root)'
+      'Invalid object (wrong type null) at (root)',
     )
   },
 
@@ -45,7 +45,7 @@ export const tests = {
     test.assertInstanceOf(error, payload.PayloadError)
     test.assertEquals(
       error.message,
-      'Invalid object (missing key "x") at (root)'
+      'Invalid object (missing key "x") at (root)',
     )
   },
 
@@ -58,12 +58,12 @@ export const tests = {
       }),
     })
     const error = test.assertThrows(() =>
-      validator.fromJson({ x: { ['space y']: {} } })
+      validator.fromJson({ x: { ['space y']: {} } }),
     )
     test.assertInstanceOf(error, payload.PayloadError)
     test.assertEquals(
       error.message,
-      'Invalid object (missing key "z") at (root).x["space y"]'
+      'Invalid object (missing key "z") at (root).x["space y"]',
     )
   },
 
@@ -79,7 +79,7 @@ export const tests = {
     test.assertInstanceOf(error, payload.PayloadError)
     test.assertEquals(
       error.message,
-      'Invalid array (wrong type null) at (root)'
+      'Invalid array (wrong type null) at (root)',
     )
   },
 
@@ -89,15 +89,15 @@ export const tests = {
         ['space y']: payload.object({
           z: payload.object({}),
         }),
-      })
+      }),
     )
     const error = test.assertThrows(() =>
-      validator.fromJson([{ ['space y']: {} }])
+      validator.fromJson([{ ['space y']: {} }]),
     )
     test.assertInstanceOf(error, payload.PayloadError)
     test.assertEquals(
       error.message,
-      'Invalid object (missing key "z") at (root)[0]["space y"]'
+      'Invalid object (missing key "z") at (root)[0]["space y"]',
     )
   },
 
@@ -119,7 +119,7 @@ export const tests = {
     test.assertInstanceOf(error, payload.PayloadError)
     test.assertEquals(
       error.message,
-      'Invalid string (wrong type array) at (root)'
+      'Invalid string (wrong type array) at (root)',
     )
   },
 
@@ -132,7 +132,7 @@ export const tests = {
     test.assertInstanceOf(error, payload.PayloadError)
     test.assertEquals(
       error.message,
-      'Invalid string (too short, min 2) at (root)'
+      'Invalid string (too short, min 2) at (root)',
     )
   },
 
@@ -145,7 +145,7 @@ export const tests = {
     test.assertInstanceOf(error, payload.PayloadError)
     test.assertEquals(
       error.message,
-      'Invalid string (too long, max 5) at (root)'
+      'Invalid string (too long, max 5) at (root)',
     )
   },
 
@@ -161,7 +161,7 @@ export const tests = {
     test.assertInstanceOf(error, payload.PayloadError)
     test.assertEquals(
       error.message,
-      'Invalid string (wrong type number) at (root)'
+      'Invalid string (wrong type number) at (root)',
     )
   },
 
@@ -171,7 +171,7 @@ export const tests = {
     test.assertInstanceOf(error, payload.PayloadError)
     test.assertEquals(
       error.message,
-      'Invalid string option (not "abc" | "xyz") at (root)'
+      'Invalid string option (not "abc" | "xyz") at (root)',
     )
   },
 
@@ -195,7 +195,7 @@ export const tests = {
     test.assertInstanceOf(error, payload.PayloadError)
     test.assertEquals(
       error.message,
-      'Invalid string option (not "x" | "y2") at (root)'
+      'Invalid string option (not "x" | "y2") at (root)',
     )
   },
 

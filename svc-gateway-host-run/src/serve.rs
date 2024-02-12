@@ -22,7 +22,7 @@ use tokio_stream::wrappers::TcpListenerStream;
 use tokio_stream::StreamExt as _;
 use tokio_util::task::TaskTracker;
 
-pub async fn serve(ctx: Arc<svc_context::MainContext>) -> Result<()> {
+pub async fn serve(ctx: Arc<svc_context::ContextImpl>) -> Result<()> {
   let tls_server_config = Arc::new(build_tls_server_config().await?);
   serve_tcp_accept(ctx, tls_server_config).await
 }
@@ -52,7 +52,7 @@ async fn build_tls_server_config() -> Result<TlsServerConfig> {
 #[allow(clippy::print_stdout)]
 #[allow(clippy::print_stderr)]
 async fn serve_tcp_accept(
-  ctx: Arc<svc_context::MainContext>,
+  ctx: Arc<svc_context::ContextImpl>,
   tls_server_config: Arc<TlsServerConfig>,
 ) -> Result<()> {
   let loopback = Ipv6Addr::new(0, 0, 0, 0, 0, 0, 0, 1);
@@ -88,7 +88,7 @@ async fn serve_tcp_accept(
 
 #[allow(clippy::print_stderr)]
 async fn serve_tls_accept(
-  ctx: Arc<svc_context::MainContext>,
+  ctx: Arc<svc_context::ContextImpl>,
   tls_server_config: Arc<TlsServerConfig>,
   tcp_stream: TcpStream,
 ) {
@@ -107,7 +107,7 @@ async fn serve_tls_accept(
 
 #[allow(clippy::print_stderr)]
 async fn serve_http2(
-  ctx: Arc<svc_context::MainContext>,
+  ctx: Arc<svc_context::ContextImpl>,
   tls_stream: TlsStream<TcpStream>,
 ) {
   let tcp_io = TokioIo::new(tls_stream);

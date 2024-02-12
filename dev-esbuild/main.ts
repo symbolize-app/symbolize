@@ -1,6 +1,6 @@
 #!/usr/bin/env node-loader
 import * as devContext from '@/context.ts'
-import * as devDatabase from '@/database.ts'
+import * as devDatabase from '@/db.ts'
 import * as devModules from '@/modules.ts'
 import * as devOutput from '@/output.ts'
 import * as payload from '@intertwine/lib-payload'
@@ -35,10 +35,9 @@ async function main(): Promise<void> {
     })
   } else {
     const ctx = {
-      ...timeNode.initContext(),
-      ...(await devDatabase.initContext()),
-      mode,
-      outdir,
+      db: await devDatabase.Db.init(),
+      dev: new devContext.Dev(mode, outdir),
+      time: new timeNode.TimeImpl(),
     }
     await nodeFsPromises.mkdir(outdir, {
       recursive: true,
@@ -66,8 +65,8 @@ async function build(ctx: devContext.Context): Promise<void> {
       versionId,
       outputFiles.map((item) => ({
         original: item.contents,
-        pathId: item.path.substring(ctx.outdir.length + 1),
-      }))
+        pathId: item.path.substring(ctx.dev.outdir.length + 1),
+      })),
     )
   } else {
     // eslint-disable-next-line functional/immutable-data -- main API
@@ -80,7 +79,7 @@ async function build(ctx: devContext.Context): Promise<void> {
 }
 
 async function buildFiles(
-  ctx: devContext.Context
+  ctx: devContext.Context,
 ): Promise<devModules.BuildResult> {
   const classicEntryPoints = [
     './svc-gateway-guest-run/init.html',
@@ -93,12 +92,12 @@ async function buildFiles(
     './svc-gateway-guest-run/serviceWorkerRegister.ts',
   ]
   const commonOptions = {
-    define: { ['import.meta.env.NODE_ENV']: JSON.stringify(ctx.mode) },
+    define: { ['import.meta.env.NODE_ENV']: JSON.stringify(ctx.dev.mode) },
     external: ['timers', 'util'],
     logLevel: 'warning' as const,
-    minify: ctx.mode === devContext.Mode.production,
+    minify: ctx.dev.mode === devContext.Mode.production,
     outbase: nodePath.resolve('.'),
-    outdir: ctx.outdir,
+    outdir: ctx.dev.outdir,
     platform: 'browser' as const,
     write: false,
   }
@@ -106,7 +105,7 @@ async function buildFiles(
     ...commonOptions,
     bundle: true,
     entryPoints: classicEntryPoints.map((entryPoint) =>
-      nodePath.resolve(entryPoint)
+      nodePath.resolve(entryPoint),
     ),
     format: 'iife',
     loader: { ['.html']: 'copy' },
@@ -115,7 +114,7 @@ async function buildFiles(
   const moduleResultPromise = devModules.build({
     ...commonOptions,
     entryPoints: moduleEntryPoints.map((entryPoint) =>
-      nodePath.resolve(entryPoint)
+      nodePath.resolve(entryPoint),
     ),
     format: 'esm',
   })

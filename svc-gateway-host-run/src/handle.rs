@@ -1,6 +1,5 @@
-use crate::context as svc_context;
 use crate::db as svc_db;
-use crate::db::Context as _;
+use crate::db::Db as _;
 use crate::request as svc_request;
 use crate::response as svc_response;
 use anyhow::Error;
@@ -22,7 +21,7 @@ pub async fn handle<TContext>(
   req: Request<IncomingBody>,
 ) -> Result<Response<FullBody<Bytes>>>
 where
-  TContext: svc_context::DbContext,
+  TContext: svc_db::Context,
 {
   handle_paths(ctx, &svc_request::SimpleRequest::new(&req))
     .await
@@ -49,7 +48,7 @@ async fn handle_paths<TContext>(
   req: &svc_request::SimpleRequest<'_>,
 ) -> Result<svc_response::SimpleResponse>
 where
-  TContext: svc_context::DbContext,
+  TContext: svc_db::Context,
 {
   let path = req.path;
   let response = if let Some(path) = path.strip_prefix(CODE_ID_PREFIX) {
@@ -91,7 +90,7 @@ async fn handle_content_by_id<TContext>(
   req: &svc_request::ContentRequest<'_>,
 ) -> Result<Option<svc_response::ContentResponse>>
 where
-  TContext: svc_context::DbContext,
+  TContext: svc_db::Context,
 {
   let content_id = Vec::from_hex(req.path_prefix).map_err(|_| {
     eprintln!("  invalid content ID hex");
@@ -119,7 +118,7 @@ async fn handle_content_by_path<TContext>(
   req: &svc_request::ContentRequest<'_>,
 ) -> Result<Option<svc_response::ContentResponse>>
 where
-  TContext: svc_context::DbContext,
+  TContext: svc_db::Context,
 {
   let path_id = req.full_path.to_owned();
   let content_row = ctx.db().get_content_by_path(path_id).await?;

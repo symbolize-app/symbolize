@@ -1,4 +1,4 @@
-# Style
+# CSS style
 
 ## Goals
 
