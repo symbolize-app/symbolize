@@ -9,7 +9,7 @@ export class Memo<K, V> {
 
   get(key: K): V {
     if (this.mutableResults.has(key)) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- already checked
       return this.mutableResults.get(key)!
     } else {
       const value = this.builder(key)

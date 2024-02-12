@@ -10,6 +10,7 @@ export function listenForMessage(): void {
 }
 
 export function listenForKeyboardShortcut(): void {
+  // eslint-disable-next-line deprecation/deprecation -- no good alternative
   const isMac = /^mac/i.test(navigator.platform)
 
   window.addEventListener('keydown', (event) => {

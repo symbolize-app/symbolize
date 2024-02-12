@@ -6,7 +6,7 @@ export function groupBy<T, K>(
   for (const item of items) {
     const key = selector(item)
     if (mutableGroups.has(key)) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- already checked
       const mutableGroup = mutableGroups.get(key)!
       mutableGroup.push(item)
     } else {
