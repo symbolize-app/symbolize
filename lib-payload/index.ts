@@ -6,9 +6,9 @@ export type JsonValue =
   | string
   | null
 
-export type JsonObject = { [Key in string]: JsonValue }
+export type JsonObject = { readonly [Key in string]: JsonValue }
 
-export type JsonArray = JsonValue[]
+export type JsonArray = readonly JsonValue[]
 
 export type JsonPayload<CustomTransformer> =
   CustomTransformer extends JsonPayloadTransformer<infer T> ? T : never
@@ -18,7 +18,7 @@ export interface JsonPayloadTransformer<Value> {
   toJson(output: Value, path?: Path): JsonValue
 }
 
-export type Path = (() => (number | string)[]) | undefined
+export type Path = (() => readonly (number | string)[]) | undefined
 
 export class PayloadError extends Error {
   constructor(message: string, path: Path) {
@@ -55,29 +55,37 @@ export function nullOr<Value>(
   }
 }
 
-export function object<Value extends Record<never, never>>(config: {
-  [Key in keyof Value]: JsonPayloadTransformer<Value[Key]>
+export function object<
+  Value extends Readonly<Record<never, never>>,
+>(config: {
+  readonly [Key in keyof Value]: JsonPayloadTransformer<Value[Key]>
 }): JsonPayloadTransformer<Value> {
   return {
     fromJson(input, path) {
       checkObject(input, path)
-      const result = {} as Value
+      const mutableResult = {} as Value
       for (const key in config) {
         const value: JsonValue | undefined = input[key]
         checkValue(value, key, path)
-        result[key] = config[key].fromJson(value, buildPath(key, path))
+        mutableResult[key] = config[key].fromJson(
+          value,
+          buildPath(key, path)
+        )
       }
-      return result
+      return mutableResult
     },
     toJson(output, path) {
       checkObject(output, path)
-      const result = {} as JsonObject
+      const mutableResult: { [Key in string]: JsonValue } = {}
       for (const key in config) {
         const value = output[key]
         checkValue(value, key, path)
-        result[key] = config[key].toJson(value, buildPath(key, path))
+        mutableResult[key] = config[key].toJson(
+          value,
+          buildPath(key, path)
+        )
       }
-      return result
+      return mutableResult
     },
   }
 }
@@ -113,27 +121,26 @@ function checkValue<T>(
 
 export function array<Value>(
   config: JsonPayloadTransformer<Value>
-): JsonPayloadTransformer<Value[]> {
+): JsonPayloadTransformer<readonly Value[]> {
   return {
     fromJson(input, path) {
       checkArray(input, path)
-      const result = [] as Value[]
+      const mutableResult: Value[] = []
       for (let i = 0; i < input.length; i++) {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const item = input[i]!
-        result[i] = config.fromJson(item, buildPath(i, path))
+        const item = input[i] as JsonValue
+        mutableResult[i] = config.fromJson(item, buildPath(i, path))
       }
-      return result
+      return mutableResult
     },
     toJson(output, path) {
       checkArray(output, path)
-      const result = [] as JsonArray
+      const mutableResult: JsonValue[] = []
       for (let i = 0; i < output.length; i++) {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const item = output[i]!
-        result[i] = config.toJson(item, buildPath(i, path))
+        mutableResult[i] = config.toJson(item, buildPath(i, path))
       }
-      return result
+      return mutableResult
     },
   }
 }
@@ -175,8 +182,8 @@ function checkString(value: unknown, path: Path): asserts value is string {
 }
 
 export function stringLength(config: {
-  max: number
-  min: number
+  readonly max: number
+  readonly min: number
 }): JsonPayloadTransformer<string> {
   function check(value: string, path: Path): void {
     if (value.length < config.min) {
@@ -207,7 +214,7 @@ export function stringLength(config: {
 }
 
 export function stringOption<Options extends string>(
-  ...options: Options[]
+  ...options: readonly Options[]
 ): JsonPayloadTransformer<Options> {
   function check(value: string, path: Path): asserts value is Options {
     for (const option of options) {
@@ -238,9 +245,9 @@ export function stringOption<Options extends string>(
 }
 
 export function stringLengthMatch(config: {
-  match: RegExp
-  max: number
-  min: number
+  readonly match: RegExp
+  readonly max: number
+  readonly min: number
 }): JsonPayloadTransformer<string> {
   function check(value: string, path: Path): void {
     if (!config.match.exec(value)) {
@@ -294,8 +301,8 @@ function checkNumber(value: unknown, path: Path): asserts value is number {
 }
 
 export function numberRange(config: {
-  max: number
-  min: number
+  readonly max: number
+  readonly min: number
 }): JsonPayloadTransformer<number> {
   function check(value: number, path: Path): void {
     if (value < config.min) {
@@ -326,8 +333,8 @@ export function numberRange(config: {
 }
 
 export function integerRange(config: {
-  max: number
-  min: number
+  readonly max: number
+  readonly min: number
 }): JsonPayloadTransformer<number> {
   function check(value: number, path: Path): void {
     if ((value | 0) !== value) {

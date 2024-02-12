@@ -1,6 +1,8 @@
+/* eslint-disable functional/type-declaration-immutability */
+
 interface ImportMeta {
-  env: {
+  readonly env: {
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    NODE_ENV: string
+    readonly NODE_ENV: string
   }
 }

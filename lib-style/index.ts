@@ -1,3 +1,8 @@
+/* eslint-disable functional/no-let */
+/* eslint-disable functional/immutable-data */
+/* eslint-disable functional/type-declaration-immutability */
+/* eslint-disable functional/prefer-immutable-types */
+
 export interface Context {
   style: {
     element: HTMLStyleElement

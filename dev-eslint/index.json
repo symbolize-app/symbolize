@@ -2,12 +2,21 @@
   "root": true,
   "parser": "@typescript-eslint/parser",
   "ignorePatterns": ["build/**", "node_modules/**"],
-  "plugins": ["import", "simple-import-sort", "@typescript-eslint"],
+  "plugins": [
+    "functional",
+    "import",
+    "simple-import-sort",
+    "@typescript-eslint"
+  ],
   "extends": [
     "eslint:recommended",
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/strict-type-checked",
-    "plugin:@typescript-eslint/stylistic-type-checked"
+    "plugin:@typescript-eslint/stylistic-type-checked",
+    "plugin:functional/external-vanilla-recommended",
+    "plugin:functional/external-typescript-recommended",
+    "plugin:functional/no-mutations",
+    "plugin:functional/stylistic"
   ],
   "rules": {
     "consistent-return": "warn",
@@ -34,6 +43,49 @@
     ],
     "prefer-named-capture-group": "warn",
     "sort-keys": ["warn", "asc", { "allowLineSeparatedGroups": true }],
+    "functional/immutable-data": [
+      "error",
+      {
+        "ignoreIdentifierPattern": ["^mutable.*"],
+        "ignoreAccessorPattern": "**.mutable*"
+      }
+    ],
+    "functional/no-let": [
+      "error",
+      {
+        "allowInFunctions": true
+      }
+    ],
+    "functional/prefer-property-signatures": "off",
+    "functional/prefer-immutable-types": [
+      "error",
+      {
+        "enforcement": "ReadonlyShallow",
+        "ignoreInferredTypes": true,
+        "parameters": {
+          "ignoreInferredTypes": true,
+          "ignoreNamePattern": ["^mutable.*"]
+        },
+        "variables": {
+          "ignoreInFunctions": true,
+          "ignoreNamePattern": ["^mutable.*"]
+        }
+      }
+    ],
+    "functional/readonly-type": ["error", "keyword"],
+    "functional/type-declaration-immutability": [
+      "error",
+      {
+        "rules": [
+          {
+            "identifiers": "^.+",
+            "immutability": "ReadonlyShallow",
+            "comparator": "AtLeast",
+            "fixer": false
+          }
+        ]
+      }
+    ],
     "import/first": "warn",
     "import/newline-after-import": "warn",
     "import/no-default-export": "error",

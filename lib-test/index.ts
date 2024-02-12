@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+
 import * as testIsDeepEqual from '@/isDeepEqual.ts'
 import * as testRandom from '@/random.ts'
 import * as testTime from '@/time.ts'
@@ -16,22 +17,21 @@ export type Context = random.Context & testTime.Context
 export type RunContext = time.Context
 
 interface TestModule<CustomContext = unknown> {
-  tests: Record<string, Test<CustomContext>>
-  url: string
+  readonly tests: Readonly<Record<string, Test<CustomContext>>>
+  readonly url: string
 }
 
-export type TestCollection<CustomContext = unknown> = () => Promise<
-  TestModule<CustomContext>
->[]
+export type TestCollection<CustomContext = unknown> =
+  () => readonly Promise<TestModule<CustomContext>>[]
 
 interface TestCollectionModule<CustomContext = unknown> {
-  all: TestCollection<CustomContext>
+  readonly all: TestCollection<CustomContext>
 }
 
 class AssertionError extends Error {
-  actual: unknown
-  diff: boolean
-  expected: unknown
+  readonly actual: unknown
+  readonly diff: boolean
+  readonly expected: unknown
 
   constructor(
     message: string,
@@ -48,7 +48,9 @@ class AssertionError extends Error {
 
 export async function runAll<CustomContext = unknown>(
   ctx: CustomContext & RunContext,
-  testCollectionModules: Promise<TestCollectionModule<CustomContext>>[]
+  testCollectionModules: readonly Promise<
+    TestCollectionModule<CustomContext>
+  >[]
 ): Promise<boolean> {
   const testModules = ([] as Promise<TestModule<CustomContext>>[]).concat(
     ...(await Promise.all(testCollectionModules)).map(
@@ -73,16 +75,11 @@ export async function runAll<CustomContext = unknown>(
         await test(testContext)
         pass += 1
       } catch (error) {
-        const basicInfo =
+        const message =
           error instanceof Error
-            ? {
-                message: error.message,
-                stack: error.stack,
-              }
-            : {
-                message: `Error value ${JSON.stringify(error)}`,
-                stack: undefined,
-              }
+            ? error.message
+            : `Error value ${JSON.stringify(error)}`
+        let stack = error instanceof Error ? error.stack : undefined
 
         const assertionInfo =
           typeof error === 'object' &&
@@ -110,7 +107,7 @@ export async function runAll<CustomContext = unknown>(
         } else {
           console.groupCollapsed(testName)
         }
-        console.log(`%c${basicInfo.message}`, 'color: crimson')
+        console.log(`%c${message}`, 'color: crimson')
         console.groupCollapsed('Details')
         if (assertionInfo) {
           console.log('%cExpected', 'color: green', assertionInfo.expected)
@@ -120,7 +117,7 @@ export async function runAll<CustomContext = unknown>(
               assertionInfo.expected as object | string,
               assertionInfo.actual as object | string
             )
-            const outputLines = []
+            const mutableOutputLines = []
             for (const diffSection of diffSections) {
               let prefix: string
               if (diffSection.added) {
@@ -132,16 +129,16 @@ export async function runAll<CustomContext = unknown>(
               }
               for (const diffLine of diffSection.value.split('\n')) {
                 if (diffLine) {
-                  outputLines.push(`${prefix} ${diffLine}`)
+                  mutableOutputLines.push(`${prefix} ${diffLine}`)
                 }
               }
             }
-            console.log(outputLines.join('\n'))
+            console.log(mutableOutputLines.join('\n'))
           }
-          basicInfo.stack = basicInfo.stack?.replace(/^Assertion/, '')
+          stack = stack?.replace(/^Assertion/, '')
         }
-        if (basicInfo.stack) {
-          console.log(basicInfo.stack, 'color: grey')
+        if (stack) {
+          console.log(stack, 'color: grey')
         }
         console.groupEnd()
         console.groupEnd()
@@ -169,31 +166,30 @@ export async function runAll<CustomContext = unknown>(
 export const mockHistory = Symbol('mockHistory')
 
 export function mock<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  Mock extends (...args: any[]) => unknown,
+  Mock extends (...args: Readonly<unknown[]>) => unknown,
 >(
-  returnValues: (() => ReturnType<Mock>)[]
-): Mock & { [mockHistory]: Parameters<Mock>[] } {
+  returnValues: readonly (() => ReturnType<Mock>)[]
+): Mock & { readonly [mockHistory]: readonly Parameters<Mock>[] } {
   let i = 0
-  const callback = ((...args: Parameters<Mock>) => {
+  const mutableCallback = ((...args: Parameters<Mock>) => {
     if (i === returnValues.length) {
       throw new Error('called too many times')
     } else {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const result = returnValues[i]!()
-      callback[mockHistory].push(args)
+      mutableCallback[mockHistory].push(args)
       i += 1
       return result
     }
   }) as Mock & { [mockHistory]: Parameters<Mock>[] }
-  callback[mockHistory] = []
-  return callback
+  mutableCallback[mockHistory] = []
+  return mutableCallback
 }
 
 export interface SyncPromise<Value> {
-  isSettled: boolean
-  rejectedValue: unknown
-  resolvedValue: Value
+  readonly isSettled: boolean
+  readonly rejectedValue: unknown
+  readonly resolvedValue: Value
 }
 
 export function sync<Value>(

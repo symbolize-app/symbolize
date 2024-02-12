@@ -1,6 +1,6 @@
 export function stripPrefix(
   input: string,
-  pattern: RegExp
+  pattern: Readonly<RegExp>
 ): string | null {
   const match = pattern.exec(input)
   if (match) {

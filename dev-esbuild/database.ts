@@ -12,22 +12,22 @@ import sqlite from 'better-sqlite3'
 import * as nodeChildProcess from 'node:child_process'
 import * as nodeUtil from 'node:util'
 
-export type Database = sqlite.Database
+export type Database = Readonly<sqlite.Database>
 
-export type Statement = sqlite.Statement
+export type Statement = Readonly<sqlite.Statement>
 
 export interface Context {
-  db: {
-    connection: Database
-    query: {
-      beginTransaction: Statement
-      commitTransaction: Statement
-      insertPath: Statement
-      insertVersion: Statement
-      pragmaWalCheckpoint: string
-      rollbackTransaction: Statement
-      updateContentCompressed: Statement
-      upsertContent: Statement
+  readonly db: {
+    readonly connection: Database
+    readonly query: {
+      readonly beginTransaction: Statement
+      readonly commitTransaction: Statement
+      readonly insertPath: Statement
+      readonly insertVersion: Statement
+      readonly pragmaWalCheckpoint: string
+      readonly rollbackTransaction: Statement
+      readonly updateContentCompressed: Statement
+      readonly upsertContent: Statement
     }
   }
 }

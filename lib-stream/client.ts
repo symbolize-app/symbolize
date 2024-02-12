@@ -3,15 +3,17 @@ import * as streamSink from '@/sink.ts'
 import * as streamSource from '@/source.ts'
 
 export interface ClientContext {
-  streamClient: {
-    resolveServerStream: ((
+  readonly streamClient: {
+    readonly mutableResolveServerStream: ((
       serverStream: ReadableStream<unknown>
     ) => void)[]
-    worker: Worker
+    readonly worker: Readonly<Worker>
   }
 }
 
-export function initClientContext(worker: Worker): ClientContext {
+export function initClientContext(
+  worker: Readonly<Worker>
+): ClientContext {
   const resolveServerStream: ((
     serverStream: ReadableStream<unknown>
   ) => void)[] = []
@@ -32,7 +34,12 @@ export function initClientContext(worker: Worker): ClientContext {
   // eslint-disable-next-line no-console
   console.log('worker', worker)
 
-  return { streamClient: { resolveServerStream, worker } }
+  return {
+    streamClient: {
+      mutableResolveServerStream: resolveServerStream,
+      worker,
+    },
+  }
 }
 
 export function connect(
@@ -43,7 +50,7 @@ export function connect(
   const clientSource = new streamSource.Source()
   const connectionRequest: streamConnection.ConnectionRequest = {
     clientStream: clientSource.readable,
-    connectionId: ctx.streamClient.resolveServerStream.length,
+    connectionId: ctx.streamClient.mutableResolveServerStream.length,
     service,
     type: 'ConnectionRequest',
   }
@@ -51,7 +58,7 @@ export function connect(
   const serverStreamPromise = new Promise<ReadableStream<unknown>>(
     (resolve) => (resolveServerStream = resolve)
   )
-  ctx.streamClient.resolveServerStream.push(
+  ctx.streamClient.mutableResolveServerStream.push(
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     resolveServerStream!
   )
