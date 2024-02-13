@@ -10,22 +10,22 @@ function main(): void {
 
   const worker = new Worker(
     '/.code/svc-gateway-guest-run/dedicatedWorker.ts.mjs',
-    { type: 'module' }
+    { type: 'module' },
   )
 
   const ctx: error.Context & stream.ClientContext = {
-    ...random.initContext(),
-    ...timeBrowser.initContext(),
-    ...stream.initClientContext(worker),
+    random: new random.RandomImpl(),
+    streamClient: stream.Client.init(worker),
+    time: new timeBrowser.TimeImpl(),
   }
 
   const entryPoints: Promise<{
     main(ctx: error.Context & stream.ClientContext): void
   }>[] = [
     import('@intertwine/svc-auth-guest-view/main.ts'),
-    ...(import.meta.env.NODE_ENV === 'development'
-      ? [import('@/main.development.ts')]
-      : []),
+    ...(import.meta.env.NODE_ENV === 'development' ?
+      [import('@/main.development.ts')]
+    : []),
   ]
 
   for (const entryPoint of entryPoints) {

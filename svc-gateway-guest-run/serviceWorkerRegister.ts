@@ -13,7 +13,7 @@ async function main(): Promise<void> {
     {
       scope: '/',
       updateViaCache: 'none',
-    }
+    },
   )
 
   reg.addEventListener('updatefound', () => {

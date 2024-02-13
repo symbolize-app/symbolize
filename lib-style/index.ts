@@ -85,7 +85,7 @@ export function build(body: StyleBody): Style {
 
 export function useSelector(
   selectorValue: string,
-  body: StyleBody
+  body: StyleBody,
 ): StyleSelector {
   return [
     {
@@ -98,7 +98,7 @@ export function useSelector(
 
 export function useCombinatorSelector(
   combinatorSelectorValue: string,
-  body: StyleBody
+  body: StyleBody,
 ): StyleCombinatorSelector {
   return [
     {
@@ -118,7 +118,7 @@ function renderNestedStyle(
   style: Style,
   combinatorSelectorValue: string,
   selectorValue: string,
-  newStyleName: boolean
+  newStyleName: boolean,
 ): string[] {
   const fullSelectorValue = `${combinatorSelectorValue}${selectorValue}`
   let fullSelectorStyleMap = ctx.style.renderMap.get(fullSelectorValue)
@@ -151,8 +151,8 @@ function renderNestedStyle(
             styleName,
             nestedStyleItem as StyleSelector,
             combinatorSelectorValue,
-            selectorValue
-          )
+            selectorValue,
+          ),
         )
       } else {
         styleClasses.push(
@@ -161,8 +161,8 @@ function renderNestedStyle(
             styleName,
             nestedStyleItem as StyleCombinatorSelector,
             combinatorSelectorValue,
-            selectorValue
-          )
+            selectorValue,
+          ),
         )
       }
     } else {
@@ -174,8 +174,8 @@ function renderNestedStyle(
             flatStyleItem as Style,
             combinatorSelectorValue,
             selectorValue,
-            true
-          )
+            true,
+          ),
         )
       } else {
         renderStyleProps(
@@ -183,7 +183,7 @@ function renderNestedStyle(
           styleName,
           flatStyleItem as StyleProps,
           combinatorSelectorValue,
-          selectorValue
+          selectorValue,
         )
       }
     }
@@ -197,16 +197,16 @@ function renderStyleSelector(
   styleName: string,
   style: StyleSelector,
   combinatorSelectorValue: string,
-  selectorValue: string
+  selectorValue: string,
 ): string[] {
   return renderNestedStyle(
     ctx,
     { body: style[1], name: styleName },
     combinatorSelectorValue,
-    selectorValue
-      ? `${selectorValue}${style[0].selector.substring(1)}`
-      : style[0].selector,
-    false
+    selectorValue ?
+      `${selectorValue}${style[0].selector.substring(1)}`
+    : style[0].selector,
+    false,
   )
 }
 
@@ -215,11 +215,11 @@ function renderStyleCombinatorSelector(
   styleName: string,
   style: StyleCombinatorSelector,
   combinatorSelectorValue: string,
-  selectorValue: string
+  selectorValue: string,
 ): string[] {
   if (combinatorSelectorValue) {
     throw Error(
-      `Style combinator "${combinatorSelectorValue}" already set, cannot use "${style[0].combinatorSelector}"`
+      `Style combinator "${combinatorSelectorValue}" already set, cannot use "${style[0].combinatorSelector}"`,
     )
   }
   return renderNestedStyle(
@@ -227,7 +227,7 @@ function renderStyleCombinatorSelector(
     { body: style[1], name: styleName },
     style[0].combinatorSelector,
     selectorValue,
-    false
+    false,
   )
 }
 
@@ -236,16 +236,16 @@ function renderStyleProps(
   styleName: string,
   style: StyleProps,
   combinatorSelectorValue: string,
-  selectorValue: string
+  selectorValue: string,
 ): void {
   const styleRules = ctx.style.sheet.cssRules
   const styleIndex = styleRules.length
   ctx.style.sheet.insertRule(
     `${combinatorSelectorValue.substring(
       0,
-      combinatorSelectorValue.length - 1
+      combinatorSelectorValue.length - 1,
     )}.${styleName}${selectorValue.substring(1)} {}`,
-    styleIndex
+    styleIndex,
   )
   const styleRule = styleRules[styleIndex] as CSSStyleRule
   const styleDeclaration = styleRule.style

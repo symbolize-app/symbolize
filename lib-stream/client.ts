@@ -3,72 +3,68 @@ import * as streamSink from '@/sink.ts'
 import * as streamSource from '@/source.ts'
 
 export interface ClientContext {
-  readonly streamClient: {
-    readonly mutableResolveServerStream: ((
-      serverStream: ReadableStream<unknown>
-    ) => void)[]
-    readonly worker: Readonly<Worker>
-  }
+  readonly streamClient: Client
 }
 
-export function initClientContext(
-  worker: Readonly<Worker>
-): ClientContext {
-  const resolveServerStream: ((
-    serverStream: ReadableStream<unknown>
+export class Client {
+  private readonly mutableResolveServerStream: ((
+    serverStream: ReadableStream<unknown>,
   ) => void)[] = []
 
-  worker.addEventListener('message', (event) => {
+  private constructor(private readonly worker: Readonly<Worker>) {}
+
+  static init(worker: Readonly<Worker>): Client {
+    const client = new Client(worker)
+
+    worker.addEventListener('message', (event) => {
+      // eslint-disable-next-line no-console
+      console.log('worker message', event)
+      const connectionResponse =
+        event.data as streamConnection.ConnectionResponse
+      const resolve =
+        client.mutableResolveServerStream[connectionResponse.connectionId]
+      if (!resolve) {
+        throw new Error(
+          `Invalid connection ID ${connectionResponse.connectionId}`,
+        )
+      }
+      resolve(connectionResponse.serverStream)
+    })
     // eslint-disable-next-line no-console
-    console.log('worker message', event)
-    const connectionResponse =
-      event.data as streamConnection.ConnectionResponse
-    const resolve = resolveServerStream[connectionResponse.connectionId]
-    if (!resolve) {
-      throw new Error(
-        `Invalid connection ID ${connectionResponse.connectionId}`
-      )
+    console.log('worker', worker)
+
+    return client
+  }
+
+  connect(
+    service: string,
+    onData: (data: unknown) => Promise<void>,
+  ): streamSource.Source<unknown> {
+    const clientSource = streamSource.Source.build()
+    const connectionRequest: streamConnection.ConnectionRequest = {
+      clientStream: clientSource.readable,
+      connectionId: this.mutableResolveServerStream.length,
+      service,
+      type: 'ConnectionRequest',
     }
-    resolve(connectionResponse.serverStream)
-  })
-  // eslint-disable-next-line no-console
-  console.log('worker', worker)
-
-  return {
-    streamClient: {
-      mutableResolveServerStream: resolveServerStream,
-      worker,
-    },
+    let resolveServerStream: (
+      serverStream: ReadableStream<unknown>,
+    ) => void
+    const serverStreamPromise = new Promise<ReadableStream<unknown>>(
+      (resolve) => (resolveServerStream = resolve),
+    )
+    this.mutableResolveServerStream.push(
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- set by promise constructor
+      resolveServerStream!,
+    )
+    this.worker.postMessage(connectionRequest, [
+      connectionRequest.clientStream,
+    ])
+    const clientSink = streamSink.Sink.build(onData)
+    void (async () => {
+      const serverStream = await serverStreamPromise
+      void serverStream.pipeTo(clientSink.writable)
+    })()
+    return clientSource
   }
-}
-
-export function connect(
-  ctx: ClientContext,
-  service: string,
-  onData: (data: unknown) => Promise<void>
-): streamSource.Source<unknown> {
-  const clientSource = new streamSource.Source()
-  const connectionRequest: streamConnection.ConnectionRequest = {
-    clientStream: clientSource.readable,
-    connectionId: ctx.streamClient.mutableResolveServerStream.length,
-    service,
-    type: 'ConnectionRequest',
-  }
-  let resolveServerStream: (serverStream: ReadableStream<unknown>) => void
-  const serverStreamPromise = new Promise<ReadableStream<unknown>>(
-    (resolve) => (resolveServerStream = resolve)
-  )
-  ctx.streamClient.mutableResolveServerStream.push(
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- set by promise constructor
-    resolveServerStream!
-  )
-  ctx.streamClient.worker.postMessage(connectionRequest, [
-    connectionRequest.clientStream,
-  ])
-  const clientSink = new streamSink.Sink(onData)
-  void (async () => {
-    const serverStream = await serverStreamPromise
-    void serverStream.pipeTo(clientSink.writable)
-  })()
-  return clientSource
 }

@@ -32,7 +32,7 @@ const resolveBase = Symbol('resolveBase')
 
 export async function build<T extends BuildOptions>(
   // eslint-disable-next-line functional/prefer-immutable-types -- library compatibility
-  options: esbuild.SameShape<BuildOptions, T>
+  options: esbuild.SameShape<BuildOptions, T>,
 ): Promise<BuildResult<T>> {
   const mutableResult: BuildResult<T> = {
     errors: [],
@@ -42,7 +42,7 @@ export async function build<T extends BuildOptions>(
 
   const pnpmPackageVersions = new Map<string, string>()
   const convertToOutPathMemo = new collection.Memo((inPath: string) =>
-    convertToOutPath(inPath, options.outbase, pnpmPackageVersions)
+    convertToOutPath(inPath, options.outbase, pnpmPackageVersions),
   )
   const allEntryPoints = new Set(options.entryPoints)
   let entryPoints = options.entryPoints.map((entryPoint) => ({
@@ -62,8 +62,8 @@ export async function build<T extends BuildOptions>(
             convertToOutPathMemo,
             allEntryPoints,
             newEntryPoints,
-            args
-          )
+            args,
+          ),
         )
       },
     }
@@ -90,7 +90,7 @@ async function resolve(
   convertToOutPathMemo: collection.Memo<string, string>,
   mutableAllEntryPoints: Set<string>,
   mutableNewEntryPoints: { in: string; out: string }[],
-  args: Readonly<esbuild.OnResolveArgs>
+  args: Readonly<esbuild.OnResolveArgs>,
 ): Promise<esbuild.OnResolveResult | undefined> {
   if (args.pluginData === resolveBase) {
     return undefined
@@ -117,15 +117,14 @@ async function resolve(
     }
     const relativePath = `${nodePath.relative(
       nodePath.dirname(convertToOutPathMemo.get(args.importer)),
-      outPath
+      outPath,
     )}.mjs`
     return {
       ...resolveResult,
       external: true,
       namespace: 'buildModules',
-      path: relativePath.startsWith('.')
-        ? relativePath
-        : `./${relativePath}`,
+      path:
+        relativePath.startsWith('.') ? relativePath : `./${relativePath}`,
     }
   } else {
     return resolveResult
@@ -133,13 +132,13 @@ async function resolve(
 }
 
 const pnpmPattern: Readonly<RegExp> = new RegExp(
-  /^node_modules\/\.pnpm\/(?<package_>[^/]+)@(?<version>[^/]+)\/node_modules\/[^/]+\//
+  /^node_modules\/\.pnpm\/(?<package_>[^/]+)@(?<version>[^/]+)\/node_modules\/[^/]+\//,
 )
 
 function convertToOutPath(
   inPath: string,
   outbase: string,
-  mutablePnpmPackageVersions: Map<string, string>
+  mutablePnpmPackageVersions: Map<string, string>,
 ): string {
   const relative = nodePath.relative(outbase, inPath)
   const pnpmMatch = pnpmPattern.exec(relative)
@@ -155,7 +154,7 @@ function convertToOutPath(
       mutablePnpmPackageVersions.set(package_, version)
     } else if (previousVersion !== version) {
       throw new Error(
-        `Ambiguous versions found for ${package_}: ${previousVersion} / ${version}`
+        `Ambiguous versions found for ${package_}: ${previousVersion} / ${version}`,
       )
     }
     return `.pnpm-${package_}/${relative.substring(pnpmMatch[0].length)}`

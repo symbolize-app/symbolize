@@ -20,7 +20,7 @@ if (
     nodeUrl.fileURLToPath(import.meta.url)
 ) {
   void run({
-    ...timeNode.initContext(),
+    time: new timeNode.TimeImpl(),
   }).then((success) => {
     process.exit(success ? 0 : 1)
   })

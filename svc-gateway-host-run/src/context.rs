@@ -1,39 +1,19 @@
 use crate::db as svc_db;
-#[cfg(test)]
-use mockall::mock;
 
-pub struct MainContext {
-  pub db: svc_db::MainContext,
+pub struct ContextImpl {
+  pub db: svc_db::DbImpl,
 }
 
-impl MainContext {
+impl ContextImpl {
   pub async fn wait(&self) {
     self.db.wait().await;
   }
 }
 
-pub trait DbContext
-where
-  Self::Inner: svc_db::Context,
-{
-  type Inner;
+impl svc_db::Context for ContextImpl {
+  type Impl = svc_db::DbImpl;
 
-  fn db(&self) -> &Self::Inner;
-}
-
-#[cfg(test)]
-mock! {
-  pub DbContext {}
-  impl DbContext for DbContext {
-      type Inner = svc_db::MockContext;
-      fn db(&self) -> &<Self as DbContext>::Inner;
-  }
-}
-
-impl DbContext for MainContext {
-  type Inner = svc_db::MainContext;
-
-  fn db(&self) -> &Self::Inner {
+  fn db(&self) -> &Self::Impl {
     &self.db
   }
 }

@@ -9,7 +9,7 @@ import * as diff from 'diff'
 import ms from 'ms'
 
 export type Test<CustomContext = unknown> = (
-  ctx: Context & CustomContext
+  ctx: Context & CustomContext,
 ) => Promise<void> | void
 
 export type Context = random.Context & testTime.Context
@@ -28,21 +28,19 @@ interface TestCollectionModule<CustomContext = unknown> {
   readonly all: TestCollection<CustomContext>
 }
 
-class AssertionError extends Error {
-  readonly actual: unknown
-  readonly diff: boolean
-  readonly expected: unknown
+enum AssertionMode {
+  error = 'error',
+  diff = 'diff',
+}
 
+class AssertionError extends Error {
   constructor(
     message: string,
-    actual: unknown,
-    expected: unknown,
-    enableDiff?: 'diff' | undefined
+    readonly actual: unknown,
+    readonly expected: unknown,
+    readonly mode: AssertionMode = AssertionMode.error,
   ) {
     super(message)
-    this.actual = actual
-    this.expected = expected
-    this.diff = !!enableDiff
   }
 }
 
@@ -50,12 +48,12 @@ export async function runAll<CustomContext = unknown>(
   ctx: CustomContext & RunContext,
   testCollectionModules: readonly Promise<
     TestCollectionModule<CustomContext>
-  >[]
+  >[],
 ): Promise<boolean> {
   const testModules = ([] as Promise<TestModule<CustomContext>>[]).concat(
     ...(await Promise.all(testCollectionModules)).map(
-      (testCollectionModule) => testCollectionModule.all()
-    )
+      (testCollectionModule) => testCollectionModule.all(),
+    ),
   )
   const resolvedTestModules = await Promise.all(testModules)
   const start = ctx.time.performanceNow()
@@ -69,30 +67,32 @@ export async function runAll<CustomContext = unknown>(
       try {
         const testContext: Context & CustomContext = {
           ...ctx,
-          ...testTime.initContext(),
-          ...testRandom.initContext(),
+          random: testRandom.RandomImpl.build(),
+          time: testTime.TimeImpl.build(),
         }
         await test(testContext)
         pass += 1
       } catch (error) {
         const message =
-          error instanceof Error
-            ? error.message
-            : `Error value ${JSON.stringify(error)}`
+          error instanceof Error ?
+            error.message
+          : `Error value ${JSON.stringify(error)}`
         let stack = error instanceof Error ? error.stack : undefined
 
         const assertionInfo =
-          typeof error === 'object' &&
-          error !== null &&
-          'actual' in error &&
-          'expected' in error &&
-          'diff' in error
-            ? {
-                actual: (error as { actual: unknown }).actual,
-                diff: (error as { diff: unknown }).diff,
-                expected: (error as { expected: unknown }).expected,
-              }
-            : undefined
+          (
+            typeof error === 'object' &&
+            error !== null &&
+            'actual' in error &&
+            'expected' in error &&
+            'mode' in error
+          ) ?
+            {
+              actual: (error as { actual: unknown }).actual,
+              expected: (error as { expected: unknown }).expected,
+              mode: (error as { mode: unknown }).mode,
+            }
+          : undefined
 
         if (!testUrlPrinted) {
           if (fail === 0) {
@@ -112,10 +112,10 @@ export async function runAll<CustomContext = unknown>(
         if (assertionInfo) {
           console.log('%cExpected', 'color: green', assertionInfo.expected)
           console.log('%cActual', 'color: crimson', assertionInfo.actual)
-          if (assertionInfo.diff) {
+          if (assertionInfo.mode === AssertionMode.diff) {
             const diffSections = diff.diffJson(
               assertionInfo.expected as object | string,
-              assertionInfo.actual as object | string
+              assertionInfo.actual as object | string,
             )
             const mutableOutputLines = []
             for (const diffSection of diffSections) {
@@ -156,34 +156,36 @@ export async function runAll<CustomContext = unknown>(
   console.log(`%cPass: ${pass}`, 'font-weight: bold; color: green')
   console.log(
     `%cFail: ${fail}`,
-    `font-weight: bold; color: ${fail ? 'crimson' : 'green'}`
+    `font-weight: bold; color: ${fail ? 'crimson' : 'green'}`,
   )
   console.log(`Elapsed: ${elapsed}`)
   console.groupEnd()
   return fail === 0
 }
 
-export const mockHistory = Symbol('mockHistory')
+export function mock<Args extends readonly unknown[], Return>(
+  returnValues: readonly (() => Return)[],
+): (...args: Args) => Return {
+  return mockWithHistory(returnValues)[0]
+}
 
-export function mock<
-  Mock extends (...args: Readonly<unknown[]>) => unknown,
->(
-  returnValues: readonly (() => ReturnType<Mock>)[]
-): Mock & { readonly [mockHistory]: readonly Parameters<Mock>[] } {
+export function mockWithHistory<Args extends readonly unknown[], Return>(
+  returnValues: readonly (() => Return)[],
+): readonly [(...args: Args) => Return, readonly Args[]] {
   let i = 0
-  const mutableCallback = ((...args: Parameters<Mock>) => {
+  const mutableHistory: Args[] = []
+  const callback: (...args: Args) => Return = (...args) => {
     if (i === returnValues.length) {
       throw new Error('called too many times')
     } else {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- already checked
       const result = returnValues[i]!()
-      mutableCallback[mockHistory].push(args)
+      mutableHistory.push(args)
       i += 1
       return result
     }
-  }) as Mock & { [mockHistory]: Parameters<Mock>[] }
-  mutableCallback[mockHistory] = []
-  return mutableCallback
+  }
+  return [callback, mutableHistory]
 }
 
 export interface SyncPromise<Value> {
@@ -192,47 +194,62 @@ export interface SyncPromise<Value> {
   readonly resolvedValue: Value
 }
 
-export function sync<Value>(
-  promise: Promise<Value> | Value
-): SyncPromise<Value> {
-  let isResolved = false
-  let resolvedValue: Value | undefined = undefined
-  let isRejected = false
-  let rejectedValue: unknown = undefined
-  const result = {
-    get isSettled() {
-      return isResolved || isRejected
-    },
-    get rejectedValue() {
-      if (isResolved) {
-        throw new AssertionError('Promise resolved', result, '<rejected>')
-      } else if (!isRejected) {
-        throw new Error('Promise not rejected yet')
-      } else {
-        return rejectedValue
-      }
-    },
-    get resolvedValue() {
-      if (isRejected) {
-        throw rejectedValue
-      } else if (!isResolved) {
-        throw new Error('Promise not resolved yet')
-      } else {
-        return resolvedValue as Value
-      }
-    },
+class SyncPromiseImpl<Value> implements SyncPromise<Value> {
+  private mutableIsRejected: boolean = false
+  private mutableIsResolved: boolean = false
+  private mutableRejectedValue: unknown = undefined
+  private mutableResolvedValue: Value | undefined = undefined
+
+  private constructor() {
+    // Private
   }
-  Promise.resolve(promise).then(
-    (value) => {
-      isResolved = true
-      resolvedValue = value
-    },
-    (value) => {
-      isRejected = true
-      rejectedValue = value
+
+  get isSettled(): boolean {
+    return this.mutableIsRejected || this.mutableIsRejected
+  }
+
+  get rejectedValue(): unknown {
+    if (this.mutableIsResolved) {
+      throw new Error('Promise resolved')
+    } else if (!this.mutableIsRejected) {
+      throw new Error('Promise not rejected yet')
+    } else {
+      return this.mutableRejectedValue
     }
-  )
-  return result
+  }
+
+  get resolvedValue(): Value {
+    if (this.mutableIsRejected) {
+      throw this.mutableRejectedValue
+    } else if (!this.mutableIsResolved) {
+      throw new Error('Promise not resolved yet')
+    } else {
+      return this.mutableResolvedValue as Value
+    }
+  }
+
+  static build<Value>(
+    promise: Promise<Value> | Value,
+  ): Readonly<SyncPromiseImpl<Value>> {
+    const syncPromise = new SyncPromiseImpl<Value>()
+    Promise.resolve(promise).then(
+      (value) => {
+        syncPromise.mutableIsResolved = true
+        syncPromise.mutableResolvedValue = value
+      },
+      (value) => {
+        syncPromise.mutableIsRejected = true
+        syncPromise.mutableRejectedValue = value
+      },
+    )
+    return syncPromise
+  }
+}
+
+export function sync<Value>(
+  promise: Promise<Value> | Value,
+): SyncPromise<Value> {
+  return SyncPromiseImpl.build(promise)
 }
 
 export function assert(actual: unknown): asserts actual {
@@ -249,25 +266,30 @@ export function assertEquals<Value>(actual: Value, expected: Value): void {
 
 export function assertInstanceOf<Result, Args extends unknown[]>(
   actual: unknown,
-  expectedType: abstract new (...args: Args) => Result
+  expectedType: abstract new (...args: Args) => Result,
 ): asserts actual is Result {
   if (!(actual instanceof expectedType)) {
     throw new AssertionError(
       'Not instance of',
-      (typeof actual === 'object'
-        ? actual?.constructor.name
-        : undefined) ?? typeof actual,
-      expectedType.name
+      (typeof actual === 'object' ?
+        actual?.constructor.name
+      : undefined) ?? typeof actual,
+      expectedType.name,
     )
   }
 }
 
 export function assertDeepEquals<Value>(
   actual: Value,
-  expected: Value
+  expected: Value,
 ): void {
   if (!testIsDeepEqual.isDeepEqual(actual, expected)) {
-    throw new AssertionError('Not deep equal', actual, expected, 'diff')
+    throw new AssertionError(
+      'Not deep equal',
+      actual,
+      expected,
+      AssertionMode.diff,
+    )
   }
 }
 

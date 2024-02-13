@@ -1,5 +1,4 @@
 use super::*;
-use crate::context as svc_context;
 use crate::db as svc_db;
 use crate::request as svc_request;
 use crate::response as svc_response;
@@ -7,13 +6,13 @@ use mockall::predicate::eq;
 
 #[tokio::test]
 async fn test_handle_content_by_id() {
-  let mut db = svc_db::MockContext::new();
+  let mut db = svc_db::MockDb::new();
   db.expect_get_content_by_id()
     .with(eq(vec![0x01, 0x0f]))
     .times(1)
     .returning(|_| Ok(Some(vec![0x09])));
 
-  let mut ctx = svc_context::MockDbContext::new();
+  let mut ctx = svc_db::MockContext::new();
   ctx.expect_db().times(1).return_const(db);
 
   let req = svc_request::ContentRequest {
@@ -39,7 +38,7 @@ async fn test_handle_content_by_id() {
 
 #[tokio::test]
 async fn test_handle_content_by_path() {
-  let mut db = svc_db::MockContext::new();
+  let mut db = svc_db::MockDb::new();
   db.expect_get_content_by_path()
     .with(eq("a.js".to_owned()))
     .times(1)
@@ -50,7 +49,7 @@ async fn test_handle_content_by_path() {
       }))
     });
 
-  let mut ctx = svc_context::MockDbContext::new();
+  let mut ctx = svc_db::MockContext::new();
   ctx.expect_db().times(1).return_const(db);
 
   let req = svc_request::ContentRequest {

@@ -2,26 +2,37 @@ const highWaterMark = 16
 const limit = 8
 
 export class Sink<T> {
-  readonly writable: WritableStream<T>
   private readonly mutableActive: Set<Promise<void>> = new Set<
     Promise<void>
   >()
 
-  constructor(onData: (data: T) => Promise<void>) {
-    const active = this.mutableActive
-    this.writable = new WritableStream(
-      {
-        async write(data) {
-          const current = onData(data).finally(() =>
-            active.delete(current)
-          )
-          active.add(current)
-          while (active.size >= limit) {
-            await Promise.race([...active.values()])
-          }
+  private constructor(
+    private readonly onData: (data: T) => Promise<void>,
+    readonly writable: WritableStream<T>,
+  ) {}
+
+  static build<T>(onData: (data: T) => Promise<void>): Sink<T> {
+    const sink: Sink<T> = new Sink<T>(
+      onData,
+      new WritableStream(
+        {
+          async write(data) {
+            return sink.write(data)
+          },
         },
-      },
-      { highWaterMark }
+        { highWaterMark },
+      ),
     )
+    return sink
+  }
+
+  async write(data: T): Promise<void> {
+    const current = this.onData(data).finally(() =>
+      this.mutableActive.delete(current),
+    )
+    this.mutableActive.add(current)
+    while (this.mutableActive.size >= limit) {
+      await Promise.race([...this.mutableActive.values()])
+    }
   }
 }

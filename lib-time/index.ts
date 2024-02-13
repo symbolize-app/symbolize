@@ -1,8 +1,10 @@
 export interface Context {
-  readonly time: {
-    performanceNow(): number
-    setTimeout(callback: () => void, ms: number): unknown
-  }
+  readonly time: Time
+}
+
+export interface Time {
+  performanceNow(): number
+  setTimeout(callback: () => void, ms: number): unknown
 }
 
 export async function delay(ctx: Context, ms: number): Promise<void> {
@@ -35,21 +37,21 @@ export function interval(parts: {
 
 export function convert(
   ms: number,
-  unit: 'hours' | 'minutes' | 'seconds'
+  unit: 'hours' | 'minutes' | 'seconds',
 ): number {
   return ms / conversionTable[unit]
 }
 
 export function subtract(
   to: Readonly<Date>,
-  from: Readonly<Date>
+  from: Readonly<Date>,
 ): number {
   return to.getTime() - from.getTime()
 }
 
 export function add(
   initial: Readonly<Date>,
-  ms: Readonly<number>
+  ms: Readonly<number>,
 ): Readonly<Date> {
   return new Date(initial.getTime() + ms)
 }

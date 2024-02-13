@@ -8,8 +8,8 @@ use std::sync::Arc;
 #[allow(clippy::print_stderr)]
 #[tokio::main]
 pub async fn main() -> Result<()> {
-  let ctx = Arc::new(svc_context::MainContext {
-    db: svc_db::MainContext::init().await?,
+  let ctx = Arc::new(svc_context::ContextImpl {
+    db: svc_db::DbImpl::init().await?,
   });
   println!("Context intialized");
 

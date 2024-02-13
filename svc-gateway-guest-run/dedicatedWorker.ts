@@ -4,12 +4,12 @@ import * as stream from '@intertwine/lib-stream'
 import * as timeBrowser from '@intertwine/lib-time/index.browser.ts'
 
 function main(): void {
-  const timeCtx = timeBrowser.initContext()
+  const timeObj = new timeBrowser.TimeImpl()
 
   const ctx: error.Context & stream.ServerContext = {
-    ...random.initContext(),
-    ...timeCtx,
-    ...stream.initServerContext(timeCtx),
+    random: new random.RandomImpl(),
+    streamServer: stream.Server.init({ time: timeObj }),
+    time: timeObj,
   }
 
   const entryPoints: Promise<{

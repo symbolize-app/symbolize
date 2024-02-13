@@ -1,20 +1,23 @@
 import * as devContext from '@/context.ts'
-import * as devDatabase from '@/database.ts'
 import * as collection from '@intertwine/lib-collection'
 import * as hex from '@intertwine/lib-hex'
 import * as nodeCrypto from 'node:crypto'
 import * as nodePath from 'node:path'
 import * as nodeZlib from 'node:zlib'
 
-interface OutputFile {
-  readonly original: Uint8Array
-  readonly pathId: string
+class OutputFile {
+  constructor(
+    readonly original: Uint8Array,
+    readonly pathId: string,
+  ) {}
 }
 
-interface ContentFile {
-  readonly contentId: Uint8Array
-  readonly original: Uint8Array
-  readonly pathId: string
+class ContentFile {
+  constructor(
+    readonly contentId: Uint8Array,
+    readonly original: Uint8Array,
+    readonly pathId: string,
+  ) {}
 }
 
 const serviceWorkerMainPath = 'svc-gateway-guest-run/serviceWorker.ts.js'
@@ -28,17 +31,17 @@ export function createVersion(): bigint {
 export function write(
   ctx: devContext.Context,
   versionId: bigint,
-  outputFiles: readonly OutputFile[]
+  outputFiles: readonly OutputFile[],
 ): void {
   const mainContentFiles = outputFiles.map(convertToContentFile)
   const manifestFiles = collection
     .groupBy(mainContentFiles, (item) =>
-      item.pathId.substring(0, item.pathId.indexOf('/'))
+      item.pathId.substring(0, item.pathId.indexOf('/')),
     )
     .map(([name, items]) => buildManifest(name, items))
     .map(convertToContentFile)
   const serviceWorkerShell = convertToContentFile(
-    buildServiceWorkerShell(versionId, mainContentFiles, manifestFiles)
+    buildServiceWorkerShell(versionId, mainContentFiles, manifestFiles),
   )
   const allContentFiles = [
     ...mainContentFiles,
@@ -53,7 +56,7 @@ export function write(
     })
     if (
       contentResult.lastInsertRowid &&
-      ctx.mode === devContext.Mode.production
+      ctx.dev.mode === devContext.Mode.production
     ) {
       const compressed = compressContent(contentFile.original)
       ctx.db.query.updateContentCompressed.run({
@@ -63,7 +66,7 @@ export function write(
     }
   }
 
-  devDatabase.withTransactionSync(ctx, () => {
+  ctx.db.withTransactionSync(() => {
     ctx.db.query.insertVersion.run({ id: versionId })
     for (const contentFile of allContentFiles) {
       ctx.db.query.insertPath.run({
@@ -76,10 +79,11 @@ export function write(
 }
 
 function convertToContentFile(outputFile: OutputFile): ContentFile {
-  return {
-    ...outputFile,
-    contentId: getContentId(outputFile.original),
-  }
+  return new ContentFile(
+    getContentId(outputFile.original),
+    outputFile.original,
+    outputFile.pathId,
+  )
 }
 
 function getContentId(original: Uint8Array): Uint8Array {
@@ -90,36 +94,36 @@ function getContentId(original: Uint8Array): Uint8Array {
 
 function buildManifest(
   name: string,
-  contentFiles: readonly ContentFile[]
+  contentFiles: readonly ContentFile[],
 ): OutputFile {
   const data = Object.fromEntries(
     contentFiles.map((item) => [
       item.pathId,
       `${hex.uint8ArrayToHex(item.contentId)}${nodePath.extname(
-        item.pathId
+        item.pathId,
       )}`,
-    ])
+    ]),
   )
   const pathId = `.manifest/${name}.js`
   const text = `Object.assign(manifest,${JSON.stringify(data)})`
   const original = Buffer.from(text, 'utf8')
-  return { original, pathId }
+  return new OutputFile(original, pathId)
 }
 
 function buildServiceWorkerShell(
   versionId: bigint,
   mainContentFiles: readonly ContentFile[],
-  manifestFiles: readonly ContentFile[]
+  manifestFiles: readonly ContentFile[],
 ): OutputFile {
   const serviceWorkerMain = mainContentFiles.find(
-    (item) => item.pathId === serviceWorkerMainPath
+    (item) => item.pathId === serviceWorkerMainPath,
   )
   if (!serviceWorkerMain) {
     throw new Error('Service worker main not found')
   }
   const scripts = [...manifestFiles, serviceWorkerMain]
     .map(
-      (item) => `"/.code/.id/${hex.uint8ArrayToHex(item.contentId)}.js"`
+      (item) => `"/.code/.id/${hex.uint8ArrayToHex(item.contentId)}.js"`,
     )
     .join(',')
   const pathId = serviceWorkerShellPath

@@ -1,24 +1,23 @@
 import * as hex from '@intertwine/lib-hex'
 
 export interface Context {
-  readonly random: {
-    cryptoBits(bits: number): Uint8Array
-    number(): number
-  }
+  readonly random: Random
 }
 
-export function initContext(): Context {
-  return {
-    random: {
-      cryptoBits(bits) {
-        const result = new Uint8Array(bits / 8)
-        crypto.getRandomValues(result)
-        return result
-      },
-      number() {
-        return Math.random()
-      },
-    },
+export interface Random {
+  cryptoBits(bits: number): Uint8Array
+  number(): number
+}
+
+export class RandomImpl implements Random {
+  cryptoBits(bits: number): Uint8Array {
+    const result = new Uint8Array(bits / 8)
+    crypto.getRandomValues(result)
+    return result
+  }
+
+  number(): number {
+    return Math.random()
   }
 }
 
