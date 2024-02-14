@@ -31,6 +31,8 @@ includes:
     taskfile: dev-task/easyrsa.yml
   lib-collection:
     taskfile: lib-collection
+  lib-compute:
+    taskfile: lib-compute
   lib-concurrency:
     taskfile: lib-concurrency
   lib-error:
@@ -200,6 +202,7 @@ tasks:
       - dev-prettier:link-build-dir
       - dev-tsconfig:link-build-dir
       - lib-collection:link-build-dir
+      - lib-compute:link-build-dir
       - lib-concurrency:link-build-dir
       - lib-error:link-build-dir
       - lib-hex-ts:link-build-dir

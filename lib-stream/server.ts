@@ -19,9 +19,7 @@ export class Server {
     streamSource.Source<streamConnection.ConnectionRequest>
   >(() => streamSource.Source.build())
 
-  private constructor() {
-    // Private
-  }
+  private constructor() {}
 
   static init(ctx: time.Context): Server {
     const server = new Server()

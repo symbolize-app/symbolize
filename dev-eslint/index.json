@@ -143,6 +143,10 @@
         }
       }
     ],
+    "@typescript-eslint/no-empty-function": [
+      "error",
+      { "allow": ["private-constructors"] }
+    ],
     "@typescript-eslint/no-inferrable-types": "off",
     "@typescript-eslint/no-loop-func": "error",
     "@typescript-eslint/no-unnecessary-condition": [
@@ -159,6 +163,7 @@
     "@typescript-eslint/no-use-before-define": [
       "warn",
       {
+        "classes": false,
         "functions": false,
         "variables": false
       }

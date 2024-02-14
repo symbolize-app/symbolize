@@ -1,4 +1,5 @@
 import * as error from '@/index.ts'
+import type * as random from '@intertwine/lib-random'
 import * as test from '@intertwine/lib-test'
 import * as time from '@intertwine/lib-time'
 
@@ -16,7 +17,7 @@ export const tests = {
       ...baseContext,
       random: {
         ...baseContext.random,
-        number: test.mock([]),
+        number: test.mock<random.Random['number']>([]),
       },
     }
     const expectedResult = {}
@@ -42,13 +43,13 @@ export const tests = {
       ...baseContext,
       random: {
         ...baseContext.random,
-        number: test.mock([() => 0.5]),
+        number: test.mock<random.Random['number']>([() => 0.5]),
       },
     }
     const expectedResult = new Error('TEST')
-    const [onError, onErrorHistory] = test.mockWithHistory([
-      () => undefined,
-    ])
+    const [onError, onErrorHistory] = test.mockWithHistory<
+      error.RetryConfig['onError']
+    >([() => undefined])
     const actualResult = test.sync(
       error.retry(ctx, async () => Promise.reject(expectedResult), {
         maxAttempts: 2,
@@ -73,14 +74,13 @@ export const tests = {
       ...baseContext,
       random: {
         ...baseContext.random,
-        number: test.mock([() => 0.8, () => 0.8]),
+        number: test.mock<random.Random['number']>([() => 0.8, () => 0.8]),
       },
     }
     const expectedResult = new Error('TEST')
-    const [onError, onErrorHistory] = test.mockWithHistory([
-      () => undefined,
-      () => undefined,
-    ])
+    const [onError, onErrorHistory] = test.mockWithHistory<
+      error.RetryConfig['onError']
+    >([() => undefined, () => undefined])
     const actualResult = test.sync(
       error.retry(ctx, async () => Promise.reject(expectedResult), {
         maxAttempts: 3,
@@ -111,7 +111,7 @@ export const tests = {
       ...baseContext,
       random: {
         ...baseContext.random,
-        number: test.mock([() => 0]),
+        number: test.mock<random.Random['number']>([() => 0]),
       },
     }
     const expectedResult = new Error('TEST')
@@ -144,14 +144,17 @@ export const tests = {
       ...baseContext,
       random: {
         ...baseContext.random,
-        number: test.mock([() => 0.6, () => 0.6, () => 0]),
+        number: test.mock<random.Random['number']>([
+          () => 0.6,
+          () => 0.6,
+          () => 0,
+        ]),
       },
     }
     const expectedResult = new Error('TEST')
-    const [onError, onErrorHistory] = test.mockWithHistory([
-      () => undefined,
-      () => undefined,
-    ])
+    const [onError, onErrorHistory] = test.mockWithHistory<
+      error.RetryConfig['onError']
+    >([() => undefined, () => undefined])
     const actualResult = test.sync(
       error.retry(ctx, async () => Promise.reject(expectedResult), {
         maxAttempts: 10,
@@ -183,7 +186,7 @@ export const tests = {
       ...baseContext,
       random: {
         ...baseContext.random,
-        number: test.mock([() => 0.8, () => 0.8]),
+        number: test.mock<random.Random['number']>([() => 0.8, () => 0.8]),
       },
     }
     const expectedResult = {}
@@ -193,10 +196,9 @@ export const tests = {
       async () => Promise.reject(expectedError),
       async () => Promise.resolve(expectedResult),
     ])
-    const [onError, onErrorHistory] = test.mockWithHistory([
-      () => undefined,
-      () => undefined,
-    ])
+    const [onError, onErrorHistory] = test.mockWithHistory<
+      error.RetryConfig['onError']
+    >([() => undefined, () => undefined])
     const actualResult = test.sync(
       error.retry(ctx, callback, {
         maxAttempts: 3,

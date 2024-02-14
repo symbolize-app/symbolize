@@ -3,9 +3,7 @@ export class EventSemaphore {
   private mutableResolve!: () => void
   private mutableResolved: boolean = true
 
-  private constructor() {
-    // Private
-  }
+  private constructor() {}
 
   static build(): Readonly<EventSemaphore> {
     const eventSemaphore = new EventSemaphore()
