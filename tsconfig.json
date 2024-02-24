@@ -13,6 +13,7 @@
     { "path": "./dev-node-suppress" },
     { "path": "./dev-pnpm-test" },
     { "path": "./lib-collection" },
+    { "path": "./lib-compute" },
     { "path": "./lib-concurrency" },
     { "path": "./lib-error" },
     { "path": "./lib-hex-ts" },

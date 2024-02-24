@@ -135,7 +135,7 @@ tasks:
         WATCH: true
         RESTART: false
         MODE: type-script
-        COMMAND: tsc --build --verbose
+        COMMAND: tsc --build
 
   test:
     aliases:

@@ -59,11 +59,23 @@ export async function runAll<CustomContext = unknown>(
   const start = ctx.time.performanceNow()
   let pass = 0
   let fail = 0
+  let onlyMode = false
+  for (const testModule of resolvedTestModules) {
+    const { tests } = testModule
+    for (const [testName] of Object.entries(tests)) {
+      if (testName.startsWith('O:')) {
+        onlyMode = true
+      }
+    }
+  }
   console.group('Testing...')
   for (const testModule of resolvedTestModules) {
     const { url, tests } = testModule
     let testUrlPrinted = false
     for (const [testName, test] of Object.entries(tests)) {
+      if (onlyMode && !testName.startsWith('O:')) {
+        continue
+      }
       try {
         const testContext: Context & CustomContext = {
           ...ctx,
@@ -163,29 +175,49 @@ export async function runAll<CustomContext = unknown>(
   return fail === 0
 }
 
-export function mock<Args extends readonly unknown[], Return>(
-  returnValues: readonly (() => Return)[],
-): (...args: Args) => Return {
+export function mock<Func extends (...args: never) => unknown>(
+  returnValues: readonly Func[],
+): Func {
   return mockWithHistory(returnValues)[0]
 }
 
-export function mockWithHistory<Args extends readonly unknown[], Return>(
-  returnValues: readonly (() => Return)[],
-): readonly [(...args: Args) => Return, readonly Args[]] {
+export function mockWithHistory<Func extends (...args: never) => unknown>(
+  returnValues: readonly Func[],
+): readonly [Func, readonly Parameters<Func>[]] {
   let i = 0
-  const mutableHistory: Args[] = []
-  const callback: (...args: Args) => Return = (...args) => {
+  const mutableHistory: Parameters<Func>[] = []
+  const callback = ((...args) => {
     if (i === returnValues.length) {
       throw new Error('called too many times')
     } else {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- already checked
-      const result = returnValues[i]!()
+      const result = returnValues[i]!(...args)
       mutableHistory.push(args)
       i += 1
       return result
     }
-  }
+  }) as Func
   return [callback, mutableHistory]
+}
+
+export function repeatMock<Func extends (...args: never) => unknown>(
+  repeat: number,
+  returnValue: Func,
+): Func {
+  return repeatMockWithHistory(repeat, returnValue)[0]
+}
+
+export function repeatMockWithHistory<
+  Func extends (...args: never) => unknown,
+>(
+  repeat: number,
+  returnValue: Func,
+): readonly [Func, readonly Parameters<Func>[]] {
+  const mutableReturnValues: Func[] = []
+  for (let i = 0; i < repeat; i++) {
+    mutableReturnValues.push(returnValue)
+  }
+  return mockWithHistory(mutableReturnValues)
 }
 
 export interface SyncPromise<Value> {
@@ -200,9 +232,7 @@ class SyncPromiseImpl<Value> implements SyncPromise<Value> {
   private mutableRejectedValue: unknown = undefined
   private mutableResolvedValue: Value | undefined = undefined
 
-  private constructor() {
-    // Private
-  }
+  private constructor() {}
 
   get isSettled(): boolean {
     return this.mutableIsRejected || this.mutableIsRejected
@@ -297,6 +327,18 @@ export function assertThrows(callback: () => unknown): unknown {
   let result: unknown
   try {
     result = callback()
+  } catch (error) {
+    return error
+  }
+  throw new AssertionError('No error thrown', result, '<error>')
+}
+
+export async function assertThrowsAsync(
+  callback: () => Promise<unknown>,
+): Promise<unknown> {
+  let result: unknown
+  try {
+    result = await callback()
   } catch (error) {
     return error
   }
