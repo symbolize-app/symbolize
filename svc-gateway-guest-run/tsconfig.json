@@ -10,9 +10,13 @@
   "references": [
     { "path": "../dev-pnpm-test" },
     { "path": "../lib-collection" },
+    { "path": "../lib-compute" },
+    { "path": "../lib-convey" },
     { "path": "../lib-hex-ts" },
+    { "path": "../lib-random" },
     { "path": "../lib-stream" },
     { "path": "../lib-test" },
+    { "path": "../lib-test-runner" },
     { "path": "../lib-time" },
     { "path": "../svc-auth-guest-read" },
     { "path": "../svc-auth-guest-view" }

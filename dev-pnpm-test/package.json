@@ -6,15 +6,16 @@
     "@intertwine/dev-prettier": "workspace:*",
     "@intertwine/dev-tsconfig": "workspace:*",
     "@intertwine/lib-compute": "workspace:*",
+    "@intertwine/lib-convey": "workspace:*",
     "@intertwine/lib-error": "workspace:*",
     "@intertwine/lib-hex": "workspace:*",
     "@intertwine/lib-payload": "workspace:*",
     "@intertwine/lib-random": "workspace:*",
     "@intertwine/lib-style": "workspace:*",
     "@intertwine/lib-test": "workspace:*",
+    "@intertwine/lib-test-runner": "workspace:*",
     "@intertwine/lib-time": "workspace:*",
-    "@intertwine/svc-auth-guest-view": "workspace:*",
-    "jsdom": "22.1.0"
+    "@intertwine/svc-auth-guest-view": "workspace:*"
   },
   "devDependencies": {
     "typescript": "5.2.2"

@@ -4,17 +4,10 @@
   "dependencies": {
     "@intertwine/dev-prettier": "workspace:*",
     "@intertwine/dev-tsconfig": "workspace:*",
-    "@intertwine/eslint-config": "workspace:@intertwine/dev-eslint@*",
-    "@intertwine/lib-random": "workspace:*",
-    "@intertwine/lib-time": "workspace:*",
-    "@sinonjs/fake-timers": "11.1.0",
-    "diff": "5.1.0",
-    "fast-mersenne-twister": "1.0.3",
-    "ms": "2.1.3"
+    "@intertwine/eslint-config": "workspace:@intertwine/dev-eslint@*"
   },
   "devDependencies": {
-    "typescript": "5.2.2",
-    "@intertwine/lib-hex": "workspace:*"
+    "typescript": "5.2.2"
   },
   "prettier": "@intertwine/dev-prettier/index.json"
 }

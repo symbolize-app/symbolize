@@ -55,9 +55,7 @@ export function nullOr<Value>(
   }
 }
 
-export function object<
-  Value extends Readonly<Record<never, never>>,
->(config: {
+export function object<Value extends object>(config: {
   readonly [Key in keyof Value]: JsonPayloadTransformer<Value[Key]>
 }): JsonPayloadTransformer<Value> {
   return {
@@ -78,7 +76,7 @@ export function object<
       checkObject(output, path)
       const mutableResult: { [Key in string]: JsonValue } = {}
       for (const key in config) {
-        const value = output[key]
+        const value: Value[typeof key] = output[key]
         checkValue(value, key, path)
         mutableResult[key] = config[key].toJson(
           value,

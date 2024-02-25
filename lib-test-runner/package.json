@@ -1,10 +1,14 @@
 {
-  "name": "@intertwine/lib-hex",
+  "name": "@intertwine/lib-test-runner",
   "type": "module",
   "dependencies": {
     "@intertwine/dev-prettier": "workspace:*",
     "@intertwine/dev-tsconfig": "workspace:*",
-    "@intertwine/lib-test": "workspace:*"
+    "@intertwine/eslint-config": "workspace:@intertwine/dev-eslint@*",
+    "@intertwine/lib-test": "workspace:*",
+    "@intertwine/lib-time": "workspace:*",
+    "diff": "5.1.0",
+    "ms": "2.1.3"
   },
   "devDependencies": {
     "typescript": "5.2.2"

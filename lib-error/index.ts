@@ -1,8 +1,6 @@
 import type * as random from '@intertwine/lib-random'
 import * as time from '@intertwine/lib-time'
 
-export type Context = random.Context & time.Context
-
 export interface RetryConfig {
   readonly maxAttempts: number
   readonly minDelayMs: number
@@ -11,7 +9,7 @@ export interface RetryConfig {
 }
 
 export async function retry<Result>(
-  ctx: Context,
+  ctx: random.Context & time.Context,
   callback: () => Promise<Result> | Result,
   config: RetryConfig,
 ): Promise<Result> {

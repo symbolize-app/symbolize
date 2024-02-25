@@ -1,4 +1,4 @@
-import type * as time from '@intertwine/lib-time'
+import type * as time from '@/index.ts'
 import * as nodePerfHooks from 'node:perf_hooks'
 
 export class TimeImpl implements time.Time {

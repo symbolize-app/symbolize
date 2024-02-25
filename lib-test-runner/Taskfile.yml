@@ -1,0 +1,10 @@
+run: when_changed
+tasks:
+  link-build-dir:
+    cmd:
+      task: :tmpfs:link-package-build-dir
+      vars:
+        NAME: '{{.NAME}}'
+vars:
+  NAME: lib-test-runner
+version: '3'

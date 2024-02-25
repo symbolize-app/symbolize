@@ -1,8 +1,8 @@
-import type * as time from '@intertwine/lib-time'
+import type * as time from '@/index.ts'
 import fakeTimers from '@sinonjs/fake-timers'
 
-export type Context = time.Context & {
-  time: TimeImpl
+export interface Context {
+  readonly time: time.Time & TimeImpl
 }
 
 export class TimeImpl implements time.Time {

@@ -2,6 +2,7 @@ import * as error from '@/index.ts'
 import type * as random from '@intertwine/lib-random'
 import * as test from '@intertwine/lib-test'
 import * as time from '@intertwine/lib-time'
+import type * as timeTest from '@intertwine/lib-time/test.ts'
 
 export const retryConfig: Omit<error.RetryConfig, 'onError'> = {
   maxAttempts: 0,
@@ -12,8 +13,10 @@ export const retryConfig: Omit<error.RetryConfig, 'onError'> = {
 export const url = import.meta.url
 
 export const tests = {
-  async ['one attempt, pass'](baseContext: test.Context): Promise<void> {
-    const ctx: error.Context & test.Context = {
+  async ['one attempt, pass'](
+    baseContext: random.Context & timeTest.Context,
+  ): Promise<void> {
+    const ctx = {
       ...baseContext,
       random: {
         ...baseContext.random,
@@ -37,9 +40,9 @@ export const tests = {
   },
 
   async ['two attempts, count limit'](
-    baseContext: test.Context,
+    baseContext: random.Context & timeTest.Context,
   ): Promise<void> {
-    const ctx: error.Context & test.Context = {
+    const ctx = {
       ...baseContext,
       random: {
         ...baseContext.random,
@@ -68,9 +71,9 @@ export const tests = {
   },
 
   async ['three attempts, count limit'](
-    baseContext: test.Context,
+    baseContext: random.Context & timeTest.Context,
   ): Promise<void> {
-    const ctx: error.Context & test.Context = {
+    const ctx = {
       ...baseContext,
       random: {
         ...baseContext.random,
@@ -105,9 +108,9 @@ export const tests = {
   },
 
   async ['one attempt, window limit'](
-    baseContext: test.Context,
+    baseContext: random.Context & timeTest.Context,
   ): Promise<void> {
-    const ctx: error.Context & test.Context = {
+    const ctx = {
       ...baseContext,
       random: {
         ...baseContext.random,
@@ -138,9 +141,9 @@ export const tests = {
   },
 
   async ['three attempts, window limit'](
-    baseContext: test.Context,
+    baseContext: random.Context & timeTest.Context,
   ): Promise<void> {
-    const ctx: error.Context & test.Context = {
+    const ctx = {
       ...baseContext,
       random: {
         ...baseContext.random,
@@ -180,9 +183,9 @@ export const tests = {
   },
 
   async ['three attempts, pass'](
-    baseContext: test.Context,
+    baseContext: random.Context & timeTest.Context,
   ): Promise<void> {
-    const ctx: error.Context & test.Context = {
+    const ctx = {
       ...baseContext,
       random: {
         ...baseContext.random,
