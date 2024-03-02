@@ -146,11 +146,11 @@ class Range<CustomContext = unknown> implements Fragment<CustomContext> {
   ) {}
 
   async *add(
-    baseCtx: compute.Context & Context & CustomContext,
+    ctx: compute.Context & Context & CustomContext,
   ): AsyncIterableIterator<Node> {
     this.mutableFragments = this.content.map(toFragment)
     for (const fragment of this.mutableFragments) {
-      for await (const node of fragment.add(baseCtx)) {
+      for await (const node of fragment.add(ctx)) {
         yield node
       }
     }
@@ -328,4 +328,140 @@ class Div<CustomContext = unknown> implements Fragment<CustomContext> {
       compute.unsubscribe(sub)
     }
   }
+}
+
+type Falsy = '' | 0 | 0n | false | null | undefined
+
+export function if_<CustomContext, Value>(
+  ifBranch: (
+    value: compute.Computation<Exclude<Value, Falsy>>,
+  ) => FragmentOpt<CustomContext>,
+  elseBranch: () => FragmentOpt<CustomContext>,
+  condition: compute.ComputationOpt<Value>,
+): Fragment<CustomContext> {
+  return new If_(ifBranch, elseBranch, condition)
+}
+
+class If_<Value, CustomContext = unknown>
+  implements Fragment<CustomContext>
+{
+  readonly [fragmentMarker]: null = null
+  private mutableFragment: Fragment<CustomContext> | null = null
+  private mutableSub: compute.Computation<void> | null = null
+
+  constructor(
+    private readonly ifBranch: (
+      value: compute.Computation<Exclude<Value, Falsy>>,
+    ) => FragmentOpt<CustomContext>,
+    private readonly elseBranch: () => FragmentOpt<CustomContext>,
+    private readonly condition: compute.ComputationOpt<Value>,
+  ) {}
+
+  async *add(
+    ctx: compute.Context & Context & CustomContext,
+  ): AsyncIterableIterator<Node> {
+    const startComment = ctx.convey.document.createComment('')
+    const endComment = ctx.convey.document.createComment('')
+
+    let ifResult:
+      | [compute.Mutation<Exclude<Value, Falsy>>, Fragment<CustomContext>]
+      | null = null
+    let elseFragment: Fragment<CustomContext> | null = null
+
+    this.mutableSub = await compute.effect(async (value) => {
+      if (value) {
+        const truthyValue = value as Exclude<Value, Falsy>
+        if (elseFragment) {
+          await elseFragment.remove()
+          elseFragment = null
+        }
+        if (!ifResult) {
+          const ifState = compute.state(truthyValue)
+          const ifFragment = toFragment(this.ifBranch(ifState))
+          ifResult = [ifState, ifFragment]
+          const mutableIfNodes: Node[] = []
+          for await (const node of ifFragment.add(ctx)) {
+            mutableIfNodes.push(node)
+          }
+          replaceBetween(startComment, endComment, mutableIfNodes)
+          this.mutableFragment = ifFragment
+        } else {
+          const [ifState] = ifResult
+          await compute.txn(ctx, async () => {
+            await compute.set(ctx, ifState, truthyValue)
+          })
+        }
+      } else {
+        if (ifResult) {
+          const [, ifFragment] = ifResult
+          await ifFragment.remove()
+          ifResult = null
+        }
+        if (!elseFragment) {
+          elseFragment = toFragment(this.elseBranch())
+          const mutableElseNodes: Node[] = []
+          for await (const node of elseFragment.add(ctx)) {
+            mutableElseNodes.push(node)
+          }
+          replaceBetween(startComment, endComment, mutableElseNodes)
+          this.mutableFragment = elseFragment
+        }
+      }
+    }, this.condition)
+
+    if (!this.mutableFragment) {
+      throw new Error('Internal If_ error, no fragment set')
+    }
+
+    yield startComment
+    for await (const node of this.mutableFragment.add(ctx)) {
+      yield node
+    }
+    yield endComment
+  }
+
+  async remove(): Promise<void> {
+    if (this.mutableFragment) {
+      await this.mutableFragment.remove()
+    }
+
+    if (this.mutableSub !== null) {
+      compute.unsubscribe(this.mutableSub)
+    }
+  }
+}
+
+function replaceBetween(
+  startNode: Readonly<Node>,
+  endNode: Readonly<Node>,
+  innerNodes: readonly Node[],
+): void {
+  if (startNode.parentElement !== endNode.parentElement) {
+    throw new Error("Can't replace with different parents")
+  }
+
+  const parentElement = startNode.parentElement
+  if (!parentElement) {
+    return
+  }
+
+  const mutableNewNodes: Node[] = []
+  let inside = false
+  for (const oldNode of parentElement.childNodes) {
+    if (oldNode === startNode) {
+      mutableNewNodes.push(startNode)
+      mutableNewNodes.push(...innerNodes)
+      inside = true
+    } else if (oldNode === endNode) {
+      if (!inside) {
+        throw new Error('End before start')
+      }
+      mutableNewNodes.push(endNode)
+      inside = false
+    } else if (!inside) {
+      mutableNewNodes.push(oldNode)
+    }
+  }
+
+  parentElement.replaceChildren(...mutableNewNodes)
 }

@@ -13,10 +13,7 @@ export class Compute {
     return this.mutableEpoch.inProgress ? this.mutableEpoch : null
   }
 
-  async beginTransaction(): Promise<void> {
-    if (!this.mutableTransactions.length) {
-      await this.mutableEpoch.wait()
-    }
+  beginTransaction(): void {
     this.mutableTransactions.push([])
   }
 
@@ -27,14 +24,20 @@ export class Compute {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- already checked
     const transaction = this.mutableTransactions.pop()!
     if (!this.mutableTransactions.length) {
-      this.mutableEpoch = new Epoch(this.mutableEpoch.id + 1)
+      let wait = false
+      if (!this.mutableEpoch.inProgress) {
+        this.mutableEpoch = new Epoch(this.mutableEpoch.id + 1)
+        wait = true
+      }
       for (const [commitImpl, newValue] of transaction) {
         commitImpl.commit(this.mutableEpoch, newValue)
       }
       for (const [commitImpl] of transaction) {
         await commitImpl.update(this.mutableEpoch)
       }
-      await this.mutableEpoch.wait()
+      if (wait) {
+        await this.mutableEpoch.wait()
+      }
     } else {
       const mutableParentTransaction =
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- already checked
@@ -267,7 +270,7 @@ export async function txn<T>(
 ): Promise<T> {
   let result: T
   try {
-    await ctx.compute.beginTransaction()
+    ctx.compute.beginTransaction()
     result = await callback()
   } catch (error) {
     ctx.compute.rollbackTransaction()
