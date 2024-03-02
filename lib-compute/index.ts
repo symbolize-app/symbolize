@@ -350,9 +350,9 @@ class StateImpl<Value> implements CommitImpl<Value> {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await -- override
   async set(ctx: Context, newValue: Value): Promise<void> {
     ctx.compute.setState(this, newValue)
-    return Promise.resolve()
   }
 
   async update(newEpoch: Epoch): Promise<Value> {

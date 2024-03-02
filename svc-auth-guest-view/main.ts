@@ -34,10 +34,9 @@ export async function main(
 ): Promise<void> {
   const clientSource = ctx.streamClient.connect(
     'svc-auth-guest-read',
-    async (data) => {
+    (data) => {
       // eslint-disable-next-line no-console
       console.log('client data', data)
-      return Promise.resolve()
     },
   )
   void clientSource.send(ctx, 'ping')

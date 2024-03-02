@@ -38,7 +38,7 @@ export class Client {
 
   connect(
     service: string,
-    onData: (data: unknown) => Promise<void>,
+    onData: (data: unknown) => Promise<void> | void,
   ): streamSource.Source<unknown> {
     const clientSource = streamSource.Source.build()
     const connectionRequest: streamConnection.ConnectionRequest = {

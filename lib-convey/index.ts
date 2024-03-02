@@ -15,6 +15,27 @@ export interface Convey {
       | 'createTextNode'
     >
   >
+
+  readonly scheduler: ConveyScheduler
+}
+
+export class ConveyScheduler {
+  private readonly mutableQueue: (() => Promise<void>)[] = []
+
+  async run(callback: () => Promise<void>): Promise<void> {
+    return new Promise((resolve) => {
+      const dispatch = async (): Promise<void> => {
+        await callback()
+        resolve()
+        this.mutableQueue.shift()
+        await this.mutableQueue[0]?.()
+      }
+      this.mutableQueue.push(dispatch)
+      if (this.mutableQueue.length === 1) {
+        void dispatch()
+      }
+    })
+  }
 }
 
 export interface ScopedContext extends Context {
@@ -76,6 +97,12 @@ export function scopedDefer(
   callback: () => Promise<void> | void,
 ): void {
   ctx.scopedConvey.defer(callback)
+}
+
+export async function wait(ctx: Context): Promise<void> {
+  return ctx.convey.scheduler.run(async () => {
+    // Empty
+  })
 }
 
 export function empty(): Fragment {
@@ -158,11 +185,11 @@ class Text implements Fragment {
     yield mutableNode
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await -- override
   async remove(): Promise<void> {
     if (this.mutableEffect !== null) {
       compute.unsubscribe(this.mutableEffect)
     }
-    return Promise.resolve()
   }
 }
 
@@ -281,8 +308,10 @@ class Div<CustomContext = unknown> implements Fragment<CustomContext> {
       const onclick = this.attrs.onclick
       mutableElement.addEventListener('click', (event) => {
         void (async () => {
-          await compute.txn(ctx, async () => {
-            await onclick(event)
+          return ctx.convey.scheduler.run(async () => {
+            return compute.txn(ctx, async () => {
+              return onclick(event)
+            })
           })
         })()
       })

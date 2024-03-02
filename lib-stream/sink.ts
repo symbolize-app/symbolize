@@ -7,11 +7,11 @@ export class Sink<T> {
   >()
 
   private constructor(
-    private readonly onData: (data: T) => Promise<void>,
+    private readonly onData: (data: T) => Promise<void> | void,
     readonly writable: WritableStream<T>,
   ) {}
 
-  static build<T>(onData: (data: T) => Promise<void>): Sink<T> {
+  static build<T>(onData: (data: T) => Promise<void> | void): Sink<T> {
     const sink: Sink<T> = new Sink<T>(
       onData,
       new WritableStream(
@@ -27,7 +27,7 @@ export class Sink<T> {
   }
 
   async write(data: T): Promise<void> {
-    const current = this.onData(data).finally(() =>
+    const current = Promise.resolve(this.onData(data)).finally(() =>
       this.mutableActive.delete(current),
     )
     this.mutableActive.add(current)
