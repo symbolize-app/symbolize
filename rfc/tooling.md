@@ -22,6 +22,7 @@
 - https://eslint.org/
 - https://esbuild.github.io/
 - https://github.com/ohmjs/ohm
+- https://github.com/capricorn86/happy-dom
 
 ## Rust
 
@@ -59,7 +60,4 @@
 
 ## Deploy
 
-- https://docs.github.com/en/actions
-- https://github.com/dorny/paths-filter
-- https://github.com/re-actors/alls-green
 - https://www.terraform.io/

@@ -1,4 +1,4 @@
-import type * as random from '@intertwine/lib-random'
+import type * as random from '@/index.ts'
 import * as fastMersenneTwister from 'fast-mersenne-twister'
 
 export class RandomImpl implements random.Random {

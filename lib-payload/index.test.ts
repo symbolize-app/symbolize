@@ -6,7 +6,7 @@ export const url = import.meta.url
 export const tests = {
   ['null, ok'](): void {
     const validator = payload.object({
-      x: payload.nullOr(payload.object<Record<never, never>>({})),
+      x: payload.nullOr(payload.object<Record<string, never>>({})),
       y: payload.nullOr(payload.object({})),
     })
     const input = { x: null, y: {} }

@@ -1,10 +1,11 @@
-import * as test from '@/index.ts'
+import type * as timeTest from '@/test.ts'
+import * as test from '@intertwine/lib-test'
 import * as time from '@intertwine/lib-time'
 
 export const url = import.meta.url
 
 export const tests = {
-  async ['delay'](ctx: test.Context): Promise<void> {
+  async ['delay'](ctx: timeTest.Context): Promise<void> {
     const result = test.sync(time.delay(ctx, 20))
     await ctx.time.clock.tickAsync(0)
     test.assert(!result.isSettled)

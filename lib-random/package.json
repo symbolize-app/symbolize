@@ -4,7 +4,9 @@
   "dependencies": {
     "@intertwine/dev-prettier": "workspace:*",
     "@intertwine/dev-tsconfig": "workspace:*",
-    "@intertwine/lib-hex": "workspace:*"
+    "@intertwine/lib-hex": "workspace:*",
+    "@intertwine/lib-test": "workspace:*",
+    "fast-mersenne-twister": "1.0.3"
   },
   "devDependencies": {
     "typescript": "5.2.2"

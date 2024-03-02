@@ -1,17 +1,30 @@
 #!/usr/bin/env node-loader
-import * as test from '@intertwine/lib-test'
+import * as compute from '@intertwine/lib-compute'
+import * as conveyNode from '@intertwine/lib-convey/index.node.ts'
+import * as randomTest from '@intertwine/lib-random/test.ts'
+import * as testRunner from '@intertwine/lib-test-runner'
 import type * as time from '@intertwine/lib-time'
 import * as timeNode from '@intertwine/lib-time/index.node.ts'
+import * as timeTest from '@intertwine/lib-time/test.ts'
 import * as nodeFs from 'node:fs'
 import * as nodeUrl from 'node:url'
-
-export const all: test.TestCollection = () => []
 
 export async function run(baseContext: time.Context): Promise<boolean> {
   const ctx = {
     ...baseContext,
   }
-  return test.runAll(ctx, [import('@/index.ts')])
+  return testRunner.runAll(ctx, [import('@/index.ts')], (defer) => {
+    const convey = new conveyNode.ConveyImpl()
+    defer(() => {
+      convey.dispose()
+    })
+    return {
+      compute: new compute.Compute(),
+      convey,
+      random: randomTest.RandomImpl.build(),
+      time: timeTest.TimeImpl.build(),
+    }
+  })
 }
 
 if (

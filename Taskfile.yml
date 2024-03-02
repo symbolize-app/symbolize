@@ -35,6 +35,8 @@ includes:
     taskfile: lib-compute
   lib-concurrency:
     taskfile: lib-concurrency
+  lib-convey:
+    taskfile: lib-convey
   lib-error:
     taskfile: lib-error
   lib-hex-rs:
@@ -51,6 +53,8 @@ includes:
     taskfile: lib-style
   lib-test:
     taskfile: lib-test
+  lib-test-runner:
+    taskfile: lib-test-runner
   lib-time:
     taskfile: lib-time
   nix:
@@ -204,6 +208,7 @@ tasks:
       - lib-collection:link-build-dir
       - lib-compute:link-build-dir
       - lib-concurrency:link-build-dir
+      - lib-convey:link-build-dir
       - lib-error:link-build-dir
       - lib-hex-ts:link-build-dir
       - lib-payload:link-build-dir
@@ -211,6 +216,7 @@ tasks:
       - lib-stream:link-build-dir
       - lib-style:link-build-dir
       - lib-test:link-build-dir
+      - lib-test-runner:link-build-dir
       - lib-time:link-build-dir
       - svc-auth-guest-read:link-build-dir
       - svc-auth-guest-view:link-build-dir

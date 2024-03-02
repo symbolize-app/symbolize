@@ -9,6 +9,7 @@ packages:
   - lib-collection
   - lib-compute
   - lib-concurrency
+  - lib-convey
   - lib-error
   - lib-hex-ts
   - lib-payload
@@ -16,6 +17,7 @@ packages:
   - lib-stream
   - lib-style
   - lib-test
+  - lib-test-runner
   - lib-time
   - svc-auth-guest-read
   - svc-auth-guest-view

@@ -1,4 +1,4 @@
-import type * as time from '@intertwine/lib-time'
+import type * as time from '@/index.ts'
 
 export class TimeImpl implements time.Time {
   performanceNow(): number {

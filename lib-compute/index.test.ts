@@ -5,8 +5,7 @@ import * as test from '@intertwine/lib-test'
 export const url = import.meta.url
 
 export const tests = {
-  async ['handler, multiple'](): Promise<void> {
-    const ctx = { compute: new compute.Compute() }
+  async ['handler, multiple'](ctx: compute.Context): Promise<void> {
     const x = compute.state('x')
     const y = compute.state('y')
     const callback = compute.handler(
@@ -79,8 +78,7 @@ export const tests = {
     test.assertEquals(await compute.value(x), 'x')
   },
 
-  async ['state, set'](): Promise<void> {
-    const ctx = { compute: new compute.Compute() }
+  async ['state, set'](ctx: compute.Context): Promise<void> {
     const x = compute.state('x')
     await compute.txn(ctx, async () => {
       await compute.set(ctx, x, 'a')
@@ -88,8 +86,7 @@ export const tests = {
     test.assertEquals(await compute.value(x), 'a')
   },
 
-  async ['state, nested set'](): Promise<void> {
-    const ctx = { compute: new compute.Compute() }
+  async ['state, nested set'](ctx: compute.Context): Promise<void> {
     const x = compute.state('x')
     const y = compute.state('y')
     await compute.txn(ctx, async () => {
@@ -102,8 +99,7 @@ export const tests = {
     test.assertEquals(await compute.value(y), 'b')
   },
 
-  async ['state, rollback'](): Promise<void> {
-    const ctx = { compute: new compute.Compute() }
+  async ['state, rollback'](ctx: compute.Context): Promise<void> {
     const x = compute.state('x')
     const error = await test.assertThrowsAsync(async () =>
       compute.txn(ctx, async () => {
@@ -116,8 +112,7 @@ export const tests = {
     test.assertEquals(await compute.value(x), 'x')
   },
 
-  async ['state, nested rollback'](): Promise<void> {
-    const ctx = { compute: new compute.Compute() }
+  async ['state, nested rollback'](ctx: compute.Context): Promise<void> {
     const x = compute.state('x')
     const y = compute.state('y')
     const error = await compute.txn(ctx, async () => {
@@ -135,8 +130,7 @@ export const tests = {
     test.assertEquals(await compute.value(y), 'y')
   },
 
-  async ['derived, set simple'](): Promise<void> {
-    const ctx = { compute: new compute.Compute() }
+  async ['derived, set simple'](ctx: compute.Context): Promise<void> {
     const parent = compute.state({ x: 'y' })
     const [callback, callbackHistory] = test.repeatMockWithHistory(
       1,
@@ -161,8 +155,7 @@ export const tests = {
     test.assertDeepEquals(callbackHistory, [[{ x: 'z' }]])
   },
 
-  async ['derived, set multiple'](): Promise<void> {
-    const ctx = { compute: new compute.Compute() }
+  async ['derived, set multiple'](ctx: compute.Context): Promise<void> {
     const x = compute.state({ x: 'x' })
     const y = compute.state({ y: 'y' })
     const [callback, callbackHistory] = test.repeatMockWithHistory(
@@ -194,8 +187,9 @@ export const tests = {
     test.assertDeepEquals(callbackHistory, [[{ x: 'a' }, { y: 'b' }]])
   },
 
-  async ['derived, set shortcut object'](): Promise<void> {
-    const ctx = { compute: new compute.Compute() }
+  async ['derived, set shortcut object'](
+    ctx: compute.Context,
+  ): Promise<void> {
     const parent = compute.state({ x: 'y' })
     const child = parent.x
     await compute.txn(ctx, async () => {
@@ -205,8 +199,9 @@ export const tests = {
     test.assertEquals(await compute.value(child), 'z')
   },
 
-  async ['derived, set shortcut tuple'](): Promise<void> {
-    const ctx = { compute: new compute.Compute() }
+  async ['derived, set shortcut tuple'](
+    ctx: compute.Context,
+  ): Promise<void> {
     const parent = compute.state(['y'] as [string])
     const child = parent[0]
     await compute.txn(ctx, async () => {
@@ -227,8 +222,9 @@ export const tests = {
     test.assertEquals(await compute.value(x), 'x')
   },
 
-  async ['effect, state change simple'](): Promise<void> {
-    const ctx = { compute: new compute.Compute() }
+  async ['effect, state change simple'](
+    ctx: compute.Context,
+  ): Promise<void> {
     const x = compute.state('x')
     const [callback, callbackHistory] = test.repeatMockWithHistory(
       2,
@@ -243,8 +239,9 @@ export const tests = {
     test.assertEquals(await compute.value(x), 'a')
   },
 
-  async ['effect, state change multiple'](): Promise<void> {
-    const ctx = { compute: new compute.Compute() }
+  async ['effect, state change multiple'](
+    ctx: compute.Context,
+  ): Promise<void> {
     const x = compute.state('x')
     const y = compute.state('y')
     const [callback, callbackHistory] = test.repeatMockWithHistory(
@@ -265,9 +262,9 @@ export const tests = {
     test.assertEquals(await compute.value(y), 'b')
   },
 
-  async ['effect, partial graph update'](): Promise<void> {
-    const ctx = { compute: new compute.Compute() }
-
+  async ['effect, partial graph update'](
+    ctx: compute.Context,
+  ): Promise<void> {
     const x = compute.state('x')
     const [x2Callback, x2CallbackHistory] = test.repeatMockWithHistory(
       2,
@@ -305,9 +302,7 @@ export const tests = {
     test.assertEquals(await compute.value(y), 'y')
   },
 
-  async ['effect, unsubscribe'](): Promise<void> {
-    const ctx = { compute: new compute.Compute() }
-
+  async ['effect, unsubscribe'](ctx: compute.Context): Promise<void> {
     const x = compute.state('x')
     const [x2Callback, x2CallbackHistory] = test.repeatMockWithHistory(
       3,

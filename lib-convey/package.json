@@ -1,12 +1,15 @@
 {
-  "name": "@intertwine/lib-hex",
+  "name": "@intertwine/lib-convey",
   "type": "module",
   "dependencies": {
     "@intertwine/dev-prettier": "workspace:*",
     "@intertwine/dev-tsconfig": "workspace:*",
-    "@intertwine/lib-test": "workspace:*"
+    "@intertwine/lib-compute": "workspace:*",
+    "@intertwine/lib-test": "workspace:*",
+    "happy-dom": "13.6.2"
   },
   "devDependencies": {
+    "core-js-pure": "3.36.0",
     "typescript": "5.2.2"
   },
   "prettier": "@intertwine/dev-prettier/index.json"
