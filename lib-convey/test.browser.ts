@@ -1,6 +1,8 @@
-import type * as convey from '@/index.ts'
+import * as convey from '@/index.ts'
 
 export class ConveyImpl implements convey.Convey {
+  readonly scheduler: convey.ConveyScheduler = new convey.ConveyScheduler()
+
   private mutableDocument: Document | null = null
   private mutableIframe: HTMLIFrameElement | null = null
 

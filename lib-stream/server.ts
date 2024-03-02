@@ -62,7 +62,6 @@ export class Server {
           connectResult.onData(data),
         )
         void connectionRequest.clientStream.pipeTo(serverSink.writable)
-        return Promise.resolve()
       },
     )
     void connectionRequestStream.pipeTo(connectionRequestSink.writable)

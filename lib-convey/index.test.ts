@@ -222,12 +222,12 @@ export const tests = {
     test.assertEquals(div.textContent, 'hello / 0')
 
     div.click()
-    await new Promise((resolve) => setTimeout(resolve, 0))
+    await convey.wait(ctx)
     test.assertEquals(div.textContent, 'hello / 1')
 
     await fragment.remove()
     div.click()
-    await new Promise((resolve) => setTimeout(resolve, 0))
+    await convey.wait(ctx)
     test.assertEquals(div.textContent, 'hello / 1')
   },
 
@@ -252,7 +252,7 @@ export const tests = {
     test.assertDeepEquals(clickCallbackHistory, [])
 
     div.click()
-    await new Promise((resolve) => setTimeout(resolve, 0))
+    await convey.wait(ctx)
     test.assertEquals(clickCallbackHistory.length, 1)
   },
 
