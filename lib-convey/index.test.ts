@@ -285,33 +285,53 @@ export const tests = {
   ): Promise<void> {
     const x = compute.state({ x: 2 } as { readonly x: number } | null)
 
+    const [init, initHistory] = test.repeatMockWithHistory(
+      2,
+      (_x: number) => {},
+    )
+    const custom = convey.defineCustom<
+      unknown,
+      {
+        readonly x: { readonly x: number }
+      }
+    >(async (_ctx, attrs) => {
+      init(await compute.value(attrs.x.x))
+      return compute.map((x) => `${x.x * 3}`, attrs.x)
+    })
     const fragment = convey.if_(
-      (x) =>
-        convey.text({
-          content: compute.map((x) => `${x.x * 3}`, x),
-        }),
+      (x) => custom({ x }),
       () => 'nothing',
       x,
     )
     const body = ctx.convey.document.body
     body.append(...(await arrayFromAsync(fragment.add(ctx))))
     test.assertEquals(body.textContent, '6')
+    test.assertDeepEquals(initHistory, [[2]])
 
     await compute.txn(ctx, async () => {
       await compute.set(ctx, x, { x: 4 })
     })
     test.assertEquals(body.textContent, '12')
+    test.assertDeepEquals(initHistory, [[2]])
 
     await compute.txn(ctx, async () => {
       await compute.set(ctx, x, null)
     })
     test.assertEquals(body.textContent, 'nothing')
+    test.assertDeepEquals(initHistory, [[2]])
 
-    await fragment.remove()
     await compute.txn(ctx, async () => {
       await compute.set(ctx, x, { x: 3 })
     })
-    test.assertEquals(body.textContent, 'nothing')
+    test.assertEquals(body.textContent, '9')
+    test.assertDeepEquals(initHistory, [[2], [3]])
+
+    await fragment.remove()
+    await compute.txn(ctx, async () => {
+      await compute.set(ctx, x, { x: 5 })
+    })
+    test.assertEquals(body.textContent, '9')
+    test.assertDeepEquals(initHistory, [[2], [3]])
   },
 
   async ['match inner count'](
@@ -383,28 +403,38 @@ export const tests = {
     const x = compute.state(true)
     const y = compute.state(true)
 
+    const [init, initHistory] = test.repeatMockWithHistory(
+      10,
+      (_name: string) => {},
+    )
+    const custom = convey.defineCustom<
+      unknown,
+      {
+        readonly name: compute.ComputationOpt<string>
+      }
+    >(async (_ctx, attrs) => {
+      init(await compute.value(attrs.name))
+      return convey.div({ content: attrs.name })
+    })
     const fragment = convey.if_(
       () =>
         convey.if_(
-          () => [convey.div({ content: '0' })],
-          () => [
-            convey.div({ content: '1' }),
-            convey.div({ content: '2' }),
-          ],
+          () => [custom({ name: '0' })],
+          () => [custom({ name: '1' }), custom({ name: '2' })],
           y,
         ),
       () =>
         convey.if_(
           () => [
-            convey.div({ content: '3' }),
-            convey.div({ content: '4' }),
-            convey.div({ content: '5' }),
+            custom({ name: '3' }),
+            custom({ name: '4' }),
+            custom({ name: '5' }),
           ],
           () => [
-            convey.div({ content: '6' }),
-            convey.div({ content: '7' }),
-            convey.div({ content: '8' }),
-            convey.div({ content: '9' }),
+            custom({ name: '6' }),
+            custom({ name: '7' }),
+            custom({ name: '8' }),
+            custom({ name: '9' }),
           ],
           y,
         ),
@@ -413,20 +443,227 @@ export const tests = {
     const body = ctx.convey.document.body
     body.append(...(await arrayFromAsync(fragment.add(ctx))))
     test.assertEquals(body.textContent, '0')
+    test.assertEquals(initHistory.map(([name]) => name).join(''), '0')
 
     await compute.txn(ctx, async () => {
       await compute.set(ctx, x, false)
     })
     test.assertEquals(body.textContent, '345')
+    test.assertEquals(initHistory.map(([name]) => name).join(''), '0345')
 
     await compute.txn(ctx, async () => {
       await compute.set(ctx, y, false)
     })
     test.assertEquals(body.textContent, '6789')
+    test.assertEquals(
+      initHistory.map(([name]) => name).join(''),
+      '03456789',
+    )
 
     await compute.txn(ctx, async () => {
       await compute.set(ctx, x, true)
     })
     test.assertEquals(body.textContent, '12')
+    test.assertEquals(
+      initHistory.map(([name]) => name).join(''),
+      '0345678912',
+    )
+  },
+
+  async ['items pure'](
+    ctx: compute.Context & convey.Context,
+  ): Promise<void> {
+    const fragment = convey.each(
+      (x) => convey.div({ content: x }),
+      (x) => x,
+      ['a', 'b', 'c'],
+    )
+    const body = ctx.convey.document.body
+    body.append(...(await arrayFromAsync(fragment.add(ctx))))
+    test.assertEquals(body.textContent, 'abc')
+  },
+
+  async ['items inner state'](
+    ctx: compute.Context & convey.Context,
+  ): Promise<void> {
+    const items = compute.state([
+      { id: 0, name: 'a' },
+      { id: 1, name: 'b' },
+      { id: 2, name: 'c' },
+    ])
+
+    const [init, initHistory] = test.repeatMockWithHistory(
+      3,
+      (_name: string) => {},
+    )
+    const custom = convey.defineCustom<
+      unknown,
+      {
+        readonly name: compute.ComputationOpt<string>
+      }
+    >(async (_ctx, attrs) => {
+      init(await compute.value(attrs.name))
+      return convey.div({ content: attrs.name })
+    })
+    const fragment = convey.each(
+      (item) => custom({ name: item.name }),
+      (item) => item.id,
+      items,
+    )
+    const body = ctx.convey.document.body
+    body.append(...(await arrayFromAsync(fragment.add(ctx))))
+    test.assertEquals(body.textContent, 'abc')
+    test.assertDeepEquals(initHistory, [['a'], ['b'], ['c']])
+
+    await compute.txn(ctx, async () => {
+      await compute.set(ctx, items, [
+        await compute.value(items[0]),
+        await compute.value(items[1]),
+        { id: 2, name: 'd' },
+      ])
+    })
+    test.assertEquals(body.textContent, 'abd')
+    test.assertDeepEquals(initHistory, [['a'], ['b'], ['c']])
+  },
+
+  async ['items move'](
+    ctx: compute.Context & convey.Context,
+  ): Promise<void> {
+    const items = compute.state([
+      { id: 0, name: 'a' },
+      { id: 1, name: 'b' },
+      { id: 2, name: 'c' },
+    ])
+
+    const [init, initHistory] = test.repeatMockWithHistory(
+      3,
+      (_name: string) => {},
+    )
+    const custom = convey.defineCustom<
+      unknown,
+      {
+        readonly name: compute.ComputationOpt<string>
+      }
+    >(async (_ctx, attrs) => {
+      init(await compute.value(attrs.name))
+      return convey.div({ content: attrs.name })
+    })
+    const fragment = convey.each(
+      (item) => custom({ name: item.name }),
+      (item) => item.id,
+      items,
+    )
+    const body = ctx.convey.document.body
+    body.append(...(await arrayFromAsync(fragment.add(ctx))))
+    test.assertEquals(body.textContent, 'abc')
+    test.assertDeepEquals(initHistory, [['a'], ['b'], ['c']])
+
+    await compute.txn(ctx, async () => {
+      await compute.set(ctx, items, [
+        await compute.value(items[2]),
+        await compute.value(items[0]),
+        await compute.value(items[1]),
+      ])
+    })
+    test.assertEquals(body.textContent, 'cab')
+    test.assertDeepEquals(initHistory, [['a'], ['b'], ['c']])
+  },
+
+  async ['items remove'](
+    ctx: compute.Context & convey.Context,
+  ): Promise<void> {
+    const items = compute.state([
+      { id: 0, name: 'a' },
+      { id: 1, name: 'b' },
+      { id: 2, name: 'c' },
+    ])
+
+    const [init, initHistory] = test.repeatMockWithHistory(
+      3,
+      (_name: string) => {},
+    )
+    const custom = convey.defineCustom<
+      unknown,
+      {
+        readonly name: compute.ComputationOpt<string>
+      }
+    >(async (_ctx, attrs) => {
+      init(await compute.value(attrs.name))
+      return convey.div({ content: attrs.name })
+    })
+    const fragment = convey.each(
+      (item) => custom({ name: item.name }),
+      (item) => item.id,
+      items,
+    )
+    const body = ctx.convey.document.body
+    body.append(...(await arrayFromAsync(fragment.add(ctx))))
+    test.assertEquals(body.textContent, 'abc')
+    test.assertDeepEquals(initHistory, [['a'], ['b'], ['c']])
+
+    await compute.txn(ctx, async () => {
+      await compute.set(ctx, items, [
+        await compute.value(items[0]),
+        await compute.value(items[2]),
+      ])
+    })
+    test.assertEquals(body.textContent, 'ac')
+    test.assertDeepEquals(initHistory, [['a'], ['b'], ['c']])
+  },
+
+  async ['items add'](
+    ctx: compute.Context & convey.Context,
+  ): Promise<void> {
+    const items = compute.state([
+      { id: 0, name: 'a' },
+      { id: 1, name: 'b' },
+      { id: 2, name: 'c' },
+    ])
+
+    const [init, initHistory] = test.repeatMockWithHistory(
+      4,
+      (_name: string) => {},
+    )
+    const custom = convey.defineCustom<
+      unknown,
+      {
+        readonly name: compute.ComputationOpt<string>
+      }
+    >(async (_ctx, attrs) => {
+      init(await compute.value(attrs.name))
+      return convey.div({ content: attrs.name })
+    })
+    const fragment = convey.each(
+      (item) => custom({ name: item.name }),
+      (item) => item.id,
+      items,
+    )
+    const body = ctx.convey.document.body
+    body.append(...(await arrayFromAsync(fragment.add(ctx))))
+    test.assertEquals(body.textContent, 'abc')
+    test.assertDeepEquals(initHistory, [['a'], ['b'], ['c']])
+
+    await compute.txn(ctx, async () => {
+      await compute.set(ctx, items, [
+        await compute.value(items[0]),
+        await compute.value(items[1]),
+        { id: 3, name: 'd' },
+        await compute.value(items[2]),
+      ])
+    })
+    test.assertEquals(body.textContent, 'abdc')
+    test.assertDeepEquals(initHistory, [['a'], ['b'], ['c'], ['d']])
+
+    await fragment.remove()
+    await compute.txn(ctx, async () => {
+      await compute.set(ctx, items, [
+        await compute.value(items[0]),
+        await compute.value(items[1]),
+        { id: 4, name: 'e' },
+        await compute.value(items[2]),
+      ])
+    })
+    test.assertEquals(body.textContent, 'abdc')
+    test.assertDeepEquals(initHistory, [['a'], ['b'], ['c'], ['d']])
   },
 }
