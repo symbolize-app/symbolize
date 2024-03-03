@@ -279,4 +279,154 @@ export const tests = {
     })
     test.assertEquals(div.id, 'b')
   },
+
+  async ['match basic'](
+    ctx: compute.Context & convey.Context,
+  ): Promise<void> {
+    const x = compute.state({ x: 2 } as { readonly x: number } | null)
+
+    const fragment = convey.if_(
+      (x) =>
+        convey.text({
+          content: compute.map((x) => `${x.x * 3}`, x),
+        }),
+      () => 'nothing',
+      x,
+    )
+    const body = ctx.convey.document.body
+    body.append(...(await arrayFromAsync(fragment.add(ctx))))
+    test.assertEquals(body.textContent, '6')
+
+    await compute.txn(ctx, async () => {
+      await compute.set(ctx, x, { x: 4 })
+    })
+    test.assertEquals(body.textContent, '12')
+
+    await compute.txn(ctx, async () => {
+      await compute.set(ctx, x, null)
+    })
+    test.assertEquals(body.textContent, 'nothing')
+
+    await fragment.remove()
+    await compute.txn(ctx, async () => {
+      await compute.set(ctx, x, { x: 3 })
+    })
+    test.assertEquals(body.textContent, 'nothing')
+  },
+
+  async ['match inner count'](
+    ctx: compute.Context & convey.Context,
+  ): Promise<void> {
+    const x = compute.state('a')
+
+    const fragment = convey.if_(
+      () => [convey.div({ content: '_' }), convey.div({ content: x })],
+      () => null,
+      compute.map((x) => x.startsWith('a'), x),
+    )
+    const body = ctx.convey.document.body
+    body.append(...(await arrayFromAsync(fragment.add(ctx))))
+    test.assertEquals(body.children.length, 2)
+    test.assertEquals(body.childNodes.length, 4)
+    test.assertEquals(body.textContent, '_a')
+
+    await compute.txn(ctx, async () => {
+      await compute.set(ctx, x, 'b')
+    })
+    test.assertEquals(body.children.length, 0)
+    test.assertEquals(body.childNodes.length, 2)
+    test.assertEquals(body.textContent, '')
+
+    await compute.txn(ctx, async () => {
+      await compute.set(ctx, x, 'ab')
+    })
+    test.assertEquals(body.children.length, 2)
+    test.assertEquals(body.childNodes.length, 4)
+    test.assertEquals(body.textContent, '_ab')
+  },
+
+  async ['match lazy true'](
+    ctx: compute.Context & convey.Context,
+  ): Promise<void> {
+    const fragment = convey.if_(
+      () =>
+        convey.defineCustom(() => {
+          throw new Error()
+        })({}),
+      () => 'ok',
+      false,
+    )
+    const body = ctx.convey.document.body
+    body.append(...(await arrayFromAsync(fragment.add(ctx))))
+    test.assertEquals(body.textContent, 'ok')
+  },
+
+  async ['match lazy false'](
+    ctx: compute.Context & convey.Context,
+  ): Promise<void> {
+    const fragment = convey.if_(
+      () =>
+        convey.defineCustom(() => {
+          throw new Error()
+        })({}),
+      () => 'ok',
+      false,
+    )
+    const body = ctx.convey.document.body
+    body.append(...(await arrayFromAsync(fragment.add(ctx))))
+    test.assertEquals(body.textContent, 'ok')
+  },
+
+  async ['match nested'](
+    ctx: compute.Context & convey.Context,
+  ): Promise<void> {
+    const x = compute.state(true)
+    const y = compute.state(true)
+
+    const fragment = convey.if_(
+      () =>
+        convey.if_(
+          () => [convey.div({ content: '0' })],
+          () => [
+            convey.div({ content: '1' }),
+            convey.div({ content: '2' }),
+          ],
+          y,
+        ),
+      () =>
+        convey.if_(
+          () => [
+            convey.div({ content: '3' }),
+            convey.div({ content: '4' }),
+            convey.div({ content: '5' }),
+          ],
+          () => [
+            convey.div({ content: '6' }),
+            convey.div({ content: '7' }),
+            convey.div({ content: '8' }),
+            convey.div({ content: '9' }),
+          ],
+          y,
+        ),
+      x,
+    )
+    const body = ctx.convey.document.body
+    body.append(...(await arrayFromAsync(fragment.add(ctx))))
+    test.assertEquals(body.textContent, '0')
+
+    await compute.txn(ctx, async () => {
+      await compute.set(ctx, x, false)
+    })
+    test.assertEquals(body.textContent, '345')
+
+    await compute.txn(ctx, async () => {
+      await compute.set(ctx, y, false)
+    })
+    test.assertEquals(body.textContent, '6789')
+
+    await compute.txn(ctx, async () => {
+      await compute.set(ctx, x, true)
+    })
+    test.assertEquals(body.textContent, '12')
+  },
 }
