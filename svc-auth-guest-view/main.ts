@@ -12,8 +12,8 @@ const custom = convey.defineCustom<
 >((ctx, attrs) => {
   const countState = compute.state(0)
 
-  return convey.div({
-    onclick: compute.handler(async (_event, count) => {
+  return convey.html.div({
+    onClick: compute.handler(async (_event, count) => {
       await compute.set(ctx, countState, count + 1)
     }, countState),
 

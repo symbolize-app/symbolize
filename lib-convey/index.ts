@@ -1,3 +1,4 @@
+import * as conveyEventMap from '@/eventMap.ts'
 import * as compute from '@intertwine/lib-compute'
 
 export interface Context {
@@ -260,64 +261,125 @@ class Custom<
   }
 }
 
-export function div<CustomContext = unknown>(attrs: {
-  readonly content?: FragmentOpt<CustomContext>
-  readonly id?: compute.ComputationOpt<string>
-  onclick?(this: void, event: Readonly<MouseEvent>): Promise<void> | void
-}): Fragment<CustomContext> {
-  return new Div(attrs)
+type WritableElementAttrs<BaseElement extends Element> = {
+  readonly [Key in Exclude<
+    keyof BaseElement,
+    keyof conveyEventMap.CustomEventMap | 'content'
+  > as (<T>() => T extends Pick<BaseElement, Key> ? 1 : 0) extends (
+    <T>() => T extends Readonly<Pick<BaseElement, Key>> ? 1 : 0
+  ) ?
+    never
+  : BaseElement[Key] extends boolean | number | string | null ? Key
+  : never]?: compute.ComputationOpt<BaseElement[Key]>
 }
 
-class Div<CustomContext = unknown> implements Fragment<CustomContext> {
+type ListenerElementAttrs<BaseElement extends Element> = {
+  readonly [Key in keyof conveyEventMap.CustomEventMap as conveyEventMap.CustomEventMap[Key] extends (
+    keyof conveyEventMap.EventMap<BaseElement>
+  ) ?
+    Key
+  : never]?: conveyEventMap.CustomEventMap[Key] extends (
+    keyof conveyEventMap.EventMap<BaseElement>
+  ) ?
+    (
+      event: conveyEventMap.EventMap<BaseElement>[conveyEventMap.CustomEventMap[Key]],
+    ) => Promise<void> | void
+  : never
+}
+
+type ElementAttrs<
+  CustomContext,
+  BaseElement extends Element,
+> = ListenerElementAttrs<BaseElement> &
+  WritableElementAttrs<BaseElement> & {
+    readonly content?: FragmentOpt<CustomContext>
+  }
+
+export const html = new Proxy(
+  {},
+  {
+    get(
+      _mutableTarget: object,
+      property: string,
+      _receiver: unknown,
+    ): unknown {
+      return (attrs: object) => new ElementFragment(property, attrs)
+    },
+  },
+) as unknown as {
+  readonly [Key in keyof HTMLElementTagNameMap]: <CustomContext = unknown>(
+    attrs: ElementAttrs<CustomContext, HTMLElementTagNameMap[Key]>,
+  ) => Fragment<CustomContext>
+}
+
+class ElementFragment<BaseElement extends Element, CustomContext = unknown>
+  implements Fragment<CustomContext>
+{
   readonly [fragmentMarker]: null = null
   private mutableFragment: Fragment<CustomContext> | null = null
   private readonly mutableSubs: compute.Computation<unknown>[] = []
 
   constructor(
-    private readonly attrs: {
-      readonly content?: FragmentOpt<CustomContext>
-      readonly id?: compute.ComputationOpt<string>
-      onclick?(
-        this: void,
-        event: Readonly<MouseEvent>,
-      ): Promise<void> | void
-    },
+    private readonly tag: string,
+    private readonly attrs: ElementAttrs<CustomContext, BaseElement>,
   ) {}
 
   async *add(
     ctx: compute.Context & Context & CustomContext,
   ): AsyncIterableIterator<Node> {
-    const mutableElement = ctx.convey.document.createElement('div')
+    const element = ctx.convey.document.createElement(
+      this.tag,
+    ) as unknown as BaseElement
 
-    if (this.attrs.content) {
-      this.mutableFragment = toFragment(this.attrs.content)
-      for await (const node of this.mutableFragment.add(ctx)) {
-        mutableElement.append(node)
+    const mutablePromises: Promise<void>[] = []
+
+    for (const [key, value] of Object.entries(this.attrs)) {
+      if (key === 'content') {
+        mutablePromises.push(
+          (async () => {
+            this.mutableFragment = toFragment(value)
+            for await (const node of this.mutableFragment.add(ctx)) {
+              element.append(node)
+            }
+          })(),
+        )
+      } else if (key in conveyEventMap.customEventMap) {
+        element.addEventListener(
+          conveyEventMap.customEventMap[
+            key as keyof conveyEventMap.CustomEventMap
+          ],
+          (event) => {
+            void (async () => {
+              return ctx.convey.scheduler.run(async () => {
+                return compute.txn(ctx, async () => {
+                  return (
+                    value as unknown as (
+                      event: Readonly<Event>,
+                    ) => Promise<void> | void
+                  )(event)
+                })
+              })
+            })()
+          },
+        )
+      } else {
+        mutablePromises.push(
+          (async () => {
+            this.mutableSubs.push(
+              await compute.effect((value) => {
+                // eslint-disable-next-line functional/immutable-data -- required mutation
+                ;(element as unknown as Record<string, unknown>)[key] =
+                  value
+              }, value as compute.ComputationOpt<unknown>),
+            )
+          })(),
+        )
       }
     }
 
-    if (this.attrs.id) {
-      this.mutableSubs.push(
-        await compute.effect((id) => {
-          mutableElement.id = id
-        }, this.attrs.id),
-      )
-    }
+    await Promise.all(mutablePromises)
 
-    if (this.attrs.onclick) {
-      const onclick = this.attrs.onclick
-      mutableElement.addEventListener('click', (event) => {
-        void (async () => {
-          return ctx.convey.scheduler.run(async () => {
-            return compute.txn(ctx, async () => {
-              return onclick(event)
-            })
-          })
-        })()
-      })
-    }
-
-    yield mutableElement
+    yield element
   }
 
   async remove(): Promise<void> {

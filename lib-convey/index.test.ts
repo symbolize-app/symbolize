@@ -201,8 +201,8 @@ export const tests = {
     >((ctx, attrs) => {
       const countState = compute.state(0)
 
-      return convey.div({
-        onclick: compute.handler(async (_event, count) => {
+      return convey.html.div({
+        onClick: compute.handler(async (_event, count) => {
           await compute.set(ctx, countState, count + 1)
         }, countState),
 
@@ -237,9 +237,9 @@ export const tests = {
     const [clickCallback, clickCallbackHistory] =
       test.repeatMockWithHistory(1, (_event: Readonly<MouseEvent>) => {})
 
-    const fragment = convey.div({
+    const fragment = convey.html.div({
       id: 'x',
-      onclick: clickCallback,
+      onClick: clickCallback,
 
       content: 'y',
     })
@@ -261,7 +261,7 @@ export const tests = {
   ): Promise<void> {
     const x = compute.state('a')
 
-    const fragment = convey.div({ id: x })
+    const fragment = convey.html.div({ id: x })
     const body = ctx.convey.document.body
     body.append(...(await arrayFromAsync(fragment.add(ctx))))
     const div = body.querySelector('div')
@@ -278,6 +278,19 @@ export const tests = {
       await compute.set(ctx, x, 'c')
     })
     test.assertEquals(div.id, 'b')
+  },
+
+  async ['button pure'](
+    ctx: compute.Context & convey.Context,
+  ): Promise<void> {
+    const fragment = convey.html.button({
+      disabled: true,
+    })
+    const body = ctx.convey.document.body
+    body.append(...(await arrayFromAsync(fragment.add(ctx))))
+    const button = body.querySelector('button')
+    test.assert(button)
+    test.assertEquals(button.disabled, true)
   },
 
   async ['match basic'](
@@ -340,7 +353,10 @@ export const tests = {
     const x = compute.state('a')
 
     const fragment = convey.if_(
-      () => [convey.div({ content: '_' }), convey.div({ content: x })],
+      () => [
+        convey.html.div({ content: '_' }),
+        convey.html.div({ content: x }),
+      ],
       () => null,
       compute.map((x) => x.startsWith('a'), x),
     )
@@ -414,7 +430,7 @@ export const tests = {
       }
     >(async (_ctx, attrs) => {
       init(await compute.value(attrs.name))
-      return convey.div({ content: attrs.name })
+      return convey.html.div({ content: attrs.name })
     })
     const fragment = convey.if_(
       () =>
@@ -474,7 +490,7 @@ export const tests = {
     ctx: compute.Context & convey.Context,
   ): Promise<void> {
     const fragment = convey.each(
-      (x) => convey.div({ content: x }),
+      (x) => convey.html.div({ content: x }),
       (x) => x,
       ['a', 'b', 'c'],
     )
@@ -503,7 +519,7 @@ export const tests = {
       }
     >(async (_ctx, attrs) => {
       init(await compute.value(attrs.name))
-      return convey.div({ content: attrs.name })
+      return convey.html.div({ content: attrs.name })
     })
     const fragment = convey.each(
       (item) => custom({ name: item.name }),
@@ -546,7 +562,7 @@ export const tests = {
       }
     >(async (_ctx, attrs) => {
       init(await compute.value(attrs.name))
-      return convey.div({ content: attrs.name })
+      return convey.html.div({ content: attrs.name })
     })
     const fragment = convey.each(
       (item) => custom({ name: item.name }),
@@ -589,7 +605,7 @@ export const tests = {
       }
     >(async (_ctx, attrs) => {
       init(await compute.value(attrs.name))
-      return convey.div({ content: attrs.name })
+      return convey.html.div({ content: attrs.name })
     })
     const fragment = convey.each(
       (item) => custom({ name: item.name }),
@@ -631,7 +647,7 @@ export const tests = {
       }
     >(async (_ctx, attrs) => {
       init(await compute.value(attrs.name))
-      return convey.div({ content: attrs.name })
+      return convey.html.div({ content: attrs.name })
     })
     const fragment = convey.each(
       (item) => custom({ name: item.name }),
