@@ -92,7 +92,14 @@
     "import/no-duplicates": "warn",
     "import/no-extraneous-dependencies": [
       "error",
-      { "devDependencies": ["**/test.ts", "**/*.test.ts"] }
+      {
+        "devDependencies": [
+          "**/test.ts",
+          "**/test.*.ts",
+          "**/*.test.ts",
+          "**/*.test-d.ts"
+        ]
+      }
     ],
     "simple-import-sort/imports": [
       "warn",
