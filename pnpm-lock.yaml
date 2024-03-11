@@ -488,6 +488,9 @@ importers:
       '@intertwine/lib-time':
         specifier: workspace:*
         version: link:../lib-time
+      core-js-pure:
+        specifier: 3.36.0
+        version: 3.36.0
       diff:
         specifier: 5.1.0
         version: 5.1.0
@@ -1416,7 +1419,6 @@ packages:
   /core-js-pure@3.36.0:
     resolution: {integrity: sha512-cN28qmhRNgbMZZMc/RFu5w8pK9VJzpb2rJVR/lHuZJKwmXnoWOpXmMkxqBB514igkp1Hu8WGROsiOAzUcKdHOQ==}
     requiresBuild: true
-    dev: true
 
   /cosmiconfig@8.2.0:
     resolution: {integrity: sha512-3rTMnFJA1tCOPwRxtgF4wd7Ab2qvDbL8jX+3smjIbS4HlZBagTlpERbdN7iAbWlrfxE3M8c27kTwTawQ7st+OQ==}

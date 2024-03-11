@@ -9,8 +9,14 @@ export interface TestModule<CustomContext = unknown> {
   readonly url: string
 }
 
+export interface TestCollectionModule<CustomContext = unknown> {
+  readonly all: TestCollection<CustomContext>
+}
+
 export type TestCollection<CustomContext = unknown> =
-  () => readonly Promise<TestModule<CustomContext>>[]
+  () => readonly Promise<
+    TestCollectionModule<CustomContext> | TestModule<CustomContext>
+  >[]
 
 export enum AssertionMode {
   error = 'error',
