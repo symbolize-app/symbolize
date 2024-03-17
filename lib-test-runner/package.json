@@ -7,6 +7,7 @@
     "@intertwine/eslint-config": "workspace:@intertwine/dev-eslint@*",
     "@intertwine/lib-test": "workspace:*",
     "@intertwine/lib-time": "workspace:*",
+    "core-js-pure": "3.36.0",
     "diff": "5.1.0",
     "ms": "2.1.3"
   },

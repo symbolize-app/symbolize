@@ -12,17 +12,31 @@ const custom = convey.defineCustom<
 >((ctx, attrs) => {
   const countState = compute.state(0)
 
-  return convey.html.div({
-    onClick: compute.handler(async (_event, count) => {
-      await compute.set(ctx, countState, count + 1)
-    }, countState),
+  return [
+    convey.html.div({
+      onClick: compute.handler(async (_event, count) => {
+        await compute.set(ctx, countState, count + 1)
+      }, countState),
 
-    content: compute.map(
-      (title, count) => `${title} / ${count}`,
-      attrs.title,
-      countState,
-    ),
-  })
+      content: compute.map(
+        (title, count) => `${title} / ${count}`,
+        attrs.title,
+        countState,
+      ),
+    }),
+    convey.svg.svg({
+      height: 50,
+      viewBox: [0, 0, 100, 100],
+      width: 50,
+
+      content: convey.svg.rect({
+        height: 80,
+        width: 80,
+        x: 10,
+        y: 10,
+      }),
+    }),
+  ]
 })
 
 export async function main(
