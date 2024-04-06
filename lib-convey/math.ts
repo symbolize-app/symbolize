@@ -1,8 +1,8 @@
 import type * as conveyFragment from '@/fragment.ts'
+import type * as conveyMathAttrs from '@/mathAttrs.ts'
 import * as conveyOpaqueElement from '@/opaqueElement.ts'
-import type * as conveySvgAttrs from '@/svgAttrs.ts'
 
-export const svg = new Proxy(
+export const math = new Proxy(
   {},
   {
     get(
@@ -12,16 +12,16 @@ export const svg = new Proxy(
     ): unknown {
       return (attrs: object) =>
         new conveyOpaqueElement.OpaqueElementFragment(
-          conveyOpaqueElement.OpaqueElementAttributeCase.keep,
-          'http://www.w3.org/2000/svg',
+          conveyOpaqueElement.OpaqueElementAttributeCase.lower,
+          'http://www.w3.org/1998/Math/MathML',
           property,
           attrs,
         )
     },
   },
 ) as unknown as {
-  readonly [Key in keyof conveySvgAttrs.AttrsTagNameMap<unknown> &
-    keyof SVGElementTagNameMap]: <CustomContext = unknown>(
-    attrs: conveySvgAttrs.AttrsTagNameMap<CustomContext>[Key],
+  readonly [Key in keyof conveyMathAttrs.AttrsTagNameMap<unknown> &
+    keyof MathMLElementTagNameMap]: <CustomContext = unknown>(
+    attrs: conveyMathAttrs.AttrsTagNameMap<CustomContext>[Key],
   ) => conveyFragment.Fragment<CustomContext>
 }

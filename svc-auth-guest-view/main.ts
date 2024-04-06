@@ -36,6 +36,15 @@ const custom = convey.defineCustom<
         y: 10,
       }),
     }),
+    convey.math.math({
+      display: 'block',
+
+      content: [
+        convey.math.mi({ content: 'x' }),
+        convey.math.mo({ content: '+' }),
+        convey.math.mi({ content: 'y' }),
+      ],
+    }),
   ]
 })
 
