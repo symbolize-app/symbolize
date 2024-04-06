@@ -7,6 +7,7 @@ export type EventMap<BaseElement extends Element> = Readonly<
   : BaseElement extends HTMLElement ? HTMLElementEventMap
   : BaseElement extends SVGSVGElement ? SVGSVGElementEventMap
   : BaseElement extends SVGElement ? SVGElementEventMap
+  : BaseElement extends MathMLElement ? MathMLElementEventMap
   : never
 >
 

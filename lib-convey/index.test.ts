@@ -10,6 +10,7 @@ export const all: test.TestCollection<
   import('@/html.test.ts'),
   import('@/items.test.ts'),
   import('@/match.test.ts'),
+  import('@/math.test.ts'),
   import('@/range.test.ts'),
   import('@/svg.test.ts'),
   import('@/text.test.ts'),
