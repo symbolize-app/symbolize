@@ -43,12 +43,14 @@ type TestWritableAttrs<BaseElement extends Element> = {
   : Key]: Key extends keyof conveyElementAttrsTest.OverrideMap ?
     conveyElementAttrsTest.OverrideMap[Key]
   : compute.ComputationOpt<
-      BaseElement[Key] extends SVGAnimatedLength ? conveyData.SvgLengthOpt
-      : BaseElement[Key] extends SVGAnimatedNumber ? number
+      BaseElement[Key] extends boolean ? boolean
+      : BaseElement[Key] extends SVGAnimatedLength ?
+        conveyData.SvgLengthOpt | null
+      : BaseElement[Key] extends SVGAnimatedNumber ? number | null
       : BaseElement[Key] extends SVGAnimatedPreserveAspectRatio ?
-        conveyData.SvgPreserveAspectRatioOpt
-      : BaseElement[Key] extends SVGAnimatedRect ? conveyData.Rect
-      : BaseElement[Key] extends SVGStringList ? string[]
-      : BaseElement[Key]
+        conveyData.SvgPreserveAspectRatioOpt | null
+      : BaseElement[Key] extends SVGAnimatedRect ? conveyData.Rect | null
+      : BaseElement[Key] extends SVGStringList ? string[] | null
+      : BaseElement[Key] | null
     >
 }

@@ -10,13 +10,17 @@ export const tests = {
     ctx: compute.Context & convey.Context,
   ): Promise<void> {
     const fragment = convey.math.math({
+      ariaDisabled: true,
       display: 'inline',
     })
     const body = ctx.convey.document.body
     body.append(...(await arrayFromAsync(fragment.add(ctx))))
     const math = body.querySelector('math')
     test.assert(math)
-    test.assertEquals(math.outerHTML, '<math display="inline"></math>')
+    test.assertEquals(
+      math.outerHTML,
+      '<math aria-disabled="true" display="inline"></math>',
+    )
   },
 
   async ['mi pure'](ctx: compute.Context & convey.Context): Promise<void> {
@@ -40,6 +44,7 @@ export const tests = {
       content: convey.math.mo({
         form: 'prefix',
         maxSize: convey.px(11),
+        stretchy: true,
       }),
     })
     const body = ctx.convey.document.body
@@ -48,7 +53,7 @@ export const tests = {
     test.assert(math)
     test.assertEquals(
       math.outerHTML,
-      '<math><mo form="prefix" maxsize="11px"></mo></math>',
+      '<math><mo form="prefix" maxsize="11px" stretchy="true"></mo></math>',
     )
   },
 }

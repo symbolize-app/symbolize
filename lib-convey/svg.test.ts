@@ -31,6 +31,7 @@ export const tests = {
     ctx: compute.Context & convey.Context,
   ): Promise<void> {
     const fragment = convey.svg.svg({
+      ariaDisabled: true,
       preserveAspectRatio: convey.svgPreserveAspectRatio({
         align: 'xMaxYMax',
         mode: 'slice',
@@ -43,7 +44,7 @@ export const tests = {
     test.assert(svg)
     test.assertEquals(
       svg.outerHTML,
-      '<svg preserveAspectRatio="xMaxYMax slice" viewBox="1 2 3 4"></svg>',
+      '<svg aria-disabled="true" preserveAspectRatio="xMaxYMax slice" viewBox="1 2 3 4"></svg>',
     )
   },
 }

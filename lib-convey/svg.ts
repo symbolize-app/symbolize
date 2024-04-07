@@ -1,5 +1,5 @@
+import * as conveyElement from '@/element.ts'
 import type * as conveyFragment from '@/fragment.ts'
-import * as conveyOpaqueElement from '@/opaqueElement.ts'
 import type * as conveySvgAttrs from '@/svgAttrs.ts'
 
 export const svg = new Proxy(
@@ -11,8 +11,7 @@ export const svg = new Proxy(
       _receiver: unknown,
     ): unknown {
       return (attrs: object) =>
-        new conveyOpaqueElement.OpaqueElementFragment(
-          conveyOpaqueElement.OpaqueElementAttributeCase.keep,
+        new conveyElement.ElementFragment(
           'http://www.w3.org/2000/svg',
           property,
           attrs,
