@@ -21,8 +21,8 @@ export const tests = {
   },
 }
 
-type Actual<Tag extends keyof typeof conveyHtml.html> = Required<
-  Parameters<(typeof conveyHtml.html)[Tag]>[0]
+type Actual<Tag extends keyof typeof conveyHtml.html> = Readonly<
+  Required<Parameters<(typeof conveyHtml.html)[Tag]>[0]>
 >
 
 type Expected<Tag extends keyof HTMLElementTagNameMap> =

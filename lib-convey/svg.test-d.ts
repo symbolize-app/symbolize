@@ -29,8 +29,8 @@ export const tests = {
   },
 }
 
-type Actual<Tag extends keyof typeof conveySvg.svg> = Required<
-  Parameters<(typeof conveySvg.svg)[Tag]>[0]
+type Actual<Tag extends keyof typeof conveySvg.svg> = Readonly<
+  Required<Parameters<(typeof conveySvg.svg)[Tag]>[0]>
 >
 
 type Expected<Tag extends keyof SVGElementTagNameMap> =

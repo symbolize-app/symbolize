@@ -54,8 +54,10 @@ export const tests = {
 
     await compute.txn(ctx, async () => {
       await compute.set(ctx, items, [
-        await compute.value(items[0]),
-        await compute.value(items[1]),
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- simple test
+        (await compute.value(items[0]))!,
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- simple test
+        (await compute.value(items[1]))!,
         { id: 2, name: 'd' },
       ])
     })
@@ -97,9 +99,12 @@ export const tests = {
 
     await compute.txn(ctx, async () => {
       await compute.set(ctx, items, [
-        await compute.value(items[2]),
-        await compute.value(items[0]),
-        await compute.value(items[1]),
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- simple test
+        (await compute.value(items[2]))!,
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- simple test
+        (await compute.value(items[0]))!,
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- simple test
+        (await compute.value(items[1]))!,
       ])
     })
     test.assertEquals(body.textContent, 'cab')
@@ -140,8 +145,10 @@ export const tests = {
 
     await compute.txn(ctx, async () => {
       await compute.set(ctx, items, [
-        await compute.value(items[0]),
-        await compute.value(items[2]),
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- simple test
+        (await compute.value(items[0]))!,
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- simple test
+        (await compute.value(items[2]))!,
       ])
     })
     test.assertEquals(body.textContent, 'ac')
@@ -182,10 +189,13 @@ export const tests = {
 
     await compute.txn(ctx, async () => {
       await compute.set(ctx, items, [
-        await compute.value(items[0]),
-        await compute.value(items[1]),
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- simple test
+        (await compute.value(items[0]))!,
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- simple test
+        (await compute.value(items[1]))!,
         { id: 3, name: 'd' },
-        await compute.value(items[2]),
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- simple test
+        (await compute.value(items[2]))!,
       ])
     })
     test.assertEquals(body.textContent, 'abdc')
@@ -194,10 +204,13 @@ export const tests = {
     await fragment.remove()
     await compute.txn(ctx, async () => {
       await compute.set(ctx, items, [
-        await compute.value(items[0]),
-        await compute.value(items[1]),
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- simple test
+        (await compute.value(items[0]))!,
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- simple test
+        (await compute.value(items[1]))!,
         { id: 4, name: 'e' },
-        await compute.value(items[2]),
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- simple test
+        (await compute.value(items[2]))!,
       ])
     })
     test.assertEquals(body.textContent, 'abdc')

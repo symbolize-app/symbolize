@@ -10,7 +10,7 @@ export const tests = {
     const tag = 'math'
     let actual: Omit<
       Actual<typeof tag>,
-      'altText' | 'dir' | 'display' | 'displayStyle' | 'scriptLevel'
+      'altText' | 'display' | 'displayStyle' | 'mathDir' | 'scriptLevel'
     > = null as never
     let expected: Expected<typeof tag> = null as never
     actual = expected
@@ -18,8 +18,8 @@ export const tests = {
   },
 }
 
-type Actual<Tag extends keyof typeof conveyMath.math> = Required<
-  Parameters<(typeof conveyMath.math)[Tag]>[0]
+type Actual<Tag extends keyof typeof conveyMath.math> = Readonly<
+  Required<Parameters<(typeof conveyMath.math)[Tag]>[0]>
 >
 
 type Expected<Tag extends keyof MathMLElementTagNameMap> =

@@ -1,6 +1,6 @@
+import * as conveyElement from '@/element.ts'
 import type * as conveyFragment from '@/fragment.ts'
 import type * as conveyMathAttrs from '@/mathAttrs.ts'
-import * as conveyOpaqueElement from '@/opaqueElement.ts'
 
 export const math = new Proxy(
   {},
@@ -11,8 +11,7 @@ export const math = new Proxy(
       _receiver: unknown,
     ): unknown {
       return (attrs: object) =>
-        new conveyOpaqueElement.OpaqueElementFragment(
-          conveyOpaqueElement.OpaqueElementAttributeCase.lower,
+        new conveyElement.ElementFragment(
           'http://www.w3.org/1998/Math/MathML',
           property,
           attrs,

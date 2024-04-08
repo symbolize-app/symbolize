@@ -55,6 +55,7 @@ export const tests = {
       test.repeatMockWithHistory(1, (_event: Readonly<MouseEvent>) => {})
 
     const fragment = convey.html.div({
+      ariaDisabled: true,
       id: 'x',
       onClick: clickCallback,
 
@@ -66,6 +67,10 @@ export const tests = {
     test.assert(div)
     test.assertEquals(div.id, 'x')
     test.assertEquals(div.textContent, 'y')
+    test.assertEquals(
+      div.outerHTML,
+      '<div aria-disabled="true" id="x">y</div>',
+    )
     test.assertDeepEquals(clickCallbackHistory, [])
 
     div.click()
@@ -97,16 +102,57 @@ export const tests = {
     test.assertEquals(div.id, 'b')
   },
 
+  async ['div string null'](
+    ctx: compute.Context & convey.Context,
+  ): Promise<void> {
+    const title = compute.state<string | null>('a')
+
+    const fragment = convey.html.div({ title })
+    const body = ctx.convey.document.body
+    body.append(...(await arrayFromAsync(fragment.add(ctx))))
+    const div = body.querySelector('div')
+    test.assert(div)
+    test.assertEquals(div.title, 'a')
+    test.assertEquals(div.outerHTML, '<div title="a"></div>')
+
+    await compute.txn(ctx, async () => {
+      await compute.set(ctx, title, null)
+    })
+    test.assertEquals(div.title, '')
+    test.assertEquals(div.outerHTML, '<div></div>')
+  },
+
   async ['button pure'](
     ctx: compute.Context & convey.Context,
   ): Promise<void> {
-    const fragment = convey.html.button({
-      disabled: true,
-    })
+    const fragment = convey.html.button({ formMethod: 'get' })
+    const body = ctx.convey.document.body
+    body.append(...(await arrayFromAsync(fragment.add(ctx))))
+    const button = body.querySelector('button')
+    test.assert(button)
+    test.assertEquals(
+      button.outerHTML,
+      '<button formmethod="get"></button>',
+    )
+  },
+
+  async ['button boolean false'](
+    ctx: compute.Context & convey.Context,
+  ): Promise<void> {
+    const disabled = compute.state(true)
+
+    const fragment = convey.html.button({ disabled })
     const body = ctx.convey.document.body
     body.append(...(await arrayFromAsync(fragment.add(ctx))))
     const button = body.querySelector('button')
     test.assert(button)
     test.assertEquals(button.disabled, true)
+    test.assertEquals(button.outerHTML, '<button disabled=""></button>')
+
+    await compute.txn(ctx, async () => {
+      await compute.set(ctx, disabled, false)
+    })
+    test.assertEquals(button.disabled, false)
+    test.assertEquals(button.outerHTML, '<button></button>')
   },
 }

@@ -256,10 +256,10 @@ class NodeProxy
   }
 }
 
-export async function set<Value>(
+export async function set<Value, NewValue extends Value>(
   ctx: Context,
   mutation: Mutation<Value>,
-  newValue: Value,
+  newValue: NewValue,
 ): Promise<void> {
   await mutation[nodeImpl].set(ctx, newValue)
 }
