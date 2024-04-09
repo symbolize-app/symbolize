@@ -1,4 +1,69 @@
+import type * as conveyData from '@/data.ts'
+import type * as conveyElementAttrsTest from '@/elementAttrs.test-d.ts'
 import type * as conveyElementAttrs from '@/elementAttrs.ts'
+import type * as compute from '@intertwine/lib-compute'
+
+export type TestAttrs<
+  CustomContext,
+  BaseElement extends Element,
+> = Required<
+  Pick<
+    conveyElementAttrs.Attrs<CustomContext, BaseElement>,
+    'content' | 'onAdd'
+  >
+> &
+  TestListenerAttrs<BaseElement> &
+  TestWritableAttrs<BaseElement>
+
+type TestListenerAttrs<BaseElement extends Element> = {
+  readonly [Key in keyof conveyElementAttrs.AllAttrs as Key extends (
+    `on${infer Type}`
+  ) ?
+    Lowercase<Type> extends (
+      keyof conveyElementAttrsTest.EventMap<BaseElement>
+    ) ?
+      Key
+    : never
+  : never]: Key extends `on${infer Type}` ?
+    Lowercase<Type> extends infer LowercaseType ?
+      LowercaseType extends (
+        keyof conveyElementAttrsTest.EventMap<BaseElement>
+      ) ?
+        (
+          event: conveyElementAttrsTest.EventMap<BaseElement>[LowercaseType],
+        ) => Promise<void> | void
+      : never
+    : never
+  : never
+}
+
+type TestWritableAttrs<BaseElement extends Element> = {
+  readonly [Key in Exclude<
+    keyof BaseElement,
+    keyof conveyElementAttrsTest.SkippedMap | 'content' | 'onAdd'
+  > as Key extends Uppercase<Key extends string ? Key : never> ? never
+  : NonNullable<BaseElement[Key]> extends (
+    | HTMLCollection
+    | NamedNodeMap
+    | Node
+    | NodeList
+    | ((...args: never) => unknown)
+  ) ?
+    never
+  : Key]: Key extends keyof conveyElementAttrsTest.OverrideMap ?
+    conveyElementAttrsTest.OverrideMap[Key]
+  : compute.ComputationOpt<
+      BaseElement[Key] extends boolean ? boolean
+      : BaseElement[Key] extends SVGAnimatedLength ?
+        conveyData.SvgLengthOpt | null
+      : BaseElement[Key] extends SVGAnimatedNumber ? number | null
+      : BaseElement[Key] extends SVGAnimatedPreserveAspectRatio ?
+        conveyData.SvgPreserveAspectRatioOpt | null
+      : BaseElement[Key] extends SVGAnimatedRect ? conveyData.Rect | null
+      : BaseElement[Key] extends SVGStringList ? string[] | null
+      : BaseElement[Key] | null
+    >
+}
 
 export type EventMap<BaseElement extends Element> = Readonly<
   BaseElement extends HTMLVideoElement ? HTMLVideoElementEventMap
@@ -10,157 +75,6 @@ export type EventMap<BaseElement extends Element> = Readonly<
   : BaseElement extends MathMLElement ? MathMLElementEventMap
   : never
 >
-
-const customGlobalEventHandlersEventMap = {
-  onAbort: 'abort',
-  onAnimationCancel: 'animationcancel',
-  onAnimationEnd: 'animationend',
-  onAnimationIteration: 'animationiteration',
-  onAnimationStart: 'animationstart',
-  onAuxClick: 'auxclick',
-  onBeforeInput: 'beforeinput',
-  onBlur: 'blur',
-  onCanPlay: 'canplay',
-  onCanPlayThrough: 'canplaythrough',
-  onCancel: 'cancel',
-  onChange: 'change',
-  onClick: 'click',
-  onClose: 'close',
-  onCompositionEnd: 'compositionend',
-  onCompositionStart: 'compositionstart',
-  onCompositionUpdate: 'compositionupdate',
-  onContextMenu: 'contextmenu',
-  onCopy: 'copy',
-  onCueChange: 'cuechange',
-  onCut: 'cut',
-  onDblClick: 'dblclick',
-  onDrag: 'drag',
-  onDragEnd: 'dragend',
-  onDragEnter: 'dragenter',
-  onDragLeave: 'dragleave',
-  onDragOver: 'dragover',
-  onDragStart: 'dragstart',
-  onDrop: 'drop',
-  onDurationChange: 'durationchange',
-  onEmptied: 'emptied',
-  onEnded: 'ended',
-  onError: 'error',
-  onFocus: 'focus',
-  onFocusIn: 'focusin',
-  onFocusOut: 'focusout',
-  onFormData: 'formdata',
-  onGotPointerCapture: 'gotpointercapture',
-  onInput: 'input',
-  onInvalid: 'invalid',
-  onKeyDown: 'keydown',
-  onKeyPress: 'keypress',
-  onKeyUp: 'keyup',
-  onLoad: 'load',
-  onLoadStart: 'loadstart',
-  onLoadedData: 'loadeddata',
-  onLoadedMetadata: 'loadedmetadata',
-  onLostPointercapture: 'lostpointercapture',
-  onMouseDown: 'mousedown',
-  onMouseEnter: 'mouseenter',
-  onMouseLeave: 'mouseleave',
-  onMouseMove: 'mousemove',
-  onMouseOut: 'mouseout',
-  onMouseOver: 'mouseover',
-  onMouseUp: 'mouseup',
-  onPaste: 'paste',
-  onPause: 'pause',
-  onPlay: 'play',
-  onPlaying: 'playing',
-  onPointerCancel: 'pointercancel',
-  onPointerDown: 'pointerdown',
-  onPointerEnter: 'pointerenter',
-  onPointerLeave: 'pointerleave',
-  onPointerMove: 'pointermove',
-  onPointerOut: 'pointerout',
-  onPointerOver: 'pointerover',
-  onPointerUp: 'pointerup',
-  onProgress: 'progress',
-  onRateChange: 'ratechange',
-  onReset: 'reset',
-  onResize: 'resize',
-  onScroll: 'scroll',
-  onScrollEnd: 'scrollend',
-  onSecurityPolicyViolation: 'securitypolicyviolation',
-  onSeeked: 'seeked',
-  onSeeking: 'seeking',
-  onSelect: 'select',
-  onSelectStart: 'selectstart',
-  onSelectionChange: 'selectionchange',
-  onSlotChange: 'slotchange',
-  onStalled: 'stalled',
-  onSubmit: 'submit',
-  onSuspend: 'suspend',
-  onTimeUpdate: 'timeupdate',
-  onToggle: 'toggle',
-  onTouchCancel: 'touchcancel',
-  onTouchEnd: 'touchend',
-  onTouchMove: 'touchmove',
-  onTouchStart: 'touchstart',
-  onTransitionCancel: 'transitioncancel',
-  onTransitionEnd: 'transitionend',
-  onTransitionRun: 'transitionrun',
-  onTransitionStart: 'transitionstart',
-  onVolumeChange: 'volumechange',
-  onWaiting: 'waiting',
-  onWebkitAnimationEnd: 'webkitanimationend',
-  onWebkitAnimationIteration: 'webkitanimationiteration',
-  onWebkitAnimationStart: 'webkitanimationstart',
-  onWebkitTransitionEnd: 'webkittransitionend',
-  onWheel: 'wheel',
-} as const
-
-const customElementEventMap = {
-  onFullscreenChange: 'fullscreenchange',
-  onFullscreenError: 'fullscreenerror',
-} as const
-
-const customWindowEventHandlersEventMap = {
-  onAfterPrint: 'afterprint',
-  onBeforePrint: 'beforeprint',
-  onBeforeUnload: 'beforeunload',
-  onGamepadConnected: 'gamepadconnected',
-  onGamepadDisconnected: 'gamepaddisconnected',
-  onHashChange: 'hashchange',
-  onLanguageChange: 'languagechange',
-  onMessage: 'message',
-  onMessageError: 'messageerror',
-  onOffline: 'offline',
-  onOnline: 'online',
-  onPageHide: 'pagehide',
-  onPageShow: 'pageshow',
-  onPopState: 'popstate',
-  onRejectionHandled: 'rejectionhandled',
-  onStorage: 'storage',
-  onUnhandledRejection: 'unhandledrejection',
-  onUnload: 'unload',
-} as const
-
-// eslint-disable-next-line @typescript-eslint/naming-convention -- match original
-const customHTMLMediaElementEventMap = {
-  onEncrypted: 'encrypted',
-  onWaitingForKey: 'waitingforkey',
-} as const
-
-// eslint-disable-next-line @typescript-eslint/naming-convention -- match original
-const customHTMLVideoElementEventMap = {
-  onEnterPictureInPicture: 'enterpictureinpicture',
-  onLeavePictureInPicture: 'leavepictureinpicture',
-} as const
-
-export type CustomEventMap = typeof customEventMap
-
-export const customEventMap = {
-  ...customGlobalEventHandlersEventMap,
-  ...customElementEventMap,
-  ...customWindowEventHandlersEventMap,
-  ...customHTMLMediaElementEventMap,
-  ...customHTMLVideoElementEventMap,
-} as const
 
 export interface SkippedMap {
   readonly accessKeyLabel: never

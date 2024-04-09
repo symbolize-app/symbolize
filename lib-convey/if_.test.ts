@@ -7,7 +7,7 @@ import arrayFromAsync from 'core-js-pure/actual/array/from-async'
 export const url = import.meta.url
 
 export const tests = {
-  async ['match basic'](
+  async ['if basic'](
     ctx: compute.Context & convey.Context,
   ): Promise<void> {
     const x = compute.state({ x: 2 } as { readonly x: number } | null)
@@ -61,7 +61,7 @@ export const tests = {
     test.assertDeepEquals(initHistory, [[2], [3]])
   },
 
-  async ['match inner count'](
+  async ['if inner count'](
     ctx: compute.Context & convey.Context,
   ): Promise<void> {
     const x = compute.state('a')
@@ -95,7 +95,7 @@ export const tests = {
     test.assertEquals(body.textContent, '_ab')
   },
 
-  async ['match lazy true'](
+  async ['if lazy true'](
     ctx: compute.Context & convey.Context,
   ): Promise<void> {
     const fragment = convey.if_(
@@ -111,7 +111,7 @@ export const tests = {
     test.assertEquals(body.textContent, 'ok')
   },
 
-  async ['match lazy false'](
+  async ['if lazy false'](
     ctx: compute.Context & convey.Context,
   ): Promise<void> {
     const fragment = convey.if_(
@@ -127,7 +127,7 @@ export const tests = {
     test.assertEquals(body.textContent, 'ok')
   },
 
-  async ['match nested'](
+  async ['if nested'](
     ctx: compute.Context & convey.Context,
   ): Promise<void> {
     const x = compute.state(true)

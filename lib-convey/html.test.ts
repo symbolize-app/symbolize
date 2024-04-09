@@ -122,6 +122,64 @@ export const tests = {
     test.assertEquals(div.outerHTML, '<div></div>')
   },
 
+  async ['div on add'](
+    ctx: compute.Context & convey.Context,
+  ): Promise<void> {
+    const show = compute.state(false)
+    const [stepCallback, stepCallbackHistory] = test.repeatMockWithHistory(
+      6,
+      (..._args: readonly unknown[]) => {},
+    )
+
+    const fragment = convey.if_(
+      () =>
+        convey.html.div({
+          id: 'x',
+          onAdd(event) {
+            stepCallback('added', event.element)
+            test.assertEquals(event.element.id, 'x')
+            test.assertEquals(event.element.textContent, 'y')
+            test.assertEquals(
+              event.element.outerHTML,
+              '<div id="x">y</div>',
+            )
+
+            convey.scopedDefer(event.ctx, () => {
+              stepCallback('removed')
+            })
+          },
+
+          content: 'y',
+        }),
+      () => null,
+      show,
+    )
+    const body = ctx.convey.document.body
+    body.append(...(await arrayFromAsync(fragment.add(ctx))))
+
+    stepCallback('start')
+    await compute.txn(ctx, async () => {
+      await compute.set(ctx, show, true)
+    })
+    stepCallback('shown')
+
+    const div = body.querySelector('div')
+    test.assert(div)
+
+    await compute.txn(ctx, async () => {
+      await compute.set(ctx, show, false)
+    })
+    stepCallback('hidden')
+
+    test.assertDeepEquals(stepCallbackHistory, [
+      ['start'],
+      ['added', div],
+      ['shown'],
+      ['removed'],
+      ['hidden'],
+    ])
+  },
+
   async ['button pure'](
     ctx: compute.Context & convey.Context,
   ): Promise<void> {

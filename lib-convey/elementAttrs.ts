@@ -1,3 +1,4 @@
+import type * as conveyContext from '@/context.ts'
 import type * as conveyData from '@/data.ts'
 import type * as conveyFragment from '@/fragment.ts'
 import type * as compute from '@intertwine/lib-compute'
@@ -6,7 +7,7 @@ export type Listener<SpecificEvent> = (
   event: SpecificEvent,
 ) => Promise<void> | void
 
-export type Attrs<CustomContext> = PickAttrs<
+export type Attrs<CustomContext, BaseElement extends Element> = PickAttrs<
   | 'ariaAtomic'
   | 'ariaAutoComplete'
   | 'ariaBusy'
@@ -154,6 +155,12 @@ export type Attrs<CustomContext> = PickAttrs<
   | 'tabIndex'
 > & {
   readonly content?: conveyFragment.FragmentOpt<CustomContext>
+  readonly onAdd?: Listener<OnAddEvent<BaseElement>>
+}
+
+export interface OnAddEvent<BaseElement extends Element> {
+  readonly ctx: conveyContext.ScopedContext
+  readonly element: BaseElement
 }
 
 export type PickAttrs<Keys extends keyof AllAttrs> = {
