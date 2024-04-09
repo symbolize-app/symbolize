@@ -1,24 +1,33 @@
 import type * as conveyElementAttrs from '@/elementAttrs.ts'
 
 export interface AttrsTagNameMap<CustomContext> {
-  readonly math: MathAttrs<CustomContext>
-  readonly mi: MiAttrs<CustomContext>
-  readonly mo: MoAttrs<CustomContext>
+  readonly math: MathAttrs<CustomContext, MathMLElement>
+  readonly mi: MiAttrs<CustomContext, MathMLElement>
+  readonly mo: MoAttrs<CustomContext, MathMLElement>
 }
 
-export type Attrs<CustomContext> =
-  conveyElementAttrs.Attrs<CustomContext> &
-    conveyElementAttrs.PickAttrs<
-      'displayStyle' | 'mathDir' | 'scriptLevel'
-    >
+export type Attrs<
+  CustomContext,
+  BaseElement extends Element,
+> = conveyElementAttrs.Attrs<CustomContext, BaseElement> &
+  conveyElementAttrs.PickAttrs<'displayStyle' | 'mathDir' | 'scriptLevel'>
 
-export type MathAttrs<CustomContext> = Attrs<CustomContext> &
+export type MathAttrs<CustomContext, BaseElement extends Element> = Attrs<
+  CustomContext,
+  BaseElement
+> &
   conveyElementAttrs.PickAttrs<'altText' | 'display'>
 
-export type MiAttrs<CustomContext> = Attrs<CustomContext> &
+export type MiAttrs<CustomContext, BaseElement extends Element> = Attrs<
+  CustomContext,
+  BaseElement
+> &
   conveyElementAttrs.PickAttrs<'mathVariant'>
 
-export type MoAttrs<CustomContext> = Attrs<CustomContext> &
+export type MoAttrs<CustomContext, BaseElement extends Element> = Attrs<
+  CustomContext,
+  BaseElement
+> &
   conveyElementAttrs.PickAttrs<
     | 'fence'
     | 'form'

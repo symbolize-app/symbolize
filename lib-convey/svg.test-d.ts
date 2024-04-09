@@ -1,4 +1,4 @@
-import type * as conveyElementTest from '@/element.test-d.ts'
+import type * as conveyElementAttrsTest from '@/elementAttrs.test-d.ts'
 import type * as conveySvg from '@/svg.ts'
 
 export const url = import.meta.url
@@ -34,4 +34,4 @@ type Actual<Tag extends keyof typeof conveySvg.svg> = Readonly<
 >
 
 type Expected<Tag extends keyof SVGElementTagNameMap> =
-  conveyElementTest.TestAttrs<unknown, SVGElementTagNameMap[Tag]>
+  conveyElementAttrsTest.TestAttrs<unknown, SVGElementTagNameMap[Tag]>

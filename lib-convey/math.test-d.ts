@@ -1,4 +1,4 @@
-import type * as conveyElementTest from '@/element.test-d.ts'
+import type * as conveyElementAttrsTest from '@/elementAttrs.test-d.ts'
 import type * as conveyMath from '@/math.ts'
 
 export const url = import.meta.url
@@ -23,4 +23,4 @@ type Actual<Tag extends keyof typeof conveyMath.math> = Readonly<
 >
 
 type Expected<Tag extends keyof MathMLElementTagNameMap> =
-  conveyElementTest.TestAttrs<unknown, MathMLElementTagNameMap[Tag]>
+  conveyElementAttrsTest.TestAttrs<unknown, MathMLElementTagNameMap[Tag]>

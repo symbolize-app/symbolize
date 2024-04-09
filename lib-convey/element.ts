@@ -41,9 +41,12 @@ export function replaceBetween(
 }
 
 export class ElementFragment<CustomContext = unknown>
-  implements conveyFragment.Fragment<CustomContext>
+  implements
+    conveyFragment.Fragment<CustomContext>,
+    conveyContext.ScopedConvey
 {
   readonly [conveyMarker.fragmentMarker]: null = null
+  private readonly mutableDeferred: (() => Promise<void> | void)[] = []
   private mutableFragment: conveyFragment.Fragment<CustomContext> | null =
     null
   private readonly mutableSubs: compute.Computation<unknown>[] = []
@@ -63,6 +66,9 @@ export class ElementFragment<CustomContext = unknown>
       : ctx.convey.document.createElement(this.tag)
 
     const mutablePromises: Promise<void>[] = []
+    let onAdd:
+      | Required<conveyElementAttrs.Attrs<CustomContext, Element>>['onAdd']
+      | null = null
 
     for (const [key, value] of Object.entries(this.attrs) as [
       keyof conveyElementAttrs.AllAttrs,
@@ -87,8 +93,9 @@ export class ElementFragment<CustomContext = unknown>
       } else if (
         attrDefinition.kind === conveyElementAttrs.ElementAttrKind.onAdd
       ) {
-        // TODO
-        throw Error()
+        onAdd = value as Required<
+          conveyElementAttrs.Attrs<CustomContext, Element>
+        >['onAdd']
       } else {
         mutablePromises.push(
           this.bindAttribute(
@@ -103,16 +110,37 @@ export class ElementFragment<CustomContext = unknown>
 
     await Promise.all(mutablePromises)
 
+    if (onAdd) {
+      await onAdd({
+        ctx: {
+          ...ctx,
+          scopedConvey: this,
+        },
+        element: mutableElement,
+      })
+    }
+
     yield mutableElement
+  }
+
+  defer(callback: () => Promise<void> | void): void {
+    this.mutableDeferred.unshift(callback)
   }
 
   async remove(): Promise<void> {
     if (this.mutableFragment) {
       await this.mutableFragment.remove()
     }
+    for (const callback of this.mutableDeferred) {
+      await callback()
+    }
     for (const sub of this.mutableSubs) {
       compute.unsubscribe(sub)
     }
+  }
+
+  subscribe(sub: compute.Computation<unknown>): void {
+    this.mutableSubs.push(sub)
   }
 
   private addElementEventListener(
@@ -151,7 +179,7 @@ export class ElementFragment<CustomContext = unknown>
     name: string,
     value: compute.ComputationOpt<unknown>,
   ): Promise<void> {
-    this.mutableSubs.push(
+    this.subscribe(
       await compute.effect((value) => {
         if (
           (kind === conveyElementAttrs.ElementAttrKind.boolean &&
