@@ -54,9 +54,9 @@ Periodically, FoundationDB will be scanned (or a secondary index used) and DBs w
 
 Becuase SQLite and FUSE do not use async IO, one thread will be needed for each parallel query. Only one write thread needed per DB (could revisit), but multiple read threads would be good for performance.
 
-## Versioned
+## Code
 
-Versioned data will be stored in Git repos, one shard as one repo, that are themselves stored in FoundationDB (separate files mirroring repo structure, refs stored in separate keys). A service will open a "local" DB on a FUSE mount, and the FUSE handler will transparently handle reads and writes (with its own caching layer).
+Code data will be stored in Git repos, one shard as one repo, that are themselves stored in FoundationDB (separate files mirroring repo structure, refs stored in separate keys). A service will open a "local" DB on a FUSE mount, and the FUSE handler will transparently handle reads and writes (with its own caching layer).
 
 For this to work properly when a write and readers are all active, Git auto-GC needs to be disabled. When new objects are available, Git will be able to see them as new files. All of the previously-written files in the Git repo will remain immutable (with refs not stored/updated in Git).
 
