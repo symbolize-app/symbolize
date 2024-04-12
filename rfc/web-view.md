@@ -26,17 +26,39 @@ Main interactive interface here built on HTML / web tech.
 - Allow removing any attribute
 - Events are serialized in async, reactive transactions
 
+### Future optimization ideas
+
+- Queue DOM effects to apply in batches
+- Preallocate and reuse DOM objects using pools
+
 ## Styling
 
+### API
+
+- As strongly typed as possible, at the expense of completeness
 - Composed via simple functions, atoms indistinguishable from helpers
-- Each property-value combination is compiled to one rule
-- Each rule can have multiple selectors (conditions & specificity)
-- Atoms only cover truly atomic properties, not compound ones
-- Overriding an atom adds a class with higher specificity (`:not(#\#)`)
-- All rule composition operations are interned
-- No nesting/grouping of styles within a condition
 - Property value is where conditions get applied
-- Strongly-typed IDs for CSS custom variables, CSS animations, DOM data attributes
 - Styles written as usage (no external definition), for easy refactoring
+- Auto-generated unique IDs for CSS animations, CSS custom properties, and DOM data attributes
+- Custom properties when inline accept reactive data
+- Pass normal styles, inline properties, and data attributes all together for easy overrides
+
+### CSS generation
+
+- Atoms only cover truly atomic properties, not shorthand properties
+- Overriding an atom causes the overridden atom to be omitted
+- Null value will also omit an atom, without replacement
+- Each property-value combination is compiled to one rule with multiple conditions nested inside
+- Conditions are all contained inside `:where()` pseudo-classes, so that code ordering of conditions directly translates to cascade
+
+### Other
+
+- Parent selectors to avoid repeating data attributes
 - Physics-based animations
 - Global style reset
+
+### Future optimization ideas
+
+- Allow targeting child elements that don't have their own classes
+- Allow precompiling styles outside of fragments
+- Pre-process all styles as macros
