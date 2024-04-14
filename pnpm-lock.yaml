@@ -53,9 +53,6 @@ importers:
       '@intertwine/lib-stream':
         specifier: workspace:*
         version: link:lib-stream
-      '@intertwine/lib-style':
-        specifier: workspace:*
-        version: link:lib-style
       '@intertwine/lib-test':
         specifier: workspace:*
         version: link:lib-test
@@ -250,9 +247,6 @@ importers:
       '@intertwine/lib-random':
         specifier: workspace:*
         version: link:../lib-random
-      '@intertwine/lib-style':
-        specifier: workspace:*
-        version: link:../lib-style
       '@intertwine/lib-test':
         specifier: workspace:*
         version: link:../lib-test
@@ -442,19 +436,6 @@ importers:
         specifier: 5.2.2
         version: 5.2.2
 
-  lib-style:
-    dependencies:
-      '@intertwine/dev-prettier':
-        specifier: workspace:*
-        version: link:../dev-prettier
-      '@intertwine/dev-tsconfig':
-        specifier: workspace:*
-        version: link:../dev-tsconfig
-    devDependencies:
-      typescript:
-        specifier: 5.2.2
-        version: 5.2.2
-
   lib-test:
     dependencies:
       '@intertwine/dev-prettier':
@@ -572,9 +553,6 @@ importers:
       '@intertwine/lib-stream':
         specifier: workspace:*
         version: link:../lib-stream
-      '@intertwine/lib-style':
-        specifier: workspace:*
-        version: link:../lib-style
       '@intertwine/lib-test':
         specifier: workspace:*
         version: link:../lib-test

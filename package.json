@@ -15,7 +15,6 @@
     "@intertwine/lib-payload": "workspace:*",
     "@intertwine/lib-random": "workspace:*",
     "@intertwine/lib-stream": "workspace:*",
-    "@intertwine/lib-style": "workspace:*",
     "@intertwine/lib-test": "workspace:*",
     "@intertwine/lib-time": "workspace:*",
     "@intertwine/svc-auth-guest-read": "workspace:*",
