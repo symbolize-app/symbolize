@@ -7,9 +7,5 @@
   "exclude": ["build/**", "node_modules/**"],
   "extends": "@intertwine/dev-tsconfig/tsconfig.json",
   "include": ["./**/*.ts", "./**/*.js", "./**/*.cjs"],
-  "references": [
-    { "path": "../lib-compute" },
-    { "path": "../lib-contrast" },
-    { "path": "../lib-test" }
-  ]
+  "references": [{ "path": "../lib-compute" }, { "path": "../lib-test" }]
 }

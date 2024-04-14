@@ -35,6 +35,8 @@ includes:
     taskfile: lib-compute
   lib-concurrency:
     taskfile: lib-concurrency
+  lib-contrast:
+    taskfile: lib-contrast
   lib-convey:
     taskfile: lib-convey
   lib-error:
@@ -206,6 +208,7 @@ tasks:
       - lib-collection:link-build-dir
       - lib-compute:link-build-dir
       - lib-concurrency:link-build-dir
+      - lib-contrast:link-build-dir
       - lib-convey:link-build-dir
       - lib-error:link-build-dir
       - lib-hex-ts:link-build-dir

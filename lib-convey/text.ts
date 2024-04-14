@@ -4,7 +4,7 @@ import * as conveyMarker from '@/marker.ts'
 import * as compute from '@intertwine/lib-compute'
 
 export function text(attrs: {
-  readonly content: compute.ComputationOpt<string>
+  readonly content: compute.NodeOpt<string>
 }): conveyFragment.Fragment {
   return new Text(attrs.content)
 }
@@ -13,7 +13,7 @@ class Text implements conveyFragment.Fragment {
   readonly [conveyMarker.fragmentMarker]: null = null
   private mutableEffect: compute.Computation<void> | null = null
 
-  constructor(private readonly content: compute.ComputationOpt<string>) {}
+  constructor(private readonly content: compute.NodeOpt<string>) {}
 
   async *add(
     ctx: compute.Context & conveyContext.Context,

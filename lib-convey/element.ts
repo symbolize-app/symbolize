@@ -177,7 +177,7 @@ export class ElementFragment<CustomContext = unknown>
       | conveyElementAttrs.ElementAttrKind.boolean
       | conveyElementAttrs.ElementAttrKind.string,
     name: string,
-    value: compute.ComputationOpt<unknown>,
+    value: compute.NodeOpt<unknown>,
   ): Promise<void> {
     this.subscribe(
       await compute.effect((value) => {

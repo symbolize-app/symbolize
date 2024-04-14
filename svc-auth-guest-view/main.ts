@@ -7,7 +7,7 @@ import type * as time from '@intertwine/lib-time'
 const custom = convey.defineCustom<
   unknown,
   {
-    readonly title: compute.ComputationOpt<string>
+    readonly title: compute.NodeOpt<string>
   }
 >((ctx, attrs) => {
   const countState = compute.state(0)

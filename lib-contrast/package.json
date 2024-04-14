@@ -1,10 +1,9 @@
 {
-  "name": "@intertwine/lib-convey",
+  "name": "@intertwine/lib-contrast",
   "type": "module",
   "dependencies": {
     "@intertwine/dev-prettier": "workspace:*",
     "@intertwine/dev-tsconfig": "workspace:*",
-    "@intertwine/lib-contrast": "workspace:*",
     "@intertwine/lib-compute": "workspace:*",
     "@intertwine/lib-test": "workspace:*",
     "happy-dom": "13.6.2"

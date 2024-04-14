@@ -35,9 +35,15 @@ importers:
       '@intertwine/lib-collection':
         specifier: workspace:*
         version: link:lib-collection
+      '@intertwine/lib-compute':
+        specifier: workspace:*
+        version: link:lib-compute
       '@intertwine/lib-concurrency':
         specifier: workspace:*
         version: link:lib-concurrency
+      '@intertwine/lib-contrast':
+        specifier: workspace:*
+        version: link:lib-contrast
       '@intertwine/lib-error':
         specifier: workspace:*
         version: link:lib-error
@@ -232,6 +238,9 @@ importers:
       '@intertwine/lib-compute':
         specifier: workspace:*
         version: link:../lib-compute
+      '@intertwine/lib-contrast':
+        specifier: workspace:*
+        version: link:../lib-contrast
       '@intertwine/lib-convey':
         specifier: workspace:*
         version: link:../lib-convey
@@ -313,6 +322,31 @@ importers:
         specifier: 5.2.2
         version: 5.2.2
 
+  lib-contrast:
+    dependencies:
+      '@intertwine/dev-prettier':
+        specifier: workspace:*
+        version: link:../dev-prettier
+      '@intertwine/dev-tsconfig':
+        specifier: workspace:*
+        version: link:../dev-tsconfig
+      '@intertwine/lib-compute':
+        specifier: workspace:*
+        version: link:../lib-compute
+      '@intertwine/lib-test':
+        specifier: workspace:*
+        version: link:../lib-test
+      happy-dom:
+        specifier: 13.6.2
+        version: 13.6.2
+    devDependencies:
+      core-js-pure:
+        specifier: 3.36.0
+        version: 3.36.0
+      typescript:
+        specifier: 5.2.2
+        version: 5.2.2
+
   lib-convey:
     dependencies:
       '@intertwine/dev-prettier':
@@ -324,6 +358,9 @@ importers:
       '@intertwine/lib-compute':
         specifier: workspace:*
         version: link:../lib-compute
+      '@intertwine/lib-contrast':
+        specifier: workspace:*
+        version: link:../lib-contrast
       '@intertwine/lib-test':
         specifier: workspace:*
         version: link:../lib-test

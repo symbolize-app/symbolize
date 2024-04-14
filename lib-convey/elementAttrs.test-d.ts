@@ -52,7 +52,7 @@ type TestWritableAttrs<BaseElement extends Element> = {
     never
   : Key]: Key extends keyof conveyElementAttrsTest.OverrideMap ?
     conveyElementAttrsTest.OverrideMap[Key]
-  : compute.ComputationOpt<
+  : compute.NodeOpt<
       BaseElement[Key] extends boolean ? boolean
       : BaseElement[Key] extends SVGAnimatedLength ?
         conveyData.SvgLengthOpt | null
