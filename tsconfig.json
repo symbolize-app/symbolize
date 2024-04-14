@@ -21,7 +21,6 @@
     { "path": "./lib-payload" },
     { "path": "./lib-random" },
     { "path": "./lib-stream" },
-    { "path": "./lib-style" },
     { "path": "./lib-test" },
     { "path": "./lib-test-runner" },
     { "path": "./lib-time" },

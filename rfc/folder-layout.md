@@ -57,10 +57,10 @@ Read/write switch to...
 ## Libraries
 
 - lib-content (schema, review, scheduling, blocks)
-- lib-store-rs
-- lib-store-ts
+- lib-convey
 - lib-http-rs
 - lib-http-ts
+- lib-store-rs
+- lib-store-ts
 - lib-stream-rs
 - lib-stream-ts
-- lib-style

@@ -14,7 +14,6 @@
     { "path": "../lib-hex-ts" },
     { "path": "../lib-payload" },
     { "path": "../lib-random" },
-    { "path": "../lib-style" },
     { "path": "../lib-test" },
     { "path": "../lib-test-runner" },
     { "path": "../lib-time" },

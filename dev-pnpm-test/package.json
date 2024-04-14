@@ -11,7 +11,6 @@
     "@intertwine/lib-hex": "workspace:*",
     "@intertwine/lib-payload": "workspace:*",
     "@intertwine/lib-random": "workspace:*",
-    "@intertwine/lib-style": "workspace:*",
     "@intertwine/lib-test": "workspace:*",
     "@intertwine/lib-test-runner": "workspace:*",
     "@intertwine/lib-time": "workspace:*",

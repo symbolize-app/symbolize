@@ -15,7 +15,6 @@ packages:
   - lib-payload
   - lib-random
   - lib-stream
-  - lib-style
   - lib-test
   - lib-test-runner
   - lib-time
