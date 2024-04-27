@@ -1,5 +1,6 @@
 import * as convey from '@/index.ts'
 import type * as compute from '@intertwine/lib-compute'
+import * as contrast from '@intertwine/lib-contrast'
 import * as test from '@intertwine/lib-test'
 import arrayFromAsync from 'core-js-pure/actual/array/from-async'
 
@@ -43,7 +44,7 @@ export const tests = {
     const fragment = convey.math.math({
       content: convey.math.mo({
         form: 'prefix',
-        maxSize: convey.px(11),
+        maxSize: contrast.px(11),
         stretchy: true,
       }),
     })

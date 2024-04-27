@@ -9,7 +9,7 @@ export function each<CustomContext, Key, Value>(
     value: compute.Computation<Value>,
   ) => conveyFragment.FragmentOpt<CustomContext>,
   key: (value: Value, index: number) => Key,
-  items: compute.ComputationOpt<readonly Value[]>,
+  items: compute.NodeOpt<readonly Value[]>,
 ): conveyFragment.Fragment<CustomContext> {
   return new Each(transform, key, items)
 }
@@ -28,7 +28,7 @@ class Each<Key, Value, CustomContext = unknown>
       value: compute.Computation<Value>,
     ) => conveyFragment.FragmentOpt<CustomContext>,
     private readonly key: (value: Value, index: number) => Key,
-    private readonly items: compute.ComputationOpt<readonly Value[]>,
+    private readonly items: compute.NodeOpt<readonly Value[]>,
   ) {}
 
   async *add(

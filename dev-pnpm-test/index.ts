@@ -8,6 +8,7 @@ export const all: test.TestCollection<
   compute.Context & convey.Context & random.Context & timeTest.Context
 > = () => [
   import('@intertwine/lib-compute/index.test.ts'),
+  import('@intertwine/lib-contrast/index.test.ts'),
   import('@intertwine/lib-convey/index.test.ts'),
   import('@intertwine/lib-error/index.test.ts'),
   import('@intertwine/lib-hex/index.test.ts'),

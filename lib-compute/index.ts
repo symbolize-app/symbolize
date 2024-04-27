@@ -89,9 +89,11 @@ class Epoch {
 
 const nodeImpl = Symbol('nodeImpl')
 
-type Node<Value, Mutable extends boolean, State extends boolean> = {
-  readonly [Key in keyof Value]: Node<Value[Key], Mutable, State>
-} & {
+export interface Node<
+  Value,
+  Mutable extends boolean = false,
+  State extends boolean = false,
+> {
   readonly [nodeImpl]: NodeImpl<Value, Mutable, State>
 }
 
@@ -113,14 +115,24 @@ interface CommitImpl<Value> extends MutationImpl<Value> {
   commit(newEpoch: Epoch, newValue: Value): void
 }
 
-export type Computation<Value> = Node<Value, boolean, boolean>
-export type Mutation<Value> = Node<Value, true, boolean>
+export type Computation<Value> = Node<Value> & {
+  readonly [Key in keyof Value & (number | string)]: Computation<
+    Value[Key]
+  >
+}
+export type Mutation<Value> = Node<Value, true> & {
+  readonly [Key in keyof Value & (number | string)]: Mutation<Value[Key]>
+}
 
-export type ComputationOpt<Value> = Node<Value, boolean, boolean> | Value
+export type NodeOpt<Value> = Node<Value> | Value
 
-export type ComputationOptTuple<Tuple extends readonly unknown[]> = {
+export type NodeValueTuple<Tuple extends readonly NodeOpt<unknown>[]> = {
+  readonly [I in keyof Tuple]: Tuple[I] extends NodeOpt<infer Value> ?
+    Value
+  : never
+} & {
   readonly length: Tuple['length']
-} & { [I in keyof Tuple]: ComputationOpt<Tuple[I]> }
+}
 
 class Links {
   private readonly mutableSubs: WeakRef<Computation<unknown>>[] = []
@@ -183,14 +195,14 @@ class NodeProxy
 
   static build<Value, Mutable extends boolean, State extends boolean>(
     mutableImpl: NodeImpl<Value, Mutable, State>,
-  ): Node<Value, Mutable, State> {
+  ): unknown {
     if (!NodeProxy.mutableInstance) {
       NodeProxy.mutableInstance = new NodeProxy()
     }
     return new Proxy(
       mutableImpl,
       NodeProxy.mutableInstance as ProxyHandler<object>,
-    ) as unknown as Node<Value, Mutable, State>
+    )
   }
 
   get(
@@ -281,7 +293,7 @@ export async function txn<T>(
 }
 
 export async function value<Value>(
-  computation: ComputationOpt<Value>,
+  computation: NodeOpt<Value>,
 ): Promise<Value> {
   const epoch = new Epoch(0)
   const result = toComputation(computation)[nodeImpl].update(epoch)
@@ -289,31 +301,36 @@ export async function value<Value>(
   return result
 }
 
-export function handler<Result, EventArg, OtherArgs extends unknown[]>(
+export function handler<
+  Result,
+  EventArg,
+  OtherArgs extends NodeValueTuple<NodeOptArgs>,
+  NodeOptArgs extends NodeOpt<unknown>[],
+>(
   callback: (
     event: EventArg,
     ...otherArgs: OtherArgs
   ) => Promise<Result> | Result,
-  ...computations: ComputationOptTuple<OtherArgs>
+  ...computations: NodeOptArgs
 ): (event: EventArg) => Promise<Result> {
   return async (event) => {
     const computationValues = (await Promise.all(
       computations.map(value),
-    )) as OtherArgs
+    )) as unknown as OtherArgs
     return callback(event, ...computationValues)
   }
 }
 
 export function toComputation<Value>(
-  value: ComputationOpt<Value>,
+  value: NodeOpt<Value>,
 ): Computation<Value> {
   return typeof value === 'object' && value !== null && nodeImpl in value ?
-      value
+      (value as Computation<Value>)
     : pure(value)
 }
 
 export function pure<Value>(value: Value): Computation<Value> {
-  return NodeProxy.build(new PureImpl(value))
+  return NodeProxy.build(new PureImpl(value)) as Computation<Value>
 }
 
 export function unsubscribe(computation: Computation<unknown>): void {
@@ -331,7 +348,9 @@ class PureImpl<Value> implements ComputationImpl<Value> {
 }
 
 export function state<Value>(init: Value): Mutation<Value> {
-  return NodeProxy.build<Value, true, true>(new StateImpl(init))
+  return NodeProxy.build<Value, true, true>(
+    new StateImpl(init),
+  ) as Mutation<Value>
 }
 
 class StateImpl<Value> implements CommitImpl<Value> {
@@ -367,16 +386,20 @@ class StateImpl<Value> implements CommitImpl<Value> {
   }
 }
 
-export function map<Args extends readonly unknown[], Result>(
+export function map<
+  Args extends NodeValueTuple<NodeOptArgs>,
+  NodeOptArgs extends NodeOpt<unknown>[],
+  Result,
+>(
   transform: (...args: Args) => Promise<Result> | Result,
-  ...computations: ComputationOptTuple<Args>
+  ...computations: NodeOptArgs
 ): Computation<Result> {
   return NodeProxy.build(
     new MapImpl(
       async (args) => transform(...(args as Args)),
       new Links(computations.map(toComputation)),
     ),
-  )
+  ) as Computation<Result>
 }
 
 type MapImplIteration<Value> = readonly [
@@ -440,10 +463,14 @@ class MapImpl<Value> implements ComputationImpl<Value> {
   }
 }
 
-export function derived<Result, Args extends readonly unknown[]>(
+export function derived<
+  Result,
+  Args extends NodeValueTuple<NodeOptArgs>,
+  NodeOptArgs extends NodeOpt<unknown>[],
+>(
   get: (...args: Args) => Promise<Result> | Result,
   set: (newValue: Result, ...args: Args) => Promise<void>,
-  ...computations: ComputationOptTuple<Args>
+  ...computations: NodeOptArgs
 ): Mutation<Result> {
   return NodeProxy.build<Result, true, false>(
     new DerivedImpl(
@@ -457,7 +484,7 @@ export function derived<Result, Args extends readonly unknown[]>(
         await set(newValue, ...(depValues as Args))
       },
     ),
-  )
+  ) as Mutation<Result>
 }
 
 class DerivedImpl<Value> implements ComputationImpl<Value> {
@@ -490,9 +517,12 @@ class DerivedImpl<Value> implements ComputationImpl<Value> {
   }
 }
 
-export async function effect<Args extends unknown[]>(
+export async function effect<
+  Args extends NodeValueTuple<NodeOptArgs>,
+  NodeOptArgs extends NodeOpt<unknown>[],
+>(
   callback: (...args: Args) => Promise<void> | void,
-  ...computations: ComputationOptTuple<Args>
+  ...computations: NodeOptArgs
 ): Promise<Computation<void>> {
   const node = NodeProxy.build(
     new EffectImpl(
@@ -501,7 +531,7 @@ export async function effect<Args extends unknown[]>(
       },
       new Links(computations.map(toComputation)),
     ),
-  )
+  ) as Computation<void>
   const epoch = new Epoch(0)
   await node[nodeImpl].update(epoch)
   await epoch.wait()

@@ -10,7 +10,7 @@ export const tests = {
   async ['if basic'](
     ctx: compute.Context & convey.Context,
   ): Promise<void> {
-    const x = compute.state({ x: 2 } as { readonly x: number } | null)
+    const y = compute.state({ x: 2 } as { readonly x: number } | null)
 
     const [init, initHistory] = test.repeatMockWithHistory(
       2,
@@ -19,16 +19,18 @@ export const tests = {
     const custom = convey.defineCustom<
       unknown,
       {
-        readonly x: { readonly x: number }
+        readonly y: compute.Computation<{
+          readonly x: number
+        }>
       }
     >(async (_ctx, attrs) => {
-      init(await compute.value(attrs.x.x))
-      return compute.map((x) => `${x.x * 3}`, attrs.x)
+      init(await compute.value(attrs.y.x))
+      return compute.map((y) => `${y.x * 3}`, attrs.y)
     })
     const fragment = convey.if_(
-      (x) => custom({ x }),
+      (y) => custom({ y }),
       () => 'nothing',
-      x,
+      y,
     )
     const body = ctx.convey.document.body
     body.append(...(await arrayFromAsync(fragment.add(ctx))))
@@ -36,26 +38,26 @@ export const tests = {
     test.assertDeepEquals(initHistory, [[2]])
 
     await compute.txn(ctx, async () => {
-      await compute.set(ctx, x, { x: 4 })
+      await compute.set(ctx, y, { x: 4 })
     })
     test.assertEquals(body.textContent, '12')
     test.assertDeepEquals(initHistory, [[2]])
 
     await compute.txn(ctx, async () => {
-      await compute.set(ctx, x, null)
+      await compute.set(ctx, y, null)
     })
     test.assertEquals(body.textContent, 'nothing')
     test.assertDeepEquals(initHistory, [[2]])
 
     await compute.txn(ctx, async () => {
-      await compute.set(ctx, x, { x: 3 })
+      await compute.set(ctx, y, { x: 3 })
     })
     test.assertEquals(body.textContent, '9')
     test.assertDeepEquals(initHistory, [[2], [3]])
 
     await fragment.remove()
     await compute.txn(ctx, async () => {
-      await compute.set(ctx, x, { x: 5 })
+      await compute.set(ctx, y, { x: 5 })
     })
     test.assertEquals(body.textContent, '9')
     test.assertDeepEquals(initHistory, [[2], [3]])
@@ -140,7 +142,7 @@ export const tests = {
     const custom = convey.defineCustom<
       unknown,
       {
-        readonly name: compute.ComputationOpt<string>
+        readonly name: compute.NodeOpt<string>
       }
     >(async (_ctx, attrs) => {
       init(await compute.value(attrs.name))

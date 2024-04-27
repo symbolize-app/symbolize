@@ -29,10 +29,13 @@ export interface ScopedConvey {
   subscribe(sub: compute.Computation<unknown>): void
 }
 
-export async function scopedEffect<Args extends unknown[]>(
+export async function scopedEffect<
+  Args extends compute.NodeValueTuple<NodeOptArgs>,
+  NodeOptArgs extends compute.NodeOpt<unknown>[],
+>(
   ctx: ScopedContext,
   callback: (...args: Args) => Promise<void> | void,
-  ...computations: compute.ComputationOptTuple<Args>
+  ...computations: NodeOptArgs
 ): Promise<void> {
   ctx.scopedConvey.subscribe(
     await compute.effect(callback, ...(computations as never)),

@@ -36,7 +36,7 @@ export const tests = {
     const custom = convey.defineCustom<
       unknown,
       {
-        readonly name: compute.ComputationOpt<string>
+        readonly name: compute.NodeOpt<string>
       }
     >(async (_ctx, attrs) => {
       init(await compute.value(attrs.name))
@@ -81,7 +81,7 @@ export const tests = {
     const custom = convey.defineCustom<
       unknown,
       {
-        readonly name: compute.ComputationOpt<string>
+        readonly name: compute.NodeOpt<string>
       }
     >(async (_ctx, attrs) => {
       init(await compute.value(attrs.name))
@@ -127,7 +127,7 @@ export const tests = {
     const custom = convey.defineCustom<
       unknown,
       {
-        readonly name: compute.ComputationOpt<string>
+        readonly name: compute.NodeOpt<string>
       }
     >(async (_ctx, attrs) => {
       init(await compute.value(attrs.name))
@@ -171,7 +171,7 @@ export const tests = {
     const custom = convey.defineCustom<
       unknown,
       {
-        readonly name: compute.ComputationOpt<string>
+        readonly name: compute.NodeOpt<string>
       }
     >(async (_ctx, attrs) => {
       init(await compute.value(attrs.name))

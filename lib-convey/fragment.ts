@@ -14,7 +14,7 @@ export interface Fragment<CustomContext = unknown> {
 }
 
 export type FragmentOpt<CustomContext = unknown> =
-  | compute.ComputationOpt<string>
+  | compute.NodeOpt<string>
   | Fragment<CustomContext>
   | readonly FragmentOpt<CustomContext>[]
   | null

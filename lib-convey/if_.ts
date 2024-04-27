@@ -11,7 +11,7 @@ export function if_<CustomContext, Value>(
     value: compute.Computation<Exclude<Value, Falsy>>,
   ) => conveyFragment.FragmentOpt<CustomContext>,
   elseBranch: () => conveyFragment.FragmentOpt<CustomContext>,
-  condition: compute.ComputationOpt<Value>,
+  condition: compute.NodeOpt<Value>,
 ): conveyFragment.Fragment<CustomContext> {
   return new If_(ifBranch, elseBranch, condition)
 }
@@ -29,7 +29,7 @@ class If_<Value, CustomContext = unknown>
       value: compute.Computation<Exclude<Value, Falsy>>,
     ) => conveyFragment.FragmentOpt<CustomContext>,
     private readonly elseBranch: () => conveyFragment.FragmentOpt<CustomContext>,
-    private readonly condition: compute.ComputationOpt<Value>,
+    private readonly condition: compute.NodeOpt<Value>,
   ) {}
 
   async *add(

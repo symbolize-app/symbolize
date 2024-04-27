@@ -22,7 +22,7 @@ export const tests = {
     const custom = convey.defineCustom<
       unknown,
       {
-        readonly title: compute.ComputationOpt<string>
+        readonly title: compute.NodeOpt<string>
       }
     >((_ctx, attrs) => {
       return convey.text({
@@ -46,7 +46,7 @@ export const tests = {
     const custom = convey.defineCustom<
       unknown,
       {
-        readonly title: compute.ComputationOpt<string>
+        readonly title: compute.NodeOpt<string>
       }
     >(async (ctx, attrs) => {
       await convey.scopedEffect(ctx, effectCallback, attrs.title)
@@ -84,7 +84,7 @@ export const tests = {
     const custom = convey.defineCustom<
       unknown,
       {
-        readonly title: compute.ComputationOpt<string>
+        readonly title: compute.NodeOpt<string>
       }
     >((ctx, attrs) => {
       convey.scopedDefer(ctx, deferCallback)

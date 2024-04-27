@@ -9,6 +9,7 @@ packages:
   - lib-collection
   - lib-compute
   - lib-concurrency
+  - lib-contrast
   - lib-convey
   - lib-error
   - lib-hex-ts

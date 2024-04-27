@@ -2,6 +2,7 @@ import type * as conveyContext from '@/context.ts'
 import type * as conveyData from '@/data.ts'
 import type * as conveyFragment from '@/fragment.ts'
 import type * as compute from '@intertwine/lib-compute'
+import type * as contrast from '@intertwine/lib-contrast'
 
 export type Listener<SpecificEvent> = (
   event: SpecificEvent,
@@ -178,7 +179,7 @@ export enum ElementAttrKind {
 interface BooleanAttrDefinition<Type> {
   readonly kind: ElementAttrKind.boolean
   readonly name: string
-  readonly type?: compute.ComputationOpt<Type>
+  readonly type?: compute.NodeOpt<Type>
 }
 
 function booleanAttr<Type = boolean>(
@@ -218,7 +219,7 @@ function onAddAttr(): OnAddAttrDefinition {
 interface StringAttrDefinition<Type> {
   readonly kind: ElementAttrKind.string
   readonly name: string
-  readonly type?: compute.ComputationOpt<Type | null>
+  readonly type?: compute.NodeOpt<Type | null>
 }
 
 function stringAttr<Type = string>(
@@ -228,6 +229,10 @@ function stringAttr<Type = string>(
 }
 
 export type AllAttrs = Readonly<typeof allAttrs>
+
+// Redeclare these types locally, to avoid triggering https://github.com/microsoft/TypeScript/issues/47663
+type LengthUnit = contrast.LengthUnit
+type Length<Unit extends LengthUnit = LengthUnit> = contrast.Length<Unit>
 
 export const allAttrs = {
   accessKey: stringAttr('accesskey'),
@@ -320,13 +325,13 @@ export const allAttrs = {
     | 'text'
     | 'url'
   >('inputmode'),
-  lSpace: stringAttr<conveyData.Length>('lspace'),
+  lSpace: stringAttr<Length>('lspace'),
   lang: stringAttr('lang'),
   largeOp: stringAttr<boolean>('largeop'),
   mathDir: stringAttr<'ltr' | 'rtl'>('dir'),
   mathVariant: stringAttr<'normal'>('mathvariant'),
-  maxSize: stringAttr<conveyData.Length>('maxsize'),
-  minSize: stringAttr<conveyData.Length>('minsize'),
+  maxSize: stringAttr<Length>('maxsize'),
+  minSize: stringAttr<Length>('minsize'),
   moveableLimits: stringAttr<boolean>('moveablelimits'),
   name: stringAttr('name'),
   nonce: stringAttr('nonce'),
@@ -462,7 +467,7 @@ export const allAttrs = {
   preserveAspectRatio: stringAttr<conveyData.SvgPreserveAspectRatioOpt>(
     'preserveAspectRatio',
   ),
-  rSpace: stringAttr<conveyData.Length>('rspace'),
+  rSpace: stringAttr<Length>('rspace'),
   requiredExtensions: stringAttr<string[]>('requiredExtensions'),
   role: stringAttr('role'),
   rx: stringAttr<conveyData.SvgLengthOpt>('rx'),
