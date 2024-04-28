@@ -9,7 +9,7 @@
     "@intertwine/lib-test": "workspace:*"
   },
   "devDependencies": {
-    "typescript": "5.2.2",
+    "typescript": "5.4.5",
     "@intertwine/lib-test": "workspace:*"
   },
   "prettier": "@intertwine/dev-prettier/index.json"

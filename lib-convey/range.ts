@@ -2,6 +2,7 @@ import type * as conveyContext from '@/context.ts'
 import * as conveyFragment from '@/fragment.ts'
 import * as conveyMarker from '@/marker.ts'
 import type * as compute from '@intertwine/lib-compute'
+import type * as contrast from '@intertwine/lib-contrast'
 
 export function range<CustomContext = unknown>(attrs: {
   readonly content: readonly conveyFragment.FragmentOpt<CustomContext>[]
@@ -22,7 +23,10 @@ class Range<CustomContext = unknown>
   ) {}
 
   async *add(
-    ctx: compute.Context & conveyContext.Context & CustomContext,
+    ctx: compute.Context &
+      contrast.Context &
+      conveyContext.Context &
+      CustomContext,
   ): AsyncIterableIterator<Node> {
     this.mutableFragments = this.content.map(conveyFragment.toFragment)
     for (const fragment of this.mutableFragments) {

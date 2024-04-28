@@ -1,5 +1,6 @@
-import * as conveyAtom from '@/atom.ts'
-import type * as conveyExpression from '@/expression.ts'
+import * as contrastAtom from '@/atom.ts'
+import type * as contrastExpression from '@/expression.ts'
+import type * as contrastScope from '@/scope.ts'
 
 export function var_<Value>(): Var<Value> {
   return new Var()
@@ -8,19 +9,19 @@ export function var_<Value>(): Var<Value> {
 export class Var<Value> {
   private readonly name = Symbol('var')
 
-  get(): conveyExpression.Expression<
+  get(): contrastExpression.Expression<
     Value,
-    conveyExpression.RestrictedScope
+    contrastScope.RestrictedScope
   > {
     throw new Error('not implemented')
   }
 
   set(
-    value: conveyExpression.ExpressionOpt<
+    value: contrastExpression.ExpressionOpt<
       Value,
-      conveyExpression.FullScope
+      contrastScope.FullScope
     >,
-  ): conveyAtom.Atom {
-    return new conveyAtom.Atom(this.name, value)
+  ): contrastAtom.Atom {
+    return new contrastAtom.Atom(this.name, value)
   }
 }

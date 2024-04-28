@@ -17,6 +17,7 @@ export type Attrs<CustomContext, BaseElement extends Element> = PickAttrs<
   | 'ariaColIndex'
   | 'ariaColSpan'
   | 'ariaCurrent'
+  | 'ariaDescription'
   | 'ariaDisabled'
   | 'ariaExpanded'
   | 'ariaHasPopup'
@@ -157,6 +158,7 @@ export type Attrs<CustomContext, BaseElement extends Element> = PickAttrs<
 > & {
   readonly content?: conveyFragment.FragmentOpt<CustomContext>
   readonly onAdd?: Listener<OnAddEvent<BaseElement>>
+  readonly style?: contrast.Style
 }
 
 export interface OnAddEvent<BaseElement extends Element> {
@@ -174,6 +176,7 @@ export enum ElementAttrKind {
   listener = 2,
   onAdd = 3,
   string = 4,
+  style = 5,
 }
 
 interface BooleanAttrDefinition<Type> {
@@ -228,6 +231,15 @@ function stringAttr<Type = string>(
   return { kind: ElementAttrKind.string, name }
 }
 
+interface StyleAttrDefinition {
+  readonly kind: ElementAttrKind.style
+  readonly type?: never
+}
+
+function styleAttr(): StyleAttrDefinition {
+  return { kind: ElementAttrKind.style }
+}
+
 export type AllAttrs = Readonly<typeof allAttrs>
 
 // Redeclare these types locally, to avoid triggering https://github.com/microsoft/TypeScript/issues/47663
@@ -249,6 +261,7 @@ export const allAttrs = {
   ariaCurrent: stringAttr<
     boolean | 'date' | 'location' | 'page' | 'step' | 'time'
   >('aria-current'),
+  ariaDescription: stringAttr('aria-description'),
   ariaDisabled: stringAttr<boolean>('aria-disabled'),
   ariaExpanded: stringAttr<boolean | 'undefined'>('aria-expanded'),
   ariaHasPopup: stringAttr<
@@ -477,6 +490,7 @@ export const allAttrs = {
   slot: stringAttr('slot'),
   spellcheck: stringAttr('spellcheck'),
   stretchy: stringAttr<boolean>('stretchy'),
+  style: styleAttr(),
   symmetric: stringAttr<boolean>('symmetric'),
   systemLanguage: stringAttr<string[]>('systemLanguage'),
   tabIndex: stringAttr<number>('tabindex'),

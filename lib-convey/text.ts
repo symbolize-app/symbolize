@@ -2,6 +2,7 @@ import type * as conveyContext from '@/context.ts'
 import type * as conveyFragment from '@/fragment.ts'
 import * as conveyMarker from '@/marker.ts'
 import * as compute from '@intertwine/lib-compute'
+import type * as contrast from '@intertwine/lib-contrast'
 
 export function text(attrs: {
   readonly content: compute.NodeOpt<string>
@@ -16,7 +17,7 @@ class Text implements conveyFragment.Fragment {
   constructor(private readonly content: compute.NodeOpt<string>) {}
 
   async *add(
-    ctx: compute.Context & conveyContext.Context,
+    ctx: compute.Context & contrast.Context & conveyContext.Context,
   ): AsyncIterableIterator<Node> {
     const mutableNode = ctx.convey.document.createTextNode('')
     this.mutableEffect = await compute.effect((value) => {

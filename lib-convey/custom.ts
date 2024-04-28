@@ -2,6 +2,7 @@ import type * as conveyContext from '@/context.ts'
 import * as conveyFragment from '@/fragment.ts'
 import * as conveyMarker from '@/marker.ts'
 import * as compute from '@intertwine/lib-compute'
+import type * as contrast from '@intertwine/lib-contrast'
 
 export function defineCustom<
   CustomContext = unknown,
@@ -44,7 +45,10 @@ class Custom<
   ) {}
 
   async *add(
-    baseCtx: compute.Context & conveyContext.Context & CustomContext,
+    baseCtx: compute.Context &
+      contrast.Context &
+      conveyContext.Context &
+      CustomContext,
   ): AsyncIterableIterator<Node> {
     const ctx: compute.Context &
       conveyContext.ScopedContext &

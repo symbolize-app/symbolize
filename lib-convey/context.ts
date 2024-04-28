@@ -6,19 +6,36 @@ export interface Context {
 }
 
 export interface Convey {
-  readonly document: Readonly<
-    Pick<
-      globalThis.Document,
-      | 'body'
-      | 'createComment'
-      | 'createElement'
-      | 'createElementNS'
-      | 'createTextNode'
-    >
-  >
+  readonly classNames: Set<string>
 
-  readonly scheduler: conveyScheduler.Scheduler
+  readonly document: RestrictedDocument
+
+  readonly mutableScheduler: conveyScheduler.Scheduler
+
+  readonly styleLayer: RestrictedCssLayerBlockRule
 }
+
+export type RestrictedDocument = Readonly<
+  Pick<
+    globalThis.Document,
+    | 'body'
+    | 'createComment'
+    | 'createElement'
+    | 'createElementNS'
+    | 'createTextNode'
+  >
+>
+
+export type RestrictedCssLayerBlockRule = Pick<
+  CSSLayerBlockRule,
+  'insertRule'
+> & { readonly cssRules: RestrictedCssRuleList }
+
+export type RestrictedCssRuleList = Pick<CSSRuleList, 'length'> & {
+  [Symbol.iterator](): IterableIterator<RestrictedCssRule>
+}
+
+export type RestrictedCssRule = Readonly<Pick<CSSRule, 'cssText'>>
 
 export interface ScopedContext extends Context {
   readonly scopedConvey: ScopedConvey
@@ -50,7 +67,5 @@ export function scopedDefer(
 }
 
 export async function wait(ctx: Context): Promise<void> {
-  return ctx.convey.scheduler.run(async () => {
-    // Empty
-  })
+  return ctx.convey.mutableScheduler.wait()
 }

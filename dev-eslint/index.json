@@ -62,7 +62,7 @@
       "error",
       {
         "enforcement": "ReadonlyShallow",
-        "ignoreNamePattern": ["^mutable.*"],
+        "ignoreNamePattern": ["^_?mutable.*"],
         "ignoreInferredTypes": true,
         "parameters": {
           "ignoreInferredTypes": true
@@ -76,6 +76,7 @@
     "functional/type-declaration-immutability": [
       "error",
       {
+        "ignoreIdentifierPattern": "Mutable*",
         "rules": [
           {
             "identifiers": "^.+",

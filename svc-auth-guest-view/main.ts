@@ -1,4 +1,5 @@
 import * as compute from '@intertwine/lib-compute'
+import * as contrast from '@intertwine/lib-contrast'
 import * as convey from '@intertwine/lib-convey'
 import type * as random from '@intertwine/lib-random'
 import type * as stream from '@intertwine/lib-stream'
@@ -30,6 +31,13 @@ const custom = convey.defineCustom<
       width: 50,
 
       content: convey.svg.rect({
+        style: [
+          contrast.fill([
+            contrast.rgb(200, 200, 255),
+            contrast.hover(contrast.rgb(0, 0, 255)),
+          ]),
+        ],
+
         height: 80,
         width: 80,
         x: 10,
@@ -37,6 +45,12 @@ const custom = convey.defineCustom<
       }),
     }),
     convey.math.math({
+      style: [
+        contrast.background.color([
+          contrast.rgb(255, 200, [255, contrast.hover(0)]),
+        ]),
+      ],
+
       display: 'block',
 
       content: [
@@ -50,6 +64,7 @@ const custom = convey.defineCustom<
 
 export async function main(
   ctx: compute.Context &
+    contrast.Context &
     convey.Context &
     random.Context &
     stream.ClientContext &

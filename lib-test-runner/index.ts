@@ -8,14 +8,18 @@ import ms from 'ms'
 
 export type RunContext = time.Context
 
+type ContextBuilder<CustomContext> = {
+  [Key in keyof CustomContext]: (
+    defer: (callback: () => Promise<void> | void) => void,
+  ) => CustomContext[Key]
+}
+
 export async function runAll<CustomContext = unknown>(
   ctx: time.Context,
   testCollectionModulePromises: readonly Promise<
     test.TestCollectionModule<CustomContext>
   >[],
-  buildTestContext: (
-    defer: (callback: () => Promise<void> | void) => void,
-  ) => CustomContext,
+  contextBuilder: ContextBuilder<CustomContext>,
 ): Promise<boolean> {
   const testModules = await arrayFromAsync(
     resolveAllTestModules(testCollectionModulePromises),
@@ -29,7 +33,7 @@ export async function runAll<CustomContext = unknown>(
     const [modulePass, moduleFail] = await runModule(
       testModule,
       onlyMode,
-      buildTestContext,
+      contextBuilder,
     )
     pass += modulePass
     fail += moduleFail
@@ -95,9 +99,7 @@ function isOnlyMode<CustomContext>(
 async function runModule<CustomContext>(
   testModule: test.TestModule<CustomContext>,
   onlyMode: boolean,
-  buildTestContext: (
-    defer: (callback: () => Promise<void> | void) => void,
-  ) => CustomContext,
+  contextBuilder: ContextBuilder<CustomContext>,
 ): Promise<[pass: number, fail: number]> {
   let pass = 0
   let fail = 0
@@ -109,9 +111,21 @@ async function runModule<CustomContext>(
     }
     try {
       const mutableDeferred: (() => Promise<void> | void)[] = []
-      await test_(
-        buildTestContext((callback) => mutableDeferred.unshift(callback)),
-      )
+      const mutableCtx = {} as Partial<CustomContext>
+      const ctx = new Proxy(contextBuilder, {
+        get(_, key) {
+          const ctxKey = key as keyof CustomContext
+          let value = mutableCtx[ctxKey]
+          if (!value) {
+            value = contextBuilder[ctxKey]((callback) =>
+              mutableDeferred.unshift(callback),
+            )
+            mutableCtx[ctxKey] = value
+          }
+          return value
+        },
+      }) as CustomContext
+      await test_(ctx)
       for (const callback of mutableDeferred) {
         await callback()
       }

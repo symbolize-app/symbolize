@@ -3,6 +3,7 @@ import * as conveyElement from '@/element.ts'
 import * as conveyFragment from '@/fragment.ts'
 import * as conveyMarker from '@/marker.ts'
 import * as compute from '@intertwine/lib-compute'
+import type * as contrast from '@intertwine/lib-contrast'
 
 type Falsy = '' | 0 | 0n | false | null | undefined
 
@@ -33,7 +34,10 @@ class If_<Value, CustomContext = unknown>
   ) {}
 
   async *add(
-    ctx: compute.Context & conveyContext.Context & CustomContext,
+    ctx: compute.Context &
+      contrast.Context &
+      conveyContext.Context &
+      CustomContext,
   ): AsyncIterableIterator<Node> {
     const startComment = ctx.convey.document.createComment('')
     const endComment = ctx.convey.document.createComment('')

@@ -1,5 +1,6 @@
 import * as convey from '@/index.ts'
 import * as compute from '@intertwine/lib-compute'
+import type * as contrast from '@intertwine/lib-contrast'
 import * as test from '@intertwine/lib-test'
 import arrayFromAsync from 'core-js-pure/actual/array/from-async'
 
@@ -7,7 +8,7 @@ export const url = import.meta.url
 
 export const tests = {
   async ['text pure'](
-    ctx: compute.Context & convey.Context,
+    ctx: compute.Context & contrast.Context & convey.Context,
   ): Promise<void> {
     const body = ctx.convey.document.body
     body.append(
@@ -19,7 +20,7 @@ export const tests = {
   },
 
   async ['text opt'](
-    ctx: compute.Context & convey.Context,
+    ctx: compute.Context & contrast.Context & convey.Context,
   ): Promise<void> {
     const body = ctx.convey.document.body
     body.append(
@@ -29,7 +30,7 @@ export const tests = {
   },
 
   async ['text state'](
-    ctx: compute.Context & convey.Context,
+    ctx: compute.Context & contrast.Context & convey.Context,
   ): Promise<void> {
     const x = compute.state('a')
 

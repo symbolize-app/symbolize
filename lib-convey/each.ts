@@ -3,6 +3,7 @@ import * as conveyElement from '@/element.ts'
 import * as conveyFragment from '@/fragment.ts'
 import * as conveyMarker from '@/marker.ts'
 import * as compute from '@intertwine/lib-compute'
+import type * as contrast from '@intertwine/lib-contrast'
 
 export function each<CustomContext, Key, Value>(
   transform: (
@@ -32,7 +33,10 @@ class Each<Key, Value, CustomContext = unknown>
   ) {}
 
   async *add(
-    ctx: compute.Context & conveyContext.Context & CustomContext,
+    ctx: compute.Context &
+      contrast.Context &
+      conveyContext.Context &
+      CustomContext,
   ): AsyncIterableIterator<Node> {
     const startComment = ctx.convey.document.createComment('')
     const mutableInnerComments: Comment[] = []
