@@ -1,4 +1,6 @@
-import * as conveyExpression from '@/expression.ts'
+import * as contrastExpression from '@/expression.ts'
+import * as contrastExpressionIntern from '@/expressionIntern.ts'
+import type * as contrastScope from '@/scope.ts'
 
 export class Length<Unit extends LengthUnit = LengthUnit> {
   constructor(
@@ -88,32 +90,29 @@ const colorMarker = Symbol('colorMarker')
 
 export type Color = typeof colorMarker
 
-export function rgb<Scope extends conveyExpression.FullScope>(
-  r: conveyExpression.ExpressionOpt<number, Scope>,
-  g: conveyExpression.ExpressionOpt<number, Scope>,
-  b: conveyExpression.ExpressionOpt<number, Scope>,
-): ColorRgbExpression<Scope> {
-  return new ColorRgbExpression(r, g, b)
+export function rgb<Scope extends contrastScope.FullScope>(
+  r: contrastExpression.ExpressionOpt<number, Scope>,
+  g: contrastExpression.ExpressionOpt<number, Scope>,
+  b: contrastExpression.ExpressionOpt<number, Scope>,
+): contrastExpression.Expression<Color, Scope> {
+  return contrastExpression.expression(compileColorRgb, (ctx) => [
+    contrastExpression.compileToPure(ctx, r),
+    contrastExpression.compileToPure(ctx, g),
+    contrastExpression.compileToPure(ctx, b),
+  ])
 }
 
-export class ColorRgbExpression<Scope extends conveyExpression.FullScope>
-  implements conveyExpression.Expression<Color, Scope>
-{
-  readonly [conveyExpression.expressionMarker] = null
-
-  constructor(
-    private readonly r: conveyExpression.ExpressionOpt<number, Scope>,
-    private readonly g: conveyExpression.ExpressionOpt<number, Scope>,
-    private readonly b: conveyExpression.ExpressionOpt<number, Scope>,
-  ) {}
-
-  compile(): string {
-    throw new Error(
-      `Method not implemented. ${typeof this.r} ${typeof this.g} ${typeof this.b}`,
-    )
-  }
-
-  intern(): conveyExpression.Expression<typeof colorMarker, Scope> {
-    throw new Error('Method not implemented.')
-  }
+function compileColorRgb(
+  r: contrastExpressionIntern.PureExpressionIntern,
+  g: contrastExpressionIntern.PureExpressionIntern,
+  b: contrastExpressionIntern.PureExpressionIntern,
+): contrastExpressionIntern.PureExpressionIntern {
+  return contrastExpressionIntern.compilePure(
+    `rgb(${r.value},${g.value},${b.value})`,
+    r,
+    g,
+    b,
+  )
 }
+
+export type SvgPaint = Color | 'context-fill' | 'context-stroke'

@@ -1,14 +1,24 @@
-import * as conveyAtom from '@/atom.ts'
-import type * as conveyData from '@/data.ts'
-import type * as conveyExpression from '@/expression.ts'
+import * as contrastAtom from '@/atom.ts'
+import type * as contrastData from '@/data.ts'
+import type * as contrastExpression from '@/expression.ts'
+import type * as contrastScope from '@/scope.ts'
 
 export const background = {
   color(
-    value: conveyExpression.ExpressionOpt<
-      conveyData.Color,
-      conveyExpression.FullScope
+    value: contrastExpression.ExpressionOpt<
+      contrastData.Color,
+      contrastScope.FullScope
     >,
-  ): conveyAtom.Atom {
-    return new conveyAtom.Atom('background-color', value)
+  ): contrastAtom.Atom {
+    return contrastAtom.atom('background-color', value)
   },
+}
+
+export function fill(
+  value: contrastExpression.ExpressionOpt<
+    contrastData.SvgPaint,
+    contrastScope.FullScope
+  >,
+): contrastAtom.Atom {
+  return contrastAtom.atom('fill', value)
 }

@@ -8,6 +8,7 @@
   "extends": "@intertwine/dev-tsconfig/tsconfig.json",
   "include": ["./**/*.ts", "./**/*.js", "./**/*.cjs"],
   "references": [
+    { "path": "../lib-collection" },
     { "path": "../lib-compute" },
     { "path": "../lib-contrast" },
     { "path": "../lib-convey" },

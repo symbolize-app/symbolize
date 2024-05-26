@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import * as convey from '@/index.ts'
 import * as compute from '@intertwine/lib-compute'
+import type * as contrast from '@intertwine/lib-contrast'
 import * as test from '@intertwine/lib-test'
 import arrayFromAsync from 'core-js-pure/actual/array/from-async'
 
@@ -8,7 +9,7 @@ export const url = import.meta.url
 
 export const tests = {
   async ['items pure'](
-    ctx: compute.Context & convey.Context,
+    ctx: compute.Context & contrast.Context & convey.Context,
   ): Promise<void> {
     const fragment = convey.each(
       (x) => convey.html.div({ content: x }),
@@ -21,7 +22,7 @@ export const tests = {
   },
 
   async ['items inner state'](
-    ctx: compute.Context & convey.Context,
+    ctx: compute.Context & contrast.Context & convey.Context,
   ): Promise<void> {
     const items = compute.state([
       { id: 0, name: 'a' },
@@ -66,7 +67,7 @@ export const tests = {
   },
 
   async ['items move'](
-    ctx: compute.Context & convey.Context,
+    ctx: compute.Context & contrast.Context & convey.Context,
   ): Promise<void> {
     const items = compute.state([
       { id: 0, name: 'a' },
@@ -112,7 +113,7 @@ export const tests = {
   },
 
   async ['items remove'](
-    ctx: compute.Context & convey.Context,
+    ctx: compute.Context & contrast.Context & convey.Context,
   ): Promise<void> {
     const items = compute.state([
       { id: 0, name: 'a' },
@@ -156,7 +157,7 @@ export const tests = {
   },
 
   async ['items add'](
-    ctx: compute.Context & convey.Context,
+    ctx: compute.Context & contrast.Context & convey.Context,
   ): Promise<void> {
     const items = compute.state([
       { id: 0, name: 'a' },

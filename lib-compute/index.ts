@@ -97,6 +97,10 @@ export interface Node<
   readonly [nodeImpl]: NodeImpl<Value, Mutable, State>
 }
 
+export function isNode<Value>(value: unknown): value is Node<Value> {
+  return typeof value === 'object' && value !== null && nodeImpl in value
+}
+
 type NodeImpl<Value, Mutable extends boolean, State extends boolean> =
   Mutable extends false ? ComputationImpl<Value>
   : State extends false ? MutationImpl<Value>

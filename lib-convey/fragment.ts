@@ -4,11 +4,15 @@ import * as conveyMarker from '@/marker.ts'
 import * as conveyRange from '@/range.ts'
 import * as conveyText from '@/text.ts'
 import type * as compute from '@intertwine/lib-compute'
+import type * as contrast from '@intertwine/lib-contrast'
 
 export interface Fragment<CustomContext = unknown> {
   readonly [conveyMarker.fragmentMarker]: null
   add(
-    ctx: compute.Context & conveyContext.Context & CustomContext,
+    ctx: compute.Context &
+      contrast.Context &
+      conveyContext.Context &
+      CustomContext,
   ): AsyncIterableIterator<globalThis.Node>
   remove(): Promise<void>
 }

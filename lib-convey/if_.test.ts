@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import * as convey from '@/index.ts'
 import * as compute from '@intertwine/lib-compute'
+import type * as contrast from '@intertwine/lib-contrast'
 import * as test from '@intertwine/lib-test'
 import arrayFromAsync from 'core-js-pure/actual/array/from-async'
 
@@ -8,7 +9,7 @@ export const url = import.meta.url
 
 export const tests = {
   async ['if basic'](
-    ctx: compute.Context & convey.Context,
+    ctx: compute.Context & contrast.Context & convey.Context,
   ): Promise<void> {
     const y = compute.state({ x: 2 } as { readonly x: number } | null)
 
@@ -64,7 +65,7 @@ export const tests = {
   },
 
   async ['if inner count'](
-    ctx: compute.Context & convey.Context,
+    ctx: compute.Context & contrast.Context & convey.Context,
   ): Promise<void> {
     const x = compute.state('a')
 
@@ -98,7 +99,7 @@ export const tests = {
   },
 
   async ['if lazy true'](
-    ctx: compute.Context & convey.Context,
+    ctx: compute.Context & contrast.Context & convey.Context,
   ): Promise<void> {
     const fragment = convey.if_(
       () =>
@@ -114,7 +115,7 @@ export const tests = {
   },
 
   async ['if lazy false'](
-    ctx: compute.Context & convey.Context,
+    ctx: compute.Context & contrast.Context & convey.Context,
   ): Promise<void> {
     const fragment = convey.if_(
       () =>
@@ -130,7 +131,7 @@ export const tests = {
   },
 
   async ['if nested'](
-    ctx: compute.Context & convey.Context,
+    ctx: compute.Context & contrast.Context & convey.Context,
   ): Promise<void> {
     const x = compute.state(true)
     const y = compute.state(true)

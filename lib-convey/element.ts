@@ -3,6 +3,7 @@ import * as conveyElementAttrs from '@/elementAttrs.ts'
 import * as conveyFragment from '@/fragment.ts'
 import * as conveyMarker from '@/marker.ts'
 import * as compute from '@intertwine/lib-compute'
+import * as contrast from '@intertwine/lib-contrast'
 
 export function replaceBetween(
   startNode: Readonly<Node>,
@@ -58,7 +59,10 @@ export class ElementFragment<CustomContext = unknown>
   ) {}
 
   async *add(
-    ctx: compute.Context & conveyContext.Context & CustomContext,
+    ctx: compute.Context &
+      contrast.Context &
+      conveyContext.Context &
+      CustomContext,
   ): AsyncIterableIterator<Node> {
     const mutableElement =
       this.namespace ?
@@ -78,7 +82,7 @@ export class ElementFragment<CustomContext = unknown>
       if (
         attrDefinition.kind === conveyElementAttrs.ElementAttrKind.listener
       ) {
-        this.addElementEventListener(
+        this.addEventListener(
           ctx,
           mutableElement,
           attrDefinition.name,
@@ -88,8 +92,12 @@ export class ElementFragment<CustomContext = unknown>
         attrDefinition.kind === conveyElementAttrs.ElementAttrKind.content
       ) {
         mutablePromises.push(
-          this.appendFragmentToElement(ctx, mutableElement, value),
+          this.appendFragment(ctx, mutableElement, value),
         )
+      } else if (
+        attrDefinition.kind === conveyElementAttrs.ElementAttrKind.style
+      ) {
+        this.bindStyle(ctx, mutableElement, value)
       } else if (
         attrDefinition.kind === conveyElementAttrs.ElementAttrKind.onAdd
       ) {
@@ -143,7 +151,7 @@ export class ElementFragment<CustomContext = unknown>
     this.mutableSubs.push(sub)
   }
 
-  private addElementEventListener(
+  private addEventListener(
     ctx: compute.Context & conveyContext.Context & CustomContext,
     mutableElement: Element,
     type: string,
@@ -151,7 +159,7 @@ export class ElementFragment<CustomContext = unknown>
   ): void {
     mutableElement.addEventListener(type, (event) => {
       void (async () => {
-        return ctx.convey.scheduler.run(async () => {
+        return ctx.convey.mutableScheduler.run(async () => {
           return compute.txn(ctx, async () => {
             return listener(event)
           })
@@ -160,8 +168,11 @@ export class ElementFragment<CustomContext = unknown>
     })
   }
 
-  private async appendFragmentToElement(
-    ctx: compute.Context & conveyContext.Context & CustomContext,
+  private async appendFragment(
+    ctx: compute.Context &
+      contrast.Context &
+      conveyContext.Context &
+      CustomContext,
     mutableElement: Element,
     fragment: conveyFragment.FragmentOpt<CustomContext>,
   ): Promise<void> {
@@ -200,5 +211,25 @@ export class ElementFragment<CustomContext = unknown>
         }
       }, value),
     )
+  }
+
+  private bindStyle(
+    ctx: compute.Context &
+      contrast.Context &
+      conveyContext.Context &
+      CustomContext,
+    mutableElement: Element,
+    value: contrast.Style,
+  ): void {
+    for (const rule of contrast.compile(ctx, value)) {
+      if (!ctx.convey.classNames.has(rule.className)) {
+        ctx.convey.styleLayer.insertRule(
+          rule.code,
+          ctx.convey.styleLayer.cssRules.length,
+        )
+        ctx.convey.classNames.add(rule.className)
+      }
+      mutableElement.classList.add(rule.className)
+    }
   }
 }

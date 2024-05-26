@@ -9,7 +9,7 @@ export type TestAttrs<
 > = Required<
   Pick<
     conveyElementAttrs.Attrs<CustomContext, BaseElement>,
-    'content' | 'onAdd'
+    'content' | 'onAdd' | 'style'
   >
 > &
   TestListenerAttrs<BaseElement> &

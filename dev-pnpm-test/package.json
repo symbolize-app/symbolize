@@ -5,6 +5,7 @@
   "dependencies": {
     "@intertwine/dev-prettier": "workspace:*",
     "@intertwine/dev-tsconfig": "workspace:*",
+    "@intertwine/lib-collection": "workspace:*",
     "@intertwine/lib-compute": "workspace:*",
     "@intertwine/lib-contrast": "workspace:*",
     "@intertwine/lib-convey": "workspace:*",
@@ -18,7 +19,7 @@
     "@intertwine/svc-auth-guest-view": "workspace:*"
   },
   "devDependencies": {
-    "typescript": "5.2.2"
+    "typescript": "5.4.5"
   },
   "prettier": "@intertwine/dev-prettier/index.json"
 }

@@ -7,6 +7,10 @@ export class Memo<K, V> {
     this.mutableResults.delete(key)
   }
 
+  entries(): IterableIterator<[K, V]> {
+    return this.mutableResults.entries()
+  }
+
   get(key: K): V {
     if (this.mutableResults.has(key)) {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- already checked

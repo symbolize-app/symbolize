@@ -40,11 +40,14 @@ export function mock<Func extends (...args: never) => unknown>(
   return mockWithHistory(returnValues)[0]
 }
 
+type ReadonlyParameters<T extends (...args: never) => unknown> =
+  T extends (...args: readonly [...infer P]) => unknown ? P : never
+
 export function mockWithHistory<Func extends (...args: never) => unknown>(
   returnValues: readonly Func[],
-): readonly [Func, readonly Parameters<Func>[]] {
+): readonly [Func, readonly ReadonlyParameters<Func>[]] {
   let i = 0
-  const mutableHistory: Parameters<Func>[] = []
+  const mutableHistory: ReadonlyParameters<Func>[] = []
   const callback = ((...args) => {
     if (i === returnValues.length) {
       throw new Error('called too many times')
@@ -71,7 +74,7 @@ export function repeatMockWithHistory<
 >(
   repeat: number,
   returnValue: Func,
-): readonly [Func, readonly Parameters<Func>[]] {
+): readonly [Func, readonly ReadonlyParameters<Func>[]] {
   const mutableReturnValues: Func[] = []
   for (let i = 0; i < repeat; i++) {
     mutableReturnValues.push(returnValue)

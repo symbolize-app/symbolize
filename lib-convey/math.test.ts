@@ -8,7 +8,7 @@ export const url = import.meta.url
 
 export const tests = {
   async ['math pure'](
-    ctx: compute.Context & convey.Context,
+    ctx: compute.Context & contrast.Context & convey.Context,
   ): Promise<void> {
     const fragment = convey.math.math({
       ariaDisabled: true,
@@ -24,7 +24,9 @@ export const tests = {
     )
   },
 
-  async ['mi pure'](ctx: compute.Context & convey.Context): Promise<void> {
+  async ['mi pure'](
+    ctx: compute.Context & contrast.Context & convey.Context,
+  ): Promise<void> {
     const fragment = convey.math.math({
       content: convey.math.mi({
         mathVariant: 'normal',
@@ -40,7 +42,9 @@ export const tests = {
     )
   },
 
-  async ['mo pure'](ctx: compute.Context & convey.Context): Promise<void> {
+  async ['mo pure'](
+    ctx: compute.Context & contrast.Context & convey.Context,
+  ): Promise<void> {
     const fragment = convey.math.math({
       content: convey.math.mo({
         form: 'prefix',

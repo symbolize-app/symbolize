@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import * as convey from '@/index.ts'
 import * as compute from '@intertwine/lib-compute'
+import type * as contrast from '@intertwine/lib-contrast'
 import * as test from '@intertwine/lib-test'
 import arrayFromAsync from 'core-js-pure/actual/array/from-async'
 
@@ -8,7 +9,7 @@ export const url = import.meta.url
 
 export const tests = {
   async ['custom empty'](
-    ctx: compute.Context & convey.Context,
+    ctx: compute.Context & contrast.Context & convey.Context,
   ): Promise<void> {
     const custom = convey.defineCustom((_ctx, _attrs) => {
       return null
@@ -17,7 +18,7 @@ export const tests = {
   },
 
   async ['custom pure'](
-    ctx: compute.Context & convey.Context,
+    ctx: compute.Context & contrast.Context & convey.Context,
   ): Promise<void> {
     const custom = convey.defineCustom<
       unknown,
@@ -38,7 +39,7 @@ export const tests = {
   },
 
   async ['custom effect'](
-    ctx: compute.Context & convey.Context,
+    ctx: compute.Context & contrast.Context & convey.Context,
   ): Promise<void> {
     const [effectCallback, effectCallbackHistory] =
       test.repeatMockWithHistory(2, (_value: string) => {})
@@ -76,7 +77,7 @@ export const tests = {
   },
 
   async ['custom defer'](
-    ctx: compute.Context & convey.Context,
+    ctx: compute.Context & contrast.Context & convey.Context,
   ): Promise<void> {
     const [deferCallback, deferCallbackHistory] =
       test.repeatMockWithHistory(2, () => {})

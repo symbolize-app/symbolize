@@ -1,5 +1,6 @@
 #!/usr/bin/env node-loader
 import * as compute from '@intertwine/lib-compute'
+import * as contrast from '@intertwine/lib-contrast'
 import * as conveyNode from '@intertwine/lib-convey/index.node.ts'
 import * as randomTest from '@intertwine/lib-random/test.ts'
 import * as testRunner from '@intertwine/lib-test-runner'
@@ -13,17 +14,26 @@ export async function run(baseContext: time.Context): Promise<boolean> {
   const ctx = {
     ...baseContext,
   }
-  return testRunner.runAll(ctx, [import('@/index.ts')], (defer) => {
-    const convey = new conveyNode.ConveyImpl()
-    defer(() => {
-      convey.dispose()
-    })
-    return {
-      compute: new compute.Compute(),
-      convey,
-      random: randomTest.RandomImpl.build(),
-      time: timeTest.TimeImpl.build(),
-    }
+  return testRunner.runAll(ctx, [import('@/index.ts')], {
+    compute() {
+      return new compute.Compute()
+    },
+    contrast() {
+      return new contrast.Contrast()
+    },
+    convey(defer) {
+      const convey = new conveyNode.ConveyImpl()
+      defer(() => {
+        convey.dispose()
+      })
+      return convey
+    },
+    random() {
+      return randomTest.RandomImpl.build()
+    },
+    time() {
+      return timeTest.TimeImpl.build()
+    },
   })
 }
 

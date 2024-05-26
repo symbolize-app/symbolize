@@ -18,7 +18,7 @@
     "@intertwine/svc-auth-guest-view": "workspace:*"
   },
   "devDependencies": {
-    "typescript": "5.2.2"
+    "typescript": "5.4.5"
   },
   "prettier": "@intertwine/dev-prettier/index.json"
 }

@@ -7,7 +7,7 @@
     "@intertwine/eslint-config": "workspace:@intertwine/dev-eslint@*"
   },
   "devDependencies": {
-    "typescript": "5.2.2"
+    "typescript": "5.4.5"
   },
   "prettier": "@intertwine/dev-prettier/index.json"
 }

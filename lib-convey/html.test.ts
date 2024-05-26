@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import * as convey from '@/index.ts'
 import * as compute from '@intertwine/lib-compute'
+import * as contrast from '@intertwine/lib-contrast'
+import * as contrastTest from '@intertwine/lib-contrast/test.ts'
 import * as test from '@intertwine/lib-test'
 import arrayFromAsync from 'core-js-pure/actual/array/from-async'
 
@@ -8,7 +10,7 @@ export const url = import.meta.url
 
 export const tests = {
   async ['div advanced'](
-    ctx: compute.Context & convey.Context,
+    ctx: compute.Context & contrast.Context & convey.Context,
   ): Promise<void> {
     const custom = convey.defineCustom<
       unknown,
@@ -49,7 +51,7 @@ export const tests = {
   },
 
   async ['div pure'](
-    ctx: compute.Context & convey.Context,
+    ctx: compute.Context & contrast.Context & convey.Context,
   ): Promise<void> {
     const [clickCallback, clickCallbackHistory] =
       test.repeatMockWithHistory(1, (_event: Readonly<MouseEvent>) => {})
@@ -79,7 +81,7 @@ export const tests = {
   },
 
   async ['div state'](
-    ctx: compute.Context & convey.Context,
+    ctx: compute.Context & contrast.Context & convey.Context,
   ): Promise<void> {
     const x = compute.state('a')
 
@@ -103,7 +105,7 @@ export const tests = {
   },
 
   async ['div string null'](
-    ctx: compute.Context & convey.Context,
+    ctx: compute.Context & contrast.Context & convey.Context,
   ): Promise<void> {
     const title = compute.state<string | null>('a')
 
@@ -123,7 +125,7 @@ export const tests = {
   },
 
   async ['div on add'](
-    ctx: compute.Context & convey.Context,
+    ctx: compute.Context & contrast.Context & convey.Context,
   ): Promise<void> {
     const show = compute.state(false)
     const [stepCallback, stepCallbackHistory] = test.repeatMockWithHistory(
@@ -180,8 +182,37 @@ export const tests = {
     ])
   },
 
+  async ['div style'](
+    ctx: compute.Context & contrast.Context & convey.Context,
+  ): Promise<void> {
+    for (let i = 0; i < 2; i += 1) {
+      const fragment = convey.html.div({
+        style: [contrast.background.color([contrast.rgb(255, 0, 0)])],
+      })
+      const body = ctx.convey.document.body
+      body.append(...(await arrayFromAsync(fragment.add(ctx))))
+      const div = body.querySelector('div')
+      test.assert(div)
+      test.assertDeepEquals([...div.classList.values()], ['a0'])
+      test.assertDeepEquals(
+        await Promise.all(
+          [...ctx.convey.styleLayer.cssRules].map(async (item) =>
+            contrastTest.formatCode(item.cssText),
+          ),
+        ),
+        [
+          contrastTest.dedent(`
+            .a0 {
+              background-color: rgb(255, 0, 0);
+            }
+          `),
+        ],
+      )
+    }
+  },
+
   async ['button pure'](
-    ctx: compute.Context & convey.Context,
+    ctx: compute.Context & contrast.Context & convey.Context,
   ): Promise<void> {
     const fragment = convey.html.button({ formMethod: 'get' })
     const body = ctx.convey.document.body
@@ -195,7 +226,7 @@ export const tests = {
   },
 
   async ['button boolean false'](
-    ctx: compute.Context & convey.Context,
+    ctx: compute.Context & contrast.Context & convey.Context,
   ): Promise<void> {
     const disabled = compute.state(true)
 
