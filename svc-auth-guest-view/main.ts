@@ -5,6 +5,8 @@ import type * as random from '@intertwine/lib-random'
 import type * as stream from '@intertwine/lib-stream'
 import type * as time from '@intertwine/lib-time'
 
+const fillProperty = contrast.customProperty<contrast.Color>()
+
 const custom = convey.defineCustom<
   unknown,
   {
@@ -26,17 +28,19 @@ const custom = convey.defineCustom<
       ),
     }),
     convey.svg.svg({
+      style: [
+        fillProperty.set([
+          contrast.rgb(200, 200, 255),
+          contrast.hover(contrast.rgb(0, 0, 255)),
+        ]),
+      ],
+
       height: 50,
       viewBox: [0, 0, 100, 100],
       width: 50,
 
       content: convey.svg.rect({
-        style: [
-          contrast.fill([
-            contrast.rgb(200, 200, 255),
-            contrast.hover(contrast.rgb(0, 0, 255)),
-          ]),
-        ],
+        style: [contrast.fill(fillProperty.get())],
 
         height: 80,
         width: 80,
