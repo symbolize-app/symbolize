@@ -5,6 +5,7 @@ import type * as test from '@intertwine/lib-test'
 export const all: test.TestCollection<
   compute.Context & contrast.Context
 > = () => [
+  import('@/customProperty.test.ts'),
   import('@/expressionIntern.test.ts'),
   import('@/function.test.ts'),
   import('@/props.test.ts'),
