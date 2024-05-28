@@ -5,7 +5,7 @@ import type * as random from '@intertwine/lib-random'
 import type * as stream from '@intertwine/lib-stream'
 import type * as time from '@intertwine/lib-time'
 
-const fillProperty = contrast.customProperty<contrast.Color>()
+const fillProperty = contrast.var_<contrast.Color>()
 
 const custom = convey.defineCustom<
   unknown,
@@ -17,6 +17,15 @@ const custom = convey.defineCustom<
 
   return [
     convey.html.div({
+      style: [
+        contrast.background.color(
+          compute.map(
+            (count) => (count % 2 ? contrast.rgb(225, 225, 225) : null),
+            countState,
+          ),
+        ),
+      ],
+
       onClick: compute.handler(async (_event, count) => {
         await compute.set(ctx, countState, count + 1)
       }, countState),
@@ -50,9 +59,9 @@ const custom = convey.defineCustom<
     }),
     convey.math.math({
       style: [
-        contrast.background.color([
+        contrast.background.color(
           contrast.rgb(255, 200, [255, contrast.hover(0)]),
-        ]),
+        ),
       ],
 
       display: 'block',

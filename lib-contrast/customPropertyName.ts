@@ -33,6 +33,10 @@ export class CustomPropertyNameMemo<Key> {
     this.memo = new collections.Memo(() => this.generator.build())
   }
 
+  entries(): IterableIterator<[Key, string]> {
+    return this.memo.entries()
+  }
+
   get(key: Key): string {
     return this.memo.get(key)
   }

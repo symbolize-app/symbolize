@@ -90,7 +90,9 @@ const colorMarker = Symbol('colorMarker')
 
 export type Color = typeof colorMarker
 
-export function rgb<Scope extends contrastScope.FullScope>(
+export function rgb<
+  Scope extends contrastScope.FullScope = contrastScope.RestrictedScope,
+>(
   r: contrastExpression.ExpressionOpt<number, Scope>,
   g: contrastExpression.ExpressionOpt<number, Scope>,
   b: contrastExpression.ExpressionOpt<number, Scope>,

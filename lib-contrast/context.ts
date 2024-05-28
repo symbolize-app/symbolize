@@ -1,8 +1,10 @@
 import * as contrastAtomIntern from '@/atomIntern.ts'
 import * as contrastClassName from '@/className.ts'
 import * as contrastCustomPropertyName from '@/customPropertyName.ts'
+import type * as contrastExpression from '@/expression.ts'
 import type * as contrastExpressionIntern from '@/expressionIntern.ts'
 import * as collections from '@intertwine/lib-collection'
+import type * as compute from '@intertwine/lib-compute'
 
 export interface Context {
   readonly contrast: Contrast
@@ -49,4 +51,15 @@ export class Contrast {
     new contrastCustomPropertyName.CustomPropertyNameMemo<symbol>(
       contrastCustomPropertyName.symbolNamespace,
     )
+}
+
+export interface CompileContext {
+  readonly contrastCompile: ContrastCompile
+}
+
+export class ContrastCompile {
+  readonly computationCustomPropertyName =
+    new contrastCustomPropertyName.CustomPropertyNameMemo<
+      compute.Node<contrastExpression.RestrictedExpressionOpt<unknown>>
+    >(contrastCustomPropertyName.computationNamespace)
 }

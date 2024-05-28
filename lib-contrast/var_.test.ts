@@ -6,22 +6,18 @@ export const url = import.meta.url
 
 export const tests = {
   async ['stable names'](ctx: contrast.Context): Promise<void> {
-    const a = contrast.customProperty<number>()
-    const b = contrast.customProperty<number>()
+    const a = contrast.var_<number>()
+    const b = contrast.var_<number>()
     for (let i = 0; i < 2; i += 1) {
       const style = [
         a.set(1),
         b.set(2),
-        contrast.background.color([contrast.rgb(0, a.get(), b.get())]),
+        contrast.background.color(contrast.rgb(0, a.get(), b.get())),
       ]
-      const rules = [...contrast.compile(ctx, style)]
+      const result = await contrastTest.testCompile(ctx, style)
 
-      test.assertDeepEquals(contrastTest.ruleClassNames(rules), [
-        'a0',
-        'a1',
-        'a2',
-      ])
-      test.assertDeepEquals(await contrastTest.ruleCode(rules), [
+      test.assertDeepEquals(result.classNames, ['a0', 'a1', 'a2'])
+      test.assertDeepEquals(result.code, [
         contrastTest.dedent(`
           .a0 {
             --s0: 1;
@@ -42,16 +38,16 @@ export const tests = {
   },
 
   async ['get or default'](ctx: contrast.Context): Promise<void> {
-    const a = contrast.customProperty<number>()
+    const a = contrast.var_<number>()
     const style = [
-      contrast.background.color([
+      contrast.background.color(
         contrast.rgb(0, 0, a.getOr([0, contrast.hover(1)])),
-      ]),
+      ),
     ]
-    const rules = [...contrast.compile(ctx, style)]
+    const result = await contrastTest.testCompile(ctx, style)
 
-    test.assertDeepEquals(contrastTest.ruleClassNames(rules), ['e0', 'a0'])
-    test.assertDeepEquals(await contrastTest.ruleCode(rules), [
+    test.assertDeepEquals(result.classNames, ['e0', 'a0'])
+    test.assertDeepEquals(result.code, [
       contrastTest.dedent(`
         .e0 {
           --e0: 0;
@@ -66,5 +62,10 @@ export const tests = {
         }
       `),
     ])
+  },
+
+  ['resolve'](ctx: contrast.Context): void {
+    const a = contrast.var_<number>()
+    test.assertEquals(a.resolveCustomPropertyName(ctx), '--s0')
   },
 }

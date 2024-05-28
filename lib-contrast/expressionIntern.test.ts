@@ -6,11 +6,11 @@ export const url = import.meta.url
 
 export const tests = {
   async ['null'](ctx: contrast.Context): Promise<void> {
-    const atom = contrast.background.color([])
-    const rules = [...atom.compile(ctx).rules(ctx)]
+    const style = [contrast.background.color(null)]
+    const result = await contrastTest.testCompile(ctx, style)
 
-    test.assertDeepEquals(contrastTest.ruleClassNames(rules), ['a0'])
-    test.assertDeepEquals(await contrastTest.ruleCode(rules), [
+    test.assertDeepEquals(result.classNames, ['a0'])
+    test.assertDeepEquals(result.code, [
       contrastTest.dedent(`
         .a0 {
         }
@@ -19,22 +19,24 @@ export const tests = {
   },
 
   async ['multi semicolon complex'](ctx: contrast.Context): Promise<void> {
-    const atom = contrast.background.color([
-      contrast.rgb(0, 0, 0),
-      [contrast.rgb(0, 0, 1), contrast.rgb(0, 0, 2)],
-      contrast.rgb(0, 0, 3),
-      contrast.hover([
-        contrast.rgb(0, 0, 4),
-        [contrast.rgb(0, 0, 5), contrast.rgb(0, 0, 6)],
-        contrast.rgb(0, 0, 7),
+    const style = [
+      contrast.background.color([
+        contrast.rgb(0, 0, 0),
+        [contrast.rgb(0, 0, 1), contrast.rgb(0, 0, 2)],
+        contrast.rgb(0, 0, 3),
+        contrast.hover([
+          contrast.rgb(0, 0, 4),
+          [contrast.rgb(0, 0, 5), contrast.rgb(0, 0, 6)],
+          contrast.rgb(0, 0, 7),
+        ]),
+        contrast.rgb(0, 0, 8),
+        contrast.rgb(0, 0, 9),
       ]),
-      contrast.rgb(0, 0, 8),
-      contrast.rgb(0, 0, 9),
-    ])
-    const rules = [...atom.compile(ctx).rules(ctx)]
+    ]
+    const result = await contrastTest.testCompile(ctx, style)
 
-    test.assertDeepEquals(contrastTest.ruleClassNames(rules), ['a0'])
-    test.assertDeepEquals(await contrastTest.ruleCode(rules), [
+    test.assertDeepEquals(result.classNames, ['a0'])
+    test.assertDeepEquals(result.code, [
       contrastTest.dedent(`
         .a0 {
           background-color: rgb(0, 0, 0);
@@ -57,13 +59,19 @@ export const tests = {
   },
 
   async ['scope expression reuse'](ctx: contrast.Context): Promise<void> {
-    const atom = contrast.background.color(
-      contrast.rgb(0, [0, contrast.hover(255)], [0, contrast.hover(255)]),
-    )
-    const rules = [...new Set(atom.compile(ctx).rules(ctx))]
+    const style = [
+      contrast.background.color(
+        contrast.rgb(
+          0,
+          [0, contrast.hover(255)],
+          [0, contrast.hover(255)],
+        ),
+      ),
+    ]
+    const result = await contrastTest.testCompile(ctx, style)
 
-    test.assertDeepEquals(contrastTest.ruleClassNames(rules), ['e0', 'a0'])
-    test.assertDeepEquals(await contrastTest.ruleCode(rules), [
+    test.assertDeepEquals(result.classNames, ['e0', 'a0'])
+    test.assertDeepEquals(result.code, [
       contrastTest.dedent(`
         .e0 {
           --e0: 0;
@@ -83,20 +91,18 @@ export const tests = {
   async ['scope expression chaining'](
     ctx: contrast.Context,
   ): Promise<void> {
-    const atom = contrast.background.color(
-      contrast.rgb(0, 0, [
-        0,
-        contrast.hover(contrast.add(1, [0, contrast.disabled(2)])),
-      ]),
-    )
-    const rules = [...new Set(atom.compile(ctx).rules(ctx))]
+    const style = [
+      contrast.background.color(
+        contrast.rgb(0, 0, [
+          0,
+          contrast.hover(contrast.add(1, [0, contrast.disabled(2)])),
+        ]),
+      ),
+    ]
+    const result = await contrastTest.testCompile(ctx, style)
 
-    test.assertDeepEquals(contrastTest.ruleClassNames(rules), [
-      'e0',
-      'e1',
-      'a0',
-    ])
-    test.assertDeepEquals(await contrastTest.ruleCode(rules), [
+    test.assertDeepEquals(result.classNames, ['e0', 'e1', 'a0'])
+    test.assertDeepEquals(result.code, [
       contrastTest.dedent(`
         .e0 {
           --e0: 0;

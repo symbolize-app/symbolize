@@ -179,3 +179,19 @@ function extractCustomProperty(
     rule,
   ])
 }
+
+export function compileCustomProperty(
+  propertyName: string,
+): PureExpressionIntern {
+  return compilePure(`var(${propertyName})`)
+}
+
+export function compileCustomPropertyOrDefault(
+  propertyName: string,
+  defaultValue: PureExpressionIntern,
+): PureExpressionIntern {
+  return compilePure(
+    `var(${propertyName},${defaultValue.value})`,
+    defaultValue,
+  )
+}
