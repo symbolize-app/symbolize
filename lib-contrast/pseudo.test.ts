@@ -6,13 +6,13 @@ export const url = import.meta.url
 
 export const tests = {
   async ['hover'](ctx: contrast.Context): Promise<void> {
-    const atom = contrast.background.color(
-      contrast.hover(contrast.rgb(255, 0, 128)),
-    )
-    const rules = [...atom.compile(ctx).rules(ctx)]
+    const style = [
+      contrast.background.color(contrast.hover(contrast.rgb(255, 0, 128))),
+    ]
+    const result = await contrastTest.testCompile(ctx, style)
 
-    test.assertDeepEquals(contrastTest.ruleClassNames(rules), ['a0'])
-    test.assertDeepEquals(await contrastTest.ruleCode(rules), [
+    test.assertDeepEquals(result.classNames, ['a0'])
+    test.assertDeepEquals(result.code, [
       contrastTest.dedent(`
         .a0 {
           &:where(:hover) {

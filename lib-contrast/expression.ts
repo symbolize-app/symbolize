@@ -3,29 +3,38 @@ import * as contrastExpressionIntern from '@/expressionIntern.ts'
 import type * as contrastScope from '@/scope.ts'
 import * as compute from '@intertwine/lib-compute'
 
-export type ExpressionOpt<Value, Scope extends contrastScope.FullScope> =
+export type ExpressionOpt<
+  Value,
+  Scope extends contrastScope.FullScope = contrastScope.FullScope,
+> =
   contrastScope.RestrictedScope extends Scope ?
     | Expression<Value, Scope>
-    | (contrastScope.FullScope extends Scope ?
-        ComputeExpression<Value> | MultiExpression<Value> | null
+    | MultiExpression<Value>
+    | (contrastScope.FullScope extends Scope ? ComputeExpression<Value>
       : never)
     | (Value extends symbol ? never : Value)
+    | null
   : never
 
-export type MultiExpression<Value> = readonly ExpressionOpt<
-  Value,
-  contrastScope.FullScope
->[]
+export type MultiExpression<Value> = readonly ExpressionOpt<Value>[]
 
 export type ComputeExpression<Value> = compute.Node<
   ExpressionOpt<Value, contrastScope.RestrictedScope>
+>
+
+export type RestrictedExpressionOpt<Value> = ExpressionOpt<
+  Value,
+  contrastScope.RestrictedScope
 >
 
 export const expressionMarker = Symbol('expressionMarker')
 export const expressionValueMarker = Symbol('internValueMarker')
 export const expressionScopeMarker = Symbol('internScopeMarker')
 
-export interface Expression<Value, Scope extends contrastScope.FullScope> {
+export interface Expression<
+  Value,
+  Scope extends contrastScope.FullScope = contrastScope.FullScope,
+> {
   readonly [expressionMarker]: null
 
   compile(
@@ -36,6 +45,11 @@ export interface Expression<Value, Scope extends contrastScope.FullScope> {
 
   [expressionValueMarker](): Value | null
 }
+
+export type RestrictedExpression<Value> = Expression<
+  Value,
+  contrastScope.RestrictedScope
+>
 
 export type ExpressionInternTuple<
   Tuple extends readonly ExpressionOpt<unknown, Scope>[],
@@ -145,7 +159,14 @@ export function toExpression<Value, Scope extends contrastScope.FullScope>(
         expr.map((item) => compile(ctx, item)),
       ) as never
     } else if (compute.isNode(expr)) {
-      throw new Error()
+      return expression(
+        contrastExpressionIntern.compileCustomProperty,
+        (ctx) => [
+          (
+            ctx as unknown as contrastContext.CompileContext
+          ).contrastCompile.computationCustomPropertyName.get(expr),
+        ],
+      )
     } else if (isExpression<Value, Scope>(expr)) {
       return expr
     }

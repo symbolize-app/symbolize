@@ -62,3 +62,10 @@ Main interactive interface here built on HTML / web tech.
 - Allow targeting child elements that don't have their own classes
 - Allow precompiling styles outside of fragments
 - Pre-process all styles as macros
+
+### Future changes
+
+- Set up strict nulls for CSS expressions
+  - Chained conditions can't resolve to empty
+  - Multiple values can't be empty
+  - Computations can't be null

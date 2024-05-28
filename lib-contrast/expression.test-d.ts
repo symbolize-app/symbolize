@@ -34,15 +34,45 @@ export const tests = {
 
   ['compute in compute'](): void {
     contrast.background.color(
-      // @ts-expect-error -- can't put compute in compute
-      contrast.rgb(compute.pure(compute.pure(255)), 0, 0),
+      contrast.rgb(
+        // @ts-expect-error -- invalid nesting
+        compute.pure(compute.pure(255)),
+        0,
+        0,
+      ),
     )
   },
 
   ['multi in compute'](): void {
+    contrast.background.color(contrast.rgb(compute.pure([254, 255]), 0, 0))
+  },
+
+  ['null in compute'](): void {
+    contrast.background.color(contrast.rgb(compute.pure(null), 0, 0))
+  },
+
+  ['expression in compute'](): void {
+    contrast.background.color(compute.pure(contrast.rgb(0, 0, 0)))
+  },
+
+  ['null in expression in compute'](): void {
+    contrast.background.color(compute.pure(contrast.rgb(null, 0, 0)))
+  },
+
+  ['multi in expression in compute'](): void {
+    contrast.background.color(compute.pure(contrast.rgb([0, 1], 0, 0)))
+  },
+
+  ['compute in expression in compute'](): void {
     contrast.background.color(
-      // @ts-expect-error -- can't put multi in compute
-      contrast.rgb(compute.pure([255]), 0, 0),
+      compute.pure(
+        contrast.rgb(
+          // @ts-expect-error -- invalid nesting
+          compute.pure(1),
+          0,
+          0,
+        ),
+      ),
     )
   },
 
@@ -60,8 +90,22 @@ export const tests = {
 
   ['pseudo in compute'](): void {
     contrast.background.color(
-      // @ts-expect-error -- can't put pseudo in compute
       contrast.rgb(compute.pure(contrast.hover(255)), 0, 0),
+    )
+  },
+
+  ['compute in pseudo in compute'](): void {
+    contrast.background.color(
+      contrast.rgb(
+        compute.pure(
+          contrast.hover(
+            // @ts-expect-error -- invalid nesting
+            compute.pure(1),
+          ),
+        ),
+        0,
+        0,
+      ),
     )
   },
 }
