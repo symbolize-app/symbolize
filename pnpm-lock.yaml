@@ -339,9 +339,6 @@ importers:
       '@intertwine/lib-collection':
         specifier: workspace:*
         version: link:../lib-collection
-      '@intertwine/lib-compute':
-        specifier: workspace:*
-        version: link:../lib-compute
       '@intertwine/lib-test':
         specifier: workspace:*
         version: link:../lib-test

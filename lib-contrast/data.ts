@@ -1,6 +1,5 @@
 import * as contrastExpression from '@/expression.ts'
 import * as contrastExpressionIntern from '@/expressionIntern.ts'
-import type * as contrastScope from '@/scope.ts'
 
 export class Length<Unit extends LengthUnit = LengthUnit> {
   constructor(
@@ -90,13 +89,11 @@ const colorMarker = Symbol('colorMarker')
 
 export type Color = typeof colorMarker
 
-export function rgb<
-  Scope extends contrastScope.FullScope = contrastScope.RestrictedScope,
->(
-  r: contrastExpression.ExpressionOpt<number, Scope>,
-  g: contrastExpression.ExpressionOpt<number, Scope>,
-  b: contrastExpression.ExpressionOpt<number, Scope>,
-): contrastExpression.Expression<Color, Scope> {
+export function rgb(
+  r: contrastExpression.ExpressionOpt<number>,
+  g: contrastExpression.ExpressionOpt<number>,
+  b: contrastExpression.ExpressionOpt<number>,
+): contrastExpression.Expression<Color> {
   return contrastExpression.expression(compileColorRgb, (ctx) => [
     contrastExpression.compileToPure(ctx, r),
     contrastExpression.compileToPure(ctx, g),

@@ -2,7 +2,6 @@ import * as contrastAtom from '@/atom.ts'
 import type * as contrastContext from '@/context.ts'
 import * as contrastExpression from '@/expression.ts'
 import * as contrastExpressionIntern from '@/expressionIntern.ts'
-import type * as contrastScope from '@/scope.ts'
 
 export function var_<Value>(): Var_<Value> {
   return new Var_()
@@ -20,9 +19,9 @@ export class Var_<Value> {
     )
   }
 
-  getOr<Scope extends contrastScope.FullScope>(
-    defaultValue: contrastExpression.ExpressionOpt<Value, Scope>,
-  ): contrastExpression.Expression<Exclude<Value, null>, Scope> {
+  getOr(
+    defaultValue: contrastExpression.ExpressionOpt<Value>,
+  ): contrastExpression.Expression<Exclude<Value, null>> {
     return contrastExpression.expression(
       contrastExpressionIntern.compileCustomPropertyOrDefault,
       (ctx) => [

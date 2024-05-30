@@ -222,80 +222,26 @@ export class ElementFragment<CustomContext = unknown>
       conveyContext.Context &
       CustomContext,
     mutableElement: HTMLElement | MathMLElement | SVGElement,
-    value: contrast.Style,
+    value: compute.NodeOpt<contrast.AtomOpt>,
   ): Promise<void> {
-    const result = contrast.compile(ctx, value)
-
-    this.bindStyleRules(ctx, mutableElement, result.rules)
-
-    const mutablePromises: Promise<void>[] = []
-    for (const [
-      computation,
-      customPropertyName,
-    ] of result.computationCustomProperties) {
-      mutablePromises.push(
-        this.bindStyleComputationCustomProperty(
-          ctx,
-          mutableElement,
-          customPropertyName,
-          computation,
-        ),
-      )
-    }
-
-    await Promise.all(mutablePromises)
-  }
-
-  private async bindStyleComputationCustomProperty(
-    ctx: compute.Context &
-      contrast.Context &
-      conveyContext.Context &
-      CustomContext,
-    mutableElement: HTMLElement | MathMLElement | SVGElement,
-    customPropertyName: string,
-    value: compute.Node<contrast.RestrictedExpressionOpt<unknown>>,
-  ): Promise<void> {
+    let oldClassNames: readonly string[] = []
     this.subscribe(
-      await compute.effect(
-        (value: contrast.RestrictedExpressionOpt<unknown>) => {
-          if (value === null) {
-            mutableElement.style.removeProperty(customPropertyName)
-          } else {
-            const expressionIntern = contrast.compileToPure(
-              ctx as never,
-              value,
+      await compute.effect((value) => {
+        mutableElement.classList.remove(...oldClassNames)
+        const mutableClassNames: string[] = []
+        for (const rule of contrast.compile(ctx, value)) {
+          if (!ctx.convey.classNames.has(rule.className)) {
+            ctx.convey.styleLayer.insertRule(
+              rule.code,
+              ctx.convey.styleLayer.cssRules.length,
             )
-            mutableElement.style.setProperty(
-              customPropertyName,
-              expressionIntern.value,
-            )
-            this.bindStyleRules(ctx, mutableElement, [
-              ...expressionIntern.extraRules(),
-            ])
+            ctx.convey.classNames.add(rule.className)
           }
-        },
-        value,
-      ),
+          mutableClassNames.push(rule.className)
+        }
+        mutableElement.classList.add(...mutableClassNames)
+        oldClassNames = mutableClassNames
+      }, value),
     )
-  }
-
-  private bindStyleRules(
-    ctx: compute.Context &
-      contrast.Context &
-      conveyContext.Context &
-      CustomContext,
-    mutableElement: HTMLElement | MathMLElement | SVGElement,
-    rules: readonly contrast.Rule[],
-  ): void {
-    for (const rule of rules) {
-      if (!ctx.convey.classNames.has(rule.className)) {
-        ctx.convey.styleLayer.insertRule(
-          rule.code,
-          ctx.convey.styleLayer.cssRules.length,
-        )
-        ctx.convey.classNames.add(rule.className)
-      }
-      mutableElement.classList.add(rule.className)
-    }
   }
 }

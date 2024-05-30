@@ -220,7 +220,13 @@ export const tests = {
       const x = compute.state<number | null>(1)
 
       const fragment = convey.html.div({
-        style: [contrast.background.color(contrast.rgb(0, 0, x))],
+        style: compute.map(
+          (x) =>
+            x !== null ?
+              contrast.background.color(contrast.rgb(0, 0, x))
+            : null,
+          x,
+        ),
       })
       const body = ctx.convey.document.body
       body.append(...(await arrayFromAsync(fragment.add(ctx))))
@@ -236,104 +242,67 @@ export const tests = {
         [
           contrastTest.dedent(`
             .a0 {
-              background-color: rgb(0, 0, var(--c0));
+              background-color: rgb(0, 0, 1);
             }
           `),
-        ],
+          contrastTest.dedent(`
+            .a1 {
+              background-color: rgb(0, 0, 2);
+            }
+          `),
+        ].slice(0, 1 + i),
       )
-      test.assertEquals(div.style.getPropertyValue('--c0'), '1')
-      test.assertEquals(div.getAttribute('style'), '--c0: 1;')
 
       await compute.txn(ctx, async () => {
         await compute.set(ctx, x, 2)
       })
-      test.assertEquals(div.style.getPropertyValue('--c0'), '2')
-      test.assertEquals(div.getAttribute('style'), '--c0: 2;')
+      test.assertDeepEquals([...div.classList.values()], ['a1'])
+      test.assertDeepEquals(
+        await Promise.all(
+          [...ctx.convey.styleLayer.cssRules].map(async (item) =>
+            contrastTest.formatCode(item.cssText),
+          ),
+        ),
+        [
+          contrastTest.dedent(`
+            .a0 {
+              background-color: rgb(0, 0, 1);
+            }
+          `),
+          contrastTest.dedent(`
+            .a1 {
+              background-color: rgb(0, 0, 2);
+            }
+          `),
+        ],
+      )
 
       await compute.txn(ctx, async () => {
         await compute.set(ctx, x, null)
       })
-      test.assertEquals(div.style.getPropertyValue('--c0'), '')
-      test.assertEquals(div.getAttribute('style') ?? '', '')
+      test.assertDeepEquals([...div.classList.values()], [])
+      test.assertDeepEquals(
+        await Promise.all(
+          [...ctx.convey.styleLayer.cssRules].map(async (item) =>
+            contrastTest.formatCode(item.cssText),
+          ),
+        ),
+        [
+          contrastTest.dedent(`
+            .a0 {
+              background-color: rgb(0, 0, 1);
+            }
+          `),
+          contrastTest.dedent(`
+            .a1 {
+              background-color: rgb(0, 0, 2);
+            }
+          `),
+        ],
+      )
 
       div.remove()
     }
-  },
-
-  async ['div computation expression style'](
-    ctx: compute.Context & contrast.Context & convey.Context,
-  ): Promise<void> {
-    const x =
-      compute.state<contrast.RestrictedExpression<contrast.Color> | null>(
-        contrast.rgb(0, 0, 1),
-      )
-
-    const fragment = convey.html.div({
-      style: [contrast.background.color(x)],
-    })
-    const body = ctx.convey.document.body
-    body.append(...(await arrayFromAsync(fragment.add(ctx))))
-    const div = body.querySelector('div')
-    test.assert(div)
-    test.assertDeepEquals([...div.classList.values()], ['a0'])
-    test.assertDeepEquals(
-      await Promise.all(
-        [...ctx.convey.styleLayer.cssRules].map(async (item) =>
-          contrastTest.formatCode(item.cssText),
-        ),
-      ),
-      [
-        contrastTest.dedent(`
-          .a0 {
-            background-color: var(--c0);
-          }
-        `),
-      ],
-    )
-    test.assertEquals(div.style.getPropertyValue('--c0'), 'rgb(0,0,1)')
-    test.assertEquals(div.getAttribute('style'), '--c0: rgb(0,0,1);')
-
-    await compute.txn(ctx, async () => {
-      await compute.set(ctx, x, contrast.rgb(0, 0, 2))
-    })
-    test.assertDeepEquals([...div.classList.values()], ['a0'])
-    test.assertEquals(div.style.getPropertyValue('--c0'), 'rgb(0,0,2)')
-    test.assertEquals(div.getAttribute('style'), '--c0: rgb(0,0,2);')
-
-    await compute.txn(ctx, async () => {
-      await compute.set(ctx, x, contrast.hover(contrast.rgb(0, 0, 3)))
-    })
-    test.assertDeepEquals([...div.classList.values()], ['a0', 'e0'])
-    test.assertDeepEquals(
-      await Promise.all(
-        [...ctx.convey.styleLayer.cssRules].map(async (item) =>
-          contrastTest.formatCode(item.cssText),
-        ),
-      ),
-      [
-        contrastTest.dedent(`
-          .a0 {
-            background-color: var(--c0);
-          }
-        `),
-        contrastTest.dedent(`
-          .e0 {
-            &:where(:hover) {
-              --e0: rgb(0, 0, 3);
-            }
-          }
-        `),
-      ],
-    )
-    test.assertEquals(div.style.getPropertyValue('--c0'), 'var(--e0)')
-    test.assertEquals(div.getAttribute('style'), '--c0: var(--e0);')
-
-    await compute.txn(ctx, async () => {
-      await compute.set(ctx, x, null)
-    })
-    test.assertDeepEquals([...div.classList.values()], ['a0', 'e0'])
-    test.assertEquals(div.style.getPropertyValue('--c0'), '')
-    test.assertEquals(div.getAttribute('style') ?? '', '')
   },
 
   async ['button pure'](

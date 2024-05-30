@@ -17,14 +17,14 @@ const custom = convey.defineCustom<
 
   return [
     convey.html.div({
-      style: [
-        contrast.background.color(
-          compute.map(
-            (count) => (count % 2 ? contrast.rgb(225, 225, 225) : null),
-            countState,
+      style: compute.map(
+        (count) => [
+          contrast.background.color(
+            count % 2 ? contrast.rgb(225, 225, 225) : null,
           ),
-        ),
-      ],
+        ],
+        countState,
+      ),
 
       onClick: compute.handler(async (_event, count) => {
         await compute.set(ctx, countState, count + 1)

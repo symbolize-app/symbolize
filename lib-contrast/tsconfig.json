@@ -9,7 +9,6 @@
   "include": ["./**/*.ts", "./**/*.js", "./**/*.cjs"],
   "references": [
     { "path": "../lib-collection" },
-    { "path": "../lib-compute" },
     { "path": "../lib-test" }
   ]
 }

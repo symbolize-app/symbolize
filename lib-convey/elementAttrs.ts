@@ -158,7 +158,7 @@ export type Attrs<CustomContext, BaseElement extends Element> = PickAttrs<
 > & {
   readonly content?: conveyFragment.FragmentOpt<CustomContext>
   readonly onAdd?: Listener<OnAddEvent<BaseElement>>
-  readonly style?: contrast.Style
+  readonly style?: compute.NodeOpt<contrast.AtomOpt>
 }
 
 export interface OnAddEvent<BaseElement extends Element> {

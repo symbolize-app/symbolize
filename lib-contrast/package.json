@@ -5,7 +5,6 @@
     "@intertwine/dev-prettier": "workspace:*",
     "@intertwine/dev-tsconfig": "workspace:*",
     "@intertwine/lib-collection": "workspace:*",
-    "@intertwine/lib-compute": "workspace:*",
     "@intertwine/lib-test": "workspace:*",
     "happy-dom": "13.6.2"
   },
