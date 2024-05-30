@@ -2,7 +2,6 @@ import * as collections from '@intertwine/lib-collection'
 
 export const symbolNamespace = 's'
 export const expressionNamespace = 'e'
-export const computationNamespace = 'c'
 
 export function buildCustomPropertyName(
   namespace: string,

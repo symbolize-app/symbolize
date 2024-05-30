@@ -9,6 +9,6 @@ export const all: test.TestCollection<
   import('@/function.test.ts'),
   import('@/props.test.ts'),
   import('@/pseudo.test.ts'),
-  import('@/style.test.ts'),
+  import('@/atom.test.ts'),
   import('@/var_.test.ts'),
 ]

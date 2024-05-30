@@ -1,11 +1,10 @@
 import * as contrastExpression from '@/expression.ts'
 import * as contrastExpressionIntern from '@/expressionIntern.ts'
-import type * as contrastScope from '@/scope.ts'
 
-export function add<Scope extends contrastScope.FullScope>(
-  a: contrastExpression.ExpressionOpt<number, Scope>,
-  b: contrastExpression.ExpressionOpt<number, Scope>,
-): contrastExpression.Expression<number, Scope> {
+export function add(
+  a: contrastExpression.ExpressionOpt<number>,
+  b: contrastExpression.ExpressionOpt<number>,
+): contrastExpression.Expression<number> {
   return contrastExpression.expression(compileAdd, (ctx) => [
     contrastExpression.compileToPure(ctx, a),
     contrastExpression.compileToPure(ctx, b),

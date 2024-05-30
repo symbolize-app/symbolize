@@ -1,5 +1,4 @@
 import * as contrast from '@/index.ts'
-import * as compute from '@intertwine/lib-compute'
 
 export const url = import.meta.url
 
@@ -28,54 +27,6 @@ export const tests = {
     contrast.background.color(contrast.rgb([255, [0, 1]], 0, 0))
   },
 
-  ['compute'](): void {
-    contrast.background.color(contrast.rgb(compute.pure(255), 0, 0))
-  },
-
-  ['compute in compute'](): void {
-    contrast.background.color(
-      contrast.rgb(
-        // @ts-expect-error -- invalid nesting
-        compute.pure(compute.pure(255)),
-        0,
-        0,
-      ),
-    )
-  },
-
-  ['multi in compute'](): void {
-    contrast.background.color(contrast.rgb(compute.pure([254, 255]), 0, 0))
-  },
-
-  ['null in compute'](): void {
-    contrast.background.color(contrast.rgb(compute.pure(null), 0, 0))
-  },
-
-  ['expression in compute'](): void {
-    contrast.background.color(compute.pure(contrast.rgb(0, 0, 0)))
-  },
-
-  ['null in expression in compute'](): void {
-    contrast.background.color(compute.pure(contrast.rgb(null, 0, 0)))
-  },
-
-  ['multi in expression in compute'](): void {
-    contrast.background.color(compute.pure(contrast.rgb([0, 1], 0, 0)))
-  },
-
-  ['compute in expression in compute'](): void {
-    contrast.background.color(
-      compute.pure(
-        contrast.rgb(
-          // @ts-expect-error -- invalid nesting
-          compute.pure(1),
-          0,
-          0,
-        ),
-      ),
-    )
-  },
-
   ['pseudo'](): void {
     contrast.background.color(contrast.rgb(contrast.hover(255), 0, 0))
     contrast.background.color(contrast.rgb(0, contrast.hover(255), 0))
@@ -88,24 +39,9 @@ export const tests = {
     ])
   },
 
-  ['pseudo in compute'](): void {
+  ['multi in pseudo'](): void {
     contrast.background.color(
-      contrast.rgb(compute.pure(contrast.hover(255)), 0, 0),
-    )
-  },
-
-  ['compute in pseudo in compute'](): void {
-    contrast.background.color(
-      contrast.rgb(
-        compute.pure(
-          contrast.hover(
-            // @ts-expect-error -- invalid nesting
-            compute.pure(1),
-          ),
-        ),
-        0,
-        0,
-      ),
+      contrast.rgb(contrast.hover([255, 254]), 0, 0),
     )
   },
 }

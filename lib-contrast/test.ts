@@ -1,27 +1,20 @@
+import * as contrastAtom from '@/atom.ts'
 import type * as contrastContext from '@/context.ts'
-import type * as contrastExpression from '@/expression.ts'
 import type * as contrastRule from '@/rule.ts'
-import * as contrastStyle from '@/style.ts'
-import type * as compute from '@intertwine/lib-compute'
 import prettierPostcss from 'prettier/plugins/postcss.mjs'
 import * as prettier from 'prettier/standalone.mjs'
 
 export async function testCompile(
   ctx: contrastContext.Context,
-  style: contrastStyle.Style,
+  atomOpt: contrastAtom.AtomOpt,
 ): Promise<{
   readonly classNames: readonly string[]
   readonly code: readonly string[]
-  readonly computationCustomProperties: [
-    compute.Node<contrastExpression.RestrictedExpressionOpt<unknown>>,
-    string,
-  ][]
 }> {
-  const result = contrastStyle.compile(ctx, style)
+  const rules = [...contrastAtom.compile(ctx, atomOpt)]
   return {
-    classNames: ruleClassNames(result.rules),
-    code: await ruleCode(result.rules),
-    computationCustomProperties: [...result.computationCustomProperties],
+    classNames: ruleClassNames(rules),
+    code: await ruleCode(rules),
   }
 }
 
