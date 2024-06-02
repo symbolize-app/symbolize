@@ -1,6 +1,5 @@
 /* eslint-env node */
 import esbuild from 'esbuild'
-import * as nodeFsPromises from 'node:fs/promises'
 import * as nodePath from 'node:path'
 import * as nodeUrl from 'node:url'
 
@@ -23,38 +22,28 @@ export const load = (url, context, defaultLoad) => {
   if (!localMatcher.exec(url)) {
     const fullPath = nodeUrl.fileURLToPath(new nodeUrl.URL(url))
     return (async () => {
-      if (ext === '.sql') {
-        const source = (await nodeFsPromises.readFile(fullPath)).toString(
-          'utf-8',
-        )
-        return {
-          format: 'module',
-          shortCircuit: true,
-          source: `const text = ${JSON.stringify(
-            source,
-          )}\nexport default text`,
-        }
-      } else {
-        const result = await esbuild.build({
-          absWorkingDir: nodePath.dirname(fullPath),
-          bundle: true,
-          entryPoints: [fullPath],
-          external: ['/*', 'node:*'],
-          format: 'esm',
-          logLevel: 'warning',
-          platform: 'node',
-          target: [`node${process.versions.node}`],
-          write: false,
-        })
-        const outputFile = result.outputFiles[0]
-        if (!outputFile) {
-          throw new Error('Missing output file')
-        }
-        return {
-          format: 'module',
-          shortCircuit: true,
-          source: outputFile.contents,
-        }
+      const result = await esbuild.build({
+        absWorkingDir: nodePath.dirname(fullPath),
+        bundle: true,
+        entryPoints: [fullPath],
+        external: ['/*', 'node:*'],
+        format: 'esm',
+        loader: {
+          ['.sql']: 'text',
+        },
+        logLevel: 'warning',
+        platform: 'node',
+        target: [`node${process.versions.node}`],
+        write: false,
+      })
+      const outputFile = result.outputFiles[0]
+      if (!outputFile) {
+        throw new Error('Missing output file')
+      }
+      return {
+        format: 'module',
+        shortCircuit: true,
+        source: outputFile.contents,
       }
     })()
   } else {

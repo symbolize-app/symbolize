@@ -85,3 +85,7 @@ impl ContentResponse {
     }
   }
 }
+
+#[cfg(test)]
+#[path = "./content_test.rs"]
+mod content_test;

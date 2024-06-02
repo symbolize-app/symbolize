@@ -1,3 +1,5 @@
+import contentSecurityPolicy from '@/contentSecurityPolicy.txt'
+import mainHtml from '@/main.html'
 import * as collection from '@intertwine/lib-collection'
 import * as time from '@intertwine/lib-time'
 import * as timeBrowser from '@intertwine/lib-time/index.browser.ts'
@@ -9,7 +11,6 @@ declare const manifest: Readonly<Record<string, string>>
 const cacheName = 'code-v1'
 const codeIdPrefix: Readonly<RegExp> = /^\/\.code\/\.id\//
 const codePrefix: Readonly<RegExp> = /\/\.code\//
-const mainHtmlPath = 'svc-gateway-guest-run/main.html'
 
 const cachePromise = self.caches.open(cacheName)
 
@@ -48,53 +49,48 @@ function main(): void {
 function handle(event: Readonly<FetchEvent>, url: Readonly<URL>): void {
   const path = url.pathname
   const codeIdPath = collection.stripPrefix(path, codeIdPrefix)
-  const codePath = codeIdPath ?? collection.stripPrefix(path, codePrefix)
   if (codeIdPath) {
-    handleContentById(event, codeIdPath, true)
-  } else if (codePath) {
-    handleContentByPath(event, codePath, true)
+    event.respondWith(fetchContentById(codeIdPath))
   } else {
-    handleContentByPath(event, mainHtmlPath, false)
+    const codePath = collection.stripPrefix(path, codePrefix)
+    if (codePath) {
+      event.respondWith(fetchContentByPath(codePath))
+    } else {
+      event.respondWith(patchMainHtmlContent())
+    }
   }
 }
 
-function handleContentById(
-  event: Readonly<FetchEvent>,
-  contentPath: string,
-  sandbox: boolean,
-): void {
-  event.respondWith(patchFetchContent(contentPath, sandbox))
-}
-
-function handleContentByPath(
-  event: Readonly<FetchEvent>,
-  path: string,
-  sandbox: boolean,
-): void {
-  const contentPath = manifest[path] ?? null
-  if (!contentPath) {
+async function fetchContentByPath(codePath: string): Promise<Response> {
+  const codeIdPath = manifest[codePath] ?? null
+  if (!codeIdPath) {
     // eslint-disable-next-line no-console
-    console.error(version, 'manifest error', path)
-    event.respondWith(
-      new Response('Path missing from manifest', { status: 404 }),
-    )
+    console.error(version, 'manifest error', codePath)
+    return new Response('Path missing from manifest', { status: 404 })
   } else {
-    handleContentById(event, contentPath, sandbox)
+    return fetchContentById(codeIdPath)
   }
+}
+
+function patchMainHtmlContent(): Response {
+  const body = mainHtml
+  return new Response(body, {
+    headers: buildHeaders('main.html'),
+  })
 }
 
 const fetchContentMemo = new collection.Memo(
-  async (contentPath: string): Promise<Response> => {
+  async (codeIdPath: string): Promise<Response> => {
     let ok = false
     try {
       const cache = await cachePromise
-      const request = new Request(`/.code/.id/${contentPath}`)
+      const request = new Request(`/.code/.id/${codeIdPath}`)
       const cacheResponse = await cache.match(request)
       if (cacheResponse) {
         return cacheResponse
       } else {
         // eslint-disable-next-line no-console
-        console.log(version, 'cache miss', contentPath)
+        console.log(version, 'cache miss', codeIdPath)
         const response = await fetch(request)
         ok = response.ok
         if (ok) {
@@ -104,33 +100,34 @@ const fetchContentMemo = new collection.Memo(
       }
     } finally {
       if (!ok) {
-        fetchContentMemo.delete(contentPath)
+        fetchContentMemo.delete(codeIdPath)
       }
     }
   },
 )
 
-async function patchFetchContent(
-  contentPath: string,
-  sandbox: boolean,
-): Promise<Response> {
-  const response = (await fetchContentMemo.get(contentPath)).clone()
-  const headers = new Headers(response.headers)
-  const contentSecurityPolicy = headers.get('content-security-policy')
-  if (!sandbox && contentSecurityPolicy) {
-    headers.set(
-      'content-security-policy',
-      contentSecurityPolicy
-        .split(';')
-        .filter((item) => item !== 'sandbox')
-        .join(';'),
-    )
-  }
+async function fetchContentById(codeIdPath: string): Promise<Response> {
+  // Make sure to clone the response to allow a new read, and create a
+  // brand new response to reset the relative path
+  const response = (await fetchContentMemo.get(codeIdPath)).clone()
   return new Response(response.body, {
-    headers,
-    status: response.status,
-    statusText: response.statusText,
+    headers: buildHeaders(codeIdPath),
   })
+}
+
+function buildHeaders(path: string): Record<string, string> {
+  let contentType: string
+  if (path.endsWith('.html')) {
+    contentType = 'text/html'
+  } else if (path.endsWith('.js') || path.endsWith('mjs')) {
+    contentType = 'text/javascript'
+  } else {
+    throw new Error(`Unknown content type for ${path}`)
+  }
+  return {
+    ['content-security-policy']: contentSecurityPolicy.trimEnd(),
+    ['content-type']: contentType,
+  }
 }
 
 async function prepareCache(ctx: time.Context): Promise<void> {
