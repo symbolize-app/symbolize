@@ -211,10 +211,13 @@ fn build_expr(cli: &Cli) -> Result<Expr> {
     ],
     Mode::TypeScript => vec![
       Expr::Suffix(vec![
-        "ts".into(),
-        "js".into(),
         "cjs".into(),
+        "css".into(),
+        "html".into(),
+        "js".into(),
         "sql".into(),
+        "ts".into(),
+        "txt".into(),
       ]),
       Expr::Name(NameTerm {
         paths: vec![

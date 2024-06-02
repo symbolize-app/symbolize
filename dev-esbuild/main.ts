@@ -81,11 +81,8 @@ async function build(ctx: devContext.Context): Promise<void> {
 async function buildFiles(
   ctx: devContext.Context,
 ): Promise<devModules.BuildResult> {
-  const classicEntryPoints = [
-    './svc-gateway-guest-run/init.html',
-    './svc-gateway-guest-run/main.html',
-    './svc-gateway-guest-run/serviceWorker.ts',
-  ]
+  const htmlEntryPoints = ['./svc-gateway-guest-run/init.html']
+  const classicEntryPoints = ['./svc-gateway-guest-run/serviceWorker.ts']
   const moduleEntryPoints = [
     './svc-gateway-guest-run/dedicatedWorker.ts',
     './svc-gateway-guest-run/main.ts',
@@ -94,6 +91,11 @@ async function buildFiles(
   const commonOptions = {
     define: { ['import.meta.env.NODE_ENV']: JSON.stringify(ctx.dev.mode) },
     external: ['timers', 'util'],
+    loader: {
+      ['.css']: 'text',
+      ['.html']: 'text',
+      ['.txt']: 'text',
+    } as const,
     logLevel: 'warning' as const,
     minify: ctx.dev.mode === devContext.Mode.production,
     outbase: nodePath.resolve('.'),
@@ -101,6 +103,16 @@ async function buildFiles(
     platform: 'browser' as const,
     write: false,
   }
+  const htmlResultPromise = esbuild.build({
+    ...commonOptions,
+    bundle: true,
+    entryPoints: htmlEntryPoints.map((entryPoint) =>
+      nodePath.resolve(entryPoint),
+    ),
+    loader: {
+      ['.html']: 'copy',
+    },
+  })
   const classicResultPromise = esbuild.build({
     ...commonOptions,
     bundle: true,
@@ -108,8 +120,9 @@ async function buildFiles(
       nodePath.resolve(entryPoint),
     ),
     format: 'iife',
-    loader: { ['.html']: 'copy' },
-    outExtension: { ['.js']: '.ts.js' },
+    outExtension: {
+      ['.js']: '.ts.js',
+    },
   })
   const moduleResultPromise = devModules.build({
     ...commonOptions,
@@ -118,13 +131,15 @@ async function buildFiles(
     ),
     format: 'esm',
   })
-  const [classicResult, moduleResult] = await Promise.all([
+  const [htmlResult, classicResult, moduleResult] = await Promise.all([
+    htmlResultPromise,
     classicResultPromise,
     moduleResultPromise,
   ])
   return {
     errors: [...classicResult.errors, ...moduleResult.errors],
     outputFiles: [
+      ...(htmlResult.outputFiles ?? []),
       ...(classicResult.outputFiles ?? []),
       ...moduleResult.outputFiles,
     ],
