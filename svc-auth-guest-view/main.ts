@@ -83,18 +83,28 @@ export async function main(
     stream.ClientContext &
     time.Context,
 ): Promise<void> {
-  const clientSource = ctx.streamClient.connect(
-    'svc-auth-guest-read',
-    (data) => {
-      // eslint-disable-next-line no-console
-      console.log('client data', data)
-    },
-  )
-  void clientSource.send(ctx, 'ping')
-
-  const fragment = custom({ title: 'hello' })
+  const html = ctx.convey.document.documentElement
   const body = ctx.convey.document.body
-  for await (const node of fragment.add(ctx)) {
-    body.append(node)
+  try {
+    const clientSource = ctx.streamClient.connect(
+      'svc-auth-guest-read',
+      (data) => {
+        // eslint-disable-next-line no-console
+        console.log('client data', data)
+      },
+    )
+    void clientSource.send(ctx, 'ping')
+
+    const fragment = custom({ title: 'hello' })
+    for await (const node of fragment.add(ctx)) {
+      body.append(node)
+    }
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(error)
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+    body.append(`Loading error: ${error}`)
+  } finally {
+    html.classList.remove('loading')
   }
 }
