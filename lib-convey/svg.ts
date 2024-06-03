@@ -5,22 +5,22 @@ import type * as conveySvgAttrs from '@/svgAttrs.ts'
 export const svg = new Proxy(
   {},
   {
-    get(
-      _mutableTarget: object,
-      property: string,
-      _receiver: unknown,
-    ): unknown {
+    get(_mutableTarget: object, tag: string, _receiver: unknown): unknown {
       return (attrs: object) =>
         new conveyElement.ElementFragment(
-          'http://www.w3.org/2000/svg',
-          property,
+          (ctx) =>
+            ctx.convey.document.createElementNS(
+              'http://www.w3.org/2000/svg',
+              tag,
+            ),
+          conveyElement.ElementFragmentMode.normal,
           attrs,
         )
     },
   },
 ) as unknown as {
-  readonly [Key in keyof conveySvgAttrs.AttrsTagNameMap<unknown> &
+  readonly [Key in keyof conveySvgAttrs.SvgAttrsTagNameMap<unknown> &
     keyof SVGElementTagNameMap]: <CustomContext = unknown>(
-    attrs: conveySvgAttrs.AttrsTagNameMap<CustomContext>[Key],
+    attrs: conveySvgAttrs.SvgAttrsTagNameMap<CustomContext>[Key],
   ) => conveyFragment.Fragment<CustomContext>
 }

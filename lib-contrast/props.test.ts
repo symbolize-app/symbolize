@@ -5,7 +5,7 @@ import * as test from '@intertwine/lib-test'
 export const url = import.meta.url
 
 export const tests = {
-  async ['background.color'](ctx: contrast.Context): Promise<void> {
+  async ['background color'](ctx: contrast.Context): Promise<void> {
     const style = [contrast.background.color(contrast.rgb(255, 0, 128))]
     const result = await contrastTest.testCompile(ctx, style)
 
@@ -14,6 +14,20 @@ export const tests = {
       contrastTest.dedent(`
         .a0 {
           background-color: rgb(255, 0, 128);
+        }
+      `),
+    ])
+  },
+
+  async ['box sizing'](ctx: contrast.Context): Promise<void> {
+    const style = [contrast.boxSizing('border-box')]
+    const result = await contrastTest.testCompile(ctx, style)
+
+    test.assertDeepEquals(result.classNames, ['a0'])
+    test.assertDeepEquals(result.code, [
+      contrastTest.dedent(`
+        .a0 {
+          box-sizing: border-box;
         }
       `),
     ])

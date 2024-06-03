@@ -7,15 +7,32 @@ import type * as time from '@intertwine/lib-time'
 
 const fillProperty = contrast.var_<contrast.Color>()
 
+const htmlStyle = convey.defineCustom((ctx) => {
+  const html = ctx.convey.document.documentElement
+  return convey.portal(html, {
+    style: [contrast.boxSizing('border-box')],
+  })
+})
+
 const custom = convey.defineCustom<
   unknown,
   {
     readonly title: compute.NodeOpt<string>
   }
 >((ctx, attrs) => {
+  const head = ctx.convey.document.head
   const countState = compute.state(0)
 
   return [
+    convey.portal(head, {
+      content: convey.html.title({
+        onAdd() {
+          head.querySelector('title')?.remove()
+        },
+
+        content: 'Intertwine Custom',
+      }),
+    }),
     convey.html.div({
       style: compute.map(
         (count) => [
@@ -96,10 +113,9 @@ export async function main(
     void clientSource.send(ctx, 'ping')
 
     const fragment = custom({ title: 'hello' })
-    await fragment.add(ctx)
-    for (const node of fragment.nodes()) {
-      body.append(node)
-    }
+    await convey
+      .portal(body, { content: [htmlStyle({}), fragment] })
+      .add(ctx)
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error)

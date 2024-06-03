@@ -24,6 +24,7 @@ export type RestrictedDocument = Readonly<
     | 'createElementNS'
     | 'createTextNode'
     | 'documentElement'
+    | 'head'
   >
 >
 

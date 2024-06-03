@@ -7,12 +7,12 @@ import type * as contrast from '@intertwine/lib-contrast'
 export function text(attrs: {
   readonly content: compute.NodeOpt<string>
 }): conveyFragment.Fragment {
-  return new Text(attrs.content)
+  return new TextFragment(attrs.content)
 }
 
-class Text implements conveyFragment.Fragment {
+class TextFragment implements conveyFragment.Fragment {
   readonly [conveyMarker.fragmentMarker]: null = null
-  private mutableNode: globalThis.Text | null = null
+  private mutableNode: Text | null = null
   private mutableSub: compute.Computation<void> | null = null
 
   constructor(private readonly content: compute.NodeOpt<string>) {}
