@@ -22,16 +22,24 @@ class Range<CustomContext = unknown>
     private readonly content: readonly conveyFragment.FragmentOpt<CustomContext>[],
   ) {}
 
-  async *add(
+  async add(
     ctx: compute.Context &
       contrast.Context &
       conveyContext.Context &
       CustomContext,
-  ): AsyncIterableIterator<Node> {
+  ): Promise<void> {
     this.mutableFragments = this.content.map(conveyFragment.toFragment)
     for (const fragment of this.mutableFragments) {
-      for await (const node of fragment.add(ctx)) {
-        yield node
+      await fragment.add(ctx)
+    }
+  }
+
+  *nodes(): IterableIterator<Node> {
+    if (this.mutableFragments) {
+      for (const fragment of this.mutableFragments) {
+        for (const node of fragment.nodes()) {
+          yield node
+        }
       }
     }
   }
@@ -41,6 +49,7 @@ class Range<CustomContext = unknown>
       for (const fragment of this.mutableFragments) {
         await fragment.remove()
       }
+      this.mutableFragments = null
     }
   }
 }

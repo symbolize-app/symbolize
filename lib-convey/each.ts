@@ -19,9 +19,12 @@ class Each<Key, Value, CustomContext = unknown>
   implements conveyFragment.Fragment<CustomContext>
 {
   readonly [conveyMarker.fragmentMarker]: null = null
+  private mutableEndComment: Comment | null = null
   private mutableFragments:
     | [number | null, conveyFragment.Fragment<CustomContext>][]
     | null = null
+  private mutableInnerNodes: readonly Node[] | null = null
+  private mutableStartComment: Comment | null = null
   private mutableSub: compute.Computation<void> | null = null
 
   constructor(
@@ -32,16 +35,15 @@ class Each<Key, Value, CustomContext = unknown>
     private readonly items: compute.NodeOpt<readonly Value[]>,
   ) {}
 
-  async *add(
+  async add(
     ctx: compute.Context &
       contrast.Context &
       conveyContext.Context &
       CustomContext,
-  ): AsyncIterableIterator<Node> {
-    const startComment = ctx.convey.document.createComment('')
+  ): Promise<void> {
+    this.mutableStartComment = ctx.convey.document.createComment('')
     const mutableInnerComments: Comment[] = []
-    const endComment = ctx.convey.document.createComment('')
-    let innerNodes = null as readonly Node[] | null
+    this.mutableEndComment = ctx.convey.document.createComment('')
 
     let previousResults = new Map<
       Key,
@@ -111,12 +113,12 @@ class Each<Key, Value, CustomContext = unknown>
           const mutableNodes: Node[] = []
           if (oldIndex !== null) {
             const start =
-              oldIndex === 0 ? startComment : (
-                mutableInnerComments[oldIndex - 1]
-              )
+              oldIndex === 0 ?
+                this.mutableStartComment
+              : mutableInnerComments[oldIndex - 1]
             const end =
               oldIndex === mutableInnerComments.length ?
-                endComment
+                this.mutableEndComment
               : mutableInnerComments[oldIndex]
             if (!start || !end) {
               throw new Error('Missing inner comment')
@@ -133,51 +135,61 @@ class Each<Key, Value, CustomContext = unknown>
               throw new Error('End comment not found')
             }
           } else {
-            for await (const node of fragment.add(ctx)) {
+            await fragment.add(ctx)
+            for (const node of fragment.nodes()) {
               mutableNodes.push(node)
             }
           }
           mutableItemNodes.push(mutableNodes)
         }
 
-        while (mutableInnerComments.length > items.length - 1) {
-          mutableInnerComments.pop()
-        }
-        while (mutableInnerComments.length < items.length - 1) {
-          mutableInnerComments.push(ctx.convey.document.createComment(''))
-        }
-
-        const mutableInnerNodes: Node[] = []
-        for (let i = 0; i < mutableItemNodes.length; i++) {
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- already checked
-          mutableInnerNodes.push(...mutableItemNodes[i]!)
-          if (i < mutableItemNodes.length - 1) {
-            const comment = mutableInnerComments[i]
-            if (!comment) {
-              throw new Error('Missing inner comment')
-            }
-            mutableInnerNodes.push(comment)
+        if (this.mutableStartComment && this.mutableEndComment) {
+          while (mutableInnerComments.length > items.length - 1) {
+            mutableInnerComments.pop()
           }
-        }
+          while (mutableInnerComments.length < items.length - 1) {
+            mutableInnerComments.push(
+              ctx.convey.document.createComment(''),
+            )
+          }
 
-        innerNodes = conveyElement.replaceBetween(
-          startComment,
-          endComment,
-          mutableInnerNodes,
-        )
+          const mutableInnerNodes: Node[] = []
+          for (let i = 0; i < mutableItemNodes.length; i++) {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- already checked
+            mutableInnerNodes.push(...mutableItemNodes[i]!)
+            if (i < mutableItemNodes.length - 1) {
+              const comment = mutableInnerComments[i]
+              if (!comment) {
+                throw new Error('Missing inner comment')
+              }
+              mutableInnerNodes.push(comment)
+            }
+          }
+
+          this.mutableInnerNodes = conveyElement.replaceBetween(
+            this.mutableStartComment,
+            this.mutableEndComment,
+            mutableInnerNodes,
+          )
+        }
       }
 
       previousResults = newResults
     }, this.items)
+  }
 
-    if (!innerNodes) {
-      throw new Error('No fragment set')
+  *nodes(): IterableIterator<Node> {
+    if (
+      this.mutableStartComment &&
+      this.mutableEndComment &&
+      this.mutableInnerNodes
+    ) {
+      yield this.mutableStartComment
+      for (const node of this.mutableInnerNodes) {
+        yield node
+      }
+      yield this.mutableEndComment
     }
-    yield startComment
-    for await (const node of innerNodes) {
-      yield node
-    }
-    yield endComment
   }
 
   async remove(): Promise<void> {
@@ -185,10 +197,16 @@ class Each<Key, Value, CustomContext = unknown>
       for (const [, fragment] of this.mutableFragments) {
         await fragment.remove()
       }
+      this.mutableFragments = null
     }
 
-    if (this.mutableSub !== null) {
+    if (this.mutableSub) {
       compute.unsubscribe(this.mutableSub)
+      this.mutableSub = null
     }
+
+    this.mutableStartComment = null
+    this.mutableEndComment = null
+    this.mutableInnerNodes = null
   }
 }

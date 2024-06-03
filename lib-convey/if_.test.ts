@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import * as convey from '@/index.ts'
+import * as conveyTest from '@/test.ts'
 import * as compute from '@intertwine/lib-compute'
 import type * as contrast from '@intertwine/lib-contrast'
 import * as test from '@intertwine/lib-test'
-import arrayFromAsync from 'core-js-pure/actual/array/from-async'
 
 export const url = import.meta.url
 
@@ -33,8 +33,7 @@ export const tests = {
       () => 'nothing',
       y,
     )
-    const body = ctx.convey.document.body
-    body.append(...(await arrayFromAsync(fragment.add(ctx))))
+    const body = await conveyTest.addFragmentToBody(ctx, fragment)
     test.assertEquals(body.textContent, '6')
     test.assertDeepEquals(initHistory, [[2]])
 
@@ -77,8 +76,7 @@ export const tests = {
       () => null,
       compute.map((x) => x.startsWith('a'), x),
     )
-    const body = ctx.convey.document.body
-    body.append(...(await arrayFromAsync(fragment.add(ctx))))
+    const body = await conveyTest.addFragmentToBody(ctx, fragment)
     test.assertEquals(body.children.length, 2)
     test.assertEquals(body.childNodes.length, 4)
     test.assertEquals(body.textContent, '_a')
@@ -109,8 +107,7 @@ export const tests = {
       () => 'ok',
       false,
     )
-    const body = ctx.convey.document.body
-    body.append(...(await arrayFromAsync(fragment.add(ctx))))
+    const body = await conveyTest.addFragmentToBody(ctx, fragment)
     test.assertEquals(body.textContent, 'ok')
   },
 
@@ -125,8 +122,7 @@ export const tests = {
       () => 'ok',
       false,
     )
-    const body = ctx.convey.document.body
-    body.append(...(await arrayFromAsync(fragment.add(ctx))))
+    const body = await conveyTest.addFragmentToBody(ctx, fragment)
     test.assertEquals(body.textContent, 'ok')
   },
 
@@ -173,8 +169,7 @@ export const tests = {
         ),
       x,
     )
-    const body = ctx.convey.document.body
-    body.append(...(await arrayFromAsync(fragment.add(ctx))))
+    const body = await conveyTest.addFragmentToBody(ctx, fragment)
     test.assertEquals(body.textContent, '0')
     test.assertEquals(initHistory.map(([name]) => name).join(''), '0')
 

@@ -374,9 +374,6 @@ importers:
         specifier: 13.6.2
         version: 13.6.2
     devDependencies:
-      core-js-pure:
-        specifier: 3.36.0
-        version: 3.36.0
       typescript:
         specifier: 5.4.5
         version: 5.4.5

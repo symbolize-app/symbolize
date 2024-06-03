@@ -21,8 +21,11 @@ class If_<Value, CustomContext = unknown>
   implements conveyFragment.Fragment<CustomContext>
 {
   readonly [conveyMarker.fragmentMarker]: null = null
+  private mutableEndComment: Comment | null = null
   private mutableFragment: conveyFragment.Fragment<CustomContext> | null =
     null
+  private mutableInnerNodes: readonly Node[] | null = null
+  private mutableStartComment: Comment | null = null
   private mutableSub: compute.Computation<void> | null = null
 
   constructor(
@@ -33,15 +36,14 @@ class If_<Value, CustomContext = unknown>
     private readonly condition: compute.NodeOpt<Value>,
   ) {}
 
-  async *add(
+  async add(
     ctx: compute.Context &
       contrast.Context &
       conveyContext.Context &
       CustomContext,
-  ): AsyncIterableIterator<Node> {
-    const startComment = ctx.convey.document.createComment('')
-    const endComment = ctx.convey.document.createComment('')
-    let innerNodes = null as readonly Node[] | null
+  ): Promise<void> {
+    this.mutableStartComment = ctx.convey.document.createComment('')
+    this.mutableEndComment = ctx.convey.document.createComment('')
 
     let ifResult:
       | [
@@ -65,14 +67,17 @@ class If_<Value, CustomContext = unknown>
           )
           ifResult = [ifState, ifFragment]
           const mutableIfNodes: Node[] = []
-          for await (const node of ifFragment.add(ctx)) {
-            mutableIfNodes.push(node)
+          await ifFragment.add(ctx)
+          if (this.mutableStartComment && this.mutableEndComment) {
+            for (const node of ifFragment.nodes()) {
+              mutableIfNodes.push(node)
+            }
+            this.mutableInnerNodes = conveyElement.replaceBetween(
+              this.mutableStartComment,
+              this.mutableEndComment,
+              mutableIfNodes,
+            )
           }
-          innerNodes = conveyElement.replaceBetween(
-            startComment,
-            endComment,
-            mutableIfNodes,
-          )
           this.mutableFragment = ifFragment
         } else {
           const [ifState] = ifResult
@@ -89,36 +94,50 @@ class If_<Value, CustomContext = unknown>
         if (!elseFragment) {
           elseFragment = conveyFragment.toFragment(this.elseBranch())
           const mutableElseNodes: Node[] = []
-          for await (const node of elseFragment.add(ctx)) {
-            mutableElseNodes.push(node)
+          await elseFragment.add(ctx)
+          if (this.mutableStartComment && this.mutableEndComment) {
+            for (const node of elseFragment.nodes()) {
+              mutableElseNodes.push(node)
+            }
+            this.mutableInnerNodes = conveyElement.replaceBetween(
+              this.mutableStartComment,
+              this.mutableEndComment,
+              mutableElseNodes,
+            )
           }
-          innerNodes = conveyElement.replaceBetween(
-            startComment,
-            endComment,
-            mutableElseNodes,
-          )
           this.mutableFragment = elseFragment
         }
       }
     }, this.condition)
+  }
 
-    if (!innerNodes) {
-      throw new Error('No fragment set')
+  *nodes(): IterableIterator<Node> {
+    if (
+      this.mutableStartComment &&
+      this.mutableEndComment &&
+      this.mutableInnerNodes
+    ) {
+      yield this.mutableStartComment
+      for (const node of this.mutableInnerNodes) {
+        yield node
+      }
+      yield this.mutableEndComment
     }
-    yield startComment
-    for await (const node of innerNodes) {
-      yield node
-    }
-    yield endComment
   }
 
   async remove(): Promise<void> {
     if (this.mutableFragment) {
       await this.mutableFragment.remove()
+      this.mutableFragment = null
     }
 
-    if (this.mutableSub !== null) {
+    if (this.mutableSub) {
       compute.unsubscribe(this.mutableSub)
+      this.mutableSub = null
     }
+
+    this.mutableStartComment = null
+    this.mutableEndComment = null
+    this.mutableInnerNodes = null
   }
 }

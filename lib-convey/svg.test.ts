@@ -1,8 +1,8 @@
 import * as convey from '@/index.ts'
+import * as conveyTest from '@/test.ts'
 import type * as compute from '@intertwine/lib-compute'
 import type * as contrast from '@intertwine/lib-contrast'
 import * as test from '@intertwine/lib-test'
-import arrayFromAsync from 'core-js-pure/actual/array/from-async'
 
 export const url = import.meta.url
 
@@ -18,8 +18,7 @@ export const tests = {
         y: 1,
       }),
     })
-    const body = ctx.convey.document.body
-    body.append(...(await arrayFromAsync(fragment.add(ctx))))
+    const body = await conveyTest.addFragmentToBody(ctx, fragment)
     const svg = body.querySelector('svg')
     test.assert(svg)
     test.assertEquals(
@@ -39,8 +38,7 @@ export const tests = {
       }),
       viewBox: [1, 2, 3, 4],
     })
-    const body = ctx.convey.document.body
-    body.append(...(await arrayFromAsync(fragment.add(ctx))))
+    const body = await conveyTest.addFragmentToBody(ctx, fragment)
     const svg = body.querySelector('svg')
     test.assert(svg)
     test.assertEquals(

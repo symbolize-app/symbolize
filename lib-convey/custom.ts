@@ -44,12 +44,12 @@ class Custom<
     private readonly attrs: Attrs,
   ) {}
 
-  async *add(
+  async add(
     baseCtx: compute.Context &
       contrast.Context &
       conveyContext.Context &
       CustomContext,
-  ): AsyncIterableIterator<Node> {
+  ): Promise<void> {
     const ctx: compute.Context &
       conveyContext.ScopedContext &
       CustomContext = {
@@ -59,25 +59,34 @@ class Custom<
     this.mutableFragment = conveyFragment.toFragment(
       await this.build(ctx, this.attrs),
     )
-    for await (const node of this.mutableFragment.add(baseCtx)) {
-      yield node
-    }
+    await this.mutableFragment.add(baseCtx)
   }
 
   defer(callback: () => Promise<void> | void): void {
     this.mutableDeferred.unshift(callback)
   }
 
+  *nodes(): IterableIterator<Node> {
+    if (this.mutableFragment) {
+      for (const node of this.mutableFragment.nodes()) {
+        yield node
+      }
+    }
+  }
+
   async remove(): Promise<void> {
     if (this.mutableFragment) {
       await this.mutableFragment.remove()
+      this.mutableFragment = null
     }
     for (const callback of this.mutableDeferred) {
       await callback()
     }
+    this.mutableDeferred.length = 0
     for (const sub of this.mutableSubs) {
       compute.unsubscribe(sub)
     }
+    this.mutableSubs.length = 0
   }
 
   subscribe(sub: compute.Computation<unknown>): void {

@@ -18,7 +18,11 @@ class Empty implements conveyFragment.Fragment {
     return Empty.mutableEmpty
   }
 
-  async *add(): AsyncIterableIterator<Node> {
+  async add(): Promise<void> {
+    // Empty
+  }
+
+  *nodes(): IterableIterator<Node> {
     // Empty
   }
 
