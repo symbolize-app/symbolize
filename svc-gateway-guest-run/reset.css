@@ -1,0 +1,19 @@
+@layer reset, loader, base;
+
+@layer reset {
+  *,
+  *::before,
+  *::after {
+    box-sizing: inherit;
+    font: unset;
+    line-height: unset;
+    margin: unset;
+    min-height: 0;
+    min-width: 0;
+    padding: unset;
+  }
+
+  *:focus {
+    outline: unset;
+  }
+}

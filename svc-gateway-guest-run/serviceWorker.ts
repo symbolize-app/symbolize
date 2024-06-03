@@ -1,5 +1,7 @@
 import contentSecurityPolicy from '@/contentSecurityPolicy.txt'
 import mainHtml from '@/main.html'
+import loaderCss from '@/loader.css'
+import resetCss from '@/reset.css'
 import * as collection from '@intertwine/lib-collection'
 import * as time from '@intertwine/lib-time'
 import * as timeBrowser from '@intertwine/lib-time/index.browser.ts'
@@ -72,8 +74,13 @@ async function fetchContentByPath(codePath: string): Promise<Response> {
   }
 }
 
+const cssImportPattern = /@import url\('(?<parameterName>[^.]*).css'\);/g
+
 function patchMainHtmlContent(): Response {
-  const body = mainHtml
+  const body = collection.applyTemplate(cssImportPattern, mainHtml, {
+    loader: loaderCss,
+    reset: resetCss,
+  })
   return new Response(body, {
     headers: buildHeaders('main.html'),
   })
