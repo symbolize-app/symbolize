@@ -1,6 +1,6 @@
 import contentSecurityPolicy from '@/contentSecurityPolicy.txt'
-import mainHtml from '@/main.html'
 import loaderCss from '@/loader.css'
+import mainHtml from '@/main.html'
 import resetCss from '@/reset.css'
 import * as collection from '@intertwine/lib-collection'
 import * as time from '@intertwine/lib-time'

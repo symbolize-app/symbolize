@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import * as convey from '@/index.ts'
+import * as conveyTest from '@/test.ts'
 import * as compute from '@intertwine/lib-compute'
 import * as contrast from '@intertwine/lib-contrast'
 import * as contrastTest from '@intertwine/lib-contrast/test.ts'
 import * as test from '@intertwine/lib-test'
-import arrayFromAsync from 'core-js-pure/actual/array/from-async'
 
 export const url = import.meta.url
 
@@ -34,8 +34,7 @@ export const tests = {
     })
 
     const fragment = custom({ title: 'hello' })
-    const body = ctx.convey.document.body
-    body.append(...(await arrayFromAsync(fragment.add(ctx))))
+    const body = await conveyTest.addFragmentToBody(ctx, fragment)
     const div = body.querySelector('div')
     test.assert(div)
     test.assertEquals(div.textContent, 'hello / 0')
@@ -63,8 +62,7 @@ export const tests = {
 
       content: 'y',
     })
-    const body = ctx.convey.document.body
-    body.append(...(await arrayFromAsync(fragment.add(ctx))))
+    const body = await conveyTest.addFragmentToBody(ctx, fragment)
     const div = body.querySelector('div')
     test.assert(div)
     test.assertEquals(div.id, 'x')
@@ -86,8 +84,7 @@ export const tests = {
     const x = compute.state('a')
 
     const fragment = convey.html.div({ id: x })
-    const body = ctx.convey.document.body
-    body.append(...(await arrayFromAsync(fragment.add(ctx))))
+    const body = await conveyTest.addFragmentToBody(ctx, fragment)
     const div = body.querySelector('div')
     test.assert(div)
     test.assertEquals(div.id, 'a')
@@ -110,8 +107,7 @@ export const tests = {
     const title = compute.state<string | null>('a')
 
     const fragment = convey.html.div({ title })
-    const body = ctx.convey.document.body
-    body.append(...(await arrayFromAsync(fragment.add(ctx))))
+    const body = await conveyTest.addFragmentToBody(ctx, fragment)
     const div = body.querySelector('div')
     test.assert(div)
     test.assertEquals(div.title, 'a')
@@ -156,8 +152,7 @@ export const tests = {
       () => null,
       show,
     )
-    const body = ctx.convey.document.body
-    body.append(...(await arrayFromAsync(fragment.add(ctx))))
+    const body = await conveyTest.addFragmentToBody(ctx, fragment)
 
     stepCallback('start')
     await compute.txn(ctx, async () => {
@@ -189,8 +184,7 @@ export const tests = {
       const fragment = convey.html.div({
         style: [contrast.background.color(contrast.rgb(255, 0, 0))],
       })
-      const body = ctx.convey.document.body
-      body.append(...(await arrayFromAsync(fragment.add(ctx))))
+      const body = await conveyTest.addFragmentToBody(ctx, fragment)
       const div = body.querySelector('div')
       test.assert(div)
       test.assertDeepEquals([...div.classList.values()], ['a0'])
@@ -228,8 +222,7 @@ export const tests = {
           x,
         ),
       })
-      const body = ctx.convey.document.body
-      body.append(...(await arrayFromAsync(fragment.add(ctx))))
+      const body = await conveyTest.addFragmentToBody(ctx, fragment)
       const div = body.querySelector('div')
       test.assert(div)
       test.assertDeepEquals([...div.classList.values()], ['a0'])
@@ -309,8 +302,7 @@ export const tests = {
     ctx: compute.Context & contrast.Context & convey.Context,
   ): Promise<void> {
     const fragment = convey.html.button({ formMethod: 'get' })
-    const body = ctx.convey.document.body
-    body.append(...(await arrayFromAsync(fragment.add(ctx))))
+    const body = await conveyTest.addFragmentToBody(ctx, fragment)
     const button = body.querySelector('button')
     test.assert(button)
     test.assertEquals(
@@ -325,8 +317,7 @@ export const tests = {
     const disabled = compute.state(true)
 
     const fragment = convey.html.button({ disabled })
-    const body = ctx.convey.document.body
-    body.append(...(await arrayFromAsync(fragment.add(ctx))))
+    const body = await conveyTest.addFragmentToBody(ctx, fragment)
     const button = body.querySelector('button')
     test.assert(button)
     test.assertEquals(button.disabled, true)

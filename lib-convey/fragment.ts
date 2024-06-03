@@ -13,7 +13,8 @@ export interface Fragment<CustomContext = unknown> {
       contrast.Context &
       conveyContext.Context &
       CustomContext,
-  ): AsyncIterableIterator<globalThis.Node>
+  ): Promise<void>
+  nodes(): IterableIterator<globalThis.Node>
   remove(): Promise<void>
 }
 

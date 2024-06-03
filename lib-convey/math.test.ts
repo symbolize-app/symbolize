@@ -1,8 +1,8 @@
 import * as convey from '@/index.ts'
+import * as conveyTest from '@/test.ts'
 import type * as compute from '@intertwine/lib-compute'
 import * as contrast from '@intertwine/lib-contrast'
 import * as test from '@intertwine/lib-test'
-import arrayFromAsync from 'core-js-pure/actual/array/from-async'
 
 export const url = import.meta.url
 
@@ -14,8 +14,7 @@ export const tests = {
       ariaDisabled: true,
       display: 'inline',
     })
-    const body = ctx.convey.document.body
-    body.append(...(await arrayFromAsync(fragment.add(ctx))))
+    const body = await conveyTest.addFragmentToBody(ctx, fragment)
     const math = body.querySelector('math')
     test.assert(math)
     test.assertEquals(
@@ -32,8 +31,7 @@ export const tests = {
         mathVariant: 'normal',
       }),
     })
-    const body = ctx.convey.document.body
-    body.append(...(await arrayFromAsync(fragment.add(ctx))))
+    const body = await conveyTest.addFragmentToBody(ctx, fragment)
     const math = body.querySelector('math')
     test.assert(math)
     test.assertEquals(
@@ -52,8 +50,7 @@ export const tests = {
         stretchy: true,
       }),
     })
-    const body = ctx.convey.document.body
-    body.append(...(await arrayFromAsync(fragment.add(ctx))))
+    const body = await conveyTest.addFragmentToBody(ctx, fragment)
     const math = body.querySelector('math')
     test.assert(math)
     test.assertEquals(

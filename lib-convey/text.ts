@@ -12,24 +12,34 @@ export function text(attrs: {
 
 class Text implements conveyFragment.Fragment {
   readonly [conveyMarker.fragmentMarker]: null = null
-  private mutableEffect: compute.Computation<void> | null = null
+  private mutableNode: globalThis.Text | null = null
+  private mutableSub: compute.Computation<void> | null = null
 
   constructor(private readonly content: compute.NodeOpt<string>) {}
 
-  async *add(
+  async add(
     ctx: compute.Context & contrast.Context & conveyContext.Context,
-  ): AsyncIterableIterator<Node> {
-    const mutableNode = ctx.convey.document.createTextNode('')
-    this.mutableEffect = await compute.effect((value) => {
-      mutableNode.textContent = value
+  ): Promise<void> {
+    this.mutableNode = ctx.convey.document.createTextNode('')
+    this.mutableSub = await compute.effect((value) => {
+      if (this.mutableNode) {
+        this.mutableNode.textContent = value
+      }
     }, this.content)
-    yield mutableNode
+  }
+
+  *nodes(): IterableIterator<Node> {
+    if (this.mutableNode) {
+      yield this.mutableNode
+    }
   }
 
   // eslint-disable-next-line @typescript-eslint/require-await -- override
   async remove(): Promise<void> {
-    if (this.mutableEffect !== null) {
-      compute.unsubscribe(this.mutableEffect)
+    if (this.mutableSub) {
+      compute.unsubscribe(this.mutableSub)
+      this.mutableSub = null
     }
+    this.mutableNode = null
   }
 }

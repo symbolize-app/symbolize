@@ -41,6 +41,8 @@ export function replaceBetween(
   return null
 }
 
+type SupportedElement = Readonly<HTMLElement | MathMLElement | SVGElement>
+
 export class ElementFragment<CustomContext = unknown>
   implements
     conveyFragment.Fragment<CustomContext>,
@@ -48,6 +50,7 @@ export class ElementFragment<CustomContext = unknown>
 {
   readonly [conveyMarker.fragmentMarker]: null = null
   private readonly mutableDeferred: (() => Promise<void> | void)[] = []
+  private mutableElement: SupportedElement | null = null
   private mutableFragment: conveyFragment.Fragment<CustomContext> | null =
     null
   private readonly mutableSubs: compute.Computation<unknown>[] = []
@@ -58,23 +61,22 @@ export class ElementFragment<CustomContext = unknown>
     private readonly attrs: object,
   ) {}
 
-  async *add(
+  async add(
     ctx: compute.Context &
       contrast.Context &
       conveyContext.Context &
       CustomContext,
-  ): AsyncIterableIterator<Node> {
-    const mutableElement = (
+  ): Promise<void> {
+    this.mutableElement = (
       this.namespace ?
         ctx.convey.document.createElementNS(this.namespace, this.tag)
-      : ctx.convey.document.createElement(this.tag)) as
-      | HTMLElement
-      | MathMLElement
-      | SVGElement
+      : ctx.convey.document.createElement(this.tag)) as SupportedElement
 
     const mutablePromises: Promise<void>[] = []
     let onAdd:
-      | Required<conveyElementAttrs.Attrs<CustomContext, Element>>['onAdd']
+      | Required<
+          conveyElementAttrs.Attrs<CustomContext, SupportedElement>
+        >['onAdd']
       | null = null
 
     for (const [key, value] of Object.entries(this.attrs) as [
@@ -85,32 +87,24 @@ export class ElementFragment<CustomContext = unknown>
       if (
         attrDefinition.kind === conveyElementAttrs.ElementAttrKind.listener
       ) {
-        this.addEventListener(
-          ctx,
-          mutableElement,
-          attrDefinition.name,
-          value,
-        )
+        this.addEventListener(ctx, attrDefinition.name, value)
       } else if (
         attrDefinition.kind === conveyElementAttrs.ElementAttrKind.content
       ) {
-        mutablePromises.push(
-          this.appendFragment(ctx, mutableElement, value),
-        )
+        mutablePromises.push(this.appendFragment(ctx, value))
       } else if (
         attrDefinition.kind === conveyElementAttrs.ElementAttrKind.style
       ) {
-        mutablePromises.push(this.bindStyle(ctx, mutableElement, value))
+        mutablePromises.push(this.bindStyle(ctx, value))
       } else if (
         attrDefinition.kind === conveyElementAttrs.ElementAttrKind.onAdd
       ) {
         onAdd = value as Required<
-          conveyElementAttrs.Attrs<CustomContext, Element>
+          conveyElementAttrs.Attrs<CustomContext, SupportedElement>
         >['onAdd']
       } else {
         mutablePromises.push(
           this.bindAttribute(
-            mutableElement,
             attrDefinition.kind,
             attrDefinition.name,
             value,
@@ -121,21 +115,26 @@ export class ElementFragment<CustomContext = unknown>
 
     await Promise.all(mutablePromises)
 
-    if (onAdd) {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- async
+    if (onAdd && this.mutableElement) {
       await onAdd({
         ctx: {
           ...ctx,
           scopedConvey: this,
         },
-        element: mutableElement,
+        element: this.mutableElement,
       })
     }
-
-    yield mutableElement
   }
 
   defer(callback: () => Promise<void> | void): void {
     this.mutableDeferred.unshift(callback)
+  }
+
+  *nodes(): IterableIterator<Node> {
+    if (this.mutableElement) {
+      yield this.mutableElement
+    }
   }
 
   async remove(): Promise<void> {
@@ -148,6 +147,8 @@ export class ElementFragment<CustomContext = unknown>
     for (const sub of this.mutableSubs) {
       compute.unsubscribe(sub)
     }
+
+    this.mutableElement = null
   }
 
   subscribe(sub: compute.Computation<unknown>): void {
@@ -156,11 +157,13 @@ export class ElementFragment<CustomContext = unknown>
 
   private addEventListener(
     ctx: compute.Context & conveyContext.Context & CustomContext,
-    mutableElement: Element,
     type: string,
     listener: (event: Readonly<Event>) => Promise<void> | void,
   ): void {
-    mutableElement.addEventListener(type, (event) => {
+    if (!this.mutableElement) {
+      return
+    }
+    this.mutableElement.addEventListener(type, (event) => {
       void (async () => {
         return ctx.convey.mutableScheduler.run(async () => {
           return compute.txn(ctx, async () => {
@@ -176,17 +179,19 @@ export class ElementFragment<CustomContext = unknown>
       contrast.Context &
       conveyContext.Context &
       CustomContext,
-    mutableElement: Element,
     fragment: conveyFragment.FragmentOpt<CustomContext>,
   ): Promise<void> {
     this.mutableFragment = conveyFragment.toFragment(fragment)
-    for await (const node of this.mutableFragment.add(ctx)) {
-      mutableElement.append(node)
+    await this.mutableFragment.add(ctx)
+    if (!this.mutableElement) {
+      return
+    }
+    for (const node of this.mutableFragment.nodes()) {
+      this.mutableElement.append(node)
     }
   }
 
   private async bindAttribute(
-    mutableElement: Element,
     kind:
       | conveyElementAttrs.ElementAttrKind.boolean
       | conveyElementAttrs.ElementAttrKind.string,
@@ -195,12 +200,15 @@ export class ElementFragment<CustomContext = unknown>
   ): Promise<void> {
     this.subscribe(
       await compute.effect((value) => {
+        if (!this.mutableElement) {
+          return
+        }
         if (
           (kind === conveyElementAttrs.ElementAttrKind.boolean &&
             value === false) ||
           value === null
         ) {
-          mutableElement.removeAttribute(name)
+          this.mutableElement.removeAttribute(name)
         } else {
           const valueItems =
             (
@@ -210,7 +218,7 @@ export class ElementFragment<CustomContext = unknown>
               ['']
             : Array.isArray(value) ? value
             : [value]
-          mutableElement.setAttribute(name, valueItems.join(' '))
+          this.mutableElement.setAttribute(name, valueItems.join(' '))
         }
       }, value),
     )
@@ -221,13 +229,15 @@ export class ElementFragment<CustomContext = unknown>
       contrast.Context &
       conveyContext.Context &
       CustomContext,
-    mutableElement: HTMLElement | MathMLElement | SVGElement,
     value: compute.NodeOpt<contrast.AtomOpt>,
   ): Promise<void> {
     let oldClassNames: readonly string[] = []
     this.subscribe(
       await compute.effect((value) => {
-        mutableElement.classList.remove(...oldClassNames)
+        if (!this.mutableElement) {
+          return
+        }
+        this.mutableElement.classList.remove(...oldClassNames)
         const mutableClassNames: string[] = []
         for (const rule of contrast.compile(ctx, value)) {
           if (!ctx.convey.classNames.has(rule.className)) {
@@ -239,7 +249,7 @@ export class ElementFragment<CustomContext = unknown>
           }
           mutableClassNames.push(rule.className)
         }
-        mutableElement.classList.add(...mutableClassNames)
+        this.mutableElement.classList.add(...mutableClassNames)
         oldClassNames = mutableClassNames
       }, value),
     )

@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import * as convey from '@/index.ts'
+import * as conveyTest from '@/test.ts'
 import * as compute from '@intertwine/lib-compute'
 import type * as contrast from '@intertwine/lib-contrast'
 import * as test from '@intertwine/lib-test'
-import arrayFromAsync from 'core-js-pure/actual/array/from-async'
 
 export const url = import.meta.url
 
@@ -16,8 +16,7 @@ export const tests = {
       (x) => x,
       ['a', 'b', 'c'],
     )
-    const body = ctx.convey.document.body
-    body.append(...(await arrayFromAsync(fragment.add(ctx))))
+    const body = await conveyTest.addFragmentToBody(ctx, fragment)
     test.assertEquals(body.textContent, 'abc')
   },
 
@@ -48,8 +47,7 @@ export const tests = {
       (item) => item.id,
       items,
     )
-    const body = ctx.convey.document.body
-    body.append(...(await arrayFromAsync(fragment.add(ctx))))
+    const body = await conveyTest.addFragmentToBody(ctx, fragment)
     test.assertEquals(body.textContent, 'abc')
     test.assertDeepEquals(initHistory, [['a'], ['b'], ['c']])
 
@@ -93,8 +91,7 @@ export const tests = {
       (item) => item.id,
       items,
     )
-    const body = ctx.convey.document.body
-    body.append(...(await arrayFromAsync(fragment.add(ctx))))
+    const body = await conveyTest.addFragmentToBody(ctx, fragment)
     test.assertEquals(body.textContent, 'abc')
     test.assertDeepEquals(initHistory, [['a'], ['b'], ['c']])
 
@@ -139,8 +136,7 @@ export const tests = {
       (item) => item.id,
       items,
     )
-    const body = ctx.convey.document.body
-    body.append(...(await arrayFromAsync(fragment.add(ctx))))
+    const body = await conveyTest.addFragmentToBody(ctx, fragment)
     test.assertEquals(body.textContent, 'abc')
     test.assertDeepEquals(initHistory, [['a'], ['b'], ['c']])
 
@@ -183,8 +179,7 @@ export const tests = {
       (item) => item.id,
       items,
     )
-    const body = ctx.convey.document.body
-    body.append(...(await arrayFromAsync(fragment.add(ctx))))
+    const body = await conveyTest.addFragmentToBody(ctx, fragment)
     test.assertEquals(body.textContent, 'abc')
     test.assertDeepEquals(initHistory, [['a'], ['b'], ['c']])
 

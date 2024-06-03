@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import * as convey from '@/index.ts'
+import * as conveyTest from '@/test.ts'
 import * as compute from '@intertwine/lib-compute'
 import type * as contrast from '@intertwine/lib-contrast'
 import * as test from '@intertwine/lib-test'
-import arrayFromAsync from 'core-js-pure/actual/array/from-async'
 
 export const url = import.meta.url
 
@@ -14,7 +14,9 @@ export const tests = {
     const custom = convey.defineCustom((_ctx, _attrs) => {
       return null
     })
-    test.assertDeepEquals(await arrayFromAsync(custom({}).add(ctx)), [])
+    const fragment = custom({})
+    const body = await conveyTest.addFragmentToBody(ctx, fragment)
+    test.assertEquals(body.childNodes.length, 0)
   },
 
   async ['custom pure'](
@@ -31,10 +33,8 @@ export const tests = {
       })
     })
 
-    const body = ctx.convey.document.body
-    body.append(
-      ...(await arrayFromAsync(custom({ title: 'hello' }).add(ctx))),
-    )
+    const fragment = custom({ title: 'hello' })
+    const body = await conveyTest.addFragmentToBody(ctx, fragment)
     test.assertEquals(body.textContent, 'hello / 0')
   },
 
@@ -57,8 +57,7 @@ export const tests = {
     const x = compute.state('a')
 
     const fragment = custom({ title: x })
-    const body = ctx.convey.document.body
-    body.append(...(await arrayFromAsync(fragment.add(ctx))))
+    const body = await conveyTest.addFragmentToBody(ctx, fragment)
     test.assertEquals(body.textContent, 'a')
     test.assertDeepEquals(effectCallbackHistory, [['a']])
 
@@ -93,8 +92,7 @@ export const tests = {
     })
 
     const fragment = custom({ title: 'x' })
-    const body = ctx.convey.document.body
-    body.append(...(await arrayFromAsync(fragment.add(ctx))))
+    const body = await conveyTest.addFragmentToBody(ctx, fragment)
     test.assertEquals(body.textContent, 'x')
     test.assertDeepEquals(deferCallbackHistory, [])
 

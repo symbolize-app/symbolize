@@ -96,7 +96,8 @@ export async function main(
     void clientSource.send(ctx, 'ping')
 
     const fragment = custom({ title: 'hello' })
-    for await (const node of fragment.add(ctx)) {
+    await fragment.add(ctx)
+    for (const node of fragment.nodes()) {
       body.append(node)
     }
   } catch (error) {
