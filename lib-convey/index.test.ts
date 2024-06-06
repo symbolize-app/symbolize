@@ -12,6 +12,7 @@ export const all: test.TestCollection<
   import('@/html.test.ts'),
   import('@/if_.test.ts'),
   import('@/math.test.ts'),
+  import('@/portal.test.ts'),
   import('@/range.test.ts'),
   import('@/svg.test.ts'),
   import('@/text.test.ts'),

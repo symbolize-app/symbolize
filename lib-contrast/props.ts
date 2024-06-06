@@ -1,5 +1,5 @@
 import * as contrastAtom from '@/atom.ts'
-import type * as contrastData from '@/data.ts'
+import type * as contrastData from '@/data/index.ts'
 import type * as contrastExpression from '@/expression.ts'
 
 export const background = {
@@ -8,6 +8,12 @@ export const background = {
   ): contrastAtom.Atom {
     return contrastAtom.atom('background-color', value)
   },
+}
+
+export function boxSizing(
+  value: contrastExpression.ExpressionOpt<'border-box' | 'content-box'>,
+): contrastAtom.Atom {
+  return contrastAtom.atom('box-sizing', value)
 }
 
 export function fill(

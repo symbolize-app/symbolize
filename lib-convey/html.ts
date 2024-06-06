@@ -6,14 +6,17 @@ export const html = new Proxy(
   {},
   {
     get(_mutableTarget: object, tag: string, _receiver: unknown): unknown {
-      const namespace = null
       return (attrs: object) =>
-        new conveyElement.ElementFragment(namespace, tag, attrs)
+        new conveyElement.ElementFragment(
+          (ctx) => ctx.convey.document.createElement(tag),
+          conveyElement.ElementFragmentMode.normal,
+          attrs,
+        )
     },
   },
 ) as unknown as {
-  readonly [Key in keyof conveyHtmlAttrs.AttrsTagNameMap<unknown> &
+  readonly [Key in keyof conveyHtmlAttrs.HtmlAttrsTagNameMap<unknown> &
     keyof HTMLElementTagNameMap]: <CustomContext = unknown>(
-    attrs: conveyHtmlAttrs.AttrsTagNameMap<CustomContext>[Key],
+    attrs: conveyHtmlAttrs.HtmlAttrsTagNameMap<CustomContext>[Key],
   ) => conveyFragment.Fragment<CustomContext>
 }

@@ -41,7 +41,14 @@ export function replaceBetween(
   return null
 }
 
-type SupportedElement = Readonly<HTMLElement | MathMLElement | SVGElement>
+export type SupportedElement = Readonly<
+  HTMLElement | MathMLElement | SVGElement
+>
+
+export enum ElementFragmentMode {
+  normal = 0,
+  portal = 1,
+}
 
 export class ElementFragment<CustomContext = unknown>
   implements
@@ -51,13 +58,13 @@ export class ElementFragment<CustomContext = unknown>
   readonly [conveyMarker.fragmentMarker]: null = null
   private readonly mutableDeferred: (() => Promise<void> | void)[] = []
   private mutableElement: SupportedElement | null = null
-  private mutableFragment: conveyFragment.Fragment<CustomContext> | null =
-    null
   private readonly mutableSubs: compute.Computation<unknown>[] = []
 
   constructor(
-    private readonly namespace: string | null,
-    private readonly tag: string,
+    private readonly create: (
+      ctx: conveyContext.Context,
+    ) => SupportedElement,
+    private readonly mode: ElementFragmentMode,
     private readonly attrs: object,
   ) {}
 
@@ -67,10 +74,7 @@ export class ElementFragment<CustomContext = unknown>
       conveyContext.Context &
       CustomContext,
   ): Promise<void> {
-    this.mutableElement = (
-      this.namespace ?
-        ctx.convey.document.createElementNS(this.namespace, this.tag)
-      : ctx.convey.document.createElement(this.tag)) as SupportedElement
+    this.mutableElement = this.create(ctx)
 
     const mutablePromises: Promise<void>[] = []
     let onAdd:
@@ -132,15 +136,12 @@ export class ElementFragment<CustomContext = unknown>
   }
 
   *nodes(): IterableIterator<Node> {
-    if (this.mutableElement) {
+    if (this.mutableElement && this.mode === ElementFragmentMode.normal) {
       yield this.mutableElement
     }
   }
 
   async remove(): Promise<void> {
-    if (this.mutableFragment) {
-      await this.mutableFragment.remove()
-    }
     for (const callback of this.mutableDeferred) {
       await callback()
     }
@@ -163,7 +164,7 @@ export class ElementFragment<CustomContext = unknown>
     if (!this.mutableElement) {
       return
     }
-    this.mutableElement.addEventListener(type, (event) => {
+    const elementListener = (event: Readonly<Event>): void => {
       void (async () => {
         return ctx.convey.mutableScheduler.run(async () => {
           return compute.txn(ctx, async () => {
@@ -171,7 +172,13 @@ export class ElementFragment<CustomContext = unknown>
           })
         })
       })()
-    })
+    }
+    if (this.mode === ElementFragmentMode.portal) {
+      this.defer(() => {
+        this.mutableElement?.removeEventListener(type, elementListener)
+      })
+    }
+    this.mutableElement.addEventListener(type, elementListener)
   }
 
   private async appendFragment(
@@ -181,13 +188,23 @@ export class ElementFragment<CustomContext = unknown>
       CustomContext,
     fragment: conveyFragment.FragmentOpt<CustomContext>,
   ): Promise<void> {
-    this.mutableFragment = conveyFragment.toFragment(fragment)
-    await this.mutableFragment.add(ctx)
-    if (!this.mutableElement) {
-      return
-    }
-    for (const node of this.mutableFragment.nodes()) {
-      this.mutableElement.append(node)
+    const mutableFragment = conveyFragment.toFragment(fragment)
+    this.defer(async () => {
+      if (
+        this.mutableElement &&
+        this.mode === ElementFragmentMode.portal
+      ) {
+        for (const node of mutableFragment.nodes()) {
+          this.mutableElement.removeChild(node)
+        }
+      }
+      await mutableFragment.remove()
+    })
+    await mutableFragment.add(ctx)
+    if (this.mutableElement) {
+      for (const node of mutableFragment.nodes()) {
+        this.mutableElement.append(node)
+      }
     }
   }
 
@@ -198,6 +215,17 @@ export class ElementFragment<CustomContext = unknown>
     name: string,
     value: compute.NodeOpt<unknown>,
   ): Promise<void> {
+    // TODO Undo attributes for portal
+    if (this.mutableElement && this.mode === ElementFragmentMode.portal) {
+      const initialValue = this.mutableElement.getAttribute(name)
+      this.defer(() => {
+        if (initialValue === null) {
+          this.mutableElement?.removeAttribute(name)
+        } else {
+          this.mutableElement?.setAttribute(name, initialValue)
+        }
+      })
+    }
     this.subscribe(
       await compute.effect((value) => {
         if (!this.mutableElement) {
@@ -232,6 +260,11 @@ export class ElementFragment<CustomContext = unknown>
     value: compute.NodeOpt<contrast.AtomOpt>,
   ): Promise<void> {
     let oldClassNames: readonly string[] = []
+    if (this.mode === ElementFragmentMode.portal) {
+      this.defer(() => {
+        this.mutableElement?.classList.remove(...oldClassNames)
+      })
+    }
     this.subscribe(
       await compute.effect((value) => {
         if (!this.mutableElement) {
