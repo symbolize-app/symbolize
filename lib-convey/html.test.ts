@@ -301,13 +301,16 @@ export const tests = {
   async ['button pure'](
     ctx: compute.Context & contrast.Context & convey.Context,
   ): Promise<void> {
-    const fragment = convey.html.button({ formMethod: 'get' })
+    const fragment = convey.html.button({
+      formMethod: 'get',
+      type: 'submit',
+    })
     const body = await conveyTest.addFragmentToBody(ctx, fragment)
     const button = body.querySelector('button')
     test.assert(button)
     test.assertEquals(
       button.outerHTML,
-      '<button formmethod="get"></button>',
+      '<button formmethod="get" type="submit"></button>',
     )
   },
 
@@ -316,17 +319,53 @@ export const tests = {
   ): Promise<void> {
     const disabled = compute.state(true)
 
-    const fragment = convey.html.button({ disabled })
+    const fragment = convey.html.button({ disabled, type: 'button' })
     const body = await conveyTest.addFragmentToBody(ctx, fragment)
     const button = body.querySelector('button')
     test.assert(button)
     test.assertEquals(button.disabled, true)
-    test.assertEquals(button.outerHTML, '<button disabled=""></button>')
+    test.assertEquals(
+      button.outerHTML,
+      '<button disabled="" type="button"></button>',
+    )
 
     await compute.txn(ctx, async () => {
       await compute.set(ctx, disabled, false)
     })
     test.assertEquals(button.disabled, false)
-    test.assertEquals(button.outerHTML, '<button></button>')
+    test.assertEquals(button.outerHTML, '<button type="button"></button>')
+  },
+
+  async ['input checkbox pure'](
+    ctx: compute.Context & contrast.Context & convey.Context,
+  ): Promise<void> {
+    const fragment = convey.html.input({
+      checked: true,
+      type: 'checkbox',
+    })
+    const body = await conveyTest.addFragmentToBody(ctx, fragment)
+    const input = body.querySelector('input')
+    test.assert(input)
+    test.assertEquals(
+      input.outerHTML,
+      '<input checked="" type="checkbox">',
+    )
+  },
+
+  async ['input text pure'](
+    ctx: compute.Context & contrast.Context & convey.Context,
+  ): Promise<void> {
+    const fragment = convey.html.input({
+      autocomplete: ['section-x', 'email'],
+      type: 'text',
+      value: 'x',
+    })
+    const body = await conveyTest.addFragmentToBody(ctx, fragment)
+    const input = body.querySelector('input')
+    test.assert(input)
+    test.assertEquals(
+      input.outerHTML,
+      '<input autocomplete="section-x email" type="text" value="x">',
+    )
   },
 }

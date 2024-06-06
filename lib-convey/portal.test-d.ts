@@ -15,6 +15,7 @@ export const tests = {
       type: 'submit',
     })
     convey.portal(button, {
+      type: 'submit',
       // @ts-expect-error -- unknown attribute
       unknown: '1',
     })

@@ -41,12 +41,12 @@ export type MoAttrs<
   BaseElement extends Element,
 > = conveyElementAttrs.PickAttrs<
   | 'fence'
-  | 'form'
   | 'largeOp'
   | 'lSpace'
   | 'maxSize'
   | 'minSize'
   | 'moveableLimits'
+  | 'operatorForm'
   | 'rSpace'
   | 'separator'
   | 'stretchy'
