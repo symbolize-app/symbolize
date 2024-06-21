@@ -14,10 +14,12 @@
     sqlfluff.url = "path:./sqlfluff";
     sqlite.url = "path:./sqlite";
     task.url = "path:./task";
+    unzip.url = "path:./unzip";
     watchman.url = "path:./watchman";
+    woff2.url = "path:./woff2";
   };
 
-  outputs = { nixpkgs, flake-utils, curl, dasel, dbmate, easyrsa, fd, haskell, node, overmind, rust, sqlfluff, sqlite, task, watchman, ... }:
+  outputs = { nixpkgs, flake-utils, curl, dasel, dbmate, easyrsa, fd, haskell, node, overmind, rust, sqlfluff, sqlite, task, unzip, watchman, woff2, ... }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs { inherit system; };
@@ -36,7 +38,9 @@
               sqlfluff.packages.${system}.default
               sqlite.packages.${system}.default
               task.packages.${system}.default
+              unzip.packages.${system}.default
               watchman.packages.${system}.default
+              woff2.packages.${system}.default
             ];
 
             nativeBuildInputs = [
@@ -63,6 +67,7 @@
               sqlfluff --version
               echo "sqlite3 v$(sqlite3 --version)"
               task --version
+              echo $(unzip -v | head -n 1)
               echo "watchman $(watchman --version)"
             '';
           };

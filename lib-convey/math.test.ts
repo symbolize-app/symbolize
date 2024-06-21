@@ -45,8 +45,8 @@ export const tests = {
   ): Promise<void> {
     const fragment = convey.math.math({
       content: convey.math.mo({
-        form: 'prefix',
         maxSize: contrast.px(11),
+        operatorForm: 'prefix',
         stretchy: true,
       }),
     })
@@ -55,7 +55,7 @@ export const tests = {
     test.assert(math)
     test.assertEquals(
       math.outerHTML,
-      '<math><mo form="prefix" maxsize="11px" stretchy="true"></mo></math>',
+      '<math><mo maxsize="11px" form="prefix" stretchy="true"></mo></math>',
     )
   },
 }

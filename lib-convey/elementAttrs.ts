@@ -170,6 +170,15 @@ export type PickAttrs<Keys extends keyof AllAttrs> = {
   readonly [Key in Keys]?: AllAttrs[Key]['type']
 }
 
+export type PickAttrsForType<
+  Type extends string,
+  Keys extends keyof AllAttrs,
+> = {
+  readonly [Key in Keys]?: AllAttrs[Key]['type']
+} & {
+  readonly type: Type
+}
+
 export enum ElementAttrKind {
   boolean = 0,
   content = 1,
@@ -300,7 +309,11 @@ export const allAttrs = {
   autocapitalize: stringAttr<
     'characters' | 'none' | 'sentences' | 'words'
   >('autocapitalize'),
+  autocomplete: stringAttr<
+    ('email' | 'name' | `section-${string}`)[] | 'off' | 'on'
+  >('autocomplete'),
   autofocus: booleanAttr('autofocus'),
+  checked: booleanAttr('checked'),
   content: contentAttr(),
   contentEditable: stringAttr<boolean | 'plaintext-only'>(
     'contenteditable',
@@ -314,7 +327,7 @@ export const allAttrs = {
     'done' | 'enter' | 'go' | 'next' | 'previous' | 'search' | 'send'
   >('enterkeyhint'),
   fence: stringAttr<boolean>('fence'),
-  form: stringAttr<'infix' | 'postfix' | 'prefix'>('form'),
+  form: stringAttr('form'),
   formAction: stringAttr('formaction'),
   formEnctype: stringAttr<
     | 'application/x-www-form-urlencoded'
@@ -341,9 +354,12 @@ export const allAttrs = {
   lSpace: stringAttr<Length>('lspace'),
   lang: stringAttr('lang'),
   largeOp: stringAttr<boolean>('largeop'),
+  list: stringAttr('list'),
   mathDir: stringAttr<'ltr' | 'rtl'>('dir'),
   mathVariant: stringAttr<'normal'>('mathvariant'),
+  maxLength: stringAttr<number>('maxlength'),
   maxSize: stringAttr<Length>('maxsize'),
+  minLength: stringAttr<number>('minlength'),
   minSize: stringAttr<Length>('minsize'),
   moveableLimits: stringAttr<boolean>('moveablelimits'),
   name: stringAttr('name'),
@@ -476,17 +492,23 @@ export const allAttrs = {
   onWebkitAnimationStart: listenerAttr<Event>('webkitanimationstart'),
   onWebkitTransitionEnd: listenerAttr<Event>('webkittransitionend'),
   onWheel: listenerAttr<WheelEvent>('wheel'),
+  operatorForm: stringAttr<'infix' | 'postfix' | 'prefix'>('form'),
   pathLength: stringAttr<number>('pathLength'),
+  pattern: stringAttr('pattern'),
+  placeholder: stringAttr('placeholder'),
   preserveAspectRatio: stringAttr<conveyData.SvgPreserveAspectRatioOpt>(
     'preserveAspectRatio',
   ),
   rSpace: stringAttr<Length>('rspace'),
+  readOnly: booleanAttr('readonly'),
+  required: booleanAttr('required'),
   requiredExtensions: stringAttr<string[]>('requiredExtensions'),
   role: stringAttr('role'),
   rx: stringAttr<conveyData.SvgLengthOpt>('rx'),
   ry: stringAttr<conveyData.SvgLengthOpt>('ry'),
   scriptLevel: stringAttr<number>('scriptlevel'),
   separator: stringAttr<boolean>('separator'),
+  size: stringAttr<number>('size'),
   slot: stringAttr('slot'),
   spellcheck: stringAttr('spellcheck'),
   stretchy: stringAttr<boolean>('stretchy'),
@@ -496,7 +518,7 @@ export const allAttrs = {
   tabIndex: stringAttr<number>('tabindex'),
   title: stringAttr('title'),
   translate: stringAttr<'no' | 'yes'>('translate'),
-  type: stringAttr<'button' | 'reset' | 'submit'>('type'),
+  type: stringAttr('type'),
   value: stringAttr('value'),
   viewBox: stringAttr<conveyData.Rect>('viewBox'),
   width: stringAttr<conveyData.SvgLengthOpt>('width'),

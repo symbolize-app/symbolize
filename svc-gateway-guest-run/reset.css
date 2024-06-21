@@ -1,6 +1,84 @@
 @layer reset, loader, base;
 
 @layer reset {
+  html {
+    font-family: 'Literata', serif;
+    font-size: clamp(100%, 75% + 1vmin, 200%);
+    line-height: 1.6;
+    font-variant-ligatures: discretionary-ligatures;
+    font-variant-numeric: oldstyle-nums;
+    font-synthesis-weight: none;
+    font-synthesis-style: none;
+    font-synthesis-small-caps: none;
+    font-optical-sizing: auto;
+    --custom-color: magenta;
+    accent-color: var(--custom-color);
+    caret-color: var(--custom-color);
+    overflow-wrap: break-word;
+    text-wrap: pretty;
+    text-rendering: optimizeLegibility;
+    hyphens: auto;
+    hanging-punctuation: first last;
+    color-scheme: light dark;
+  }
+
+  body {
+    padding: 2rlh;
+  }
+
+  h1,
+  h2,
+  p {
+    max-width: 60rch;
+  }
+
+  h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.5rlh;
+    margin-bottom: 1rlh;
+  }
+
+  h2 {
+    font-size: 1.6rem;
+    font-weight: 500;
+    line-height: 1.5rlh;
+    margin-bottom: 0.5rlh;
+  }
+
+  p + p {
+    margin-top: 0.5rlh;
+  }
+
+  hr {
+    margin-top: 3rlh;
+    margin-bottom: calc(1rlh - 1px);
+    border: none;
+    border-top: 1px solid black;
+  }
+
+  body::after {
+    content: '';
+    isolation: isolate;
+    position: absolute;
+    pointer-events: none;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    --grid-color: light-dark(
+      hsl(240deg 100% 36% / 5%),
+      hsla(240, 100%, 70%, 0.2)
+    );
+    background-image: linear-gradient(
+        to bottom,
+        var(--grid-color) 1px,
+        transparent 1px
+      ),
+      linear-gradient(to right, var(--grid-color) 1px, transparent 1px);
+    background-size: 0.5rlh 0.5rlh;
+  }
+
   *,
   *::before,
   *::after {

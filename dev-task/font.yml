@@ -1,0 +1,17 @@
+version: '3'
+
+run: when_changed
+
+tasks:
+  install:
+    deps:
+      - :svc-gateway-guest-run:link-build-dir
+    vars:
+      OUT_DIR: svc-gateway-guest-run/.font
+    cmds:
+      - mkdir -p {{.OUT_DIR}}
+      - curl --fail --silent --show-error --location "https://github.com/googlefonts/literata/releases/download/3.103/3.103.zip" -o {{.OUT_DIR}}/literata.zip
+      - unzip -p {{.OUT_DIR}}/literata.zip 'fonts/variable/Literata\[opsz,wght\].ttf' > {{.OUT_DIR}}/literata.ttf
+      - woff2_compress {{.OUT_DIR}}/literata.ttf
+      - unzip -p {{.OUT_DIR}}/literata.zip 'fonts/variable/Literata-Italic\[opsz,wght\].ttf' > {{.OUT_DIR}}/literata-italic.ttf
+      - woff2_compress {{.OUT_DIR}}/literata-italic.ttf

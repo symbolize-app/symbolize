@@ -9,15 +9,3 @@ export const background = {
     return contrastAtom.atom('background-color', value)
   },
 }
-
-export function boxSizing(
-  value: contrastExpression.ExpressionOpt<'border-box' | 'content-box'>,
-): contrastAtom.Atom {
-  return contrastAtom.atom('box-sizing', value)
-}
-
-export function fill(
-  value: contrastExpression.ExpressionOpt<contrastData.SvgPaint>,
-): contrastAtom.Atom {
-  return contrastAtom.atom('fill', value)
-}

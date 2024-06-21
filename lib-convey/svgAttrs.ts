@@ -10,13 +10,13 @@ export type SvgAttrsByElement<
   CustomElement extends SVGElement,
   CustomContext,
 > = {
-  [Key in keyof SvgAttrsTagNameMap<unknown>]: SvgAttrs<
-    CustomContext,
+  [Key in keyof SvgAttrsTagNameMap<CustomContext> &
+    keyof SVGElementTagNameMap]: SVGElementTagNameMap[Key] extends (
     CustomElement
-  > extends SvgAttrsTagNameMap<CustomContext>[Key] ?
+  ) ?
     SvgAttrsTagNameMap<CustomContext>[Key]
   : never
-}[keyof SvgAttrsTagNameMap<unknown>]
+}[keyof SvgAttrsTagNameMap<CustomContext> & keyof SVGElementTagNameMap]
 
 export type SvgAttrs<
   CustomContext,

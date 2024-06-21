@@ -1,4 +1,5 @@
 import contentSecurityPolicy from '@/contentSecurityPolicy.txt'
+import fontCss from '@/font.css'
 import loaderCss from '@/loader.css'
 import mainHtml from '@/main.html'
 import resetCss from '@/reset.css'
@@ -78,6 +79,7 @@ const cssImportPattern = /@import url\('(?<parameterName>[^.]*).css'\);/g
 
 function patchMainHtmlContent(): Response {
   const body = collection.applyTemplate(cssImportPattern, mainHtml, {
+    font: fontCss,
     loader: loaderCss,
     reset: resetCss,
   })
@@ -128,6 +130,8 @@ function buildHeaders(path: string): Record<string, string> {
     contentType = 'text/html'
   } else if (path.endsWith('.js') || path.endsWith('mjs')) {
     contentType = 'text/javascript'
+  } else if (path.endsWith('.woff2')) {
+    contentType = 'font/woff2'
   } else {
     throw new Error(`Unknown content type for ${path}`)
   }

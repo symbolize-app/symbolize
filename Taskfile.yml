@@ -29,6 +29,8 @@ includes:
     taskfile: dev-watchman-client
   easyrsa:
     taskfile: dev-task/easyrsa.yml
+  font:
+    taskfile: dev-task/font.yml
   lib-collection:
     taskfile: lib-collection
   lib-compute:
@@ -174,6 +176,7 @@ tasks:
       - i
     deps:
       - cargo:install
+      - font:install
       - stack:install
   lint:check:
     aliases:

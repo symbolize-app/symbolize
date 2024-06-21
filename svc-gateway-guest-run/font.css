@@ -1,0 +1,17 @@
+@font-face {
+  font-family: 'Literata';
+  font-style: italic;
+  font-weight: 200 900;
+  font-display: optional;
+  src: url(/.code/svc-gateway-guest-run/.font/literata-italic.woff2)
+    format('woff2');
+}
+
+@font-face {
+  font-family: 'Literata';
+  font-style: normal;
+  font-weight: 200 900;
+  font-display: optional;
+  src: url(/.code/svc-gateway-guest-run/.font/literata.woff2)
+    format('woff2');
+}

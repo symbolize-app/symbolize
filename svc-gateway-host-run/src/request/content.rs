@@ -20,6 +20,7 @@ pub struct ContentRequest<'a> {
 pub enum ContentMime {
   Html,
   JavaScript,
+  Woff2,
 }
 
 impl ContentRequest<'_> {
@@ -82,6 +83,7 @@ impl ContentRequest<'_> {
     match ext {
       "html" => Ok(ContentMime::Html),
       "js" | "mjs" => Ok(ContentMime::JavaScript),
+      "woff2" => Ok(ContentMime::Woff2),
       _ => Err(anyhow!("invalid extension for {full_path:?}")),
     }
   }
@@ -180,6 +182,7 @@ impl From<ContentMime> for &'static mime::Mime {
     match value {
       ContentMime::Html => &mime::TEXT_HTML,
       ContentMime::JavaScript => &mime::TEXT_JAVASCRIPT,
+      ContentMime::Woff2 => &mime::FONT_WOFF2,
     }
   }
 }

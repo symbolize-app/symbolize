@@ -20,6 +20,9 @@ includes:
   easyrsa:
     taskfile: dev-task/easyrsa.yml
 
+  font:
+    taskfile: dev-task/font.yml
+
   nix:
     taskfile: dev-task/nix.yml
 
@@ -123,6 +126,7 @@ tasks:
       - i
     deps:
       - cargo:install
+      - font:install
       - stack:install
 
   lint:check:

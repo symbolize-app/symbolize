@@ -34,6 +34,29 @@ const custom = convey.defineCustom<
       }),
     }),
     convey.html.div({
+      content: [
+        convey.html.h1({
+          content: 'The Tale of Peter Rabbit by Beatrix Potter',
+        }),
+        convey.html.h2({
+          content: 'Chapter 1',
+        }),
+        convey.html.p({
+          content:
+            'Once upon a time there were four little Rabbits, and their names were— Flopsy, Mopsy, Cotton-tail, and Peter.',
+        }),
+        convey.html.p({
+          content:
+            'They lived with their Mother in a sand-bank, underneath the root of a very big fir-tree.',
+        }),
+        convey.html.p({
+          content:
+            "'Now, my dears,' said old Mrs. Rabbit one morning, 'you may go into the fields or down the lane, but don't go into Mr. McGregor's garden.'",
+        }),
+      ],
+    }),
+    convey.html.hr({}),
+    convey.html.div({
       style: compute.map(
         (count) => [
           contrast.background.color(
@@ -89,6 +112,14 @@ const custom = convey.defineCustom<
         convey.math.mi({ content: 'y' }),
       ],
     }),
+    convey.html.input({
+      checked: true,
+      type: 'checkbox',
+    }),
+    convey.html.input({
+      type: 'text',
+      value: 'abc',
+    }),
   ]
 })
 
@@ -112,7 +143,7 @@ export async function main(
     )
     void clientSource.send(ctx, 'ping')
 
-    const fragment = custom({ title: 'hello' })
+    const fragment = custom({ title: 'st hello' })
     await convey
       .portal(body, { content: [htmlStyle({}), fragment] })
       .add(ctx)

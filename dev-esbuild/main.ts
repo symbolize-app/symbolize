@@ -81,7 +81,11 @@ async function build(ctx: devContext.Context): Promise<void> {
 async function buildFiles(
   ctx: devContext.Context,
 ): Promise<devModules.BuildResult> {
-  const htmlEntryPoints = ['./svc-gateway-guest-run/init.html']
+  const copyEntryPoints = [
+    './svc-gateway-guest-run/.font/literata-italic.woff2',
+    './svc-gateway-guest-run/.font/literata.woff2',
+    './svc-gateway-guest-run/init.html',
+  ]
   const classicEntryPoints = ['./svc-gateway-guest-run/serviceWorker.ts']
   const moduleEntryPoints = [
     './svc-gateway-guest-run/dedicatedWorker.ts',
@@ -103,14 +107,15 @@ async function buildFiles(
     platform: 'browser' as const,
     write: false,
   }
-  const htmlResultPromise = esbuild.build({
+  const copyResultPromise = esbuild.build({
     ...commonOptions,
     bundle: true,
-    entryPoints: htmlEntryPoints.map((entryPoint) =>
+    entryPoints: copyEntryPoints.map((entryPoint) =>
       nodePath.resolve(entryPoint),
     ),
     loader: {
       ['.html']: 'copy',
+      ['.woff2']: 'copy',
     },
   })
   const classicResultPromise = esbuild.build({
@@ -131,15 +136,15 @@ async function buildFiles(
     ),
     format: 'esm',
   })
-  const [htmlResult, classicResult, moduleResult] = await Promise.all([
-    htmlResultPromise,
+  const [copyResult, classicResult, moduleResult] = await Promise.all([
+    copyResultPromise,
     classicResultPromise,
     moduleResultPromise,
   ])
   return {
     errors: [...classicResult.errors, ...moduleResult.errors],
     outputFiles: [
-      ...(htmlResult.outputFiles ?? []),
+      ...(copyResult.outputFiles ?? []),
       ...(classicResult.outputFiles ?? []),
       ...moduleResult.outputFiles,
     ],

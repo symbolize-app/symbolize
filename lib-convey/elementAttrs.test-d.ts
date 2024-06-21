@@ -41,7 +41,8 @@ type TestWritableAttrs<BaseElement extends Element> = {
   readonly [Key in Exclude<
     keyof BaseElement,
     keyof conveyElementAttrsTest.SkippedMap | 'content' | 'onAdd'
-  > as Key extends Uppercase<Key extends string ? Key : never> ? never
+  > as Key extends keyof conveyElementAttrsTest.OverrideMap ? Key
+  : Key extends Uppercase<Key extends string ? Key : never> ? never
   : NonNullable<BaseElement[Key]> extends (
     | HTMLCollection
     | NamedNodeMap
@@ -91,6 +92,8 @@ export interface SkippedMap {
   readonly currentScale: never
   readonly currentTranslate: never
   readonly dataset: never
+  readonly defaultChecked: never
+  readonly defaultValue: never
   readonly ['innerHTML']: never
   readonly innerText: never
   readonly isConnected: never
@@ -114,12 +117,20 @@ export interface SkippedMap {
   readonly scrollLeft: never
   readonly scrollTop: never
   readonly scrollWidth: never
+  readonly selectionDirection: never
+  readonly selectionEnd: never
+  readonly selectionStart: never
   readonly style: never
   readonly tagName: never
   readonly textContent: never
   readonly transform: never
+  readonly type: never
   readonly validationMessage: never
   readonly validity: never
+  readonly valueAsDate: never
+  readonly valueAsNumber: never
+  readonly webkitEntries: never
+  readonly webkitdirectory: never
   readonly willValidate: never
 }
 
@@ -145,14 +156,17 @@ export type OverrideMap = Required<
     | 'ariaSelected'
     | 'ariaSort'
     | 'autocapitalize'
+    | 'autocomplete'
     | 'contentEditable'
     | 'dir'
     | 'draggable'
     | 'enterKeyHint'
+    | 'form'
     | 'formEnctype'
     | 'formMethod'
     | 'hidden'
     | 'inputMode'
+    | 'list'
     | 'nonce'
     | 'spellcheck'
     | 'translate'
