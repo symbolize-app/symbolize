@@ -15,6 +15,8 @@ export type SvgPreserveAspectRatioOpt =
   | SvgPreserveAspectRatio
   | SvgPreserveAspectRatio['align']
 
+const svgPreserveAspectRatioMarker = Symbol('svgPreserveAspectRatioMarker')
+
 export class SvgPreserveAspectRatio {
   constructor(
     readonly align:
@@ -31,15 +33,18 @@ export class SvgPreserveAspectRatio {
     readonly mode: 'meet' | 'slice',
   ) {}
 
+  [svgPreserveAspectRatioMarker](): unknown {
+    return null
+  }
+
   toString(): string {
     return `${this.align} ${this.mode}`
   }
 }
 
-export type SvgLengthOpt = SvgLength | SvgLength['value']
+export type SvgLengthPctOpt = contrast.Pct | SvgLength | SvgLength['value']
 
 export type SvgLengthUnit =
-  | '%'
   | 'cm'
   | 'em'
   | 'ex'

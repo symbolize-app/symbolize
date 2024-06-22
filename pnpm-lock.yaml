@@ -342,9 +342,6 @@ importers:
       '@intertwine/lib-test':
         specifier: workspace:*
         version: link:../lib-test
-      happy-dom:
-        specifier: 13.6.2
-        version: 13.6.2
     devDependencies:
       prettier:
         specifier: 3.2.5

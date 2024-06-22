@@ -36,8 +36,12 @@ export const tests = {
   ['entries'](): void {
     const memo = new Memo<number, number>((n) => n * 2)
     test.assertDeepEquals([...memo.entries()], [])
+    test.assertDeepEquals([...memo.keys()], [])
+    test.assertDeepEquals([...memo.values()], [])
     memo.get(1)
     test.assertDeepEquals([...memo.entries()], [[1, 2]])
+    test.assertDeepEquals([...memo.keys()], [1])
+    test.assertDeepEquals([...memo.values()], [2])
     memo.get(4)
     test.assertDeepEquals(
       [...memo.entries()],
@@ -46,6 +50,8 @@ export const tests = {
         [4, 8],
       ],
     )
+    test.assertDeepEquals([...memo.keys()], [1, 4])
+    test.assertDeepEquals([...memo.values()], [2, 8])
     memo.get(2)
     test.assertDeepEquals(
       [...memo.entries()],
@@ -55,5 +61,7 @@ export const tests = {
         [2, 4],
       ],
     )
+    test.assertDeepEquals([...memo.keys()], [1, 4, 2])
+    test.assertDeepEquals([...memo.values()], [2, 8, 4])
   },
 }

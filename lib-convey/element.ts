@@ -1,5 +1,5 @@
 import type * as conveyContext from '@/context.ts'
-import * as conveyElementAttrs from '@/elementAttrs.ts'
+import * as conveyElementAttr from '@/elementAttr.ts'
 import * as conveyFragment from '@/fragment.ts'
 import * as conveyMarker from '@/marker.ts'
 import * as compute from '@intertwine/lib-compute'
@@ -79,32 +79,32 @@ export class ElementFragment<CustomContext = unknown>
     const mutablePromises: Promise<void>[] = []
     let onAdd:
       | Required<
-          conveyElementAttrs.Attrs<CustomContext, SupportedElement>
+          conveyElementAttr.Attrs<CustomContext, SupportedElement>
         >['onAdd']
       | null = null
 
     for (const [key, value] of Object.entries(this.attrs) as [
-      keyof conveyElementAttrs.AllAttrs,
+      keyof conveyElementAttr.AllAttrs,
       never,
     ][]) {
-      const attrDefinition = conveyElementAttrs.allAttrs[key]
+      const attrDefinition = conveyElementAttr.allAttrs[key]
       if (
-        attrDefinition.kind === conveyElementAttrs.ElementAttrKind.listener
+        attrDefinition.kind === conveyElementAttr.ElementAttrKind.listener
       ) {
         this.addEventListener(ctx, attrDefinition.name, value)
       } else if (
-        attrDefinition.kind === conveyElementAttrs.ElementAttrKind.content
+        attrDefinition.kind === conveyElementAttr.ElementAttrKind.content
       ) {
         mutablePromises.push(this.appendFragment(ctx, value))
       } else if (
-        attrDefinition.kind === conveyElementAttrs.ElementAttrKind.style
+        attrDefinition.kind === conveyElementAttr.ElementAttrKind.style
       ) {
         mutablePromises.push(this.bindStyle(ctx, value))
       } else if (
-        attrDefinition.kind === conveyElementAttrs.ElementAttrKind.onAdd
+        attrDefinition.kind === conveyElementAttr.ElementAttrKind.onAdd
       ) {
         onAdd = value as Required<
-          conveyElementAttrs.Attrs<CustomContext, SupportedElement>
+          conveyElementAttr.Attrs<CustomContext, SupportedElement>
         >['onAdd']
       } else {
         mutablePromises.push(
@@ -210,8 +210,8 @@ export class ElementFragment<CustomContext = unknown>
 
   private async bindAttribute(
     kind:
-      | conveyElementAttrs.ElementAttrKind.boolean
-      | conveyElementAttrs.ElementAttrKind.string,
+      | conveyElementAttr.ElementAttrKind.boolean
+      | conveyElementAttr.ElementAttrKind.string,
     name: string,
     value: compute.NodeOpt<unknown>,
   ): Promise<void> {
@@ -232,7 +232,7 @@ export class ElementFragment<CustomContext = unknown>
           return
         }
         if (
-          (kind === conveyElementAttrs.ElementAttrKind.boolean &&
+          (kind === conveyElementAttr.ElementAttrKind.boolean &&
             value === false) ||
           value === null
         ) {
@@ -240,7 +240,7 @@ export class ElementFragment<CustomContext = unknown>
         } else {
           const valueItems =
             (
-              kind === conveyElementAttrs.ElementAttrKind.boolean &&
+              kind === conveyElementAttr.ElementAttrKind.boolean &&
               value === true
             ) ?
               ['']

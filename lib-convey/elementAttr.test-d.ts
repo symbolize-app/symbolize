@@ -1,6 +1,6 @@
 import type * as conveyData from '@/data.ts'
-import type * as conveyElementAttrsTest from '@/elementAttrs.test-d.ts'
-import type * as conveyElementAttrs from '@/elementAttrs.ts'
+import type * as conveyElementAttrTest from '@/elementAttr.test-d.ts'
+import type * as conveyElementAttr from '@/elementAttr.ts'
 import type * as compute from '@intertwine/lib-compute'
 
 export type TestAttrs<
@@ -8,7 +8,7 @@ export type TestAttrs<
   BaseElement extends Element,
 > = Required<
   Pick<
-    conveyElementAttrs.Attrs<CustomContext, BaseElement>,
+    conveyElementAttr.Attrs<CustomContext, BaseElement>,
     'content' | 'onAdd' | 'style'
   >
 > &
@@ -16,21 +16,21 @@ export type TestAttrs<
   TestWritableAttrs<BaseElement>
 
 type TestListenerAttrs<BaseElement extends Element> = {
-  readonly [Key in keyof conveyElementAttrs.AllAttrs as Key extends (
+  readonly [Key in keyof conveyElementAttr.AllAttrs as Key extends (
     `on${infer Type}`
   ) ?
     Lowercase<Type> extends (
-      keyof conveyElementAttrsTest.EventMap<BaseElement>
+      keyof conveyElementAttrTest.EventMap<BaseElement>
     ) ?
       Key
     : never
   : never]: Key extends `on${infer Type}` ?
     Lowercase<Type> extends infer LowercaseType ?
       LowercaseType extends (
-        keyof conveyElementAttrsTest.EventMap<BaseElement>
+        keyof conveyElementAttrTest.EventMap<BaseElement>
       ) ?
         (
-          event: conveyElementAttrsTest.EventMap<BaseElement>[LowercaseType],
+          event: conveyElementAttrTest.EventMap<BaseElement>[LowercaseType],
         ) => Promise<void> | void
       : never
     : never
@@ -40,8 +40,8 @@ type TestListenerAttrs<BaseElement extends Element> = {
 type TestWritableAttrs<BaseElement extends Element> = {
   readonly [Key in Exclude<
     keyof BaseElement,
-    keyof conveyElementAttrsTest.SkippedMap | 'content' | 'onAdd'
-  > as Key extends keyof conveyElementAttrsTest.OverrideMap ? Key
+    keyof conveyElementAttrTest.SkippedMap | 'content' | 'onAdd'
+  > as Key extends keyof conveyElementAttrTest.OverrideMap ? Key
   : Key extends Uppercase<Key extends string ? Key : never> ? never
   : NonNullable<BaseElement[Key]> extends (
     | HTMLCollection
@@ -51,12 +51,12 @@ type TestWritableAttrs<BaseElement extends Element> = {
     | ((...args: never) => unknown)
   ) ?
     never
-  : Key]: Key extends keyof conveyElementAttrsTest.OverrideMap ?
-    conveyElementAttrsTest.OverrideMap[Key]
+  : Key]: Key extends keyof conveyElementAttrTest.OverrideMap ?
+    conveyElementAttrTest.OverrideMap[Key]
   : compute.NodeOpt<
       BaseElement[Key] extends boolean ? boolean
       : BaseElement[Key] extends SVGAnimatedLength ?
-        conveyData.SvgLengthOpt | null
+        conveyData.SvgLengthPctOpt | null
       : BaseElement[Key] extends SVGAnimatedNumber ? number | null
       : BaseElement[Key] extends SVGAnimatedPreserveAspectRatio ?
         conveyData.SvgPreserveAspectRatioOpt | null
@@ -135,7 +135,7 @@ export interface SkippedMap {
 }
 
 export type OverrideMap = Required<
-  conveyElementAttrs.PickAttrs<
+  conveyElementAttr.PickAttrs<
     | 'ariaAtomic'
     | 'ariaAutoComplete'
     | 'ariaBusy'

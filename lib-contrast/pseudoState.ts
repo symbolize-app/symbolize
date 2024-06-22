@@ -4,32 +4,32 @@ import * as contrastExpressionIntern from '@/expressionIntern.ts'
 export function disabled<Value>(
   value: contrastExpression.ExpressionOpt<Value>,
 ): contrastExpression.Expression<Value> {
-  return pseudo('disabled', value)
+  return pseudoState('disabled', value)
 }
 
 export function empty<Value>(
   value: contrastExpression.ExpressionOpt<Value>,
 ): contrastExpression.Expression<Value> {
-  return pseudo('empty', value)
+  return pseudoState('empty', value)
 }
 
 export function hover<Value>(
   value: contrastExpression.ExpressionOpt<Value>,
 ): contrastExpression.Expression<Value> {
-  return pseudo('hover', value)
+  return pseudoState('hover', value)
 }
 
-function pseudo<Value>(
+function pseudoState<Value>(
   name: string,
   value: contrastExpression.ExpressionOpt<Value>,
 ): contrastExpression.Expression<Value> {
-  return contrastExpression.expression(compilePseudo, (ctx) => [
+  return contrastExpression.expression(compilePseudoState, (ctx) => [
     name,
     contrastExpression.compile(ctx, value),
   ])
 }
 
-function compilePseudo(
+function compilePseudoState(
   name: string,
   value: contrastExpressionIntern.ExpressionIntern,
 ): contrastExpressionIntern.ExpressionIntern {

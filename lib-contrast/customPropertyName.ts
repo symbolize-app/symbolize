@@ -1,4 +1,4 @@
-import * as collections from '@intertwine/lib-collection'
+import * as collection from '@intertwine/lib-collection'
 
 export const symbolNamespace = 's'
 export const expressionNamespace = 'e'
@@ -25,11 +25,11 @@ export class CustomPropertyNameGenerator {
 
 export class CustomPropertyNameMemo<Key> {
   private readonly generator: CustomPropertyNameGenerator
-  private readonly memo: collections.Memo<Key, string>
+  private readonly memo: collection.Memo<Key, string>
 
   constructor(namespace: string) {
     this.generator = new CustomPropertyNameGenerator(namespace)
-    this.memo = new collections.Memo(() => this.generator.build())
+    this.memo = new collection.Memo(() => this.generator.build())
   }
 
   entries(): IterableIterator<[Key, string]> {

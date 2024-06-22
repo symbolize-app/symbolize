@@ -39,15 +39,14 @@ Main interactive interface here built on HTML / web tech.
 - Composed via simple functions, atoms indistinguishable from helpers
 - Property value is where conditions get applied
 - Styles written as usage (no external definition), for easy refactoring
-- Auto-generated unique IDs for CSS animations, CSS custom properties, and DOM data attributes
-- Custom properties when inline accept reactive data
-- Pass normal styles, inline properties, and data attributes all together for easy overrides
+- Auto-generated unique IDs for CSS animations, CSS custom properties, etc.
+- Custom properties when inline expressions use conditional data
+- CSS properties grouped logically, even if not explicitly grouped in spec
 
 ### CSS generation
 
 - Atoms only cover truly atomic properties, not shorthand properties
 - Overriding an atom causes the overridden atom to be omitted
-- Null value will also omit an atom, without replacement
 - Each property-value combination is compiled to one rule with multiple conditions nested inside
 - Conditions are all contained inside `:where()` pseudo-classes, so that code ordering of conditions directly translates to cascade
 

@@ -1,4 +1,4 @@
-import type * as conveyElementAttrs from '@/elementAttrs.ts'
+import type * as conveyElementAttr from '@/elementAttr.ts'
 
 export interface HtmlAttrsTagNameMap<CustomContext> {
   readonly button: ButtonAttrs<CustomContext, HTMLButtonElement>
@@ -31,8 +31,8 @@ export type HtmlAttrsByElement<
 export type HtmlAttrs<
   CustomContext,
   BaseElement extends Element,
-> = conveyElementAttrs.Attrs<CustomContext, BaseElement> &
-  conveyElementAttrs.PickAttrs<
+> = conveyElementAttr.Attrs<CustomContext, BaseElement> &
+  conveyElementAttr.PickAttrs<
     | 'accessKey'
     | 'autocapitalize'
     | 'contentEditable'
@@ -53,7 +53,7 @@ export type ButtonAttrs<
   BaseElement extends Element,
 > = HtmlAttrs<CustomContext, BaseElement> &
   (
-    | conveyElementAttrs.PickAttrsForType<
+    | conveyElementAttr.PickAttrsForType<
         'submit',
         | 'disabled'
         | 'form'
@@ -65,8 +65,8 @@ export type ButtonAttrs<
         | 'name'
         | 'value'
       >
-    | conveyElementAttrs.PickAttrsForType<'button', 'disabled'>
-    | conveyElementAttrs.PickAttrsForType<'reset', 'disabled' | 'form'>
+    | conveyElementAttr.PickAttrsForType<'button', 'disabled'>
+    | conveyElementAttr.PickAttrsForType<'reset', 'disabled' | 'form'>
   )
 
 export type InputAttrs<
@@ -74,11 +74,11 @@ export type InputAttrs<
   BaseElement extends Element,
 > = HtmlAttrs<CustomContext, BaseElement> &
   (
-    | conveyElementAttrs.PickAttrsForType<
+    | conveyElementAttr.PickAttrsForType<
         'checkbox',
         'checked' | 'disabled' | 'form' | 'name' | 'required' | 'value'
       >
-    | conveyElementAttrs.PickAttrsForType<
+    | conveyElementAttr.PickAttrsForType<
         'text',
         | 'autocomplete'
         | 'disabled'

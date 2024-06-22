@@ -1,8 +1,19 @@
 export function rule(
   className: string,
+  pseudoElement: string | null,
   code: IterableIterator<string>,
 ): Rule {
-  return new Rule(className, ''.concat('.', className, '{', ...code, '}'))
+  return new Rule(
+    className,
+    ''.concat(
+      '.',
+      className,
+      ...(pseudoElement ? ['::', pseudoElement] : []),
+      '{',
+      ...code,
+      '}',
+    ),
+  )
 }
 
 export class Rule {

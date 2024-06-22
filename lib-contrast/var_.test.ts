@@ -6,13 +6,15 @@ export const url = import.meta.url
 
 export const tests = {
   async ['stable names'](ctx: contrast.Context): Promise<void> {
-    const a = contrast.var_<number>()
-    const b = contrast.var_<number>()
+    const a = contrast.var_<contrast.Pct>()
+    const b = contrast.var_<contrast.Pct>()
     for (let i = 0; i < 2; i += 1) {
       const style = [
-        a.set(1),
-        b.set(2),
-        contrast.background.color(contrast.rgb(0, a.get(), b.get())),
+        a.set(contrast.pct(1)),
+        b.set(contrast.pct(2)),
+        contrast.background.color(
+          contrast.rgb(contrast.pct(0), a.get(), b.get()),
+        ),
       ]
       const result = await contrastTest.testCompile(ctx, style)
 
@@ -20,17 +22,17 @@ export const tests = {
       test.assertDeepEquals(result.code, [
         contrastTest.dedent(`
           .a0 {
-            --s0: 1;
+            --s0: 1%;
           }
         `),
         contrastTest.dedent(`
           .a1 {
-            --s1: 2;
+            --s1: 2%;
           }
         `),
         contrastTest.dedent(`
           .a2 {
-            background-color: rgb(0, var(--s0), var(--s1));
+            background-color: rgb(0% var(--s0) var(--s1));
           }
         `),
       ])
@@ -38,10 +40,16 @@ export const tests = {
   },
 
   async ['get or default'](ctx: contrast.Context): Promise<void> {
-    const a = contrast.var_<number>()
+    const a = contrast.var_<contrast.Pct>()
     const style = [
       contrast.background.color(
-        contrast.rgb(0, 0, a.getOr([0, contrast.hover(1)])),
+        contrast.rgb(
+          contrast.pct(0),
+          contrast.pct(0),
+          a.getOr(
+            contrast.c(contrast.pct(0), contrast.hover(contrast.pct(1))),
+          ),
+        ),
       ),
     ]
     const result = await contrastTest.testCompile(ctx, style)
@@ -50,15 +58,15 @@ export const tests = {
     test.assertDeepEquals(result.code, [
       contrastTest.dedent(`
         .e0 {
-          --e0: 0;
+          --e0: 0%;
           &:where(:hover) {
-            --e0: 1;
+            --e0: 1%;
           }
         }
       `),
       contrastTest.dedent(`
         .a0 {
-          background-color: rgb(0, 0, var(--s0, var(--e0)));
+          background-color: rgb(0% 0% var(--s0, var(--e0)));
         }
       `),
     ])

@@ -21,4 +21,12 @@ export class Memo<K, V> {
       return value
     }
   }
+
+  keys(): IterableIterator<K> {
+    return this.mutableResults.keys()
+  }
+
+  values(): IterableIterator<V> {
+    return this.mutableResults.values()
+  }
 }

@@ -5,10 +5,11 @@ import type * as test from '@intertwine/lib-test'
 export const all: test.TestCollection<
   compute.Context & contrast.Context
 > = () => [
+  import('@/atom.test.ts'),
   import('@/expressionIntern.test.ts'),
   import('@/function.test.ts'),
-  import('@/props/index.test.ts'),
-  import('@/pseudo.test.ts'),
-  import('@/atom.test.ts'),
+  import('@/prop/index.test.ts'),
+  import('@/pseudoElement.test.ts'),
+  import('@/pseudoState.test.ts'),
   import('@/var_.test.ts'),
 ]
