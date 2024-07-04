@@ -2,19 +2,28 @@ import type * as contrastAtomIntern from '@/atomIntern.ts'
 import type * as contrastContext from '@/context.ts'
 import * as contrastExpression from '@/expression.ts'
 import type * as contrastRule from '@/rule.ts'
+import * as collection from '@intertwine/lib-collection'
 
 export class Atom {
   constructor(
+    readonly pseudoElement: string | null,
     readonly propertyName: string | symbol,
     readonly expressionOpt: contrastExpression.ExpressionOpt<unknown>,
   ) {}
 
   compile(ctx: contrastContext.Context): contrastAtomIntern.AtomIntern {
+    // Note: force a pure expression for pseudo-elements because the
+    // pseudo-element selector needs to be the final selector
+    const expressionIntern =
+      this.pseudoElement === null ?
+        contrastExpression.compile(ctx, this.expressionOpt)
+      : contrastExpression.compile(ctx, this.expressionOpt).toPure(ctx)
     return ctx.contrast.atomIntern.get(
+      this.pseudoElement,
       typeof this.propertyName === 'string' ?
         this.propertyName
       : ctx.contrast.symbolCustomPropertyName.get(this.propertyName),
-      contrastExpression.compile(ctx, this.expressionOpt),
+      expressionIntern,
     )
   }
 }
@@ -23,7 +32,8 @@ export function atom(
   propertyName: string | symbol,
   value: contrastExpression.ExpressionOpt<unknown>,
 ): Atom {
-  return new Atom(propertyName, value)
+  const pseudoElement = null
+  return new Atom(pseudoElement, propertyName, value)
 }
 
 export type AtomOpt = Atom | readonly AtomOpt[] | null
@@ -47,7 +57,7 @@ function* compileRules(
   }
 }
 
-function* toAtomIterable(atomOpt: AtomOpt): IterableIterator<Atom> {
+export function* toAtomIterable(atomOpt: AtomOpt): IterableIterator<Atom> {
   if (isAtomOptArray(atomOpt)) {
     for (const item of atomOpt) {
       for (const subitem of toAtomIterable(item)) {
@@ -63,12 +73,19 @@ function isAtomOptArray(atomOpt: AtomOpt): atomOpt is readonly AtomOpt[] {
   return Array.isArray(atomOpt)
 }
 
-function getFinalAtoms(
+function* getFinalAtoms(
   atoms: IterableIterator<Atom>,
 ): IterableIterator<Atom> {
-  const finalAtoms = new Map<string | symbol, Atom>()
+  const finalAtoms = new collection.Memo<
+    string | null,
+    Map<string | symbol, Atom>
+  >(() => new Map())
   for (const atom of atoms) {
-    finalAtoms.set(atom.propertyName, atom)
+    finalAtoms.get(atom.pseudoElement).set(atom.propertyName, atom)
   }
-  return finalAtoms.values()
+  for (const group of finalAtoms.values()) {
+    for (const atom of group.values()) {
+      yield atom
+    }
+  }
 }

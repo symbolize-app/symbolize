@@ -254,6 +254,7 @@ export type AllAttrs = Readonly<typeof allAttrs>
 // Redeclare these types locally, to avoid triggering https://github.com/microsoft/TypeScript/issues/47663
 type LengthUnit = contrast.LengthUnit
 type Length<Unit extends LengthUnit = LengthUnit> = contrast.Length<Unit>
+type Pct = contrast.Pct
 
 export const allAttrs = {
   accessKey: stringAttr('accesskey'),
@@ -337,7 +338,7 @@ export const allAttrs = {
   formMethod: stringAttr<'dialog' | 'get' | 'post'>('formmethod'),
   formNoValidate: booleanAttr('formnovalidate'),
   formTarget: stringAttr('formtarget'),
-  height: stringAttr<conveyData.SvgLengthOpt>('height'),
+  height: stringAttr<conveyData.SvgLengthPctOpt>('height'),
   hidden: booleanAttr<boolean | 'until-found'>('hidden'),
   id: stringAttr('id'),
   inert: booleanAttr('inert'),
@@ -351,16 +352,16 @@ export const allAttrs = {
     | 'text'
     | 'url'
   >('inputmode'),
-  lSpace: stringAttr<Length>('lspace'),
+  lSpace: stringAttr<Length | Pct>('lspace'),
   lang: stringAttr('lang'),
   largeOp: stringAttr<boolean>('largeop'),
   list: stringAttr('list'),
   mathDir: stringAttr<'ltr' | 'rtl'>('dir'),
   mathVariant: stringAttr<'normal'>('mathvariant'),
   maxLength: stringAttr<number>('maxlength'),
-  maxSize: stringAttr<Length>('maxsize'),
+  maxSize: stringAttr<Length | Pct>('maxsize'),
   minLength: stringAttr<number>('minlength'),
-  minSize: stringAttr<Length>('minsize'),
+  minSize: stringAttr<Length | Pct>('minsize'),
   moveableLimits: stringAttr<boolean>('moveablelimits'),
   name: stringAttr('name'),
   nonce: stringAttr('nonce'),
@@ -499,13 +500,13 @@ export const allAttrs = {
   preserveAspectRatio: stringAttr<conveyData.SvgPreserveAspectRatioOpt>(
     'preserveAspectRatio',
   ),
-  rSpace: stringAttr<Length>('rspace'),
+  rSpace: stringAttr<Length | Pct>('rspace'),
   readOnly: booleanAttr('readonly'),
   required: booleanAttr('required'),
   requiredExtensions: stringAttr<string[]>('requiredExtensions'),
   role: stringAttr('role'),
-  rx: stringAttr<conveyData.SvgLengthOpt>('rx'),
-  ry: stringAttr<conveyData.SvgLengthOpt>('ry'),
+  rx: stringAttr<conveyData.SvgLengthPctOpt>('rx'),
+  ry: stringAttr<conveyData.SvgLengthPctOpt>('ry'),
   scriptLevel: stringAttr<number>('scriptlevel'),
   separator: stringAttr<boolean>('separator'),
   size: stringAttr<number>('size'),
@@ -521,7 +522,7 @@ export const allAttrs = {
   type: stringAttr('type'),
   value: stringAttr('value'),
   viewBox: stringAttr<conveyData.Rect>('viewBox'),
-  width: stringAttr<conveyData.SvgLengthOpt>('width'),
-  x: stringAttr<conveyData.SvgLengthOpt>('x'),
-  y: stringAttr<conveyData.SvgLengthOpt>('y'),
+  width: stringAttr<conveyData.SvgLengthPctOpt>('width'),
+  x: stringAttr<conveyData.SvgLengthPctOpt>('x'),
+  y: stringAttr<conveyData.SvgLengthPctOpt>('y'),
 }

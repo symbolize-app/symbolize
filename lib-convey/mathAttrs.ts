@@ -1,4 +1,4 @@
-import type * as conveyElementAttrs from '@/elementAttrs.ts'
+import type * as conveyElementAttr from '@/elementAttr.ts'
 
 export interface MathAttrsTagNameMap<CustomContext> {
   readonly math: MathMathAttrs<CustomContext, MathMLElement>
@@ -21,25 +21,25 @@ export type MathAttrsByElement<
 export type MathAttrs<
   CustomContext,
   BaseElement extends Element,
-> = conveyElementAttrs.Attrs<CustomContext, BaseElement> &
-  conveyElementAttrs.PickAttrs<'displayStyle' | 'mathDir' | 'scriptLevel'>
+> = conveyElementAttr.Attrs<CustomContext, BaseElement> &
+  conveyElementAttr.PickAttrs<'displayStyle' | 'mathDir' | 'scriptLevel'>
 
 export type MathMathAttrs<
   CustomContext,
   BaseElement extends Element,
-> = conveyElementAttrs.PickAttrs<'altText' | 'display'> &
+> = conveyElementAttr.PickAttrs<'altText' | 'display'> &
   MathAttrs<CustomContext, BaseElement>
 
 export type MiAttrs<
   CustomContext,
   BaseElement extends Element,
-> = conveyElementAttrs.PickAttrs<'mathVariant'> &
+> = conveyElementAttr.PickAttrs<'mathVariant'> &
   MathAttrs<CustomContext, BaseElement>
 
 export type MoAttrs<
   CustomContext,
   BaseElement extends Element,
-> = conveyElementAttrs.PickAttrs<
+> = conveyElementAttr.PickAttrs<
   | 'fence'
   | 'largeOp'
   | 'lSpace'

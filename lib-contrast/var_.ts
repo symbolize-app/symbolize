@@ -26,7 +26,7 @@ export class Var_<Value> {
       contrastExpressionIntern.compileCustomPropertyOrDefault,
       (ctx) => [
         ctx.contrast.symbolCustomPropertyName.get(this.propertyName),
-        contrastExpression.compileToPure(ctx, defaultValue),
+        contrastExpression.compile(ctx, defaultValue).toPure(ctx),
       ],
     )
   }

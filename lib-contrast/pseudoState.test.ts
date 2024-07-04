@@ -5,17 +5,27 @@ import * as test from '@intertwine/lib-test'
 export const url = import.meta.url
 
 export const tests = {
-  async ['variant / ligatures / basic'](
-    ctx: contrast.Context,
-  ): Promise<void> {
-    const style = [contrast.font.variant.ligatures('common-ligatures')]
+  async ['hover'](ctx: contrast.Context): Promise<void> {
+    const style = [
+      contrast.background.color(
+        contrast.hover(
+          contrast.rgb(
+            contrast.pct(100),
+            contrast.pct(0),
+            contrast.pct(50),
+          ),
+        ),
+      ),
+    ]
     const result = await contrastTest.testCompile(ctx, style)
 
     test.assertDeepEquals(result.classNames, ['a0'])
     test.assertDeepEquals(result.code, [
       contrastTest.dedent(`
         .a0 {
-          font-variant-ligatures: common-ligatures;
+          &:where(:hover) {
+            background-color: rgb(100% 0% 50%);
+          }
         }
       `),
     ])

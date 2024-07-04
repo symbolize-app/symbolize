@@ -2,7 +2,7 @@ import * as contrastAtomIntern from '@/atomIntern.ts'
 import * as contrastClassName from '@/className.ts'
 import * as contrastCustomPropertyName from '@/customPropertyName.ts'
 import type * as contrastExpressionIntern from '@/expressionIntern.ts'
-import * as collections from '@intertwine/lib-collection'
+import * as collection from '@intertwine/lib-collection'
 
 export interface Context {
   readonly contrast: Contrast
@@ -14,15 +14,20 @@ export class Contrast {
       contrastClassName.atomNamespace,
     )
 
-  readonly atomIntern = new collections.MultiMemo<
+  readonly atomIntern = new collection.MultiMemo<
     [
+      pseudoElement: string | null,
       propertyName: string,
       expressionIntern: contrastExpressionIntern.ExpressionIntern,
     ],
     contrastAtomIntern.AtomIntern
   >(
-    (propertyName, expressionIntern) =>
-      new contrastAtomIntern.AtomIntern(propertyName, expressionIntern),
+    (pseudoElement, propertyName, expressionIntern) =>
+      new contrastAtomIntern.AtomIntern(
+        pseudoElement,
+        propertyName,
+        expressionIntern,
+      ),
   )
 
   readonly expressionClassName =
@@ -35,7 +40,7 @@ export class Contrast {
       contrastCustomPropertyName.expressionNamespace,
     )
 
-  readonly expressionIntern = new collections.MultiMemo<
+  readonly expressionIntern = new collection.MultiMemo<
     [
       (
         ...args: readonly unknown[]

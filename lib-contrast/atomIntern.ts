@@ -10,6 +10,7 @@ export class AtomIntern {
   }
 
   constructor(
+    readonly pseudoElement: string | null,
     readonly propertyName: string,
     readonly expressionIntern: contrastExpressionIntern.ExpressionIntern,
   ) {}
@@ -18,7 +19,7 @@ export class AtomIntern {
     if (!this.mutableRules.value) {
       const className = ctx.contrast.atomClassName.build()
       const code = this.expressionIntern.code(this.propertyName)
-      const rule = contrastRule.rule(className, code)
+      const rule = contrastRule.rule(className, this.pseudoElement, code)
       this.mutableRules.value = [
         ...this.expressionIntern.extraRules(),
         rule,

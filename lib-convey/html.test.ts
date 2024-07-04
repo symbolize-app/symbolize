@@ -182,7 +182,7 @@ export const tests = {
   ): Promise<void> {
     for (let i = 0; i < 2; i += 1) {
       const fragment = convey.html.div({
-        style: [contrast.background.color(contrast.rgb(255, 0, 0))],
+        style: [contrast.background.size('contain')],
       })
       const body = await conveyTest.addFragmentToBody(ctx, fragment)
       const div = body.querySelector('div')
@@ -197,7 +197,7 @@ export const tests = {
         [
           contrastTest.dedent(`
             .a0 {
-              background-color: rgb(255, 0, 0);
+              background-size: contain;
             }
           `),
         ],
@@ -211,14 +211,11 @@ export const tests = {
     ctx: compute.Context & contrast.Context & convey.Context,
   ): Promise<void> {
     for (let i = 0; i < 2; i += 1) {
-      const x = compute.state<number | null>(1)
+      const x = compute.state<contrast.Length | null>(contrast.px(1))
 
       const fragment = convey.html.div({
         style: compute.map(
-          (x) =>
-            x !== null ?
-              contrast.background.color(contrast.rgb(0, 0, x))
-            : null,
+          (x) => (x !== null ? contrast.padding.os(x) : null),
           x,
         ),
       })
@@ -235,19 +232,19 @@ export const tests = {
         [
           contrastTest.dedent(`
             .a0 {
-              background-color: rgb(0, 0, 1);
+              padding-block-start: 1px;
             }
           `),
           contrastTest.dedent(`
             .a1 {
-              background-color: rgb(0, 0, 2);
+              padding-block-start: 2px;
             }
           `),
         ].slice(0, 1 + i),
       )
 
       await compute.txn(ctx, async () => {
-        await compute.set(ctx, x, 2)
+        await compute.set(ctx, x, contrast.px(2))
       })
       test.assertDeepEquals([...div.classList.values()], ['a1'])
       test.assertDeepEquals(
@@ -259,12 +256,12 @@ export const tests = {
         [
           contrastTest.dedent(`
             .a0 {
-              background-color: rgb(0, 0, 1);
+              padding-block-start: 1px;
             }
           `),
           contrastTest.dedent(`
             .a1 {
-              background-color: rgb(0, 0, 2);
+              padding-block-start: 2px;
             }
           `),
         ],
@@ -283,12 +280,12 @@ export const tests = {
         [
           contrastTest.dedent(`
             .a0 {
-              background-color: rgb(0, 0, 1);
+              padding-block-start: 1px;
             }
           `),
           contrastTest.dedent(`
             .a1 {
-              background-color: rgb(0, 0, 2);
+              padding-block-start: 2px;
             }
           `),
         ],

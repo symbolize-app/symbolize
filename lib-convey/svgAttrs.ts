@@ -1,4 +1,4 @@
-import type * as conveyElementAttrs from '@/elementAttrs.ts'
+import type * as conveyElementAttr from '@/elementAttr.ts'
 
 export interface SvgAttrsTagNameMap<CustomContext> {
   readonly g: SvgAttrs<CustomContext, SVGGElement>
@@ -21,13 +21,13 @@ export type SvgAttrsByElement<
 export type SvgAttrs<
   CustomContext,
   BaseElement extends Element,
-> = conveyElementAttrs.Attrs<CustomContext, BaseElement> &
-  conveyElementAttrs.PickAttrs<'requiredExtensions' | 'systemLanguage'>
+> = conveyElementAttr.Attrs<CustomContext, BaseElement> &
+  conveyElementAttr.PickAttrs<'requiredExtensions' | 'systemLanguage'>
 
 export type RectAttrs<
   CustomContext,
   BaseElement extends Element,
-> = conveyElementAttrs.PickAttrs<
+> = conveyElementAttr.PickAttrs<
   'height' | 'pathLength' | 'rx' | 'ry' | 'width' | 'x' | 'y'
 > &
   SvgAttrs<CustomContext, BaseElement>
@@ -35,7 +35,7 @@ export type RectAttrs<
 export type SvgSvgAttrs<
   CustomContext,
   BaseElement extends Element,
-> = conveyElementAttrs.PickAttrs<
+> = conveyElementAttr.PickAttrs<
   | 'height'
   | 'onAfterPrint'
   | 'onBeforePrint'

@@ -31,7 +31,9 @@ export const tests = {
     const fragment = convey.portal(div, {
       id: 'y',
       onClick: clickCallback,
-      style: contrast.background.color(contrast.rgb(255, 0, 0)),
+      style: contrast.background.color(
+        contrast.rgb(contrast.pct(100), contrast.pct(0), contrast.pct(0)),
+      ),
       tabIndex: 1,
 
       content: [

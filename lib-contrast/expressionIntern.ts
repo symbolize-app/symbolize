@@ -3,7 +3,7 @@ import * as contrastRule from '@/rule.ts'
 
 export interface ExpressionIntern {
   readonly type: (
-    | MultiExpressionIntern
+    | CascadeExpressionIntern
     | PureExpressionIntern
     | ScopeExpressionIntern
   )['type']
@@ -15,7 +15,7 @@ export interface ExpressionIntern {
 
 export function compilePure(
   value: unknown,
-  ...dependencies: readonly ExpressionIntern[]
+  ...dependencies: readonly PureExpressionIntern[]
 ): PureExpressionIntern {
   const mutableExtraRules: contrastRule.Rule[] = []
   for (const dependency of dependencies) {
@@ -26,6 +26,46 @@ export function compilePure(
     `${value}`,
     mutableExtraRules,
   )
+}
+
+export function compilePureFunctionSeparator(
+  name: string,
+  separator: string,
+  ...dependencies: readonly PureExpressionIntern[]
+): PureExpressionIntern {
+  return compilePure(
+    `${name}(${dependencies.map((expression) => expression.value).join(separator)})`,
+    ...dependencies,
+  )
+}
+
+export function compilePureFunction(
+  name: string,
+  ...dependencies: readonly PureExpressionIntern[]
+): PureExpressionIntern {
+  return compilePureFunctionSeparator(name, ',', ...dependencies)
+}
+
+export function compilePureSeparator(
+  separator: string,
+  ...dependencies: readonly PureExpressionIntern[]
+): PureExpressionIntern {
+  return compilePure(
+    dependencies.map((expression) => expression.value).join(separator),
+    ...dependencies,
+  )
+}
+
+export function compilePureSpaceSeparator(
+  ...dependencies: readonly PureExpressionIntern[]
+): PureExpressionIntern {
+  return compilePureSeparator(' ', ...dependencies)
+}
+
+export function compilePureCommaSeparator(
+  ...dependencies: readonly PureExpressionIntern[]
+): PureExpressionIntern {
+  return compilePureSeparator(',', ...dependencies)
 }
 
 export class PureExpressionIntern implements ExpressionIntern {
@@ -53,14 +93,14 @@ export class PureExpressionIntern implements ExpressionIntern {
   }
 }
 
-export function compileMulti(
+export function compileCascade(
   ...args: readonly ExpressionIntern[]
-): MultiExpressionIntern {
-  return new MultiExpressionIntern(args)
+): CascadeExpressionIntern {
+  return new CascadeExpressionIntern(args)
 }
 
-export class MultiExpressionIntern implements ExpressionIntern {
-  readonly type = 'multi'
+export class CascadeExpressionIntern implements ExpressionIntern {
+  readonly type = 'cascade'
 
   private readonly mutablePure: {
     value: PureExpressionIntern | null
@@ -173,7 +213,8 @@ function extractCustomProperty(
   const className = ctx.contrast.expressionClassName.build()
   const propertyName = ctx.contrast.expressionCustomPropertyName.build()
   const code = expressionIntern.code(propertyName)
-  const rule = contrastRule.rule(className, code)
+  const pseudoElement = null
+  const rule = contrastRule.rule(className, pseudoElement, code)
   return new PureExpressionIntern(`var(${propertyName})`, [
     ...expressionIntern.extraRules(),
     rule,

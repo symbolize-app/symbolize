@@ -1,6 +1,7 @@
 import * as contrastAtom from '@/atom.ts'
 import type * as contrastContext from '@/context.ts'
 import type * as contrastRule from '@/rule.ts'
+import * as test from '@intertwine/lib-test'
 import prettierPostcss from 'prettier/plugins/postcss.mjs'
 import * as prettier from 'prettier/standalone.mjs'
 
@@ -16,6 +17,23 @@ export async function testCompile(
     classNames: ruleClassNames(rules),
     code: await ruleCode(rules),
   }
+}
+
+export async function assertCompileBasicEquals(
+  ctx: contrastContext.Context,
+  atomOpt: contrastAtom.AtomOpt,
+  code: string,
+): Promise<void> {
+  const result = await testCompile(ctx, atomOpt)
+
+  test.assertDeepEquals(result.classNames, ['a0'])
+  test.assertDeepEquals(result.code, [
+    dedent(`
+      .a0 {
+        ${code};
+      }
+    `),
+  ])
 }
 
 function ruleClassNames(

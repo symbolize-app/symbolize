@@ -27,3 +27,15 @@ Other details:
 - Hide implementation details inside class or interface methods
 - Make most data readonly
 - Use classes over plain interfaces
+
+## CSS
+
+Reset includes:
+
+- Browser or element-specific simplification
+- Settings for jank-free preload (fonts, sizing)
+- Line box grid setup
+
+In-app root includes:
+
+- Application-level details not needed for preload
