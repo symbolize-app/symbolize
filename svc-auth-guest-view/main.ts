@@ -75,12 +75,12 @@ const bodyStyle = convey.defineCustom((ctx) => {
         contrast.background.image(
           contrast.gradient.linear(
             contrast.deg(0),
-            [gridColorVar.get(), contrast.px(1)],
+            [gridColorVar, contrast.px(1)],
             [transparent, contrast.px(1)],
           ),
           contrast.gradient.linear(
             contrast.deg(90),
-            [gridColorVar.get(), contrast.px(1)],
+            [gridColorVar, contrast.px(1)],
             [transparent, contrast.px(1)],
           ),
         ),
@@ -103,6 +103,7 @@ const custom = convey.defineCustom<
 >((ctx, attrs) => {
   const head = ctx.convey.document.head
   const countState = compute.state(0)
+  const extra = contrast.container.build()
 
   return [
     convey.portal(head, {
@@ -199,6 +200,28 @@ const custom = convey.defineCustom<
                 contrast.pct(80),
                 contrast.pct(80),
                 contrast.pct(80),
+                contrast.c(
+                  contrast.pct(0),
+                  contrast.support.match(
+                    contrast.support.and(
+                      contrast.support.code(
+                        contrast.size.oi(contrast.px(2)),
+                      ),
+                      contrast.support.not(
+                        contrast.support.code(
+                          contrast.size.oi(contrast.px(-2)),
+                        ),
+                      ),
+                    ),
+                    contrast.pct(100),
+                  ),
+                  contrast.support.match(
+                    contrast.support.code(
+                      contrast.size.oi(contrast.px(-2)),
+                    ),
+                    contrast.pct(50),
+                  ),
+                ),
               ),
             )
           : null,
@@ -225,7 +248,8 @@ const custom = convey.defineCustom<
               contrast.pct(60),
               contrast.pct(100),
             ),
-            contrast.hover(
+            contrast.select.match(
+              contrast.select.hover(),
               contrast.rgb(
                 contrast.pct(0),
                 contrast.pct(0),
@@ -241,7 +265,7 @@ const custom = convey.defineCustom<
       width: 50,
 
       content: convey.svg.rect({
-        style: [contrast.fill(fillVar.get())],
+        style: [contrast.fill(fillVar)],
 
         height: 80,
         width: 80,
@@ -253,14 +277,36 @@ const custom = convey.defineCustom<
       style: [
         contrast.background.color(
           contrast.rgb(
-            contrast.pct(100),
+            contrast.c(
+              contrast.pct(0),
+              contrast.media.match(
+                'all',
+                contrast.media.min.w(contrast.px(400)),
+                contrast.pct(100),
+              ),
+            ),
             contrast.pct(75),
-            contrast.c(contrast.pct(100), contrast.hover(contrast.pct(0))),
+            contrast.c(
+              contrast.pct(100),
+              contrast.select.match(
+                contrast.select.or(
+                  contrast.select.empty(),
+                  contrast.select.and(
+                    contrast.select.not(contrast.select.disabled()),
+                    contrast.select.hover(),
+                    convey.select.attr({ display: 'block', nonce: 'x' }),
+                    convey.select.type('math', 'svg'),
+                  ),
+                ),
+                contrast.pct(0),
+              ),
+            ),
           ),
         ),
       ],
 
       display: 'block',
+      nonce: 'x',
 
       content: [
         convey.math.mi({ content: 'x' }),
@@ -268,13 +314,37 @@ const custom = convey.defineCustom<
         convey.math.mi({ content: 'y' }),
       ],
     }),
-    convey.html.input({
-      checked: true,
-      type: 'checkbox',
-    }),
-    convey.html.input({
-      type: 'text',
-      value: 'abc',
+    convey.html.div({
+      style: [
+        contrast.container.name(extra),
+        contrast.container.type('inline-size'),
+      ],
+
+      content: [
+        convey.html.input({
+          checked: true,
+          type: 'checkbox',
+        }),
+        convey.html.input({
+          style: [
+            contrast.background.color(
+              contrast.container.match(
+                extra,
+                contrast.container.min.i(contrast.rlh(30)),
+                contrast.rgb(
+                  contrast.pct(100),
+                  contrast.pct(0),
+                  contrast.pct(0),
+                  contrast.pct(5),
+                ),
+              ),
+            ),
+          ],
+
+          type: 'text',
+          value: 'abc',
+        }),
+      ],
     }),
   ]
 })

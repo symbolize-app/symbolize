@@ -1,6 +1,6 @@
 import * as conveyElement from '@/element.ts'
 import type * as conveyFragment from '@/fragment.ts'
-import type * as conveyMathAttrs from '@/mathAttrs.ts'
+import type * as conveyMathAttr from '@/mathAttr.ts'
 
 export const math = new Proxy(
   {},
@@ -19,8 +19,8 @@ export const math = new Proxy(
     },
   },
 ) as unknown as {
-  readonly [Key in keyof conveyMathAttrs.MathAttrsTagNameMap<unknown> &
+  readonly [Key in keyof conveyMathAttr.MathAttrsTagNameMap<unknown> &
     keyof MathMLElementTagNameMap]: <CustomContext = unknown>(
-    attrs: conveyMathAttrs.MathAttrsTagNameMap<CustomContext>[Key],
+    attrs: conveyMathAttr.MathAttrsTagNameMap<CustomContext>[Key],
   ) => conveyFragment.Fragment<CustomContext>
 }

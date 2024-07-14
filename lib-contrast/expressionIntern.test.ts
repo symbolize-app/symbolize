@@ -23,7 +23,8 @@ export const tests = {
             ),
           ),
           contrast.rgb(contrast.pct(0), contrast.pct(0), contrast.pct(3)),
-          contrast.hover(
+          contrast.select.match(
+            contrast.select.hover(),
             contrast.c(
               contrast.rgb(
                 contrast.pct(0),
@@ -84,8 +85,20 @@ export const tests = {
       contrast.background.color(
         contrast.rgb(
           contrast.pct(0),
-          contrast.c(contrast.pct(0), contrast.hover(contrast.pct(1))),
-          contrast.c(contrast.pct(0), contrast.hover(contrast.pct(1))),
+          contrast.c(
+            contrast.pct(0),
+            contrast.select.match(
+              contrast.select.hover(),
+              contrast.pct(1),
+            ),
+          ),
+          contrast.c(
+            contrast.pct(0),
+            contrast.select.match(
+              contrast.select.hover(),
+              contrast.pct(1),
+            ),
+          ),
         ),
       ),
     ]
@@ -119,12 +132,16 @@ export const tests = {
           contrast.pct(0),
           contrast.c(
             contrast.pct(0),
-            contrast.hover(
+            contrast.select.match(
+              contrast.select.hover(),
               contrast.add(
                 contrast.pct(1),
                 contrast.c(
                   contrast.pct(0),
-                  contrast.disabled(contrast.pct(2)),
+                  contrast.select.match(
+                    contrast.select.disabled(),
+                    contrast.pct(2),
+                  ),
                 ),
               ),
             ),

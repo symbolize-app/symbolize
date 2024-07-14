@@ -61,7 +61,7 @@ type TestWritableAttrs<BaseElement extends Element> = {
       : BaseElement[Key] extends SVGAnimatedPreserveAspectRatio ?
         conveyData.SvgPreserveAspectRatioOpt | null
       : BaseElement[Key] extends SVGAnimatedRect ? conveyData.Rect | null
-      : BaseElement[Key] extends SVGStringList ? string[] | null
+      : BaseElement[Key] extends SVGStringList ? readonly string[] | null
       : BaseElement[Key] | null
     >
 }
@@ -84,7 +84,6 @@ export interface SkippedMap {
   readonly ['baseURI']: never
   readonly childElementCount: never
   readonly classList: never
-  readonly className: never
   readonly clientHeight: never
   readonly clientLeft: never
   readonly clientTop: never
@@ -157,6 +156,7 @@ export type OverrideMap = Required<
     | 'ariaSort'
     | 'autocapitalize'
     | 'autocomplete'
+    | 'className'
     | 'contentEditable'
     | 'dir'
     | 'draggable'

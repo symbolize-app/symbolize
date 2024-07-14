@@ -62,7 +62,7 @@ export const tests = {
   ['pseudo'](): void {
     contrast.background.color(
       contrast.rgb(
-        contrast.hover(contrast.pct(100)),
+        contrast.select.match(contrast.select.hover(), contrast.pct(100)),
         contrast.pct(0),
         contrast.pct(0),
         contrast.pct(100),
@@ -71,7 +71,7 @@ export const tests = {
     contrast.background.color(
       contrast.rgb(
         contrast.pct(0),
-        contrast.hover(contrast.pct(100)),
+        contrast.select.match(contrast.select.hover(), contrast.pct(100)),
         contrast.pct(0),
         contrast.pct(100),
       ),
@@ -82,7 +82,8 @@ export const tests = {
     contrast.background.color(
       contrast.c(
         contrast.rgb(contrast.pct(100), contrast.pct(0), contrast.pct(0)),
-        contrast.hover(
+        contrast.select.match(
+          contrast.select.hover(),
           contrast.rgb(
             contrast.pct(0),
             contrast.pct(100),
@@ -96,7 +97,10 @@ export const tests = {
   ['multi in pseudo'](): void {
     contrast.background.color(
       contrast.rgb(
-        contrast.hover(contrast.c(contrast.pct(100), contrast.pct(99))),
+        contrast.select.match(
+          contrast.select.hover(),
+          contrast.c(contrast.pct(100), contrast.pct(99)),
+        ),
         contrast.pct(0),
         contrast.pct(0),
         contrast.pct(100),

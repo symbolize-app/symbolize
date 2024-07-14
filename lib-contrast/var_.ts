@@ -7,31 +7,39 @@ export function var_<Value>(): Var_<Value> {
   return new Var_()
 }
 
-export class Var_<Value> {
-  private readonly propertyName = Symbol('customProperty')
+export class Var_<Value> implements contrastExpression.Expression<Value> {
+  private readonly propertyName = Symbol('var')
 
-  get(): contrastExpression.Expression<Value> {
-    return contrastExpression.expression(
-      contrastExpressionIntern.compileCustomProperty,
-      (ctx) => [
-        ctx.contrast.symbolCustomPropertyName.get(this.propertyName),
-      ],
+  compile(
+    ctx: contrastContext.Context,
+  ): contrastExpressionIntern.ExpressionIntern {
+    return ctx.contrast.expressionIntern.get(
+      contrastExpressionIntern.compileCustomProperty as never,
+      this.resolve(ctx),
     )
   }
 
-  getOr(
+  [contrastExpression.expressionMarker](): unknown {
+    return null
+  }
+
+  [contrastExpression.expressionValueMarker](): Value | null {
+    return null
+  }
+
+  or(
     defaultValue: contrastExpression.ExpressionOpt<Value>,
   ): contrastExpression.Expression<Exclude<Value, null>> {
     return contrastExpression.expression(
       contrastExpressionIntern.compileCustomPropertyOrDefault,
       (ctx) => [
-        ctx.contrast.symbolCustomPropertyName.get(this.propertyName),
+        this.resolve(ctx),
         contrastExpression.compile(ctx, defaultValue).toPure(ctx),
       ],
     )
   }
 
-  resolveCustomPropertyName(ctx: contrastContext.Context): string {
+  resolve(ctx: contrastContext.Context): string {
     return ctx.contrast.symbolCustomPropertyName.get(this.propertyName)
   }
 

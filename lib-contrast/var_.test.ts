@@ -12,9 +12,7 @@ export const tests = {
       const style = [
         a.set(contrast.pct(1)),
         b.set(contrast.pct(2)),
-        contrast.background.color(
-          contrast.rgb(contrast.pct(0), a.get(), b.get()),
-        ),
+        contrast.background.color(contrast.rgb(contrast.pct(0), a, b)),
       ]
       const result = await contrastTest.testCompile(ctx, style)
 
@@ -46,8 +44,14 @@ export const tests = {
         contrast.rgb(
           contrast.pct(0),
           contrast.pct(0),
-          a.getOr(
-            contrast.c(contrast.pct(0), contrast.hover(contrast.pct(1))),
+          a.or(
+            contrast.c(
+              contrast.pct(0),
+              contrast.select.match(
+                contrast.select.hover(),
+                contrast.pct(1),
+              ),
+            ),
           ),
         ),
       ),
@@ -74,6 +78,6 @@ export const tests = {
 
   ['resolve'](ctx: contrast.Context): void {
     const a = contrast.var_<number>()
-    test.assertEquals(a.resolveCustomPropertyName(ctx), '--s0')
+    test.assertEquals(a.resolve(ctx), '--s0')
   },
 }

@@ -1,6 +1,6 @@
 import * as conveyElement from '@/element.ts'
 import type * as conveyFragment from '@/fragment.ts'
-import type * as conveyHtmlAttrs from '@/htmlAttrs.ts'
+import type * as conveyHtmlAttr from '@/htmlAttr.ts'
 
 export const html = new Proxy(
   {},
@@ -15,8 +15,8 @@ export const html = new Proxy(
     },
   },
 ) as unknown as {
-  readonly [Key in keyof conveyHtmlAttrs.HtmlAttrsTagNameMap<unknown> &
+  readonly [Key in keyof conveyHtmlAttr.HtmlAttrsTagNameMap<unknown> &
     keyof HTMLElementTagNameMap]: <CustomContext = unknown>(
-    attrs: conveyHtmlAttrs.HtmlAttrsTagNameMap<CustomContext>[Key],
+    attrs: conveyHtmlAttr.HtmlAttrsTagNameMap<CustomContext>[Key],
   ) => conveyFragment.Fragment<CustomContext>
 }

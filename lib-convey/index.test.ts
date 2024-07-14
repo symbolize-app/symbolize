@@ -14,6 +14,7 @@ export const all: test.TestCollection<
   import('@/math.test.ts'),
   import('@/portal.test.ts'),
   import('@/range.test.ts'),
+  import('@/select.test.ts'),
   import('@/svg.test.ts'),
   import('@/text.test.ts'),
 ]

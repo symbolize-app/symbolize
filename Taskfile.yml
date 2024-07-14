@@ -124,6 +124,8 @@ tasks:
   check:
     aliases:
       - c
+    cmds:
+      - echo "✅"
     deps:
       - build:release
       - gen:check

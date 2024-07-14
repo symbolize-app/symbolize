@@ -171,6 +171,31 @@ export function compileScope(
   return new ScopeExpressionIntern(scope, body)
 }
 
+export function compileScopeAnd(...values: readonly string[]): string {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- index already checked
+  return values.length > 1 ? `(${values.join(' and ')})` : values[0]!
+}
+
+export function compileScopeNot(value: string): string {
+  return `(not ${value})`
+}
+
+export function compileScopeOr(...values: readonly string[]): string {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- index already checked
+  return values.length > 1 ? `(${values.join(' or ')})` : values[0]!
+}
+
+export function compileScopePureExpressionIntern(
+  ctx: contrastContext.Context,
+  expressionIntern: ExpressionIntern,
+): PureExpressionIntern {
+  const pureExpressionIntern = expressionIntern.toPure(ctx)
+  if ([...pureExpressionIntern.extraRules()].length > 0) {
+    throw new Error('Extra rules not allowed for scope conditions')
+  }
+  return pureExpressionIntern
+}
+
 export class ScopeExpressionIntern implements ExpressionIntern {
   readonly type = 'scope'
 

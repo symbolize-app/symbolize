@@ -1,20 +1,11 @@
 import type * as contrastContext from '@/context.ts'
 import * as contrastExpressionIntern from '@/expressionIntern.ts'
+import type * as contrastUtilityType from '@/utilityType.ts'
 
 export type ExpressionOpt<Value> = Expression<Value> | Value
 
 export const expressionMarker = Symbol('expressionMarker')
 export const expressionValueMarker = Symbol('internValueMarker')
-
-export interface Expression<Value> {
-  readonly [expressionMarker]: null
-
-  compile(
-    ctx: contrastContext.Context,
-  ): contrastExpressionIntern.ExpressionIntern
-
-  [expressionValueMarker](): Value | null
-}
 
 export type ExpressionInternTuple<
   Tuple extends readonly ExpressionOpt<unknown>[],
@@ -26,30 +17,35 @@ export type ExpressionInternTuple<
   readonly length: Tuple['length']
 }
 
-export class ExpressionImpl<
-  Value,
-  InternCompile extends (
-    ...args: never
-  ) => contrastExpressionIntern.ExpressionIntern,
-> implements Expression<Value>
-{
-  readonly [expressionMarker] = null
+export interface Expression<Value> {
+  compile(
+    ctx: contrastContext.Context,
+  ): contrastExpressionIntern.ExpressionIntern
 
+  [expressionMarker](): unknown
+
+  [expressionValueMarker](): Value | null
+}
+
+class ExpressionImpl<Value> implements Expression<Value> {
   constructor(
-    private readonly internCompile: InternCompile,
+    private readonly compile_: (
+      ...args: readonly unknown[]
+    ) => contrastExpressionIntern.ExpressionIntern,
     private readonly args: (
       ctx: contrastContext.Context,
-    ) => Readonly<ReadonlyParameters<InternCompile>>,
+    ) => readonly unknown[],
   ) {}
 
   compile(
     ctx: contrastContext.Context,
   ): contrastExpressionIntern.ExpressionIntern {
     const internArgs = this.args(ctx)
-    return ctx.contrast.expressionIntern.get(
-      this.internCompile as never,
-      ...internArgs,
-    )
+    return ctx.contrast.expressionIntern.get(this.compile_, ...internArgs)
+  }
+
+  [expressionMarker](): unknown {
+    return null
   }
 
   [expressionValueMarker](): Value | null {
@@ -57,23 +53,18 @@ export class ExpressionImpl<
   }
 }
 
-type ReadonlyParameters<T extends (...args: never) => unknown> =
-  T extends (...args: infer P) => unknown ? P
-  : T extends (...args: readonly [...infer P]) => unknown ? P
-  : never
-
 export function expression<
   Value,
-  InternCompile extends (
+  Compile extends (
     ...args: never
   ) => contrastExpressionIntern.ExpressionIntern,
 >(
-  internCompile: InternCompile,
+  compile: Compile,
   args: (
     ctx: contrastContext.Context,
-  ) => Readonly<ReadonlyParameters<InternCompile>>,
-): ExpressionImpl<Value, InternCompile> {
-  return new ExpressionImpl(internCompile, args)
+  ) => contrastUtilityType.ReadonlyParameters<Compile>,
+): Expression<Value> {
+  return new ExpressionImpl(compile as never, args)
 }
 
 export function isExpression<Value>(
@@ -108,6 +99,16 @@ export function compileAllToPure<
   }
 }
 
+export function compileScopePureExpression(
+  ctx: contrastContext.Context,
+  expr: ExpressionOpt<unknown>,
+): contrastExpressionIntern.PureExpressionIntern {
+  return contrastExpressionIntern.compileScopePureExpressionIntern(
+    ctx,
+    compile(ctx, expr),
+  )
+}
+
 export function c<Value>(
   value: ExpressionOpt<Value>,
   ...values: readonly ExpressionOpt<Value>[]
@@ -123,9 +124,6 @@ export function toExpression<Value>(
   if (typeof expr === 'object' && isExpression<Value>(expr)) {
     return expr
   } else {
-    return expression(
-      contrastExpressionIntern.compilePure,
-      () => [expr] as const,
-    )
+    return expression(contrastExpressionIntern.compilePure, () => [expr])
   }
 }
