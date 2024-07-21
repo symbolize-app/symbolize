@@ -25,11 +25,13 @@ tasks:
   clean:debug:
     deps:
       - esbuild:clean:debug
+      - eslint:clean
       - tsc:clean
 
   clean:release:
     deps:
       - esbuild:clean:release
+      - eslint:clean
       - tsc:clean
 
   esbuild:build:debug:
@@ -58,6 +60,9 @@ tasks:
 
   esbuild:clean:release:
     cmd: dev-esbuild --mode production --clean
+
+  eslint:clean:
+    cmd: rm build/eslint-cache
 
   eslint:lint:check:
     deps:

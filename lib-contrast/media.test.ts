@@ -60,10 +60,7 @@ export const tests = {
         contrast.media.match(
           'screen',
           contrast.media.min.w(
-            contrast.add<contrast.Length>(
-              contrast.rem(30),
-              contrast.px(300),
-            ),
+            contrast.add(contrast.rem(30), contrast.px(300)),
           ),
           'scroll',
         ),
