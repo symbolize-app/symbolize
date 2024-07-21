@@ -215,7 +215,6 @@ export class ElementFragment<CustomContext = unknown>
     name: string,
     value: compute.NodeOpt<unknown>,
   ): Promise<void> {
-    // TODO Undo attributes for portal
     if (this.mutableElement && this.mode === ElementFragmentMode.portal) {
       const initialValue = this.mutableElement.getAttribute(name)
       this.defer(() => {

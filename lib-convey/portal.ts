@@ -1,8 +1,8 @@
 import * as conveyElement from '@/element.ts'
 import type * as conveyFragment from '@/fragment.ts'
-import type * as conveyHtmlAttrs from '@/htmlAttrs.ts'
-import type * as conveyMathAttrs from '@/mathAttrs.ts'
-import type * as conveySvgAttrs from '@/svgAttrs.ts'
+import type * as conveyHtmlAttr from '@/htmlAttr.ts'
+import type * as conveyMathAttr from '@/mathAttr.ts'
+import type * as conveySvgAttr from '@/svgAttr.ts'
 
 export function portal<
   CustomElement extends conveyElement.SupportedElement,
@@ -10,11 +10,11 @@ export function portal<
 >(
   element: CustomElement,
   attrs: CustomElement extends HTMLElement ?
-    conveyHtmlAttrs.HtmlAttrsByElement<CustomElement, CustomContext>
+    conveyHtmlAttr.HtmlAttrsByElement<CustomElement, CustomContext>
   : CustomElement extends SVGElement ?
-    conveySvgAttrs.SvgAttrsByElement<CustomElement, CustomContext>
+    conveySvgAttr.SvgAttrsByElement<CustomElement, CustomContext>
   : CustomElement extends MathMLElement ?
-    conveyMathAttrs.MathAttrs<CustomContext, CustomElement>
+    conveyMathAttr.MathAttrs<CustomContext, CustomElement>
   : never,
 ): conveyFragment.Fragment<CustomContext> {
   return new conveyElement.ElementFragment(

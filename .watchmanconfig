@@ -3,6 +3,7 @@
     ".cargo",
     ".direnv",
     ".env",
+    ".font",
     ".pki",
     ".stack-bin",
     ".tantivy",

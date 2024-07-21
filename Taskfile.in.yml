@@ -64,6 +64,7 @@ tasks:
       - cargo:build:release
       - pnpm:build:release
       - stack:build:release
+
   check:
     aliases:
       - c
@@ -74,6 +75,8 @@ tasks:
       - format:check
       - lint:check
       - lock:check
+    cmds:
+      - echo "✅"
 
   clean:
     deps:

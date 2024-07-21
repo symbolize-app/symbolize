@@ -22,8 +22,8 @@ tasks:
     deps:
       - client:prep
     cmd: >-
-      {{if eq .WATCH "true" -}}
-        build/target/{{.TASK_WATCHMAN_CLIENT_MODE}}/intertwine-dev-watchman-client --mode {{.MODE}} {{if eq .RESTART "true"}}--restart{{end}} --
+      {{if eq (toString .WATCH) "true" -}}
+        build/target/{{.TASK_WATCHMAN_CLIENT_MODE}}/intertwine-dev-watchman-client --mode {{.MODE}} {{if eq (toString .RESTART) "true"}}--restart{{end}} --
       {{- end}}
       {{.COMMAND}}
 

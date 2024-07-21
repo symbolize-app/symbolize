@@ -78,6 +78,18 @@ export const tests = {
     test.assertEquals(clickCallbackHistory.length, 1)
   },
 
+  async ['div class names'](
+    ctx: compute.Context & contrast.Context & convey.Context,
+  ): Promise<void> {
+    const fragment = convey.html.div({
+      className: ['x', 'y'],
+    })
+    const body = await conveyTest.addFragmentToBody(ctx, fragment)
+    const div = body.querySelector('div')
+    test.assert(div)
+    test.assertEquals(div.className, 'x y')
+  },
+
   async ['div state'](
     ctx: compute.Context & contrast.Context & convey.Context,
   ): Promise<void> {

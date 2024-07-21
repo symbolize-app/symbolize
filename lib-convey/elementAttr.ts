@@ -48,6 +48,7 @@ export type Attrs<CustomContext, BaseElement extends Element> = PickAttrs<
   | 'ariaValueNow'
   | 'ariaValueText'
   | 'autofocus'
+  | 'className'
   | 'id'
   | 'nonce'
   | 'onAbort'
@@ -311,10 +312,11 @@ export const allAttrs = {
     'characters' | 'none' | 'sentences' | 'words'
   >('autocapitalize'),
   autocomplete: stringAttr<
-    ('email' | 'name' | `section-${string}`)[] | 'off' | 'on'
+    readonly ('email' | 'name' | `section-${string}`)[] | 'off' | 'on'
   >('autocomplete'),
   autofocus: booleanAttr('autofocus'),
   checked: booleanAttr('checked'),
+  className: stringAttr<readonly string[]>('class'),
   content: contentAttr(),
   contentEditable: stringAttr<boolean | 'plaintext-only'>(
     'contenteditable',
@@ -503,7 +505,7 @@ export const allAttrs = {
   rSpace: stringAttr<Length | Pct>('rspace'),
   readOnly: booleanAttr('readonly'),
   required: booleanAttr('required'),
-  requiredExtensions: stringAttr<string[]>('requiredExtensions'),
+  requiredExtensions: stringAttr<readonly string[]>('requiredExtensions'),
   role: stringAttr('role'),
   rx: stringAttr<conveyData.SvgLengthPctOpt>('rx'),
   ry: stringAttr<conveyData.SvgLengthPctOpt>('ry'),
@@ -515,7 +517,7 @@ export const allAttrs = {
   stretchy: stringAttr<boolean>('stretchy'),
   style: styleAttr(),
   symmetric: stringAttr<boolean>('symmetric'),
-  systemLanguage: stringAttr<string[]>('systemLanguage'),
+  systemLanguage: stringAttr<readonly string[]>('systemLanguage'),
   tabIndex: stringAttr<number>('tabindex'),
   title: stringAttr('title'),
   translate: stringAttr<'no' | 'yes'>('translate'),

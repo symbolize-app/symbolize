@@ -60,13 +60,16 @@ tasks:
       DIST_DIR:
         sh: realpath --relative-to . $(sh -c "$(cd {{.NAME}} && stack config env --work-dir build/stack-work-{{.MODE}}) echo \$HASKELL_DIST_DIR")
       FULL_TARGET: intertwine-{{.NAME}}-{{.TARGET}}
-    cmd:
-      task: :watchman:client
-      vars:
-        WATCH: '{{.WATCH}}'
-        RESTART: false
-        MODE: executable
-        COMMAND: '{{.DIST_DIR}}/build/{{.FULL_TARGET}}/{{.FULL_TARGET}} {{.ARGS}} {{.CLI_ARGS}}'
+    cmds:
+      # HACK: Reference all variables here, so Task doesn't think they're unused
+      - cmd: 'true # /{{.WATCH}}/{{.MODE}}/{{.NAME}}/{{.TARGET}}/{{.ARGS}}/'
+        silent: true
+      - task: :watchman:client
+        vars:
+          WATCH: '{{.WATCH}}'
+          RESTART: false
+          MODE: executable
+          COMMAND: '{{.DIST_DIR}}/build/{{.FULL_TARGET}}/{{.FULL_TARGET}} {{.ARGS}} {{.CLI_ARGS}}'
 
   execute-target:run:debug:
     internal: true

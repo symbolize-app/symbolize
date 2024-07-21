@@ -1,6 +1,6 @@
 import * as conveyElement from '@/element.ts'
 import type * as conveyFragment from '@/fragment.ts'
-import type * as conveySvgAttrs from '@/svgAttrs.ts'
+import type * as conveySvgAttr from '@/svgAttr.ts'
 
 export const svg = new Proxy(
   {},
@@ -19,8 +19,8 @@ export const svg = new Proxy(
     },
   },
 ) as unknown as {
-  readonly [Key in keyof conveySvgAttrs.SvgAttrsTagNameMap<unknown> &
+  readonly [Key in keyof conveySvgAttr.SvgAttrsTagNameMap<unknown> &
     keyof SVGElementTagNameMap]: <CustomContext = unknown>(
-    attrs: conveySvgAttrs.SvgAttrsTagNameMap<CustomContext>[Key],
+    attrs: conveySvgAttr.SvgAttrsTagNameMap<CustomContext>[Key],
   ) => conveyFragment.Fragment<CustomContext>
 }

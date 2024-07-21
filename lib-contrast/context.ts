@@ -1,7 +1,6 @@
 import * as contrastAtomIntern from '@/atomIntern.ts'
-import * as contrastClassName from '@/className.ts'
-import * as contrastCustomPropertyName from '@/customPropertyName.ts'
 import type * as contrastExpressionIntern from '@/expressionIntern.ts'
+import * as contrastGeneratedName from '@/generatedName.ts'
 import * as collection from '@intertwine/lib-collection'
 
 export interface Context {
@@ -9,10 +8,9 @@ export interface Context {
 }
 
 export class Contrast {
-  readonly atomClassName =
-    new contrastClassName.CustomPropertyNameGenerator(
-      contrastClassName.atomNamespace,
-    )
+  readonly atomClassName = contrastGeneratedName.identifierGenerator(
+    contrastGeneratedName.atomNamespace,
+  )
 
   readonly atomIntern = new collection.MultiMemo<
     [
@@ -30,28 +28,39 @@ export class Contrast {
       ),
   )
 
-  readonly expressionClassName =
-    new contrastClassName.CustomPropertyNameGenerator(
-      contrastClassName.expressionNamespace,
-    )
+  readonly containerName = contrastGeneratedName.identifierMemo<symbol>(
+    contrastGeneratedName.containerNamespace,
+  )
+
+  readonly expressionClassName = contrastGeneratedName.identifierGenerator(
+    contrastGeneratedName.expressionNamespace,
+  )
 
   readonly expressionCustomPropertyName =
-    new contrastCustomPropertyName.CustomPropertyNameGenerator(
-      contrastCustomPropertyName.expressionNamespace,
+    contrastGeneratedName.customPropertyNameGenerator(
+      contrastGeneratedName.expressionNamespace,
     )
 
   readonly expressionIntern = new collection.MultiMemo<
     [
-      (
+      compile: (
         ...args: readonly unknown[]
       ) => contrastExpressionIntern.ExpressionIntern,
-      ...unknown[],
+      ...args: readonly unknown[],
     ],
     contrastExpressionIntern.ExpressionIntern
   >((compile, ...args) => compile(...args))
 
+  readonly scopeIntern = new collection.MultiMemo<
+    [
+      compile: (...args: readonly unknown[]) => string,
+      ...args: readonly unknown[],
+    ],
+    string
+  >((compile, ...args) => compile(...args))
+
   readonly symbolCustomPropertyName =
-    new contrastCustomPropertyName.CustomPropertyNameMemo<symbol>(
-      contrastCustomPropertyName.symbolNamespace,
+    contrastGeneratedName.customPropertyNameMemo<symbol>(
+      contrastGeneratedName.symbolNamespace,
     )
 }

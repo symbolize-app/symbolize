@@ -39,7 +39,8 @@ export const tests = {
               contrast.pct(0),
               contrast.pct(49),
             ),
-            contrast.hover(
+            contrast.select.match(
+              contrast.select.hover(),
               contrast.rgb(
                 contrast.pct(100),
                 contrast.pct(0),
@@ -81,7 +82,8 @@ export const tests = {
                 contrast.pct(0),
                 contrast.pct(127),
               ),
-              contrast.hover(
+              contrast.select.match(
+                contrast.select.hover(),
                 contrast.rgb(
                   contrast.pct(100),
                   contrast.pct(0),
