@@ -185,9 +185,7 @@ const custom = convey.defineCustom<
         ),
         contrast.border.style.oe('solid'),
         contrast.border.width.oe(contrast.px(1)),
-        contrast.margin.oe(
-          contrast.sub<contrast.Length>(contrast.rlh(3), contrast.px(1)),
-        ),
+        contrast.margin.oe(contrast.sub(contrast.rlh(3), contrast.px(1))),
         contrast.margin.os(contrast.rlh(3)),
       ],
     }),
@@ -244,9 +242,9 @@ const custom = convey.defineCustom<
         fillVar.set(
           contrast.c(
             contrast.rgb(
-              contrast.pct(60),
-              contrast.pct(60),
-              contrast.pct(100),
+              contrast.mul(contrast.pct(30), 2),
+              contrast.div(contrast.pct(120), 2),
+              contrast.max(contrast.pct(0), contrast.pct(100)),
             ),
             contrast.select.match(
               contrast.select.hover(),

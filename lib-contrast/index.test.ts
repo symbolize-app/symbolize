@@ -8,7 +8,7 @@ export const all: test.TestCollection<
   import('@/atom.test.ts'),
   import('@/container.test.ts'),
   import('@/expressionIntern.test.ts'),
-  import('@/function.test.ts'),
+  import('@/math.test.ts'),
   import('@/media.test.ts'),
   import('@/prop/index.test.ts'),
   import('@/pseudoElement.test.ts'),

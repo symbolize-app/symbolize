@@ -100,10 +100,7 @@ export const tests = {
         contrast.container.match(
           'all',
           contrast.container.min.w(
-            contrast.add<contrast.Length>(
-              contrast.rem(30),
-              contrast.px(300),
-            ),
+            contrast.add(contrast.rem(30), contrast.px(300)),
           ),
           'scroll',
         ),
