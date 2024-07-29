@@ -43,6 +43,26 @@ Each stream has its own internal queue and own high water mark. Once the queue r
 - Always check ready promise before writing
   - Ensures not writing past high water mark
 
+# Rust
+
+## `futures::stream::Stream`
+
+- Used for all Tokio network streams
+- Used for all memory-based channels
+- Completely poll-based
+- Slow consumer will automatically trigger producer backpressure
+  - Either to stop producing or stop buffering data
+- After an initial poll, the stream can wake up the poller later when data is ready
+  - This will cause the poller to retry
+- No buffering by default
+  - So if there's a chain of stream processors, all stages needs to be ready simultaneously for the stream to run
+- Many combinators available for combining and transforming streams
+
+## `async_stream::stream!`
+
+- Macro for easily creating new streams with async/await and `yield`
+- No custom structs needed
+
 # Linux
 
 Socket receive and send buffer sizes are [tunable](https://man7.org/linux/man-pages/man2/setsockopt.2.html) per socket.

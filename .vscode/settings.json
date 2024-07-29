@@ -25,7 +25,9 @@
   },
   "[markdown]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "editor.wordWrap": "bounded",
+    "editor.wordWrapColumn": 75
   },
   "[rust]": {
     "editor.defaultFormatter": "rust-lang.rust-analyzer",
