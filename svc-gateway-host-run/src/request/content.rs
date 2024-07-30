@@ -1,5 +1,5 @@
 use crate::header as svc_header;
-use crate::request::simple as svc_request_simple;
+use crate::request::data as svc_request_data;
 use crate::response as svc_response;
 use anyhow::anyhow;
 use anyhow::Result;
@@ -8,12 +8,12 @@ use http::StatusCode;
 use mime;
 
 #[derive(Debug)]
-pub struct ContentRequest<'a> {
-  pub full_path: &'a str,
-  pub path_prefix: &'a str,
+pub struct ContentRequest {
+  pub full_path: String,
+  pub path_prefix: String,
   pub mime: ContentMime,
   pub sandbox: bool,
-  pub if_none_match: Option<&'a str>,
+  pub if_none_match: Option<String>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -23,38 +23,37 @@ pub enum ContentMime {
   Woff2,
 }
 
-impl ContentRequest<'_> {
-  pub fn try_new_no_sandbox<'a>(
-    req: &'a svc_request_simple::SimpleRequest<'a>,
-    full_path: &'a str,
-  ) -> Result<ContentRequest<'a>> {
+impl ContentRequest {
+  pub fn try_new_no_sandbox(
+    req: svc_request_data::DataRequest,
+    full_path: String,
+  ) -> Result<ContentRequest> {
     Self::try_new_base(req, full_path, false)
   }
 
-  pub fn try_new<'a>(
-    req: &'a svc_request_simple::SimpleRequest<'a>,
-    full_path: &'a str,
-  ) -> Result<ContentRequest<'a>> {
+  pub fn try_new(
+    req: svc_request_data::DataRequest,
+    full_path: String,
+  ) -> Result<ContentRequest> {
     Self::try_new_base(req, full_path, true)
   }
 
   #[allow(clippy::print_stdout)]
-  fn try_new_base<'a>(
-    req: &'a svc_request_simple::SimpleRequest<'a>,
-    full_path: &'a str,
+  fn try_new_base(
+    req: svc_request_data::DataRequest,
+    full_path: String,
     sandbox: bool,
-  ) -> Result<ContentRequest<'a>> {
+  ) -> Result<ContentRequest> {
     println!("{}", req.path);
 
-    let (path_prefix, ext) = Self::split_path(full_path)?;
-    let mime = Self::get_mime(full_path, ext)?;
+    let (path_prefix, ext) = Self::split_path(&full_path)?;
+    let path_prefix = path_prefix.to_owned();
+    let mime = Self::get_mime(&full_path, ext)?;
     let sandbox = sandbox && matches!(mime, ContentMime::Html);
-    let if_none_match = req
-      .if_none_match
-      .as_ref()
-      .map(|if_none_match| if_none_match.0);
+    let if_none_match =
+      req.if_none_match.map(|if_none_match| if_none_match.0);
 
-    Self::check_method(req.method)?;
+    Self::check_method(&req.method)?;
     if let Some(accept) = &req.accept {
       Self::check_accept(accept, mime)?;
     }
@@ -108,17 +107,17 @@ impl ContentRequest<'_> {
     mime: ContentMime,
   ) -> Result<()> {
     let mime: &mime::Mime = mime.into();
-    let found = accept.0.clone().any(|item| {
-      item
-        .map(|item| match (item.type_(), item.subtype()) {
+    let found =
+      accept
+        .0
+        .iter()
+        .any(|item| match (item.type_(), item.subtype()) {
           (mime::STAR, mime::STAR) => true,
           (mime::STAR, subtype) => subtype == mime.subtype(),
           (type_, subtype) => {
             (type_, subtype) == (mime.type_(), mime.subtype())
           }
-        })
-        .unwrap_or(false)
-    });
+        });
     if found {
       Ok(())
     } else {

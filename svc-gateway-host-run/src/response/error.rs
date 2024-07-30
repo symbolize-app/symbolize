@@ -1,5 +1,7 @@
 use crate::header as svc_header;
-use crate::response::simple as svc_response_simple;
+use crate::response::base as svc_response_base;
+use crate::response::data as svc_response_data;
+use anyhow::Result;
 use bytes::Bytes;
 use http;
 use http::StatusCode;
@@ -23,10 +25,8 @@ impl Error {
     }
   }
 
-  pub fn into_simple_response(
-    self,
-  ) -> svc_response_simple::SimpleResponse {
-    svc_response_simple::SimpleResponse {
+  pub fn into_response(self) -> Result<svc_response_base::BaseResponse> {
+    svc_response_data::DataResponse {
       status: self.status,
       sandbox: false,
       cache_control: None,
@@ -35,5 +35,6 @@ impl Error {
       service_worker_allowed: None,
       body: self.message,
     }
+    .into_response()
   }
 }

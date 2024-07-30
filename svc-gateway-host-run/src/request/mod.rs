@@ -1,7 +1,10 @@
+mod base;
 mod content;
-mod ext;
-mod simple;
+mod data;
+mod stream;
 
+pub use base::BaseRequest;
 pub use content::ContentMime;
 pub use content::ContentRequest;
-pub use simple::SimpleRequest;
+pub use data::DataRequest;
+pub use stream::StreamRequest;

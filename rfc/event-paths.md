@@ -20,9 +20,9 @@ Because browsers only support "half duplex" communication for one `fetch` reques
 
 A pair of requests will be sent for every host-guest link required. By using the same origin, a single HTTP/2 connection can be shared (avoiding extra TCP/TLS handshakes). But by having separate streams, each stream can own its own backpressure signal, and each host service has an easy, direct link to send events back to the guest service. This also introduces some failure isolation, where a single host-guest link can fail without interrupting others.
 
-One complication of using two requests is that there is no guarantee from the browser that these requests will share a single HTTP/2 connection. If they do not share a connection, they may not reach the same gateway host service instance. To guard against this, the gateway host instance will refuse response streams when a matching request stream is not found, and terminate request streams without matching response streams.
+One complication of using two requests is that there is no guarantee from the browser that these requests will share a single HTTP/2 connection. If they do not share a connection, they may not reach the same gateway host service instance. To guard against this, all stream pairs will share a host-generated response stream ID, the gateway host instance will terminate request streams without matching response streams, and if the gateway guest finds its response stream got closed, it will reopen both request and response streams.
 
-This correlation can happen using a guest ID, which can also be used for session tracking, and sending async events to the gateway guest service instance.
+As of July 2024, half duplex request streams are only supported in Chrome and Edge. As a fallback for other browsers, the request stream will need to be re-initiated for every request event that needs sending. This will trigger HTTP request parsing, but will not require new TCP/TLS connections.
 
 # Guest-guest
 
