@@ -28,6 +28,11 @@ export class EventSemaphore {
   }
 
   async wait(): Promise<void> {
-    await this.mutableReady
+    while (true) {
+      await this.mutableReady
+      if (this.mutableResolved) {
+        return
+      }
+    }
   }
 }

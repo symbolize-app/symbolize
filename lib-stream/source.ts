@@ -1,3 +1,4 @@
+import * as concurrency from '@intertwine/lib-concurrency'
 import * as time from '@intertwine/lib-time'
 
 const highWaterMark = 16
@@ -5,28 +6,64 @@ const timeoutMs = 1_000
 
 export class Source<T> {
   private constructor(
-    private readonly writer: WritableStreamDefaultWriter<T>,
+    private readonly onClose: () => void,
+    private readonly onSend: (ctx: time.Context, data: T) => Promise<void>,
     readonly readable: ReadableStream<T>,
   ) {}
 
   static build<T>(): Source<T> {
-    const transform = new TransformStream<T, T>(undefined, {
-      highWaterMark,
-    })
+    let controller: ReadableStreamDefaultController | null = null
+    const ready = concurrency.EventSemaphore.build()
+    const done = concurrency.EventSemaphore.build()
     return new Source<T>(
-      transform.writable.getWriter(),
-      transform.readable,
+      () => {
+        if (!controller) {
+          throw new Error('Closed before started')
+        }
+        controller.close()
+        done.set()
+      },
+      async (ctx, data) => {
+        const readyBeforeTimeout = await Promise.race([
+          ready.wait().then(() => true),
+          time.delay(ctx, timeoutMs).then(() => false),
+        ])
+        if (!readyBeforeTimeout) {
+          throw new Error('Ready before started')
+        }
+        if (!controller) {
+          throw new Error('Ready but missing controller')
+        }
+        controller.enqueue(data)
+        if (controller.desiredSize === null) {
+          done.set()
+          throw new Error('Stream in error state')
+        } else if (controller.desiredSize <= 0) {
+          ready.clear()
+          done.set()
+        }
+      },
+      new ReadableStream(
+        {
+          async pull() {
+            done.clear()
+            ready.set()
+            await done.wait()
+          },
+          start(controller_) {
+            controller = controller_
+          },
+        },
+        { highWaterMark },
+      ),
     )
   }
 
+  close(): void {
+    this.onClose()
+  }
+
   async send(ctx: time.Context, data: T): Promise<void> {
-    const ready = await Promise.race([
-      this.writer.ready.then(() => true),
-      time.delay(ctx, timeoutMs).then(() => false),
-    ])
-    if (!ready) {
-      throw new Error('Not ready, cannot write')
-    }
-    await this.writer.write(data)
+    await this.onSend(ctx, data)
   }
 }

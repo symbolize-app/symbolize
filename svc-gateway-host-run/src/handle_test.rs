@@ -16,15 +16,15 @@ async fn test_handle_content_by_id() {
   ctx.expect_db().times(1).return_const(db);
 
   let req = svc_request::ContentRequest {
-    full_path: "010f.js",
-    path_prefix: "010f",
+    full_path: "010f.js".to_owned(),
+    path_prefix: "010f".to_owned(),
     mime: svc_request::ContentMime::JavaScript,
     sandbox: false,
     if_none_match: None,
   };
 
   assert_eq!(
-    handle_content_by_id(&ctx, &req).await.unwrap(),
+    handle_content_by_id(&ctx, req).await.unwrap(),
     Some(svc_response::ContentResponse {
       sandbox: false,
       mime: svc_request::ContentMime::JavaScript,
@@ -53,15 +53,15 @@ async fn test_handle_content_by_path() {
   ctx.expect_db().times(1).return_const(db);
 
   let req = svc_request::ContentRequest {
-    full_path: "a.js",
-    path_prefix: "a",
+    full_path: "a.js".to_owned(),
+    path_prefix: "a".to_owned(),
     mime: svc_request::ContentMime::JavaScript,
     sandbox: false,
     if_none_match: None,
   };
 
   assert_eq!(
-    handle_content_by_path(&ctx, &req).await.unwrap(),
+    handle_content_by_path(&ctx, req).await.unwrap(),
     Some(svc_response::ContentResponse {
       sandbox: false,
       mime: svc_request::ContentMime::JavaScript,

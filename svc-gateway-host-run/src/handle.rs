@@ -1,36 +1,52 @@
 use crate::db as svc_db;
 use crate::db::Db as _;
+use crate::random as svc_random;
+use crate::random::RandomExt;
 use crate::request as svc_request;
 use crate::response as svc_response;
+use crate::state as svc_state;
+use crate::state::StateExt;
 use anyhow::Error;
 use anyhow::Result;
-use bytes::Bytes;
+use futures::stream;
+use futures::StreamExt;
+use futures::TryFutureExt as _;
+use futures::TryStreamExt as _;
 use http::StatusCode;
-use http_body_util::Full as FullBody;
+use http_body_util::BodyDataStream;
 use hyper::body::Incoming as IncomingBody;
-use hyper::Request;
-use hyper::Response;
 use intertwine_lib_hex::FromHex as _;
+use std::time::Duration;
+use tokio::sync::mpsc;
+use tokio_stream::wrappers as stream_wrappers;
 
 const CODE_ID_PREFIX: &str = "/.code/.id/";
 const CODE_PREFIX: &str = "/.code/";
+const STREAM_PATH: &str = "/.stream";
 const INIT_HTML_PATH: &str = "svc-gateway-guest-run/init.html";
+const RESPONSE_STREAM_CHANNEL_BUFFER_SIZE: usize = 16;
+const RESPONSE_STREAM_CHANNEL_SEND_TIMEOUT: Duration =
+  Duration::from_millis(1_000);
 
 pub async fn handle<TContext>(
   ctx: &TContext,
-  req: Request<IncomingBody>,
-) -> Result<Response<FullBody<Bytes>>>
+  req: svc_request::BaseRequest,
+) -> Result<svc_response::BaseResponse>
 where
   TContext: svc_db::Context,
+  TContext: svc_random::Context,
+  TContext: svc_state::Context,
 {
-  handle_paths(ctx, &svc_request::SimpleRequest::new(&req))
-    .await
-    .unwrap_or_else(handle_error)
-    .into_response()
+  let result = if req.uri().path() == STREAM_PATH {
+    handle_stream(ctx, req).await
+  } else {
+    handle_content(ctx, req).await
+  };
+  result.or_else(handle_error)
 }
 
 #[allow(clippy::print_stderr)]
-fn handle_error(err: Error) -> svc_response::SimpleResponse {
+fn handle_error(err: Error) -> Result<svc_response::BaseResponse> {
   let err = if err.is::<svc_response::Error>() {
     err.downcast().expect("downcast")
   } else {
@@ -40,43 +56,46 @@ fn handle_error(err: Error) -> svc_response::SimpleResponse {
       "Internal error",
     )
   };
-  err.into_simple_response()
+  err.into_response()
 }
 
-async fn handle_paths<TContext>(
+async fn handle_content<TContext>(
   ctx: &TContext,
-  req: &svc_request::SimpleRequest<'_>,
-) -> Result<svc_response::SimpleResponse>
+  req: svc_request::BaseRequest,
+) -> Result<svc_response::BaseResponse>
 where
   TContext: svc_db::Context,
 {
-  let path = req.path;
-  let response = if let Some(path) = path.strip_prefix(CODE_ID_PREFIX) {
-    handle_content_by_id(
-      ctx,
-      &svc_request::ContentRequest::try_new(req, path)?,
-    )
-    .await?
-  } else if let Some(path) = path.strip_prefix(CODE_PREFIX) {
-    handle_content_by_path(
-      ctx,
-      &svc_request::ContentRequest::try_new(req, path)?,
-    )
-    .await?
-  } else if path == "/" {
-    handle_content_by_path(
-      ctx,
-      &svc_request::ContentRequest::try_new_no_sandbox(
-        req,
-        INIT_HTML_PATH,
-      )?,
-    )
-    .await?
-  } else {
-    None
-  };
-  if let Some(response) = response {
-    Ok(response.into_simple_response())
+  let req = svc_request::DataRequest::new(req)?;
+  let content_response =
+    if let Some(path) = req.path.strip_prefix(CODE_ID_PREFIX) {
+      let path = path.to_owned();
+      handle_content_by_id(
+        ctx,
+        svc_request::ContentRequest::try_new(req, path)?,
+      )
+      .await?
+    } else if let Some(path) = req.path.strip_prefix(CODE_PREFIX) {
+      let path = path.to_owned();
+      handle_content_by_path(
+        ctx,
+        svc_request::ContentRequest::try_new(req, path)?,
+      )
+      .await?
+    } else if &req.path == "/" {
+      handle_content_by_path(
+        ctx,
+        svc_request::ContentRequest::try_new_no_sandbox(
+          req,
+          INIT_HTML_PATH.to_owned(),
+        )?,
+      )
+      .await?
+    } else {
+      None
+    };
+  if let Some(response) = content_response {
+    response.into_response()
   } else {
     Err(
       svc_response::Error::new(StatusCode::NOT_FOUND, "Not found").into(),
@@ -87,12 +106,12 @@ where
 #[allow(clippy::print_stderr)]
 async fn handle_content_by_id<TContext>(
   ctx: &TContext,
-  req: &svc_request::ContentRequest<'_>,
+  req: svc_request::ContentRequest,
 ) -> Result<Option<svc_response::ContentResponse>>
 where
   TContext: svc_db::Context,
 {
-  let content_id = Vec::from_hex(req.path_prefix).map_err(|_| {
+  let content_id = Vec::from_hex(&req.path_prefix).map_err(|_| {
     eprintln!("  invalid content ID hex");
     svc_response::Error::new(
       StatusCode::BAD_REQUEST,
@@ -115,12 +134,12 @@ where
 
 async fn handle_content_by_path<TContext>(
   ctx: &TContext,
-  req: &svc_request::ContentRequest<'_>,
+  req: svc_request::ContentRequest,
 ) -> Result<Option<svc_response::ContentResponse>>
 where
   TContext: svc_db::Context,
 {
-  let path_id = req.full_path.to_owned();
+  let path_id = req.full_path.clone();
   let content_row = ctx.db().get_content_by_path(path_id).await?;
   if let Some(content_row) = content_row {
     Ok(Some(svc_response::ContentResponse::try_new(
@@ -130,6 +149,73 @@ where
   } else {
     Ok(None)
   }
+}
+
+#[allow(clippy::print_stdout)]
+async fn handle_stream<TContext>(
+  ctx: &TContext,
+  req: svc_request::BaseRequest,
+) -> Result<svc_response::BaseResponse>
+where
+  TContext: svc_db::Context,
+  TContext: svc_random::Context,
+  TContext: svc_state::Context,
+{
+  let req = svc_request::StreamRequest::new(req)?;
+  if let Some(response_stream_id) = &req.response_stream_id {
+    println!("Request with response stream ID {response_stream_id:?}");
+    let response_stream_sender =
+      ctx.state().find_response_stream(response_stream_id)?;
+    handle_stream_request(req, response_stream_sender).await?;
+    svc_response::StreamResponse {
+      response_stream_id: None,
+      body: stream::empty::<Result<&[u8]>>(),
+    }
+    .into_response()
+  } else {
+    let response_stream_id = ctx.random().response_stream_id()?.expose();
+    println!("New response stream ID {response_stream_id:?}");
+    let (response_stream_sender, response_stream_receiver) =
+      mpsc::channel(RESPONSE_STREAM_CHANNEL_BUFFER_SIZE);
+    ctx.state().register_response_stream(
+      &response_stream_id,
+      &response_stream_sender,
+    )?;
+    let request_stream_handle = tokio::spawn(async move {
+      handle_stream_request(req, response_stream_sender).await
+    });
+    let response_stream_future = request_stream_handle
+      .map_ok(|_| {
+        // TODO cancel the response
+        vec![]
+      })
+      .map_err(Error::new);
+    svc_response::StreamResponse {
+      response_stream_id: Some(response_stream_id),
+      body: stream_wrappers::ReceiverStream::new(response_stream_receiver)
+        .map(Ok)
+        .chain(stream::once(response_stream_future)),
+    }
+    .into_response()
+  }
+}
+
+async fn handle_stream_request(
+  req: svc_request::StreamRequest<BodyDataStream<IncomingBody>>,
+  response_stream_sender: mpsc::Sender<Vec<u8>>,
+) -> Result<()> {
+  req
+    .data
+    .map_err(Error::new)
+    .try_for_each(|data| {
+      response_stream_sender
+        .send_timeout(
+          data.to_ascii_uppercase(),
+          RESPONSE_STREAM_CHANNEL_SEND_TIMEOUT,
+        )
+        .map_err(Error::new)
+    })
+    .await
 }
 
 #[cfg(test)]

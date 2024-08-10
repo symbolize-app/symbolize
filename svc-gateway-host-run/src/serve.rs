@@ -1,6 +1,6 @@
 use crate::context as svc_context;
+use crate::executor as svc_executor;
 use crate::handle as svc_handle;
-use crate::task_tracker as svc_task_tracker;
 use anyhow::anyhow;
 use anyhow::Result;
 use hyper::server::conn::http2;
@@ -117,7 +117,7 @@ async fn serve_http2(
     async move { svc_handle::handle(ctx.as_ref(), req).await }
   });
   let executor =
-    svc_task_tracker::TaskTrackerExecutor::new(&request_task_tracker);
+    svc_executor::Executor::new(ctx.clone(), &request_task_tracker);
   let connection_result = http2::Builder::new(executor)
     .serve_connection(tcp_io, service)
     .await;

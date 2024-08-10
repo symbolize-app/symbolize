@@ -15,6 +15,7 @@
   "include": ["./**/*.ts", "./**/*.js", "./**/*.cjs"],
   "references": [
     { "path": "../lib-collection" },
+    { "path": "../lib-concurrency" },
     { "path": "../lib-test" },
     { "path": "../lib-time" }
   ]

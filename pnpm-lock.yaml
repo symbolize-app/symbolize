@@ -462,6 +462,9 @@ importers:
       '@intertwine/lib-collection':
         specifier: workspace:*
         version: link:../lib-collection
+      '@intertwine/lib-concurrency':
+        specifier: workspace:*
+        version: link:../lib-concurrency
       '@intertwine/lib-test':
         specifier: workspace:*
         version: link:../lib-test

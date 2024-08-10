@@ -12,7 +12,7 @@ async fn test_no_sandbox_content_security_policy() -> Result<()> {
     e_tag: "010f".to_owned(),
     original: vec![0x09],
   };
-  let response = response.into_simple_response().into_response()?;
+  let response = response.into_response()?;
   let content_security_policy = response
     .headers()
     .get(svc_header::ContentSecurityPolicy::key())

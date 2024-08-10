@@ -1,12 +1,12 @@
 use crate::header as svc_header;
-use crate::response::ext::BuilderExt as _;
+use crate::response::base as svc_response_base;
+use crate::response::base::BuilderExt as _;
 use anyhow::Result;
 use bytes::Bytes;
 use http::StatusCode;
-use http_body_util::Full as FullBody;
 use hyper::Response;
 
-pub struct SimpleResponse {
+pub struct DataResponse {
   pub status: StatusCode,
   pub sandbox: bool,
   pub cache_control: Option<svc_header::CacheControl>,
@@ -16,8 +16,8 @@ pub struct SimpleResponse {
   pub body: Bytes,
 }
 
-impl SimpleResponse {
-  pub fn into_response(self) -> Result<Response<FullBody<Bytes>>> {
+impl DataResponse {
+  pub fn into_response(self) -> Result<svc_response_base::BaseResponse> {
     Ok(
       Response::builder()
         .status(self.status)
@@ -33,7 +33,7 @@ impl SimpleResponse {
         .header_pair(self.content_type)
         .header_pair_opt(self.e_tag)
         .header_pair_opt(self.service_worker_allowed)
-        .full_body(self.body)?,
+        .data_body(self.body)?,
     )
   }
 }
