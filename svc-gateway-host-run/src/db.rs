@@ -10,6 +10,8 @@ use mockall::mock;
 use rusqlite;
 use rusqlite::OptionalExtension as _;
 use std::sync::Arc;
+use std::thread;
+use std::thread::ThreadId;
 use std::time::Duration;
 use tokio::process::Command;
 use tokio::runtime::Handle as TokioHandle;
@@ -54,7 +56,8 @@ pub trait Db {
 
 pub struct DbImpl {
   connection_task_tracker: TaskTracker,
-  idle_connections: Arc<ArrayQueue<oneshot::Sender<QueryRequest>>>,
+  idle_connections:
+    Arc<ArrayQueue<(ThreadId, oneshot::Sender<QueryRequest>)>>,
 }
 
 struct MainQueryContext<'connection> {
@@ -136,14 +139,16 @@ impl DbImpl {
       })
     }));
 
-    while let Some(idle_request_tx) = self.idle_connections.pop() {
+    while let Some((thread_id, idle_request_tx)) =
+      self.idle_connections.pop()
+    {
       match idle_request_tx.send(request) {
         Ok(()) => {
-          println!("  DB old thread");
+          println!("  DB old thread {thread_id:?}");
           return response_rx.await?;
         }
         Err(send_failed) => {
-          eprintln!("Idle request send error");
+          eprintln!("  DB thread closed {thread_id:?}");
           request = send_failed;
         }
       }
@@ -152,21 +157,28 @@ impl DbImpl {
     let handle = TokioHandle::current();
     let idle_connections = self.idle_connections.clone();
     self.connection_task_tracker.spawn_thread(move || {
+      let thread_id = thread::current().id();
+      println!("  DB new thread {thread_id:?}");
+
       if let Err(err) =
-        Self::run_thread(&handle, &idle_connections, request)
+        Self::run_thread(&handle, &idle_connections, thread_id, request)
       {
-        eprintln!("Thread error: {err:?}");
+        eprintln!("  DB thread {thread_id:?} error: {err:?}");
       }
     });
 
-    println!("  DB new thread");
     response_rx.await?
   }
 
   #[allow(clippy::print_stderr)]
+  #[allow(clippy::print_stdout)]
   fn run_thread(
     handle: &TokioHandle,
-    idle_connections: &ArrayQueue<oneshot::Sender<QueryRequest>>,
+    idle_connections: &ArrayQueue<(
+      ThreadId,
+      oneshot::Sender<QueryRequest>,
+    )>,
+    thread_id: ThreadId,
     init_request: QueryRequest,
   ) -> Result<()> {
     let connection = match Self::open_db_connection() {
@@ -188,16 +200,25 @@ impl DbImpl {
     loop {
       let (idle_request_tx, mut idle_request_rx) = oneshot::channel();
 
-      // Drop any old/replaced TX, will raise an RX error
-      idle_connections.force_push(idle_request_tx);
+      // Drop any old/replaced TX if queue full, will raise an RX error
+      let replaced =
+        idle_connections.force_push((thread_id, idle_request_tx));
+      if let Some((other_thread_id, _)) = replaced {
+        println!("Replaced DB thread {other_thread_id:?}");
+      }
 
       let idle_request_result = handle.block_on(async {
         select! {
           idle_request = (&mut idle_request_rx) =>
             idle_request.map_err(
-              |_| oneshot::error::TryRecvError::Closed
+              |_| {
+                // Only error possible is TX closed
+                oneshot::error::TryRecvError::Closed
+              }
             ),
           () = sleep(IDLE_CONNECTION_TIMEOUT) => {
+            // Trigger an error for future TX, but stil check for raced TX
+            println!("Closing DB thread {thread_id:?}");
             idle_request_rx.close();
             idle_request_rx.try_recv()
           }
