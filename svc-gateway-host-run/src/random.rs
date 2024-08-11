@@ -47,18 +47,7 @@ impl Random for RandomImpl {
   }
 }
 
-pub trait RandomExt {
-  fn generate<T>(&self) -> Result<rand::Random<T>, Error>
-  where
-    T: rand::RandomlyConstructable;
-
-  fn response_stream_id(&self) -> Result<rand::Random<[u8; 256]>, Error>;
-}
-
-impl<R> RandomExt for R
-where
-  R: Random,
-{
+pub trait RandomExt: Random {
   fn generate<T>(&self) -> Result<rand::Random<T>, Error>
   where
     T: rand::RandomlyConstructable,
@@ -70,3 +59,5 @@ where
     self.generate()
   }
 }
+
+impl<R> RandomExt for R where R: Random {}

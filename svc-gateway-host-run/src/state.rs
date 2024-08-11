@@ -55,27 +55,7 @@ impl State for StateImpl {
   }
 }
 
-pub trait StateExt {
-  async fn scope_response_stream<F>(&self, f: F) -> <F as Future>::Output
-  where
-    F: Future;
-
-  fn register_response_stream(
-    &self,
-    response_stream_id: &[u8],
-    response_stream_sender: &mpsc::Sender<Vec<u8>>,
-  ) -> Result<()>;
-
-  fn find_response_stream(
-    &self,
-    response_stream_id: &[u8],
-  ) -> Result<mpsc::Sender<Vec<u8>>>;
-}
-
-impl<T> StateExt for T
-where
-  T: State,
-{
+pub trait StateExt: State {
   async fn scope_response_stream<F>(&self, f: F) -> <F as Future>::Output
   where
     F: Future,
@@ -129,3 +109,5 @@ where
     )
   }
 }
+
+impl<T> StateExt for T where T: State {}

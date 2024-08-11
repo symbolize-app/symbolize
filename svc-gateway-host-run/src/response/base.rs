@@ -7,6 +7,7 @@ use futures::stream;
 use futures::stream::StreamExt as _;
 use http;
 use http::response::Builder;
+use http::HeaderName;
 use http::HeaderValue;
 use http_body::Body;
 use http_body::Frame;
@@ -19,43 +20,42 @@ use std::pin::Pin;
 pub type BaseResponse =
   Response<Pin<Box<dyn Body<Data = Bytes, Error = Error> + Sync + Send>>>;
 
-pub trait BuilderExt {
-  fn header_pair<T>(self, header: T) -> Self
+trait BuilderStruct: Sized {
+  fn header_<K, V>(self, key: K, value: V) -> Self
   where
-    T: svc_header::HeaderPair,
-    HeaderValue: TryFrom<T>,
-    <HeaderValue as TryFrom<T>>::Error: Into<http::Error>;
+    HeaderName: TryFrom<K>,
+    <HeaderName as TryFrom<K>>::Error: Into<http::Error>,
+    HeaderValue: TryFrom<V>,
+    <HeaderValue as TryFrom<V>>::Error: Into<http::Error>;
 
-  fn header_pair_opt<T>(self, header: Option<T>) -> Self
-  where
-    T: svc_header::HeaderPair,
-    HeaderValue: TryFrom<T>,
-    <HeaderValue as TryFrom<T>>::Error: Into<http::Error>;
-
-  fn data_body<T>(
-    self,
-    body: T,
-  ) -> http::Result<svc_response_base::BaseResponse>
-  where
-    Bytes: From<T>;
-
-  fn stream_body<S, T>(
-    self,
-    body: S,
-  ) -> http::Result<svc_response_base::BaseResponse>
-  where
-    S: stream::Stream<Item = Result<T>> + Sync + Send + 'static,
-    Bytes: From<T>;
+  fn body_<T>(self, body: T) -> http::Result<Response<T>>;
 }
 
-impl BuilderExt for Builder {
+impl BuilderStruct for Builder {
+  fn header_<K, V>(self, key: K, value: V) -> Self
+  where
+    HeaderName: TryFrom<K>,
+    <HeaderName as TryFrom<K>>::Error: Into<http::Error>,
+    HeaderValue: TryFrom<V>,
+    <HeaderValue as TryFrom<V>>::Error: Into<http::Error>,
+  {
+    self.header(key, value)
+  }
+
+  fn body_<T>(self, body: T) -> http::Result<Response<T>> {
+    self.body(body)
+  }
+}
+
+#[allow(private_bounds)]
+pub trait BuilderExt: BuilderStruct {
   fn header_pair<T>(self, header: T) -> Self
   where
     T: svc_header::HeaderPair,
     HeaderValue: TryFrom<T>,
     <HeaderValue as TryFrom<T>>::Error: Into<http::Error>,
   {
-    self.header(T::key(), header)
+    self.header_(T::key(), header)
   }
 
   fn header_pair_opt<T>(self, header: Option<T>) -> Self
@@ -65,7 +65,7 @@ impl BuilderExt for Builder {
     <HeaderValue as TryFrom<T>>::Error: Into<http::Error>,
   {
     if let Some(header) = header {
-      self.header(T::key(), header)
+      self.header_(T::key(), header)
     } else {
       self
     }
@@ -78,7 +78,7 @@ impl BuilderExt for Builder {
   where
     Bytes: From<T>,
   {
-    self.body(Box::pin(
+    self.body_(Box::pin(
       FullBody::new(Bytes::from(body)).map_err(anyhow::Error::new),
     ))
   }
@@ -93,6 +93,8 @@ impl BuilderExt for Builder {
   {
     let body =
       body.map(|item| item.map(|item| Frame::data(Bytes::from(item))));
-    self.body(Box::pin(StreamBody::new(body)))
+    self.body_(Box::pin(StreamBody::new(body)))
   }
 }
+
+impl BuilderExt for Builder {}
