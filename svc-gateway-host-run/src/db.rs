@@ -9,6 +9,7 @@ use mockall::automock;
 use mockall::mock;
 use rusqlite;
 use rusqlite::OptionalExtension as _;
+use std::future::Future;
 use std::sync::Arc;
 use std::thread;
 use std::thread::ThreadId;
@@ -43,17 +44,18 @@ mock! {
 
 #[cfg_attr(test, automock)]
 pub trait Db {
-  async fn get_content_by_id(
+  fn get_content_by_id(
     &self,
     content_id: Vec<u8>,
-  ) -> Result<Option<Vec<u8>>>;
+  ) -> impl Future<Output = Result<Option<Vec<u8>>>> + Send;
 
-  async fn get_content_by_path(
+  fn get_content_by_path(
     &self,
     path_id: String,
-  ) -> Result<Option<ContentRowWithId>>;
+  ) -> impl Future<Output = Result<Option<ContentRowWithId>>> + Send;
 }
 
+#[derive(Debug)]
 pub struct DbImpl {
   connection_task_tracker: TaskTracker,
   idle_connections:
@@ -65,6 +67,7 @@ struct MainQueryContext<'connection> {
   get_content_by_path: rusqlite::Statement<'connection>,
 }
 
+#[derive(Debug)]
 pub struct ContentRowWithId {
   pub id: Vec<u8>,
   pub original: Vec<u8>,

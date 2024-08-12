@@ -4,8 +4,10 @@ use http::HeaderValue;
 use hyper::header::HeaderName;
 
 // https://www.w3.org/TR/service-workers/#service-worker-allowed
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct ServiceWorkerAllowed(pub &'static str);
+
+impl Copy for ServiceWorkerAllowed {}
 
 static SERVICE_WORKER_ALLOWED: HeaderName =
   HeaderName::from_static("service-worker-allowed");

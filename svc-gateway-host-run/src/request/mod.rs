@@ -4,6 +4,7 @@ mod data;
 mod stream;
 
 pub use base::BaseRequest;
+pub use base::HeaderMapExt;
 pub use content::ContentMime;
 pub use content::ContentRequest;
 pub use data::DataRequest;

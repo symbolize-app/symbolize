@@ -6,6 +6,7 @@ use bytes::Bytes;
 use http::StatusCode;
 use hyper::Response;
 
+#[derive(Debug)]
 pub struct DataResponse {
   pub status: StatusCode,
   pub sandbox: bool,

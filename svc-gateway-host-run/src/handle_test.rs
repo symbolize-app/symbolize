@@ -10,7 +10,7 @@ async fn test_handle_content_by_id() {
   db.expect_get_content_by_id()
     .with(eq(vec![0x01, 0x0f]))
     .times(1)
-    .returning(|_| Ok(Some(vec![0x09])));
+    .returning(|_| Box::pin(async { Ok(Some(vec![0x09])) }));
 
   let mut ctx = svc_db::MockContext::new();
   ctx.expect_db().times(1).return_const(db);
@@ -43,10 +43,12 @@ async fn test_handle_content_by_path() {
     .with(eq("a.js".to_owned()))
     .times(1)
     .returning(|_| {
-      Ok(Some(svc_db::ContentRowWithId {
-        id: vec![0xff],
-        original: vec![0x08],
-      }))
+      Box::pin(async {
+        Ok(Some(svc_db::ContentRowWithId {
+          id: vec![0xff],
+          original: vec![0x08],
+        }))
+      })
     });
 
   let mut ctx = svc_db::MockContext::new();

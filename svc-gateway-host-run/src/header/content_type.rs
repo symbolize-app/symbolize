@@ -6,8 +6,10 @@ use hyper::header::HeaderName;
 use mime;
 
 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Type
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct ContentType(pub &'static mime::Mime);
+
+impl Copy for ContentType {}
 
 impl HeaderPair for ContentType {
   fn key() -> &'static HeaderName {

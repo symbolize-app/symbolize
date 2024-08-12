@@ -6,13 +6,14 @@ use std::future::Future;
 use std::sync::Arc;
 use tokio_util::task::TaskTracker;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Executor {
   pub ctx: Arc<svc_context::ContextImpl>,
   pub task_tracker: TaskTracker,
 }
 
 impl Executor {
+  #[must_use]
   pub fn new(
     ctx: Arc<svc_context::ContextImpl>,
     task_tracker: &TaskTracker,

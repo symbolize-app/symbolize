@@ -9,3 +9,6 @@ path = "src/mod.rs"
 
 [dependencies]
 anyhow = { workspace = true }
+
+[lints]
+workspace = true

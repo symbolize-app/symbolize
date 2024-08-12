@@ -2,6 +2,7 @@ use crate::db as svc_db;
 use crate::random as svc_random;
 use crate::state as svc_state;
 
+#[derive(Debug)]
 pub struct ContextImpl {
   pub db: svc_db::DbImpl,
   pub random: svc_random::RandomImpl,

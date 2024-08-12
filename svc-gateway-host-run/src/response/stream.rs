@@ -7,6 +7,7 @@ use futures::stream;
 use http::StatusCode;
 use hyper::Response;
 
+#[derive(Debug)]
 pub struct StreamResponse<S> {
   pub response_stream_id: Option<[u8; 256]>,
   pub body: S,
