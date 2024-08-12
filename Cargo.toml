@@ -38,3 +38,67 @@ tokio-rustls = { version = "0.25.0", features = ["logging", "ring", "tls12"] }
 tokio-stream = { version = "0.1.14", features = ["net"] }
 tokio-util = { version = "0.7.10", features = ["rt"] }
 watchman_client = { version = "0.8.0", features = [] }
+
+
+[workspace.lints.rust]
+# Groups
+future-incompatible = "warn"
+let-underscore = "warn"
+nonstandard-style = "warn"
+refining-impl-trait = "warn"
+unused = "warn"
+
+# Allowed by default
+absolute-paths-not-starting-with-crate = "warn"
+deprecated-in-future = "warn"
+elided-lifetimes-in-paths = "warn"
+explicit-outlives-requirements = "warn"
+ffi-unwind-calls = "warn"
+keyword-idents = "warn"
+macro-use-extern-crate = "warn"
+meta-variable-misuse = "warn"
+missing-abi = "warn"
+missing-copy-implementations = "warn"
+missing-debug-implementations = "warn"
+missing-docs = "allow"
+single-use-lifetimes = "warn"
+trivial-casts = "warn"
+trivial-numeric-casts = "warn"
+unit-bindings = "warn"
+unreachable-pub = "warn"
+unsafe-op-in-unsafe-fn = "warn"
+unsafe_code = "warn"
+unused-crate-dependencies = "warn"
+unused-extern-crates = "warn"
+unused-import-braces = "warn"
+unused-lifetimes = "warn"
+unused-macro-rules = "warn"
+unused-qualifications = "warn"
+unused-tuple-struct-fields = "warn"
+variant-size-differences = "warn"
+
+[workspace.lints.clippy]
+cargo = "warn"
+
+# Pedantic
+pedantic = "warn"
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+module_name_repetitions = "allow"
+
+# Style
+style = "warn"
+single_component_path_imports = "allow"
+
+# Restrictions
+absolute_paths = "warn"
+dbg_macro = "warn"
+exit = "warn"
+panic_in_result_fn = "warn"
+partial_pub_fields = "warn"
+print_stderr = "warn"
+print_stdout = "warn"
+pub_without_shorthand = "warn"
+self_named_module_files = "warn"
+try_err = "warn"
+unwrap_in_result = "warn"

@@ -9,6 +9,7 @@ use hyper::header::HeaderName;
 pub struct CacheControl(pub Vec<Directive>);
 
 impl CacheControl {
+  #[must_use]
   pub fn builder() -> Builder {
     Builder(Vec::new())
   }
@@ -31,6 +32,7 @@ impl Directive {
   }
 }
 
+#[derive(Debug)]
 pub struct Builder(Vec<Directive>);
 
 impl Builder {

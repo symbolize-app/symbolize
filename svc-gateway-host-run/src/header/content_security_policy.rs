@@ -9,6 +9,7 @@ use hyper::header::HeaderName;
 pub struct ContentSecurityPolicy(pub Vec<Directive>);
 
 impl ContentSecurityPolicy {
+  #[must_use]
   pub fn builder() -> Builder {
     Builder(Vec::new())
   }
@@ -35,6 +36,7 @@ impl Directive {
   }
 }
 
+#[derive(Debug)]
 pub struct Builder(Vec<Directive>);
 
 impl Builder {

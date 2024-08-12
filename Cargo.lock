@@ -632,8 +632,6 @@ dependencies = [
  "backon",
  "clap",
  "nix",
- "serde",
- "serde_json",
  "tokio",
  "watchman_client",
 ]

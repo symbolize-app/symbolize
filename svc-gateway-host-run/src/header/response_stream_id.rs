@@ -4,7 +4,10 @@ use http::HeaderValue;
 use hyper::header::HeaderName;
 use intertwine_lib_hex::ToHex as _;
 
+#[derive(Clone, Debug)]
 pub struct ResponseStreamId(pub [u8; 256]);
+
+impl Copy for ResponseStreamId {}
 
 static RESPONSE_STREAM_ID: HeaderName =
   HeaderName::from_static("response-stream-id");

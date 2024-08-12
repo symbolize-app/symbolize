@@ -3,36 +3,11 @@ version: '3'
 run: when_changed
 
 vars:
+  # Note: some options still needed as args (https://github.com/rust-lang/rust-clippy/issues/7290)
   CLIPPY_ARGS: >-
     --
-    -W clippy::cargo
-    -W clippy::pedantic
-    -W clippy::style
-    {{.CLIPPY_PEDANTIC}}
-    {{.CLIPPY_STYLE}}
-    {{.CLIPPY_RESTRICTIONS}}
-    -D warnings
-
-  CLIPPY_PEDANTIC: >-
-    -A clippy::missing_errors_doc
-    -A clippy::missing_panics_doc
-    -A clippy::module_name_repetitions
-
-  CLIPPY_STYLE: >-
     -A clippy::single_component_path_imports
-
-  CLIPPY_RESTRICTIONS: >-
-    -W clippy::absolute_paths
-    -W clippy::dbg_macro
-    -W clippy::exit
-    -W clippy::panic_in_result_fn
-    -W clippy::partial_pub_fields
-    -W clippy::print_stderr
-    -W clippy::print_stdout
-    -W clippy::pub_without_shorthand
-    -W clippy::self_named_module_files
-    -W clippy::try_err
-    -W clippy::unwrap_in_result
+    -D warnings
 
 tasks:
   bin:install:

@@ -7,6 +7,7 @@ use http_body_util::BodyExt as _;
 use hyper::body::Incoming as IncomingBody;
 use intertwine_lib_hex::FromHex as _;
 
+#[derive(Debug)]
 pub struct StreamRequest<S> {
   pub method: Method,
   pub response_stream_id: Option<Vec<u8>>,

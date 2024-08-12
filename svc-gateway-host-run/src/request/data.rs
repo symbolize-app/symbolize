@@ -4,6 +4,7 @@ use crate::request::base::HeaderMapExt as _;
 use anyhow::Result;
 use http::Method;
 
+#[derive(Debug)]
 pub struct DataRequest {
   pub method: Method,
   pub path: String,

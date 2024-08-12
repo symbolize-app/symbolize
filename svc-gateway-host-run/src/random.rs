@@ -29,11 +29,13 @@ pub trait Random {
   fn rng(&self) -> &dyn rand::SecureRandom;
 }
 
+#[derive(Debug)]
 pub struct RandomImpl {
   system_random: rand::SystemRandom,
 }
 
 impl RandomImpl {
+  #[must_use]
   pub fn init() -> Self {
     RandomImpl {
       system_random: rand::SystemRandom::new(),

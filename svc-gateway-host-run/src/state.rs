@@ -37,11 +37,13 @@ pub trait State {
   fn response_streams(&self) -> &DashMap<Vec<u8>, mpsc::Sender<Vec<u8>>>;
 }
 
+#[derive(Debug)]
 pub struct StateImpl {
   response_streams: DashMap<Vec<u8>, mpsc::Sender<Vec<u8>>>,
 }
 
 impl StateImpl {
+  #[must_use]
   pub fn init() -> Self {
     StateImpl {
       response_streams: DashMap::new(),
@@ -56,22 +58,28 @@ impl State for StateImpl {
 }
 
 pub trait StateExt: State {
-  async fn scope_response_stream<F>(&self, f: F) -> <F as Future>::Output
+  fn scope_response_stream<F>(
+    &self,
+    f: F,
+  ) -> impl Future<Output = <F as Future>::Output> + Send
   where
-    F: Future,
+    F: Future + Send,
+    Self: Sync,
   {
-    let mut task_local_future =
-      pin!(RESPONSE_STREAM_ID_CELL.scope(OnceCell::new(), f));
-    let result = task_local_future.as_mut().await;
-    let response_stream_id_cell = task_local_future
-      .as_mut()
-      .take_value()
-      .expect("taken twice");
-    if let Some(response_stream_id) = response_stream_id_cell.get() {
-      let removed = self.response_streams().remove(response_stream_id);
-      assert!(removed.is_some(), "missing response stream key");
+    async {
+      let mut task_local_future =
+        pin!(RESPONSE_STREAM_ID_CELL.scope(OnceCell::new(), f));
+      let result = task_local_future.as_mut().await;
+      let response_stream_id_cell = task_local_future
+        .as_mut()
+        .take_value()
+        .expect("taken twice");
+      if let Some(response_stream_id) = response_stream_id_cell.get() {
+        let removed = self.response_streams().remove(response_stream_id);
+        assert!(removed.is_some(), "missing response stream key");
+      }
+      result
     }
-    result
   }
 
   fn register_response_stream(

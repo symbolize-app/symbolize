@@ -1,5 +1,4 @@
 use crate::header as svc_header;
-use crate::response::base as svc_response_base;
 use anyhow::Error;
 use anyhow::Result;
 use bytes::Bytes;
@@ -49,6 +48,7 @@ impl BuilderStruct for Builder {
 
 #[allow(private_bounds)]
 pub trait BuilderExt: BuilderStruct {
+  #[must_use]
   fn header_pair<T>(self, header: T) -> Self
   where
     T: svc_header::HeaderPair,
@@ -58,6 +58,7 @@ pub trait BuilderExt: BuilderStruct {
     self.header_(T::key(), header)
   }
 
+  #[must_use]
   fn header_pair_opt<T>(self, header: Option<T>) -> Self
   where
     T: svc_header::HeaderPair,
@@ -71,10 +72,7 @@ pub trait BuilderExt: BuilderStruct {
     }
   }
 
-  fn data_body<T>(
-    self,
-    body: T,
-  ) -> http::Result<svc_response_base::BaseResponse>
+  fn data_body<T>(self, body: T) -> http::Result<BaseResponse>
   where
     Bytes: From<T>,
   {
@@ -83,10 +81,7 @@ pub trait BuilderExt: BuilderStruct {
     ))
   }
 
-  fn stream_body<S, T>(
-    self,
-    body: S,
-  ) -> http::Result<svc_response_base::BaseResponse>
+  fn stream_body<S, T>(self, body: S) -> http::Result<BaseResponse>
   where
     S: stream::Stream<Item = Result<T>> + Sync + Send + 'static,
     Bytes: From<T>,
