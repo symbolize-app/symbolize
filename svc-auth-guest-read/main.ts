@@ -39,7 +39,12 @@ async function testStream(
   if (!response.body) {
     throw new Error('missing response body')
   }
-  const responsePromise = response.body.pipeTo(responseSink.writable)
+  const responsePromise = response.body
+    .pipeTo(responseSink.writable)
+    .then(() => {
+      // eslint-disable-next-line no-console
+      console.log('resposne done')
+    })
 
   const source = stream.Source.build<Uint8Array>()
   const requestUrl = new URL('/.stream', self.location.origin)
