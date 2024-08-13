@@ -34,12 +34,12 @@ tokio::task_local! {
 
 #[cfg_attr(test, automock)]
 pub trait State {
-  fn response_streams(&self) -> &DashMap<Vec<u8>, mpsc::Sender<Vec<u8>>>;
+  fn response_streams(&self) -> &DashMap<Vec<u8>, ResponseStreamState>;
 }
 
 #[derive(Debug)]
 pub struct StateImpl {
-  response_streams: DashMap<Vec<u8>, mpsc::Sender<Vec<u8>>>,
+  response_streams: DashMap<Vec<u8>, ResponseStreamState>,
 }
 
 impl StateImpl {
@@ -52,9 +52,15 @@ impl StateImpl {
 }
 
 impl State for StateImpl {
-  fn response_streams(&self) -> &DashMap<Vec<u8>, mpsc::Sender<Vec<u8>>> {
+  fn response_streams(&self) -> &DashMap<Vec<u8>, ResponseStreamState> {
     &self.response_streams
   }
+}
+
+#[derive(Clone, Debug)]
+pub struct ResponseStreamState {
+  pub sender: mpsc::Sender<Vec<u8>>,
+  pub close: mpsc::Sender<()>,
 }
 
 pub trait StateExt: State {
@@ -85,14 +91,14 @@ pub trait StateExt: State {
   fn register_response_stream(
     &self,
     response_stream_id: &[u8],
-    response_stream_sender: &mpsc::Sender<Vec<u8>>,
+    response_stream_state: &ResponseStreamState,
   ) -> Result<()> {
     if self.response_streams().contains_key(response_stream_id) {
       Err(anyhow!("duplicate response stream key"))
     } else {
       self.response_streams().insert(
         response_stream_id.to_vec(),
-        response_stream_sender.clone(),
+        response_stream_state.clone(),
       );
       RESPONSE_STREAM_ID_CELL.with(|response_stream_id_cell| {
         response_stream_id_cell
@@ -106,15 +112,11 @@ pub trait StateExt: State {
   fn find_response_stream(
     &self,
     response_stream_id: &[u8],
-  ) -> Result<mpsc::Sender<Vec<u8>>> {
-    Ok(
-      self
-        .response_streams()
-        .get(response_stream_id)
-        .ok_or_else(|| anyhow!("response stream not found"))?
-        .value()
-        .clone(),
-    )
+  ) -> Option<ResponseStreamState> {
+    self
+      .response_streams()
+      .get(response_stream_id)
+      .map(|pair| pair.value().clone())
   }
 }
 

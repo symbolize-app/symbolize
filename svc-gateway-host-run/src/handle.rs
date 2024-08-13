@@ -17,7 +17,9 @@ use http_body_util::BodyDataStream;
 use hyper::body::Incoming as IncomingBody;
 use intertwine_lib_hex::FromHex as _;
 use std::time::Duration;
+use tokio;
 use tokio::sync::mpsc;
+use tokio::time::sleep;
 use tokio_stream::wrappers as stream_wrappers;
 
 const CODE_ID_PREFIX: &str = "/.code/.id/";
@@ -27,6 +29,8 @@ const INIT_HTML_PATH: &str = "svc-gateway-guest-run/init.html";
 const RESPONSE_STREAM_CHANNEL_BUFFER_SIZE: usize = 16;
 const RESPONSE_STREAM_CHANNEL_SEND_TIMEOUT: Duration =
   Duration::from_millis(1_000);
+const RESPONSE_STREAM_IDLE_TIMEOUT: Duration =
+  Duration::from_millis(5_000);
 
 pub async fn handle<TContext>(
   ctx: &TContext,
@@ -164,9 +168,16 @@ where
   let req = svc_request::StreamRequest::new(req)?;
   if let Some(response_stream_id) = &req.response_stream_id {
     println!("Request with response stream ID {response_stream_id:?}");
-    let response_stream_sender =
-      ctx.state().find_response_stream(response_stream_id)?;
-    handle_stream_request(req, response_stream_sender).await?;
+    let response_stream_state = ctx
+      .state()
+      .find_response_stream(response_stream_id)
+      .ok_or_else(|| {
+        svc_response::Error::new(
+          StatusCode::NOT_FOUND,
+          "response stream not found",
+        )
+      })?;
+    handle_stream_request(req, response_stream_state).await?;
     svc_response::StreamResponse {
       response_stream_id: None,
       body: stream::empty::<Result<&[u8]>>(),
@@ -177,22 +188,27 @@ where
     println!("New response stream ID {response_stream_id:?}");
     let (response_stream_sender, response_stream_receiver) =
       mpsc::channel(RESPONSE_STREAM_CHANNEL_BUFFER_SIZE);
+    let (response_stream_close_sender, mut response_stream_close_receiver) =
+      mpsc::channel(1);
+    let response_stream_state = svc_state::ResponseStreamState {
+      sender: response_stream_sender,
+      close: response_stream_close_sender,
+    };
     ctx.state().register_response_stream(
       &response_stream_id,
-      &response_stream_sender,
+      &response_stream_state,
     )?;
     let request_stream_handle = tokio::spawn(async move {
-      handle_stream_request(req, response_stream_sender).await
+      handle_stream_request(req, response_stream_state).await
     });
-    let response_stream_future = request_stream_handle
-      .map_ok(|_| {
-        // TODO cancel the response
-        vec![]
-      })
-      .map_err(Error::new);
+    let response_stream_future =
+      request_stream_handle.map_ok(|_| vec![]).map_err(Error::new);
     svc_response::StreamResponse {
       response_stream_id: Some(response_stream_id),
       body: stream_wrappers::ReceiverStream::new(response_stream_receiver)
+        .take_until(async move {
+          response_stream_close_receiver.recv().await;
+        })
         .map(Ok)
         .chain(stream::once(response_stream_future)),
     }
@@ -200,22 +216,31 @@ where
   }
 }
 
+#[allow(clippy::print_stdout)]
 async fn handle_stream_request(
   req: svc_request::StreamRequest<BodyDataStream<IncomingBody>>,
-  response_stream_sender: mpsc::Sender<Vec<u8>>,
+  response_stream_state: svc_state::ResponseStreamState,
 ) -> Result<()> {
-  req
+  let result = req
     .data
     .map_err(Error::new)
     .try_for_each(|data| {
-      response_stream_sender
+      response_stream_state
+        .sender
         .send_timeout(
           data.to_ascii_uppercase(),
           RESPONSE_STREAM_CHANNEL_SEND_TIMEOUT,
         )
         .map_err(Error::new)
     })
-    .await
+    .await;
+  tokio::spawn(async move {
+    sleep(RESPONSE_STREAM_IDLE_TIMEOUT).await;
+    if response_stream_state.sender.strong_count() == 2 {
+      let _ = response_stream_state.close.send(()).await;
+    }
+  });
+  result
 }
 
 #[cfg(test)]
