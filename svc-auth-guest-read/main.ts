@@ -3,7 +3,7 @@ import * as stream from '@intertwine/lib-stream'
 import * as time from '@intertwine/lib-time'
 
 export function main(
-  ctx: random.Context & stream.ServerContext & time.Context,
+  ctx: random.Context & stream.WorkerServerContext & time.Context,
 ): void {
   ctx.streamServer.serve('svc-auth-guest-read', async (serverSource) => {
     return Promise.resolve({
