@@ -1,26 +1,26 @@
-import type * as streamConnection from '@/connection.ts'
 import * as streamSink from '@/sink.ts'
 import * as streamSource from '@/source.ts'
+import type * as streamWorkerConnection from '@/worker/connection.ts'
 
-export interface ClientContext {
-  readonly streamClient: Client
+export interface WorkerClientContext {
+  readonly streamClient: WorkerClient
 }
 
-export class Client {
+export class WorkerClient {
   private readonly mutableResolveServerStream: ((
     serverStream: ReadableStream<unknown>,
   ) => void)[] = []
 
   private constructor(private readonly worker: Readonly<Worker>) {}
 
-  static init(worker: Readonly<Worker>): Client {
-    const client = new Client(worker)
+  static init(worker: Readonly<Worker>): WorkerClient {
+    const client = new WorkerClient(worker)
 
     worker.addEventListener('message', (event) => {
       // eslint-disable-next-line no-console
       console.log('worker message', event)
       const connectionResponse =
-        event.data as streamConnection.ConnectionResponse
+        event.data as streamWorkerConnection.WorkerConnectionResponse
       const resolve =
         client.mutableResolveServerStream[connectionResponse.connectionId]
       if (!resolve) {
@@ -38,15 +38,16 @@ export class Client {
 
   connect(
     service: string,
-    onData: (data: unknown) => Promise<void> | void,
-  ): streamSource.Source<unknown> {
-    const clientSource = streamSource.Source.build()
-    const connectionRequest: streamConnection.ConnectionRequest = {
-      clientStream: clientSource.readable,
-      connectionId: this.mutableResolveServerStream.length,
-      service,
-      type: 'ConnectionRequest',
-    }
+    onData: (data: string) => Promise<void> | void,
+  ): streamSource.Source<string> {
+    const clientSource = streamSource.Source.build<string>()
+    const connectionRequest: streamWorkerConnection.WorkerConnectionRequest =
+      {
+        clientStream: clientSource.readable,
+        connectionId: this.mutableResolveServerStream.length,
+        service,
+        type: 'WorkerConnectionRequest',
+      }
     let resolveServerStream: (
       serverStream: ReadableStream<unknown>,
     ) => void

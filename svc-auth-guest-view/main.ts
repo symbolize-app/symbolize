@@ -352,7 +352,7 @@ export async function main(
     contrast.Context &
     convey.Context &
     random.Context &
-    stream.ClientContext &
+    stream.WorkerClientContext &
     time.Context,
 ): Promise<void> {
   const html = ctx.convey.document.documentElement

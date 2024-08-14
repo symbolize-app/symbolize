@@ -21,13 +21,13 @@ function main(): void {
     contrast.Context &
     convey.Context &
     random.Context &
-    stream.ClientContext &
+    stream.WorkerClientContext &
     time.Context = {
     compute: new compute.Compute(),
     contrast: new contrast.Contrast(),
     convey: new conveyBrowser.ConveyImpl(),
     random: new random.RandomImpl(),
-    streamClient: stream.Client.init(worker),
+    streamClient: stream.WorkerClient.init(worker),
     time: new timeBrowser.TimeImpl(),
   }
 

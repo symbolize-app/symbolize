@@ -6,9 +6,11 @@ import * as timeBrowser from '@intertwine/lib-time/index.browser.ts'
 function main(): void {
   const timeObj = new timeBrowser.TimeImpl()
 
-  const mainCtx: random.Context & stream.ServerContext & time.Context = {
+  const mainCtx: random.Context &
+    stream.WorkerServerContext &
+    time.Context = {
     random: new random.RandomImpl(),
-    streamServer: stream.Server.init({ time: timeObj }),
+    streamServer: stream.WorkerServer.init({ time: timeObj }),
     time: timeObj,
   }
 
