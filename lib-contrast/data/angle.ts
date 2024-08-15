@@ -2,7 +2,7 @@ import * as collection from '@intertwine/lib-collection'
 
 const angleMarker = Symbol('angleMarker')
 
-const angleIntern = new collection.MultiMemo<
+const angleIntern = collection.multiMemo<
   [value: number, unit: AngleUnit],
   Angle
 >((value, unit) => new Angle(value, unit))
@@ -10,7 +10,7 @@ const angleIntern = new collection.MultiMemo<
 /**
  * @see https://developer.mozilla.org/en-US/docs/Web/CSS/angle
  */
-export class Angle<Unit extends AngleUnit = AngleUnit> {
+class Angle<Unit extends AngleUnit = AngleUnit> {
   constructor(
     readonly value: number,
     readonly unit: Unit,
@@ -24,6 +24,8 @@ export class Angle<Unit extends AngleUnit = AngleUnit> {
     return `${this.value}${this.unit}`
   }
 }
+
+export type { Angle }
 
 export function angle<Unit extends AngleUnit>(
   value: number,

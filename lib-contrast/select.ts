@@ -5,7 +5,7 @@ import type * as contrastUtilityType from '@/utilityType.ts'
 
 const selectMarker = Symbol('selectMarker')
 
-export class SelectTerm {
+class SelectTerm {
   constructor(
     private readonly compile_: (...args: readonly unknown[]) => string,
     private readonly args: (
@@ -22,6 +22,8 @@ export class SelectTerm {
     return null
   }
 }
+
+export type { SelectTerm }
 
 export const select = {
   term<Compile extends (...args: never) => string>(

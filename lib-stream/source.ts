@@ -4,60 +4,12 @@ import * as time from '@intertwine/lib-time'
 const highWaterMark = 16
 const timeoutMs = 1_000
 
-export class Source<T> {
-  private constructor(
+class Source<T> {
+  constructor(
     private readonly onClose: () => void,
     private readonly onSend: (ctx: time.Context, data: T) => Promise<void>,
     readonly readable: ReadableStream<T>,
   ) {}
-
-  static build<T>(): Source<T> {
-    let controller: ReadableStreamDefaultController | null = null
-    const ready = concurrency.EventSemaphore.build()
-    const done = concurrency.EventSemaphore.build()
-    return new Source<T>(
-      () => {
-        if (!controller) {
-          throw new Error('Closed before started')
-        }
-        controller.close()
-        done.set()
-      },
-      async (ctx, data) => {
-        const readyBeforeTimeout = await Promise.race([
-          ready.wait().then(() => true),
-          time.delay(ctx, timeoutMs).then(() => false),
-        ])
-        if (!readyBeforeTimeout) {
-          throw new Error('Ready before started')
-        }
-        if (!controller) {
-          throw new Error('Ready but missing controller')
-        }
-        controller.enqueue(data)
-        if (controller.desiredSize === null) {
-          done.set()
-          throw new Error('Stream in error state')
-        } else if (controller.desiredSize <= 0) {
-          ready.clear()
-          done.set()
-        }
-      },
-      new ReadableStream(
-        {
-          async pull() {
-            done.clear()
-            ready.set()
-            await done.wait()
-          },
-          start(controller_) {
-            controller = controller_
-          },
-        },
-        { highWaterMark },
-      ),
-    )
-  }
 
   close(): void {
     this.onClose()
@@ -66,4 +18,54 @@ export class Source<T> {
   async send(ctx: time.Context, data: T): Promise<void> {
     await this.onSend(ctx, data)
   }
+}
+
+export type { Source }
+
+export function source<T>(): Source<T> {
+  let controller: ReadableStreamDefaultController | null = null
+  const ready = concurrency.eventSemaphore()
+  const done = concurrency.eventSemaphore()
+  return new Source<T>(
+    () => {
+      if (!controller) {
+        throw new Error('Closed before started')
+      }
+      controller.close()
+      done.set()
+    },
+    async (ctx, data) => {
+      const readyBeforeTimeout = await Promise.race([
+        ready.wait().then(() => true),
+        time.delay(ctx, timeoutMs).then(() => false),
+      ])
+      if (!readyBeforeTimeout) {
+        throw new Error('Ready before started')
+      }
+      if (!controller) {
+        throw new Error('Ready but missing controller')
+      }
+      controller.enqueue(data)
+      if (controller.desiredSize === null) {
+        done.set()
+        throw new Error('Stream in error state')
+      } else if (controller.desiredSize <= 0) {
+        ready.clear()
+        done.set()
+      }
+    },
+    new ReadableStream(
+      {
+        async pull() {
+          done.clear()
+          ready.set()
+          await done.wait()
+        },
+        start(controller_) {
+          controller = controller_
+        },
+      },
+      { highWaterMark },
+    ),
+  )
 }

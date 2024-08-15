@@ -68,7 +68,7 @@ export function compilePureCommaSeparator(
   return compilePureSeparator(',', ...dependencies)
 }
 
-export class PureExpressionIntern implements ExpressionIntern {
+class PureExpressionIntern implements ExpressionIntern {
   readonly type = 'pure'
 
   constructor(
@@ -93,13 +93,15 @@ export class PureExpressionIntern implements ExpressionIntern {
   }
 }
 
+export type { PureExpressionIntern }
+
 export function compileCascade(
   ...args: readonly ExpressionIntern[]
 ): CascadeExpressionIntern {
   return new CascadeExpressionIntern(args)
 }
 
-export class CascadeExpressionIntern implements ExpressionIntern {
+class CascadeExpressionIntern implements ExpressionIntern {
   readonly type = 'cascade'
 
   private readonly mutablePure: {
@@ -164,6 +166,8 @@ export class CascadeExpressionIntern implements ExpressionIntern {
   }
 }
 
+export type { CascadeExpressionIntern }
+
 export function compileScope(
   scope: string,
   body: ExpressionIntern,
@@ -196,7 +200,7 @@ export function compileScopePureExpressionIntern(
   return pureExpressionIntern
 }
 
-export class ScopeExpressionIntern implements ExpressionIntern {
+class ScopeExpressionIntern implements ExpressionIntern {
   readonly type = 'scope'
 
   private readonly mutablePure: {
@@ -230,6 +234,8 @@ export class ScopeExpressionIntern implements ExpressionIntern {
     return this.mutablePure.value
   }
 }
+
+export type { ScopeExpressionIntern }
 
 function extractCustomProperty(
   ctx: contrastContext.Context,

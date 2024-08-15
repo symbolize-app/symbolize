@@ -1,10 +1,10 @@
-import { Memo } from '@/memo.ts'
+import { memo } from '@/memo.ts'
 
 export function groupBy<T, K>(
   items: readonly T[],
   selector: (item: T) => K,
 ): readonly [key: K, groupItems: T[]][] {
-  const mutableGroups = new Memo<K, T[]>(() => [])
+  const mutableGroups = memo<K, T[]>(() => [])
   for (const item of items) {
     const key = selector(item)
     const mutableGroup = mutableGroups.get(key)

@@ -6,7 +6,7 @@ import type * as contrastUtilityType from '@/utilityType.ts'
 
 const supportMarker = Symbol('supportMarker')
 
-export class SupportTerm {
+class SupportTerm {
   constructor(
     private readonly compile_: (...args: readonly unknown[]) => string,
     private readonly args: (
@@ -23,6 +23,8 @@ export class SupportTerm {
     return null
   }
 }
+
+export type { SupportTerm }
 
 export const support = {
   term<Compile extends (...args: never) => string>(

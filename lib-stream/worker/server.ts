@@ -10,18 +10,16 @@ export interface WorkerServerContext {
   readonly streamServer: WorkerServer
 }
 
-export class WorkerServer {
+class WorkerServer {
   private readonly connectionRequestSources: collection.Memo<
     string,
     streamSource.Source<streamWorkerConnection.WorkerConnectionRequest>
-  > = new collection.Memo<
+  > = collection.memo<
     string,
     streamSource.Source<streamWorkerConnection.WorkerConnectionRequest>
-  >(() => streamSource.Source.build())
+  >(() => streamSource.source())
 
-  private constructor() {}
-
-  static init(ctx: time.Context): WorkerServer {
+  static build(ctx: time.Context): WorkerServer {
     const server = new WorkerServer()
 
     self.addEventListener('message', (event) => {
@@ -46,11 +44,11 @@ export class WorkerServer {
     const connectionRequestStream =
       this.connectionRequestSources.get(service).readable
 
-    const connectionRequestSink = streamSink.Sink.build(
+    const connectionRequestSink = streamSink.sink(
       async (
         connectionRequest: streamWorkerConnection.WorkerConnectionRequest,
       ) => {
-        const serverSource = streamSource.Source.build<string>()
+        const serverSource = streamSource.source<string>()
         const connectResult = await onConnect(serverSource)
         const connectionResponse: streamWorkerConnection.WorkerConnectionResponse =
           {
@@ -61,7 +59,7 @@ export class WorkerServer {
         self.postMessage(connectionResponse, [
           connectionResponse.serverStream,
         ])
-        const serverSink = streamSink.Sink.build<string>(async (data) =>
+        const serverSink = streamSink.sink<string>(async (data) =>
           connectResult.onData(data),
         )
         void connectionRequest.clientStream.pipeTo(serverSink.writable)
@@ -69,4 +67,10 @@ export class WorkerServer {
     )
     void connectionRequestStream.pipeTo(connectionRequestSink.writable)
   }
+}
+
+export type { WorkerServer }
+
+export function workerServer(ctx: time.Context): WorkerServer {
+  return WorkerServer.build(ctx)
 }

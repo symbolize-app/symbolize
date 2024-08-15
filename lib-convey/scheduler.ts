@@ -1,4 +1,4 @@
-export class Scheduler {
+class MutableScheduler {
   private mutableQueueTail: Promise<void> = Promise.resolve()
 
   async run(callback: () => Promise<void>): Promise<void> {
@@ -13,4 +13,10 @@ export class Scheduler {
   async wait(): Promise<void> {
     return this.mutableQueueTail
   }
+}
+
+export type Scheduler = Readonly<MutableScheduler>
+
+export function scheduler(): Scheduler {
+  return new MutableScheduler()
 }

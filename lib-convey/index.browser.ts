@@ -1,11 +1,11 @@
 import type * as conveyContext from '@/context.ts'
 import * as conveyScheduler from '@/scheduler.ts'
 
-export class ConveyImpl implements conveyContext.Convey {
+class ConveyImpl implements conveyContext.Convey {
   readonly classNames = new Set<string>()
   readonly document: Readonly<Document> = window.document
-  readonly mutableScheduler: conveyScheduler.Scheduler =
-    new conveyScheduler.Scheduler()
+  readonly scheduler: conveyScheduler.Scheduler =
+    conveyScheduler.scheduler()
   readonly styleLayer: Readonly<CSSLayerBlockRule>
 
   constructor() {
@@ -19,4 +19,8 @@ export class ConveyImpl implements conveyContext.Convey {
       styleSheet.insertRule('@layer base {}'),
     ) as CSSLayerBlockRule
   }
+}
+
+export function convey(): conveyContext.Convey {
+  return new ConveyImpl()
 }

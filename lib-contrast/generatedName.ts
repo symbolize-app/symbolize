@@ -9,7 +9,7 @@ export function buildIdentifier(namespace: string, index: number): string {
   return `${namespace}${index.toString(16)}`
 }
 
-export class IdentifierGenerator {
+class IdentifierGenerator {
   private readonly mutableIndex: { value: number } = { value: 0 }
 
   constructor(private readonly namespace: string) {}
@@ -18,6 +18,8 @@ export class IdentifierGenerator {
     return buildIdentifier(this.namespace, this.mutableIndex.value++)
   }
 }
+
+export type { IdentifierGenerator }
 
 export function identifierGenerator(
   namespace: string,
@@ -31,13 +33,13 @@ export function customPropertyNameGenerator(
   return identifierGenerator(`--${namespace}`)
 }
 
-export class IdentifierMemo<Key> {
+class IdentifierMemo<Key> {
   private readonly generator: IdentifierGenerator
   private readonly memo: collection.Memo<Key, string>
 
   constructor(namespace: string) {
     this.generator = new IdentifierGenerator(namespace)
-    this.memo = new collection.Memo(() => this.generator.build())
+    this.memo = collection.memo(() => this.generator.build())
   }
 
   entries(): IterableIterator<[Key, string]> {
@@ -48,6 +50,8 @@ export class IdentifierMemo<Key> {
     return this.memo.get(key)
   }
 }
+
+export type { IdentifierMemo }
 
 export function identifierMemo<Key>(
   namespace: string,

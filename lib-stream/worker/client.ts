@@ -6,14 +6,14 @@ export interface WorkerClientContext {
   readonly streamClient: WorkerClient
 }
 
-export class WorkerClient {
+class WorkerClient {
   private readonly mutableResolveServerStream: ((
     serverStream: ReadableStream<unknown>,
   ) => void)[] = []
 
   private constructor(private readonly worker: Readonly<Worker>) {}
 
-  static init(worker: Readonly<Worker>): WorkerClient {
+  static build(worker: Readonly<Worker>): WorkerClient {
     const client = new WorkerClient(worker)
 
     worker.addEventListener('message', (event) => {
@@ -40,7 +40,7 @@ export class WorkerClient {
     service: string,
     onData: (data: string) => Promise<void> | void,
   ): streamSource.Source<string> {
-    const clientSource = streamSource.Source.build<string>()
+    const clientSource = streamSource.source<string>()
     const connectionRequest: streamWorkerConnection.WorkerConnectionRequest =
       {
         clientStream: clientSource.readable,
@@ -61,11 +61,17 @@ export class WorkerClient {
     this.worker.postMessage(connectionRequest, [
       connectionRequest.clientStream,
     ])
-    const clientSink = streamSink.Sink.build(onData)
+    const clientSink = streamSink.sink(onData)
     void (async () => {
       const serverStream = await serverStreamPromise
       void serverStream.pipeTo(clientSink.writable)
     })()
     return clientSource
   }
+}
+
+export type { WorkerClient }
+
+export function workerClient(worker: Readonly<Worker>): WorkerClient {
+  return WorkerClient.build(worker)
 }

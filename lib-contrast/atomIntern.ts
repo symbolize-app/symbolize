@@ -2,7 +2,7 @@ import type * as contrastContext from '@/context.ts'
 import type * as contrastExpressionIntern from '@/expressionIntern.ts'
 import * as contrastRule from '@/rule.ts'
 
-export class AtomIntern {
+class AtomIntern {
   private readonly mutableRules: {
     value: contrastRule.Rule[] | null
   } = {
@@ -27,4 +27,14 @@ export class AtomIntern {
     }
     return this.mutableRules.value
   }
+}
+
+export type { AtomIntern }
+
+export function atomIntern(
+  pseudoElement: string | null,
+  propertyName: string,
+  expressionIntern: contrastExpressionIntern.ExpressionIntern,
+): AtomIntern {
+  return new AtomIntern(pseudoElement, propertyName, expressionIntern)
 }

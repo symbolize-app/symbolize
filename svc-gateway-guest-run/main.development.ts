@@ -9,23 +9,23 @@ import * as timeTest from '@intertwine/lib-time/test.ts'
 export async function main(ctx: time.Context): Promise<void> {
   await testRunner.runAll(ctx, [import('@intertwine/dev-pnpm-test')], {
     compute() {
-      return new compute.Compute()
+      return compute.compute()
     },
     contrast() {
-      return new contrast.Contrast()
+      return contrast.contrast()
     },
     convey(defer) {
-      const convey = new conveyTestBrowser.ConveyImpl()
+      const convey = conveyTestBrowser.convey()
       defer(() => {
         convey.dispose()
       })
       return convey
     },
     random() {
-      return randomTest.RandomImpl.build()
+      return randomTest.random()
     },
     time() {
-      return timeTest.TimeImpl.build()
+      return timeTest.time()
     },
   })
 }

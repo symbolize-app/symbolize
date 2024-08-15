@@ -21,7 +21,7 @@ export function main(
 async function testStream(
   ctx: random.Context & time.Context,
 ): Promise<void> {
-  const responseSink = stream.Sink.build<Uint8Array>((data) => {
+  const responseSink = stream.sink<Uint8Array>((data) => {
     // eslint-disable-next-line no-console
     console.log('stream response', new TextDecoder().decode(data))
   })
@@ -46,7 +46,7 @@ async function testStream(
       console.log('resposne done')
     })
 
-  const source = stream.Source.build<Uint8Array>()
+  const source = stream.source<Uint8Array>()
   const requestUrl = new URL('/.stream', self.location.origin)
   requestUrl.searchParams.set('response_stream_id', responseStreamId)
   const requestPromise = fetch(requestUrl, {

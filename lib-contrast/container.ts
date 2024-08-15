@@ -12,9 +12,7 @@ const containerNameValueMarker = Symbol('containerNameValueMarker')
 /**
  * @see https://developer.mozilla.org/en-US/docs/Web/CSS/container-name
  */
-export class Container
-  implements contrastExpression.Expression<ContainerName>
-{
+class Container implements contrastExpression.Expression<ContainerName> {
   private readonly value = Symbol('containerName')
 
   compile(
@@ -43,6 +41,8 @@ export class Container
   }
 }
 
+export type { Container }
+
 /**
  * @see https://developer.mozilla.org/en-US/docs/Web/CSS/container-name
  */
@@ -50,7 +50,7 @@ export interface ContainerName {
   [containerNameValueMarker](): unknown
 }
 
-export class ContainerTerm {
+class ContainerTerm {
   constructor(
     private readonly compile_: (...args: readonly unknown[]) => string,
     private readonly args: (
@@ -67,6 +67,8 @@ export class ContainerTerm {
     return null
   }
 }
+
+export type { ContainerTerm }
 
 export const container = {
   /**

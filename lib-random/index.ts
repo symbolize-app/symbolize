@@ -9,7 +9,7 @@ export interface Random {
   number(): number
 }
 
-export class RandomImpl implements Random {
+class RandomImpl implements Random {
   cryptoBits(bits: number): Uint8Array {
     const result = new Uint8Array(bits / 8)
     crypto.getRandomValues(result)
@@ -19,6 +19,10 @@ export class RandomImpl implements Random {
   number(): number {
     return Math.random()
   }
+}
+
+export function random(): Random {
+  return new RandomImpl()
 }
 
 export function requestId(ctx: Context): Uint8Array {

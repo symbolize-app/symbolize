@@ -17,7 +17,7 @@ export type SvgPreserveAspectRatioOpt =
 
 const svgPreserveAspectRatioMarker = Symbol('svgPreserveAspectRatioMarker')
 
-export class SvgPreserveAspectRatio {
+class SvgPreserveAspectRatio {
   constructor(
     readonly align:
       | 'none'
@@ -41,6 +41,8 @@ export class SvgPreserveAspectRatio {
     return `${this.align} ${this.mode}`
   }
 }
+
+export type { SvgPreserveAspectRatio }
 
 export type SvgLengthPctOpt = contrast.Pct | SvgLength | SvgLength['value']
 

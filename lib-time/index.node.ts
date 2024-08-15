@@ -1,7 +1,7 @@
-import type * as time from '@/index.ts'
+import type * as time_ from '@/index.ts'
 import * as nodePerfHooks from 'node:perf_hooks'
 
-export class TimeImpl implements time.Time {
+class TimeImpl implements time_.Time {
   performanceNow(): number {
     return nodePerfHooks.performance.now()
   }
@@ -9,4 +9,8 @@ export class TimeImpl implements time.Time {
   setTimeout(callback: () => void, ms: number): unknown {
     return global.setTimeout(callback, ms)
   }
+}
+
+export function time(): time_.Time {
+  return new TimeImpl()
 }

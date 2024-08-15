@@ -2,11 +2,15 @@ import type * as conveyContext from '@/context.ts'
 import * as conveyScheduler from '@/scheduler.ts'
 import * as happyDom from 'happy-dom'
 
-export class ConveyImpl implements conveyContext.Convey {
+export interface Convey extends conveyContext.Convey {
+  dispose(): void
+}
+
+class ConveyImpl implements Convey {
   readonly classNames = new Set<string>()
   readonly document: conveyContext.RestrictedDocument
-  readonly mutableScheduler: conveyScheduler.Scheduler =
-    new conveyScheduler.Scheduler()
+  readonly scheduler: conveyScheduler.Scheduler =
+    conveyScheduler.scheduler()
 
   readonly styleLayer: conveyContext.RestrictedCssLayerBlockRule
   private readonly window: Readonly<happyDom.Window> = new happyDom.Window(
@@ -34,4 +38,8 @@ export class ConveyImpl implements conveyContext.Convey {
   dispose(): void {
     this.window.close()
   }
+}
+
+export function convey(): Convey {
+  return new ConveyImpl()
 }

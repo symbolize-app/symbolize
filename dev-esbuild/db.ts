@@ -20,8 +20,8 @@ export interface Context {
   readonly db: Db
 }
 
-export class Db {
-  private constructor(
+class Db {
+  constructor(
     readonly query: {
       readonly beginTransaction: Statement
       readonly commitTransaction: Statement
@@ -36,50 +36,6 @@ export class Db {
     this.query = query
   }
 
-  static async init(): Promise<Db> {
-    await Db.runMigrations()
-    const connection = Db.open()
-    Db.configure(connection)
-    const query = Db.prepareStatements(connection)
-    return new Db(query)
-  }
-
-  private static configure(connection: Database): void {
-    connection.defaultSafeIntegers()
-    connection.pragma(Db.parsePragma(pragmaForeignKey))
-    connection.pragma(Db.parsePragma(pragmaWalAutocheckpoint))
-  }
-
-  private static open(): Database {
-    return sqlite('svc-gateway-host-store/build/manifest.sqlite3', {
-      fileMustExist: true,
-      readonly: false,
-    })
-  }
-
-  private static parsePragma(pragma: string): string {
-    return pragma.replace(/^pragma /, '')
-  }
-
-  private static prepareStatements(connection: Database): Db['query'] {
-    return {
-      beginTransaction: connection.prepare(beginTransaction),
-      commitTransaction: connection.prepare(commitTransaction),
-      insertPath: connection.prepare(insertPath),
-      insertVersion: connection.prepare(insertVersion),
-      pragmaWalCheckpoint: Db.parsePragma(pragmaWalCheckpoint),
-      rollbackTransaction: connection.prepare(rollbackTransaction),
-      updateContentCompressed: connection.prepare(updateContentCompressed),
-      upsertContent: connection.prepare(upsertContent),
-    }
-  }
-
-  private static async runMigrations(): Promise<void> {
-    await nodeUtil.promisify(nodeChildProcess.exec)(
-      'dbmate --no-dump-schema up',
-    )
-  }
-
   withTransactionSync<T>(action: () => T): T {
     try {
       this.query.beginTransaction.run()
@@ -91,4 +47,50 @@ export class Db {
       throw exception
     }
   }
+}
+
+export type { Db }
+
+export async function db(): Promise<Db> {
+  await runMigrations()
+  const connection = open()
+  configure(connection)
+  const query = prepareStatements(connection)
+  return new Db(query)
+}
+
+function configure(connection: Database): void {
+  connection.defaultSafeIntegers()
+  connection.pragma(parsePragma(pragmaForeignKey))
+  connection.pragma(parsePragma(pragmaWalAutocheckpoint))
+}
+
+function open(): Database {
+  return sqlite('svc-gateway-host-store/build/manifest.sqlite3', {
+    fileMustExist: true,
+    readonly: false,
+  })
+}
+
+function parsePragma(pragma: string): string {
+  return pragma.replace(/^pragma /, '')
+}
+
+function prepareStatements(connection: Database): Db['query'] {
+  return {
+    beginTransaction: connection.prepare(beginTransaction),
+    commitTransaction: connection.prepare(commitTransaction),
+    insertPath: connection.prepare(insertPath),
+    insertVersion: connection.prepare(insertVersion),
+    pragmaWalCheckpoint: parsePragma(pragmaWalCheckpoint),
+    rollbackTransaction: connection.prepare(rollbackTransaction),
+    updateContentCompressed: connection.prepare(updateContentCompressed),
+    upsertContent: connection.prepare(upsertContent),
+  }
+}
+
+async function runMigrations(): Promise<void> {
+  await nodeUtil.promisify(nodeChildProcess.exec)(
+    'dbmate --no-dump-schema up',
+  )
 }

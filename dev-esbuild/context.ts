@@ -7,11 +7,17 @@ export interface DevContext {
   readonly dev: Dev
 }
 
-export class Dev {
+class Dev {
   constructor(
     readonly mode: Mode,
     readonly outdir: string,
   ) {}
+}
+
+export type { Dev }
+
+export function dev(mode: Mode, outdir: string): Dev {
+  return new Dev(mode, outdir)
 }
 
 export enum Mode {

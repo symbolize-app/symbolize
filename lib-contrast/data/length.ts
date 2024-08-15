@@ -2,7 +2,7 @@ import * as collection from '@intertwine/lib-collection'
 
 const lengthMarker = Symbol('lengthMarker')
 
-const lengthIntern = new collection.MultiMemo<
+const lengthIntern = collection.multiMemo<
   [value: number, unit: LengthUnit],
   Length
 >((value, unit) => new Length(value, unit))
@@ -10,7 +10,7 @@ const lengthIntern = new collection.MultiMemo<
 /**
  * @see https://developer.mozilla.org/en-US/docs/Web/CSS/length
  */
-export class Length<Unit extends LengthUnit = LengthUnit> {
+class Length<Unit extends LengthUnit = LengthUnit> {
   constructor(
     readonly value: number,
     readonly unit: Unit,
@@ -24,6 +24,8 @@ export class Length<Unit extends LengthUnit = LengthUnit> {
     return `${this.value}${this.unit}`
   }
 }
+
+export type { Length }
 
 export function length<Unit extends LengthUnit>(
   value: number,

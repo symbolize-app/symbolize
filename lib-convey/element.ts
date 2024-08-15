@@ -50,7 +50,15 @@ export enum ElementFragmentMode {
   portal = 1,
 }
 
-export class ElementFragment<CustomContext = unknown>
+export function elementFragment<CustomContext = unknown>(
+  create: (ctx: conveyContext.Context) => SupportedElement,
+  mode: ElementFragmentMode,
+  attrs: object,
+): ElementFragment<CustomContext> {
+  return new MutableElementFragment(create, mode, attrs)
+}
+
+class MutableElementFragment<CustomContext = unknown>
   implements
     conveyFragment.Fragment<CustomContext>,
     conveyContext.ScopedConvey
@@ -166,7 +174,7 @@ export class ElementFragment<CustomContext = unknown>
     }
     const elementListener = (event: Readonly<Event>): void => {
       void (async () => {
-        return ctx.convey.mutableScheduler.run(async () => {
+        return ctx.convey.scheduler.run(async () => {
           return compute.txn(ctx, async () => {
             return listener(event)
           })
@@ -287,3 +295,7 @@ export class ElementFragment<CustomContext = unknown>
     )
   }
 }
+
+export type ElementFragment<CustomContext = unknown> = Readonly<
+  MutableElementFragment<CustomContext>
+>
