@@ -7,7 +7,7 @@ export const html = new Proxy(
   {
     get(_mutableTarget: object, tag: string, _receiver: unknown): unknown {
       return (attrs: object) =>
-        new conveyElement.ElementFragment(
+        conveyElement.elementFragment(
           (ctx) => ctx.convey.document.createElement(tag),
           conveyElement.ElementFragmentMode.normal,
           attrs,

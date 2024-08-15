@@ -23,12 +23,12 @@ function main(): void {
     random.Context &
     stream.WorkerClientContext &
     time.Context = {
-    compute: new compute.Compute(),
-    contrast: new contrast.Contrast(),
-    convey: new conveyBrowser.ConveyImpl(),
-    random: new random.RandomImpl(),
-    streamClient: stream.WorkerClient.init(worker),
-    time: new timeBrowser.TimeImpl(),
+    compute: compute.compute(),
+    contrast: contrast.contrast(),
+    convey: conveyBrowser.convey(),
+    random: random.random(),
+    streamClient: stream.workerClient(worker),
+    time: timeBrowser.time(),
   }
 
   const entryPoints = [

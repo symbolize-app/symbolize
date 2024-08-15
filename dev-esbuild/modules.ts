@@ -41,7 +41,7 @@ export async function build<T extends BuildOptions>(
   }
 
   const pnpmPackageVersions = new Map<string, string>()
-  const convertToOutPathMemo = new collection.Memo((inPath: string) =>
+  const convertToOutPathMemo = collection.memo((inPath: string) =>
     convertToOutPath(inPath, options.outbase, pnpmPackageVersions),
   )
   const allEntryPoints = new Set(options.entryPoints)

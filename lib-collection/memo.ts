@@ -1,4 +1,4 @@
-export class Memo<K, V> {
+class Memo<K, V> {
   private readonly mutableResults = new Map<K, V>()
 
   constructor(private readonly builder: (key: K) => V) {}
@@ -29,4 +29,10 @@ export class Memo<K, V> {
   values(): IterableIterator<V> {
     return this.mutableResults.values()
   }
+}
+
+export type { Memo }
+
+export function memo<K, V>(builder: (key: K) => V): Memo<K, V> {
+  return new Memo(builder)
 }

@@ -7,25 +7,24 @@ export interface Context {
   readonly contrast: Contrast
 }
 
-export class Contrast {
+class Contrast {
   readonly atomClassName = contrastGeneratedName.identifierGenerator(
     contrastGeneratedName.atomNamespace,
   )
 
-  readonly atomIntern = new collection.MultiMemo<
+  readonly atomIntern = collection.multiMemo<
     [
       pseudoElement: string | null,
       propertyName: string,
       expressionIntern: contrastExpressionIntern.ExpressionIntern,
     ],
     contrastAtomIntern.AtomIntern
-  >(
-    (pseudoElement, propertyName, expressionIntern) =>
-      new contrastAtomIntern.AtomIntern(
-        pseudoElement,
-        propertyName,
-        expressionIntern,
-      ),
+  >((pseudoElement, propertyName, expressionIntern) =>
+    contrastAtomIntern.atomIntern(
+      pseudoElement,
+      propertyName,
+      expressionIntern,
+    ),
   )
 
   readonly containerName = contrastGeneratedName.identifierMemo<symbol>(
@@ -41,7 +40,7 @@ export class Contrast {
       contrastGeneratedName.expressionNamespace,
     )
 
-  readonly expressionIntern = new collection.MultiMemo<
+  readonly expressionIntern = collection.multiMemo<
     [
       compile: (
         ...args: readonly unknown[]
@@ -51,7 +50,7 @@ export class Contrast {
     contrastExpressionIntern.ExpressionIntern
   >((compile, ...args) => compile(...args))
 
-  readonly scopeIntern = new collection.MultiMemo<
+  readonly scopeIntern = collection.multiMemo<
     [
       compile: (...args: readonly unknown[]) => string,
       ...args: readonly unknown[],
@@ -63,4 +62,10 @@ export class Contrast {
     contrastGeneratedName.customPropertyNameMemo<symbol>(
       contrastGeneratedName.symbolNamespace,
     )
+}
+
+export type { Contrast }
+
+export function contrast(): Contrast {
+  return new Contrast()
 }

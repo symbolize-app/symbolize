@@ -9,7 +9,7 @@ export interface String_ {
   [stringMarker](): unknown
 }
 
-const stringLiteralIntern = new collection.Memo<string, StringLiteral>(
+const stringLiteralIntern = collection.memo<string, StringLiteral>(
   (text) => new StringLiteral(text),
 )
 
@@ -32,9 +32,7 @@ export function stringLiteral(text: string): String_ {
   return stringLiteralIntern.get(text)
 }
 
-const attrIntern = new collection.Memo<string, Attr>(
-  (name) => new Attr(name),
-)
+const attrIntern = collection.memo<string, Attr>((name) => new Attr(name))
 
 class Attr implements String_ {
   constructor(readonly name: string) {}

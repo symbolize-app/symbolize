@@ -17,7 +17,7 @@ export function portal<
     conveyMathAttr.MathAttrs<CustomContext, CustomElement>
   : never,
 ): conveyFragment.Fragment<CustomContext> {
-  return new conveyElement.ElementFragment(
+  return conveyElement.elementFragment(
     () => element,
     conveyElement.ElementFragmentMode.portal,
     attrs,

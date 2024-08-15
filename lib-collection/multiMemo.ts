@@ -2,7 +2,7 @@ const endMarker = Symbol('endMarker')
 
 type MutableRecursiveMap<K, V> = Map<K, MutableRecursiveMap<K, V> | V>
 
-export class MultiMemo<K extends readonly unknown[], V> {
+class MultiMemo<K extends readonly unknown[], V> {
   private readonly mutableResults: MutableRecursiveMap<K[number], V> =
     new Map()
 
@@ -31,4 +31,12 @@ export class MultiMemo<K extends readonly unknown[], V> {
       return value
     }
   }
+}
+
+export type { MultiMemo }
+
+export function multiMemo<K extends readonly unknown[], V>(
+  builder: (...key: K) => V,
+): MultiMemo<K, V> {
+  return new MultiMemo(builder)
 }

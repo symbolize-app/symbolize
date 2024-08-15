@@ -35,9 +35,9 @@ async function main(): Promise<void> {
     })
   } else {
     const ctx = {
-      db: await devDatabase.Db.init(),
-      dev: new devContext.Dev(mode, outdir),
-      time: new timeNode.TimeImpl(),
+      db: await devDatabase.db(),
+      dev: devContext.dev(mode, outdir),
+      time: timeNode.time(),
     }
     await nodeFsPromises.mkdir(outdir, {
       recursive: true,

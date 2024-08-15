@@ -7,7 +7,7 @@ export const svg = new Proxy(
   {
     get(_mutableTarget: object, tag: string, _receiver: unknown): unknown {
       return (attrs: object) =>
-        new conveyElement.ElementFragment(
+        conveyElement.elementFragment(
           (ctx) =>
             ctx.convey.document.createElementNS(
               'http://www.w3.org/2000/svg',

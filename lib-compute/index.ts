@@ -2,7 +2,19 @@ export interface Context {
   readonly compute: Compute
 }
 
-export class Compute {
+export interface Compute {
+  readonly inProgressEpoch: Epoch | null
+
+  beginTransaction(): void
+
+  commitTransaction(): Promise<void>
+
+  rollbackTransaction(): void
+
+  setState(mutableNodeImpl: CommitImpl<unknown>, newValue: unknown): void
+}
+
+class ComputeImpl implements Compute {
   private mutableEpoch: Epoch = new Epoch(0)
   private readonly mutableTransactions: [
     commitImpl: CommitImpl<unknown>,
@@ -62,6 +74,10 @@ export class Compute {
       this.mutableTransactions[this.mutableTransactions.length - 1]!
     mutableTransaction.push([mutableNodeImpl, newValue])
   }
+}
+
+export function compute(): Compute {
+  return new ComputeImpl()
 }
 
 class Epoch {

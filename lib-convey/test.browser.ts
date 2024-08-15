@@ -1,11 +1,15 @@
 import type * as conveyContext from '@/context.ts'
 import * as conveyScheduler from '@/scheduler.ts'
 
-export class ConveyImpl implements conveyContext.Convey {
+export interface Convey extends conveyContext.Convey {
+  dispose(): void
+}
+
+class ConveyImpl implements Convey {
   readonly classNames = new Set<string>()
   readonly document: Readonly<Document>
-  readonly mutableScheduler: conveyScheduler.Scheduler =
-    new conveyScheduler.Scheduler()
+  readonly scheduler: conveyScheduler.Scheduler =
+    conveyScheduler.scheduler()
   readonly styleLayer: Readonly<CSSLayerBlockRule>
 
   private readonly iframe: Readonly<HTMLIFrameElement>
@@ -34,4 +38,8 @@ export class ConveyImpl implements conveyContext.Convey {
   dispose(): void {
     this.iframe.remove()
   }
+}
+
+export function convey(): Convey {
+  return new ConveyImpl()
 }

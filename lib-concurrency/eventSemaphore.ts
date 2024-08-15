@@ -1,15 +1,7 @@
-export class EventSemaphore {
+class EventSemaphore {
   private mutableReady!: Promise<void>
   private mutableResolve!: () => void
   private mutableResolved: boolean = true
-
-  private constructor() {}
-
-  static build(): Readonly<EventSemaphore> {
-    const eventSemaphore = new EventSemaphore()
-    eventSemaphore.clear()
-    return eventSemaphore
-  }
 
   clear(): void {
     if (this.mutableResolved) {
@@ -35,4 +27,12 @@ export class EventSemaphore {
       }
     }
   }
+}
+
+export type { EventSemaphore }
+
+export function eventSemaphore(): Readonly<EventSemaphore> {
+  const eventSemaphore = new EventSemaphore()
+  eventSemaphore.clear()
+  return eventSemaphore
 }

@@ -18,7 +18,7 @@ const codePrefix: Readonly<RegExp> = /\/\.code\//
 const cachePromise = self.caches.open(cacheName)
 
 function main(): void {
-  const ctx = { time: new timeBrowser.TimeImpl() }
+  const ctx = { time: timeBrowser.time() }
 
   // eslint-disable-next-line no-console
   console.log(version, 'loading', self, manifest)
@@ -88,7 +88,7 @@ function patchMainHtmlContent(): Response {
   })
 }
 
-const fetchContentMemo = new collection.Memo(
+const fetchContentMemo = collection.memo(
   async (codeIdPath: string): Promise<Response> => {
     let ok = false
     try {

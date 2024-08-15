@@ -4,7 +4,7 @@ import * as contrastExpression from '@/expression.ts'
 import type * as contrastRule from '@/rule.ts'
 import * as collection from '@intertwine/lib-collection'
 
-export class Atom {
+class Atom {
   constructor(
     readonly pseudoElement: string | null,
     readonly propertyName: string | symbol,
@@ -28,11 +28,21 @@ export class Atom {
   }
 }
 
+export type { Atom }
+
 export function atom(
   propertyName: string | symbol,
   value: contrastExpression.ExpressionOpt<unknown>,
 ): Atom {
   const pseudoElement = null
+  return new Atom(pseudoElement, propertyName, value)
+}
+
+export function atomWithPseudoElement(
+  pseudoElement: string,
+  propertyName: string | symbol,
+  value: contrastExpression.ExpressionOpt<unknown>,
+): Atom {
   return new Atom(pseudoElement, propertyName, value)
 }
 
@@ -76,7 +86,7 @@ function isAtomOptArray(atomOpt: AtomOpt): atomOpt is readonly AtomOpt[] {
 function* getFinalAtoms(
   atoms: IterableIterator<Atom>,
 ): IterableIterator<Atom> {
-  const finalAtoms = new collection.Memo<
+  const finalAtoms = collection.memo<
     string | null,
     Map<string | symbol, Atom>
   >(() => new Map())

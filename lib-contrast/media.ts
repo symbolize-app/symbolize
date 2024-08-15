@@ -6,7 +6,7 @@ import type * as contrastUtilityType from '@/utilityType.ts'
 
 const mediaMarker = Symbol('mediaMarker')
 
-export class MediaTerm {
+class MediaTerm {
   constructor(
     private readonly compile_: (...args: readonly unknown[]) => string,
     private readonly args: (
@@ -23,6 +23,8 @@ export class MediaTerm {
     return null
   }
 }
+
+export type { MediaTerm }
 
 export const media = {
   term<Compile extends (...args: never) => string>(

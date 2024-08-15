@@ -1,4 +1,4 @@
-import { Memo } from '@/memo.ts'
+import { memo } from '@/memo.ts'
 import * as test from '@intertwine/lib-test'
 
 export const url = import.meta.url
@@ -9,13 +9,13 @@ export const tests = {
       2,
       (n: number) => n * 2,
     )
-    const memo = new Memo<number, number>(generate)
+    const container = memo<number, number>(generate)
     test.assertDeepEquals(generateHistory, [])
-    test.assertEquals(memo.get(1), 2)
+    test.assertEquals(container.get(1), 2)
     test.assertDeepEquals(generateHistory, [[1]])
-    test.assertEquals(memo.get(1), 2)
+    test.assertEquals(container.get(1), 2)
     test.assertDeepEquals(generateHistory, [[1]])
-    test.assertEquals(memo.get(2), 4)
+    test.assertEquals(container.get(2), 4)
     test.assertDeepEquals(generateHistory, [[1], [2]])
   },
 
@@ -24,44 +24,44 @@ export const tests = {
       2,
       (n: number) => n * 2,
     )
-    const memo = new Memo<number, number>(generate)
+    const container = memo<number, number>(generate)
     test.assertDeepEquals(generateHistory, [])
-    memo.get(1)
+    container.get(1)
     test.assertDeepEquals(generateHistory, [[1]])
-    memo.delete(1)
-    memo.get(1)
+    container.delete(1)
+    container.get(1)
     test.assertDeepEquals(generateHistory, [[1], [1]])
   },
 
   ['entries'](): void {
-    const memo = new Memo<number, number>((n) => n * 2)
-    test.assertDeepEquals([...memo.entries()], [])
-    test.assertDeepEquals([...memo.keys()], [])
-    test.assertDeepEquals([...memo.values()], [])
-    memo.get(1)
-    test.assertDeepEquals([...memo.entries()], [[1, 2]])
-    test.assertDeepEquals([...memo.keys()], [1])
-    test.assertDeepEquals([...memo.values()], [2])
-    memo.get(4)
+    const container = memo<number, number>((n) => n * 2)
+    test.assertDeepEquals([...container.entries()], [])
+    test.assertDeepEquals([...container.keys()], [])
+    test.assertDeepEquals([...container.values()], [])
+    container.get(1)
+    test.assertDeepEquals([...container.entries()], [[1, 2]])
+    test.assertDeepEquals([...container.keys()], [1])
+    test.assertDeepEquals([...container.values()], [2])
+    container.get(4)
     test.assertDeepEquals(
-      [...memo.entries()],
+      [...container.entries()],
       [
         [1, 2],
         [4, 8],
       ],
     )
-    test.assertDeepEquals([...memo.keys()], [1, 4])
-    test.assertDeepEquals([...memo.values()], [2, 8])
-    memo.get(2)
+    test.assertDeepEquals([...container.keys()], [1, 4])
+    test.assertDeepEquals([...container.values()], [2, 8])
+    container.get(2)
     test.assertDeepEquals(
-      [...memo.entries()],
+      [...container.entries()],
       [
         [1, 2],
         [4, 8],
         [2, 4],
       ],
     )
-    test.assertDeepEquals([...memo.keys()], [1, 4, 2])
-    test.assertDeepEquals([...memo.values()], [2, 8, 4])
+    test.assertDeepEquals([...container.keys()], [1, 4, 2])
+    test.assertDeepEquals([...container.values()], [2, 8, 4])
   },
 }

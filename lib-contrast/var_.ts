@@ -7,7 +7,7 @@ export function var_<Value>(): Var_<Value> {
   return new Var_()
 }
 
-export class Var_<Value> implements contrastExpression.Expression<Value> {
+class Var_<Value> implements contrastExpression.Expression<Value> {
   private readonly propertyName = Symbol('var')
 
   compile(
@@ -47,3 +47,5 @@ export class Var_<Value> implements contrastExpression.Expression<Value> {
     return contrastAtom.atom(this.propertyName, value)
   }
 }
+
+export type { Var_ }

@@ -16,23 +16,23 @@ export async function run(baseContext: time.Context): Promise<boolean> {
   }
   return testRunner.runAll(ctx, [import('@/index.ts')], {
     compute() {
-      return new compute.Compute()
+      return compute.compute()
     },
     contrast() {
-      return new contrast.Contrast()
+      return contrast.contrast()
     },
     convey(defer) {
-      const convey = new conveyNode.ConveyImpl()
+      const convey = conveyNode.convey()
       defer(() => {
         convey.dispose()
       })
       return convey
     },
     random() {
-      return randomTest.RandomImpl.build()
+      return randomTest.random()
     },
     time() {
-      return timeTest.TimeImpl.build()
+      return timeTest.time()
     },
   })
 }
@@ -43,7 +43,7 @@ if (
     nodeUrl.fileURLToPath(import.meta.url)
 ) {
   void run({
-    time: new timeNode.TimeImpl(),
+    time: timeNode.time(),
   }).then((success) => {
     process.exit(success ? 0 : 1)
   })

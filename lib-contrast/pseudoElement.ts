@@ -22,7 +22,7 @@ function pseudoElement(
         `${typeof atom.propertyName === 'string' ? atom.propertyName : 'var'} atom already has ::${atom.pseudoElement} pseudo-element`,
       )
     } else {
-      return new contrastAtom.Atom(
+      return contrastAtom.atomWithPseudoElement(
         name,
         atom.propertyName,
         atom.expressionOpt,

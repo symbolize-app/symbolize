@@ -1,17 +1,16 @@
-import type * as time from '@/index.ts'
+import type * as time_ from '@/index.ts'
 import fakeTimers from '@sinonjs/fake-timers'
 
 export interface Context {
-  readonly time: time.Time & TimeImpl
+  readonly time: Time
 }
 
-export class TimeImpl implements time.Time {
-  private constructor(readonly clock: Readonly<fakeTimers.Clock>) {}
+export interface Time extends time_.Time {
+  readonly clock: Readonly<fakeTimers.Clock>
+}
 
-  static build(): TimeImpl {
-    const clock = fakeTimers.createClock(1616952581493)
-    return new TimeImpl(clock)
-  }
+class TimeImpl implements Time {
+  constructor(readonly clock: Readonly<fakeTimers.Clock>) {}
 
   performanceNow(): number {
     return this.clock.now
@@ -20,4 +19,9 @@ export class TimeImpl implements time.Time {
   setTimeout(callback: () => void, ms: number): unknown {
     return this.clock.setTimeout(callback, ms)
   }
+}
+
+export function time(): Time {
+  const clock = fakeTimers.createClock(1616952581493)
+  return new TimeImpl(clock)
 }

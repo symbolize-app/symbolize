@@ -26,7 +26,16 @@ Other details:
   - If needed, introduce a static builder method
 - Hide implementation details inside class or interface methods
 - Make most data readonly
-- Use classes over plain interfaces
+
+### Classes
+
+- Use interfaces instead of object literal type aliases
+- Use class instances instead of object literals
+- Only export class types (except errors)
+- Don't export class types for purely-implementation classes
+- Export a constructor function with the same name as the class
+- Use a readonly type alias if the class has mutable fields
+- Don't use class inheritance
 
 ## CSS
 

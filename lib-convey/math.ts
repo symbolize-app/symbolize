@@ -7,7 +7,7 @@ export const math = new Proxy(
   {
     get(_mutableTarget: object, tag: string, _receiver: unknown): unknown {
       return (attrs: object) =>
-        new conveyElement.ElementFragment(
+        conveyElement.elementFragment(
           (ctx) =>
             ctx.convey.document.createElementNS(
               'http://www.w3.org/1998/Math/MathML',

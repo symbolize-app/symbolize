@@ -1,17 +1,12 @@
-import type * as random from '@/index.ts'
+import type * as random_ from '@/index.ts'
 import * as fastMersenneTwister from 'fast-mersenne-twister'
 
-export class RandomImpl implements random.Random {
-  private constructor(
+class RandomImpl implements random_.Random {
+  constructor(
     private readonly twister: Readonly<
       ReturnType<typeof fastMersenneTwister.MersenneTwister>
     >,
   ) {}
-
-  static build(): RandomImpl {
-    const twister = fastMersenneTwister.MersenneTwister(1616952581493)
-    return new RandomImpl(twister)
-  }
 
   cryptoBits(bits: number): Uint8Array {
     const mutableResult = new Uint8Array(bits / 8)
@@ -27,4 +22,9 @@ export class RandomImpl implements random.Random {
   number(): number {
     return this.twister.random()
   }
+}
+
+export function random(): random_.Random {
+  const twister = fastMersenneTwister.MersenneTwister(1616952581493)
+  return new RandomImpl(twister)
 }

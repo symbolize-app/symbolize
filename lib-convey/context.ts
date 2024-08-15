@@ -10,7 +10,7 @@ export interface Convey {
 
   readonly document: RestrictedDocument
 
-  readonly mutableScheduler: conveyScheduler.Scheduler
+  readonly scheduler: conveyScheduler.Scheduler
 
   readonly styleLayer: RestrictedCssLayerBlockRule
 }
@@ -69,5 +69,5 @@ export function scopedDefer(
 }
 
 export async function wait(ctx: Context): Promise<void> {
-  return ctx.convey.mutableScheduler.wait()
+  return ctx.convey.scheduler.wait()
 }

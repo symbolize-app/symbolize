@@ -16,9 +16,11 @@ export function rule(
   )
 }
 
-export class Rule {
+class Rule {
   constructor(
     readonly className: string,
     readonly code: string,
   ) {}
 }
+
+export type { Rule }

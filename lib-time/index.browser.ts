@@ -1,6 +1,6 @@
-import type * as time from '@/index.ts'
+import type * as time_ from '@/index.ts'
 
-export class TimeImpl implements time.Time {
+class TimeImpl implements time_.Time {
   performanceNow(): number {
     return globalThis.performance.now()
   }
@@ -8,4 +8,8 @@ export class TimeImpl implements time.Time {
   setTimeout(callback: () => void, ms: number): unknown {
     return globalThis.setTimeout(callback, ms)
   }
+}
+
+export function time(): time_.Time {
+  return new TimeImpl()
 }
