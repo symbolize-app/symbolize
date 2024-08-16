@@ -1,71 +1,37 @@
-import * as concurrency from '@intertwine/lib-concurrency'
 import * as time from '@intertwine/lib-time'
 
 const highWaterMark = 16
 const timeoutMs = 1_000
 
-class Source<T> {
-  constructor(
-    private readonly onClose: () => void,
-    private readonly onSend: (ctx: time.Context, data: T) => Promise<void>,
-    readonly readable: ReadableStream<T>,
-  ) {}
+export function source<T>(): Source<T> {
+  return new Source()
+}
 
-  close(): void {
-    this.onClose()
+class Source<T> {
+  readonly readable: ReadableStream<T>
+  private readonly writer: WritableStreamDefaultWriter<T>
+
+  constructor() {
+    const transform = new TransformStream<T, T>(undefined, {
+      highWaterMark,
+    })
+    this.readable = transform.readable
+    this.writer = transform.writable.getWriter()
+  }
+
+  async close(): Promise<void> {
+    return this.writer.close()
   }
 
   async send(ctx: time.Context, data: T): Promise<void> {
-    await this.onSend(ctx, data)
+    const readyBeforeTimeout = await Promise.race([
+      this.writer.write(data).then(() => true),
+      time.delay(ctx, timeoutMs).then(() => false),
+    ])
+    if (!readyBeforeTimeout) {
+      throw new Error('Send timeout')
+    }
   }
 }
 
 export type { Source }
-
-export function source<T>(): Source<T> {
-  let controller: ReadableStreamDefaultController | null = null
-  const ready = concurrency.eventSemaphore()
-  const done = concurrency.eventSemaphore()
-  return new Source<T>(
-    () => {
-      if (!controller) {
-        throw new Error('Closed before started')
-      }
-      controller.close()
-      done.set()
-    },
-    async (ctx, data) => {
-      const readyBeforeTimeout = await Promise.race([
-        ready.wait().then(() => true),
-        time.delay(ctx, timeoutMs).then(() => false),
-      ])
-      if (!readyBeforeTimeout) {
-        throw new Error('Ready before started')
-      }
-      if (!controller) {
-        throw new Error('Ready but missing controller')
-      }
-      controller.enqueue(data)
-      if (controller.desiredSize === null) {
-        done.set()
-        throw new Error('Stream in error state')
-      } else if (controller.desiredSize <= 0) {
-        ready.clear()
-        done.set()
-      }
-    },
-    new ReadableStream(
-      {
-        async pull() {
-          done.clear()
-          ready.set()
-          await done.wait()
-        },
-        start(controller_) {
-          controller = controller_
-        },
-      },
-      { highWaterMark },
-    ),
-  )
-}

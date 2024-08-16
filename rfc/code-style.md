@@ -33,7 +33,7 @@ Other details:
 - Use class instances instead of object literals
 - Only export class types (except errors)
 - Don't export class types for purely-implementation classes
-- Export a constructor function with the same name as the class
+- Export an optionally-async constructor function with the same name as the class
 - Use a readonly type alias if the class has mutable fields
 - Don't use class inheritance
 
