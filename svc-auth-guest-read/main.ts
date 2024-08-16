@@ -57,6 +57,6 @@ async function testStream(
   await source.send(ctx, new TextEncoder().encode('hello'))
   await time.delay(ctx, 10000)
   await source.send(ctx, new TextEncoder().encode('world'))
-  source.close()
+  await source.close()
   await Promise.all([requestPromise, responsePromise])
 }
