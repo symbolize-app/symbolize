@@ -15,7 +15,9 @@
   "include": ["./**/*.ts", "./**/*.js", "./**/*.cjs"],
   "references": [
     { "path": "../lib-collection" },
-    { "path": "../lib-concurrency" },
+    { "path": "../lib-error" },
+    { "path": "../lib-hex-ts" },
+    { "path": "../lib-random" },
     { "path": "../lib-test" },
     { "path": "../lib-time" }
   ]

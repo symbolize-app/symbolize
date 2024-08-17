@@ -8,11 +8,16 @@ vars:
 
 tasks:
   build:debug:
+    aliases:
+      - build
+      - b
     deps:
       - esbuild:build:debug
       - tsc:build
 
   build:release:
+    aliases:
+      - br
     deps:
       - esbuild:build:release
       - tsc:build

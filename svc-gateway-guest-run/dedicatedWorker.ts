@@ -1,22 +1,18 @@
 import * as random from '@intertwine/lib-random'
 import * as stream from '@intertwine/lib-stream'
-import type * as time from '@intertwine/lib-time'
-import * as timeBrowser from '@intertwine/lib-time/index.browser.ts'
+import * as time from '@intertwine/lib-time'
 
 function main(): void {
-  const timeObj = timeBrowser.time()
+  const timeObj = time.time()
 
-  const mainCtx: random.Context &
-    stream.WorkerServerContext &
-    time.Context = {
+  const mainCtx = {
     random: random.random(),
+    stream: stream.stream(),
     streamServer: stream.workerServer({ time: timeObj }),
     time: timeObj,
   }
 
-  const entryPoints: Promise<{
-    main(ctx: typeof mainCtx): void
-  }>[] = [import('@intertwine/svc-auth-guest-read/main.ts')]
+  const entryPoints = [import('@intertwine/svc-auth-guest-read/main.ts')]
 
   for (const entryPoint of entryPoints) {
     void (async () => {

@@ -12,7 +12,7 @@
             node-packages = prev.callPackage ./node-packages/default.nix {
               pkgs = pkgs;
               system = system;
-              nodejs = pkgs.nodejs_20;
+              nodejs = pkgs.nodejs_22;
             };
           })
         ];
@@ -25,8 +25,8 @@
           packages.default = pkgs.buildEnv {
             name = "intertwine-node";
             buildInputs = [
-              pkgs.nodejs_20
-              pkgs.nodejs_20.pkgs.node2nix
+              pkgs.nodejs_22
+              pkgs.nodejs_22.pkgs.node2nix
               pkgs.node-packages.pnpm
               node-loader
             ];

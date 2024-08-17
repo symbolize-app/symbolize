@@ -5,7 +5,6 @@ import mainHtml from '@/main.html'
 import resetCss from '@/reset.css'
 import * as collection from '@intertwine/lib-collection'
 import * as time from '@intertwine/lib-time'
-import * as timeBrowser from '@intertwine/lib-time/index.browser.ts'
 
 declare const self: Readonly<ServiceWorkerGlobalScope>
 declare const version: bigint
@@ -18,7 +17,7 @@ const codePrefix: Readonly<RegExp> = /\/\.code\//
 const cachePromise = self.caches.open(cacheName)
 
 function main(): void {
-  const ctx = { time: timeBrowser.time() }
+  const ctx = { time: time.time() }
 
   // eslint-disable-next-line no-console
   console.log(version, 'loading', self, manifest)

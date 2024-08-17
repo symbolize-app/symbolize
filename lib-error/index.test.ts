@@ -4,7 +4,7 @@ import * as test from '@intertwine/lib-test'
 import * as time from '@intertwine/lib-time'
 import type * as timeTest from '@intertwine/lib-time/test.ts'
 
-export const retryConfig: Omit<error.RetryConfig, 'onError'> = {
+export const retryConfig: Omit<error.RetryConfig, 'onError' | 'signal'> = {
   maxAttempts: 0,
   minDelayMs: 0,
   windowMs: 0,
@@ -32,6 +32,7 @@ export const tests = {
           milliseconds: 10,
         }),
         onError,
+        signal: null,
         windowMs: time.interval({ seconds: 10 }),
       }),
     )
@@ -46,12 +47,12 @@ export const tests = {
       ...baseContext,
       random: {
         ...baseContext.random,
-        number: test.mock<random.Random['number']>([() => 0.5]),
+        number: test.mock<random.Random['number']>([() => 0.7]),
       },
     }
     const expectedResult = new Error('TEST')
     const [onError, onErrorHistory] = test.mockWithHistory<
-      error.RetryConfig['onError']
+      Exclude<error.RetryConfig['onError'], null>
     >([() => undefined])
     const actualResult = test.sync(
       error.retry(ctx, async () => Promise.reject(expectedResult), {
@@ -60,13 +61,14 @@ export const tests = {
           milliseconds: 10,
         }),
         onError,
+        signal: null,
         windowMs: time.interval({ seconds: 10 }),
       }),
     )
     await ctx.time.clock.tickAsync(0)
-    test.assertDeepEquals(onErrorHistory, [[expectedResult, 0, 10]])
+    test.assertDeepEquals(onErrorHistory, [[expectedResult, 0, 17]])
     test.assert(!actualResult.isSettled)
-    await ctx.time.clock.tickAsync(10)
+    await ctx.time.clock.tickAsync(17)
     test.assertEquals(actualResult.rejectedValue, expectedResult)
   },
 
@@ -82,7 +84,7 @@ export const tests = {
     }
     const expectedResult = new Error('TEST')
     const [onError, onErrorHistory] = test.mockWithHistory<
-      error.RetryConfig['onError']
+      Exclude<error.RetryConfig['onError'], null>
     >([() => undefined, () => undefined])
     const actualResult = test.sync(
       error.retry(ctx, async () => Promise.reject(expectedResult), {
@@ -91,19 +93,20 @@ export const tests = {
           milliseconds: 10,
         }),
         onError,
+        signal: null,
         windowMs: time.interval({ seconds: 10 }),
       }),
     )
     await ctx.time.clock.tickAsync(0)
-    test.assertDeepEquals(onErrorHistory, [[expectedResult, 0, 10]])
+    test.assertDeepEquals(onErrorHistory, [[expectedResult, 0, 18]])
     test.assert(!actualResult.isSettled)
-    await ctx.time.clock.tickAsync(10)
+    await ctx.time.clock.tickAsync(18)
     test.assertDeepEquals(onErrorHistory, [
-      [expectedResult, 0, 10],
-      [expectedResult, 1, 16],
+      [expectedResult, 0, 18],
+      [expectedResult, 1, 26],
     ])
     test.assert(!actualResult.isSettled)
-    await ctx.time.clock.tickAsync(16)
+    await ctx.time.clock.tickAsync(26)
     test.assertEquals(actualResult.rejectedValue, expectedResult)
   },
 
@@ -130,6 +133,7 @@ export const tests = {
           maxAttempts: 10,
           minDelayMs: time.interval({ seconds: 1 }),
           onError,
+          signal: null,
           windowMs: time.interval({ seconds: 10 }),
         },
       ),
@@ -156,29 +160,30 @@ export const tests = {
     }
     const expectedResult = new Error('TEST')
     const [onError, onErrorHistory] = test.mockWithHistory<
-      error.RetryConfig['onError']
+      Exclude<error.RetryConfig['onError'], null>
     >([() => undefined, () => undefined])
     const actualResult = test.sync(
       error.retry(ctx, async () => Promise.reject(expectedResult), {
         maxAttempts: 10,
         minDelayMs: time.interval({ seconds: 1 }),
         onError,
+        signal: null,
         windowMs: time.interval({
-          milliseconds: 201,
-          seconds: 2,
+          milliseconds: 801,
+          seconds: 3,
         }),
       }),
     )
     await ctx.time.clock.tickAsync(0)
-    test.assertDeepEquals(onErrorHistory, [[expectedResult, 0, 1000]])
+    test.assertDeepEquals(onErrorHistory, [[expectedResult, 0, 1600]])
     test.assert(!actualResult.isSettled)
-    await ctx.time.clock.tickAsync(1000)
+    await ctx.time.clock.tickAsync(1600)
     test.assertDeepEquals(onErrorHistory, [
-      [expectedResult, 0, 1000],
-      [expectedResult, 1, 1200],
+      [expectedResult, 0, 1600],
+      [expectedResult, 1, 2200],
     ])
     test.assert(!actualResult.isSettled)
-    await ctx.time.clock.tickAsync(1200)
+    await ctx.time.clock.tickAsync(2200)
     test.assertEquals(actualResult.rejectedValue, expectedResult)
   },
 
@@ -200,26 +205,61 @@ export const tests = {
       async () => Promise.resolve(expectedResult),
     ])
     const [onError, onErrorHistory] = test.mockWithHistory<
-      error.RetryConfig['onError']
+      Exclude<error.RetryConfig['onError'], null>
     >([() => undefined, () => undefined])
     const actualResult = test.sync(
       error.retry(ctx, callback, {
         maxAttempts: 3,
         minDelayMs: time.interval({ milliseconds: 10 }),
         onError,
+        signal: null,
         windowMs: time.interval({ seconds: 10 }),
       }),
     )
     await ctx.time.clock.tickAsync(0)
-    test.assertDeepEquals(onErrorHistory, [[expectedError, 0, 10]])
+    test.assertDeepEquals(onErrorHistory, [[expectedError, 0, 18]])
     test.assert(!actualResult.isSettled)
-    await ctx.time.clock.tickAsync(10)
+    await ctx.time.clock.tickAsync(18)
     test.assertDeepEquals(onErrorHistory, [
-      [expectedError, 0, 10],
-      [expectedError, 1, 16],
+      [expectedError, 0, 18],
+      [expectedError, 1, 26],
     ])
     test.assert(!actualResult.isSettled)
-    await ctx.time.clock.tickAsync(16)
+    await ctx.time.clock.tickAsync(26)
     test.assertEquals(actualResult.resolvedValue, expectedResult)
+  },
+
+  async ['one attempt, abort'](
+    baseContext: random.Context & timeTest.Context,
+  ): Promise<void> {
+    const ctx = {
+      ...baseContext,
+      random: {
+        ...baseContext.random,
+        number: test.mock<random.Random['number']>([() => 0.5]),
+      },
+    }
+    const expectedResult = new Error('TEST')
+    const [onError, onErrorHistory] = test.mockWithHistory<
+      Exclude<error.RetryConfig['onError'], null>
+    >([() => undefined])
+    const abortController = new AbortController()
+    const actualResult = test.sync(
+      error.retry(ctx, async () => Promise.reject(expectedResult), {
+        maxAttempts: 10,
+        minDelayMs: time.interval({ milliseconds: 100 }),
+        onError,
+        signal: abortController.signal,
+        windowMs: time.interval({ seconds: 10 }),
+      }),
+    )
+    await ctx.time.clock.tickAsync(0)
+    test.assert(!actualResult.isSettled)
+    await ctx.time.clock.tickAsync(100)
+    test.assertDeepEquals(onErrorHistory, [[expectedResult, 0, 150]])
+    test.assert(!actualResult.isSettled)
+    abortController.abort()
+    await ctx.time.clock.tickAsync(0)
+    test.assertEquals(actualResult.rejectedValue, expectedResult)
   },
 }

@@ -4,7 +4,7 @@ import * as devDatabase from '@/db.ts'
 import * as devModules from '@/modules.ts'
 import * as devOutput from '@/output.ts'
 import * as payload from '@intertwine/lib-payload'
-import * as timeNode from '@intertwine/lib-time/index.node.ts'
+import * as time from '@intertwine/lib-time'
 import * as esbuild from 'esbuild'
 import ms from 'ms'
 import * as nodeFs from 'node:fs'
@@ -37,7 +37,7 @@ async function main(): Promise<void> {
     const ctx = {
       db: await devDatabase.db(),
       dev: devContext.dev(mode, outdir),
-      time: timeNode.time(),
+      time: time.time(),
     }
     await nodeFsPromises.mkdir(outdir, {
       recursive: true,

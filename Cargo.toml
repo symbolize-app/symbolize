@@ -10,7 +10,7 @@ resolver = "2"
 
 [workspace.dependencies]
 anyhow = { version = "1.0.75", features = ["std"] }
-backon = { version = "0.4.1", features = [] }
+backon = { version = "1.2.0", features = [] }
 bytes = { version = "1.5.0", features = [] }
 clap = { version = "4.4.12", features = ["color", "derive", "error-context", "help", "std", "suggestions", "usage"] }
 crossbeam = { version = "0.8.4", features = ["crossbeam-queue", "std"] }

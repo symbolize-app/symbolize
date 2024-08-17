@@ -161,6 +161,10 @@
       { "allowAsThisParameter": true }
     ],
     "@typescript-eslint/no-loop-func": "error",
+    "@typescript-eslint/no-throw-literal": [
+      "error",
+      { "allowThrowingUnknown": true }
+    ],
     "@typescript-eslint/no-unnecessary-condition": [
       "error",
       { "allowConstantLoopConditions": true }

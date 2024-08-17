@@ -16,6 +16,7 @@ use http::StatusCode;
 use http_body_util::BodyDataStream;
 use hyper::body::Incoming as IncomingBody;
 use intertwine_lib_hex::FromHex as _;
+use intertwine_lib_hex::ToHex as _;
 use std::time::Duration;
 use tokio;
 use tokio::sync::mpsc;
@@ -167,7 +168,10 @@ where
 {
   let req = svc_request::StreamRequest::new(req)?;
   if let Some(response_stream_id) = &req.response_stream_id {
-    println!("Request with response stream ID {response_stream_id:?}");
+    println!(
+      "Request with response stream ID {}",
+      response_stream_id.to_hex()
+    );
     let response_stream_state = ctx
       .state()
       .find_response_stream(response_stream_id)
@@ -185,7 +189,7 @@ where
     .into_response()
   } else {
     let response_stream_id = ctx.random().response_stream_id()?.expose();
-    println!("New response stream ID {response_stream_id:?}");
+    println!("New response stream ID {}", response_stream_id.to_hex());
     let (response_stream_sender, response_stream_receiver) =
       mpsc::channel(RESPONSE_STREAM_CHANNEL_BUFFER_SIZE);
     let (response_stream_close_sender, mut response_stream_close_receiver) =
