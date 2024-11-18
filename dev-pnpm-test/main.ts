@@ -3,9 +3,9 @@ import * as compute from '@intertwine/lib-compute'
 import * as contrast from '@intertwine/lib-contrast'
 import * as conveyNode from '@intertwine/lib-convey/index.node.ts'
 import * as randomTest from '@intertwine/lib-random/test.ts'
+import * as streamTest from '@intertwine/lib-stream/test.ts'
 import * as testRunner from '@intertwine/lib-test-runner'
-import type * as time from '@intertwine/lib-time'
-import * as timeNode from '@intertwine/lib-time/index.node.ts'
+import * as time from '@intertwine/lib-time'
 import * as timeTest from '@intertwine/lib-time/test.ts'
 import * as nodeFs from 'node:fs'
 import * as nodeUrl from 'node:url'
@@ -31,6 +31,9 @@ export async function run(baseContext: time.Context): Promise<boolean> {
     random() {
       return randomTest.random()
     },
+    stream() {
+      return streamTest.stream()
+    },
     time() {
       return timeTest.time()
     },
@@ -43,7 +46,7 @@ if (
     nodeUrl.fileURLToPath(import.meta.url)
 ) {
   void run({
-    time: timeNode.time(),
+    time: time.time(),
   }).then((success) => {
     process.exit(success ? 0 : 1)
   })

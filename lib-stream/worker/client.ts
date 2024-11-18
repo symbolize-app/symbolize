@@ -48,16 +48,9 @@ class WorkerClient {
         service,
         type: 'WorkerConnectionRequest',
       }
-    let resolveServerStream: (
-      serverStream: ReadableStream<unknown>,
-    ) => void
-    const serverStreamPromise = new Promise<ReadableStream<unknown>>(
-      (resolve) => (resolveServerStream = resolve),
-    )
-    this.mutableResolveServerStream.push(
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- set by promise constructor
-      resolveServerStream!,
-    )
+    const { promise: serverStreamPromise, resolve: resolveServerStream } =
+      Promise.withResolvers<ReadableStream<unknown>>()
+    this.mutableResolveServerStream.push(resolveServerStream)
     this.worker.postMessage(connectionRequest, [
       connectionRequest.clientStream,
     ])

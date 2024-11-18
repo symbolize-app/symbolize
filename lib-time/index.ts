@@ -15,6 +15,18 @@ export async function delay(ctx: Context, ms: number): Promise<void> {
   })
 }
 
+class TimeImpl implements Time {
+  readonly performanceNow = globalThis.performance.now.bind(
+    globalThis.performance,
+  )
+
+  readonly setTimeout = globalThis.setTimeout.bind(globalThis)
+}
+
+export function time(): Time {
+  return new TimeImpl()
+}
+
 const conversionTable = {
   hours: 60 * 60 * 1000,
   minutes: 60 * 1000,

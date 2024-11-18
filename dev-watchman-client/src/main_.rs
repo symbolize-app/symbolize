@@ -96,7 +96,7 @@ async fn watch_files(
     .watchman_cli_path("/dev/null");
   let client = { || connector.connect() }
     .retry(
-      &backon::ExponentialBuilder::default()
+      backon::ExponentialBuilder::default()
         .with_jitter()
         .with_min_delay(Duration::from_millis(100))
         .with_max_delay(Duration::from_secs(2))
@@ -304,7 +304,7 @@ async fn start_child(cli: &Cli) -> Result<Child> {
   let child = { || ready(Command::new(program).args(args).spawn()) }
     .retry(
       // Retry in case an executable is still being written
-      &backon::ExponentialBuilder::default()
+      backon::ExponentialBuilder::default()
         .with_jitter()
         .with_min_delay(Duration::from_millis(10))
         .with_min_delay(Duration::from_millis(200))

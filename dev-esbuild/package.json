@@ -8,7 +8,7 @@
     "@intertwine/lib-collection": "workspace:*",
     "@intertwine/lib-payload": "workspace:*",
     "@intertwine/lib-time": "workspace:*",
-    "better-sqlite3": "9.2.2",
+    "better-sqlite3": "11.1.2",
     "esbuild": "0.19.5",
     "ms": "2.1.3",
     "zod": "3.22.4"

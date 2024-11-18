@@ -5,8 +5,7 @@ import type * as convey from '@intertwine/lib-convey'
 import * as conveyBrowser from '@intertwine/lib-convey/index.browser.ts'
 import * as random from '@intertwine/lib-random'
 import * as stream from '@intertwine/lib-stream'
-import type * as time from '@intertwine/lib-time'
-import * as timeBrowser from '@intertwine/lib-time/index.browser.ts'
+import * as time from '@intertwine/lib-time'
 
 function main(): void {
   svcReload.listenForMessage()
@@ -28,7 +27,7 @@ function main(): void {
     convey: conveyBrowser.convey(),
     random: random.random(),
     streamClient: stream.workerClient(worker),
-    time: timeBrowser.time(),
+    time: time.time(),
   }
 
   const entryPoints = [
