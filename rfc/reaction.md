@@ -6,10 +6,7 @@ Of course fun reactions are nice to have, but the system itself can be built to 
 
 - Store in same row as a the message
 - Use hash map: `{ author_id: [reaction_1, reaction_2] }`
-- No explicit history needed
-  - Check Git if curious
 - If max count reached, they spill out into thread replies
-  - If thread replies too many, they spill into a nested thread on the last message
   - Don’t block, just trigger new shards (use this for all shards)
 
 ## Notifications

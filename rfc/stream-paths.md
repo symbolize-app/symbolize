@@ -1,14 +1,6 @@
-# Event paths
+# Streams paths
 
-All services in the system communicate using events. This is the isolation boundary, and a mechanism for working with real-time information.
-
-Each service has a restricted scope for improved reliability and maintainability.
-
-- Host services run on trusted infrastructure
-- Guest services run on untrusted browsers
-- Read services don't make data changes
-- Write services do make data changes
-- View services render parts of the webpage
+All distributed service boundaries are implemented with reactive streams, to make buffers explicit and bounded, and surface back-pressure from servers to clients.
 
 # Host-guest
 
@@ -16,13 +8,13 @@ Guest services use HTTP/2 streams to communicate with host services.
 
 The `gateway-guest-run` service establishes the connection using the Fetch API from a dedicated service worker. The `gateway-host-run` service handles the request using the `hyper` library.
 
-Because browsers only support "half duplex" communication for one `fetch` request, the browser must make two requests. One for sending discrete, async events, and one for receiving them. This way, host (and guest) services can work on async tasks and send async updates.
+Because browsers only support "half duplex" communication for one `fetch` request, the browser must make two requests. One for sending data, and one for receiving data. This way, host (and guest) services can work on async tasks and send async updates.
 
-A pair of requests will be sent for every host-guest link required. By using the same origin, a single HTTP/2 connection can be shared (avoiding extra TCP/TLS handshakes). But by having separate streams, each stream can own its own backpressure signal, and each host service has an easy, direct link to send events back to the guest service. This also introduces some failure isolation, where a single host-guest link can fail without interrupting others.
+A pair of requests will be sent for every host-guest link required. By using the same origin, a single HTTP/2 connection can be shared (avoiding extra TCP/TLS handshakes). But by having separate streams, each stream can own its own backpressure signal, and each host service has an easy, direct link to send data back to the guest service. This also introduces some failure isolation, where a single host-guest link can fail without interrupting others.
 
 One complication of using two requests is that there is no guarantee from the browser that these requests will share a single HTTP/2 connection. If they do not share a connection, they may not reach the same gateway host service instance. To guard against this, all stream pairs will share a host-generated response stream ID, the gateway host instance will terminate request streams without matching response streams, and if the gateway guest finds its response stream got closed, it will reopen both request and response streams.
 
-As of July 2024, half duplex request streams are only supported in Chrome and Edge. As a fallback for other browsers, the request stream will need to be re-initiated for every request event that needs sending. This will trigger HTTP request parsing, but will not require new TCP/TLS connections.
+As of July 2024, half duplex request streams are only supported in Chrome and Edge. As a fallback for other browsers, the request stream will need to be re-initiated for every piece of data that needs sending. This will trigger HTTP request parsing, but will not require new TCP/TLS connections.
 
 # Guest-guest
 

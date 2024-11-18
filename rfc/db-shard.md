@@ -22,7 +22,6 @@
   - entry
 - chat
   - thread / capacity
-  - thread / capacity
 - feed
   - author
 - forum
@@ -30,7 +29,7 @@
 - letter
   - post
 - log
-  - service / capacity
+  - service / host / capacity
 - media
   - file
 - mod
@@ -52,7 +51,7 @@
 - review
   - review
 - track
-  - service / capacity
+  - service / host / capacity
 - vote
   - vote
 
