@@ -1,6 +1,8 @@
-# Setup
+# Symbolize <img width="30" height="30" src="art/favicon.svg?raw=true"/>
 
-## Nix package manager
+## Setup
+
+### Nix package manager
 
 1. Install Nix 2.15.0
 1. Install init profile flake
@@ -10,7 +12,7 @@ curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix/
 nix profile install ./dev-nix-init
 ```
 
-### Upgrade
+#### Upgrade
 
 1. Nix: uninstall, then reinstall
 1. Init profile flake: find and upgrade the profile
@@ -20,7 +22,7 @@ nix profile list
 nix profile upgrade <YOUR_PROFILE_ENTRY_INDEX>
 ```
 
-## direnv
+### direnv
 
 1. Installed by Nix
 1. [Hook into your shell](https://direnv.net/docs/hook.html)
@@ -33,15 +35,15 @@ mkdir -p $HOME/.config/direnv
 echo 'source $HOME/.nix-profile/share/nix-direnv/direnvrc' >> $HOME/.config/direnv/direnvrc
 ```
 
-## pnpm
+### pnpm
 
 1. Installed by Nix
 
-## Rust
+### Rust
 
 1. Installed by Nix
 
-## Easy-RSA
+### Easy-RSA
 
 General:
 
@@ -65,6 +67,6 @@ Chrome & Firefox:
 1. Install [Visual Studio Code](https://code.visualstudio.com/docs/setup/setup-overview)
 1. Run the command `Tasks: Allow Automatic Tasks in Folder`
 
-# Commands
+## Commands
 
 - `task c`
