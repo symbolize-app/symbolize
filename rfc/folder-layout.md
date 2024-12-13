@@ -1,7 +1,5 @@
 # Folder layout
 
-Like biology achieves scale through hierarchy and repetition.
-
 ## Services
 
 - auth (RBAC, groups, logins, alts)
@@ -32,6 +30,16 @@ Like biology achieves scale through hierarchy and repetition.
 - vote (open votes, straw polls)
 
 ### Standard
+
+Each service has a restricted scope for improved reliability and maintainability.
+
+- Host services run on trusted infrastructure
+- Guest services run on untrusted browsers
+- Read services don't make data changes
+- Write services do make data changes
+- View services render parts of the webpage
+
+This results in the following folders per service:
 
 - svc-<service>-doc
 - svc-<service>-guest-read

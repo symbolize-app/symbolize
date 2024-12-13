@@ -48,7 +48,7 @@ After writing a page, the service also checks if there are any active readers. I
 
 Relational data will be stored in SQLite databases, one shard as one DB, that are themselves stored in FoundationDB (separate files for DB and log). A service will open a "local" DB on a FUSE mount, and the FUSE handler will transparently handle reads and writes (with its own caching layer).
 
-For this to work properly when a write and readers are all active, the DB needs to be set to WAL mode with auto-checkpointing disabled. When new WAL entries are available, SQLite will be able to see the new data. The rest of the DB file content will remain immutable (can be enforce by FUSE handler).
+For this to work properly when a write and readers are all active, the DB needs to be set to WAL mode with auto-checkpointing and checkpoint-on-close disabled. When new WAL entries are available, SQLite will be able to see the new data. The rest of the DB file content will remain immutable (can be enforce by FUSE handler).
 
 Periodically, FoundationDB will be scanned (or a secondary index used) and DBs will be checkpointed (applying the WAL to the main DB content). This needs exclusive write access, and readers will need to reset their DB connections afterward (forcing fresh reads for all cached pages).
 
