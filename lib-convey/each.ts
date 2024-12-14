@@ -2,8 +2,8 @@ import type * as conveyContext from '@/context.ts'
 import * as conveyElement from '@/element.ts'
 import * as conveyFragment from '@/fragment.ts'
 import * as conveyMarker from '@/marker.ts'
-import * as compute from '@intertwine/lib-compute'
-import type * as contrast from '@intertwine/lib-contrast'
+import * as compute from '@symbolize/lib-compute'
+import type * as contrast from '@symbolize/lib-contrast'
 
 export function each<CustomContext, Key, Value>(
   transform: (

@@ -11,7 +11,7 @@
       in
         {
           packages.default = pkgs.buildEnv {
-            name = "intertwine-fd";
+            name = "symbolize-fd";
             buildInputs = [
               pkgs.fd
             ];

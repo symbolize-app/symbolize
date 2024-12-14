@@ -29,13 +29,13 @@ pub async fn serve(ctx: Arc<svc_context::ContextImpl>) -> Result<()> {
 
 async fn build_tls_server_config() -> Result<TlsServerConfig> {
   let mut local_certs_slice =
-    &read(".pki/issued/intertwine-gateway.crt").await?[..];
+    &read(".pki/issued/symbolize-gateway.crt").await?[..];
   let local_certs = certs(&mut local_certs_slice)
     .map(|item| item.map_err(Into::into))
     .collect::<Result<Vec<_>>>()?;
 
   let mut local_keys_slice =
-    &read(".pki/private/intertwine-gateway.key").await?[..];
+    &read(".pki/private/symbolize-gateway.key").await?[..];
   let local_key = pkcs8_private_keys(&mut local_keys_slice)
     .next()
     .ok_or(anyhow!("missing key"))

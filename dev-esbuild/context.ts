@@ -1,5 +1,5 @@
 import type * as devDatabase from '@/db.ts'
-import type * as time from '@intertwine/lib-time'
+import type * as time from '@symbolize/lib-time'
 
 export type Context = DevContext & devDatabase.Context & time.Context
 

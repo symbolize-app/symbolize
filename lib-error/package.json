@@ -1,16 +1,16 @@
 {
-  "name": "@intertwine/lib-error",
+  "name": "@symbolize/lib-error",
   "type": "module",
   "dependencies": {
-    "@intertwine/dev-prettier": "workspace:*",
-    "@intertwine/dev-tsconfig": "workspace:*",
-    "@intertwine/lib-random": "workspace:*",
-    "@intertwine/lib-time": "workspace:*",
-    "@intertwine/lib-test": "workspace:*"
+    "@symbolize/dev-prettier": "workspace:*",
+    "@symbolize/dev-tsconfig": "workspace:*",
+    "@symbolize/lib-random": "workspace:*",
+    "@symbolize/lib-time": "workspace:*",
+    "@symbolize/lib-test": "workspace:*"
   },
   "devDependencies": {
     "typescript": "5.4.5",
-    "@intertwine/lib-test": "workspace:*"
+    "@symbolize/lib-test": "workspace:*"
   },
-  "prettier": "@intertwine/dev-prettier/index.json"
+  "prettier": "@symbolize/dev-prettier/index.json"
 }

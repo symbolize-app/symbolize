@@ -1,16 +1,16 @@
 {
-  "name": "@intertwine/lib-convey",
+  "name": "@symbolize/lib-convey",
   "type": "module",
   "dependencies": {
-    "@intertwine/dev-prettier": "workspace:*",
-    "@intertwine/dev-tsconfig": "workspace:*",
-    "@intertwine/lib-contrast": "workspace:*",
-    "@intertwine/lib-compute": "workspace:*",
-    "@intertwine/lib-test": "workspace:*",
+    "@symbolize/dev-prettier": "workspace:*",
+    "@symbolize/dev-tsconfig": "workspace:*",
+    "@symbolize/lib-contrast": "workspace:*",
+    "@symbolize/lib-compute": "workspace:*",
+    "@symbolize/lib-test": "workspace:*",
     "happy-dom": "13.6.2"
   },
   "devDependencies": {
     "typescript": "5.4.5"
   },
-  "prettier": "@intertwine/dev-prettier/index.json"
+  "prettier": "@symbolize/dev-prettier/index.json"
 }

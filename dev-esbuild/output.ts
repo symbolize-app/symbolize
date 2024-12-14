@@ -1,6 +1,6 @@
 import * as devContext from '@/context.ts'
-import * as collection from '@intertwine/lib-collection'
-import * as hex from '@intertwine/lib-hex'
+import * as collection from '@symbolize/lib-collection'
+import * as hex from '@symbolize/lib-hex'
 import * as nodeCrypto from 'node:crypto'
 import * as nodePath from 'node:path'
 import * as nodeZlib from 'node:zlib'

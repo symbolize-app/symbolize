@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import * as convey from '@/index.ts'
 import * as conveyTest from '@/test.ts'
-import * as compute from '@intertwine/lib-compute'
-import * as contrast from '@intertwine/lib-contrast'
-import * as contrastTest from '@intertwine/lib-contrast/test.ts'
-import * as test from '@intertwine/lib-test'
+import * as compute from '@symbolize/lib-compute'
+import * as contrast from '@symbolize/lib-contrast'
+import * as contrastTest from '@symbolize/lib-contrast/test.ts'
+import * as test from '@symbolize/lib-test'
 
 export const url = import.meta.url
 

@@ -1,5 +1,5 @@
 {
-  "name": "@intertwine/dev-tsconfig",
+  "name": "@symbolize/dev-tsconfig",
   "type": "module",
-  "prettier": "@intertwine/dev-prettier/index.json"
+  "prettier": "@symbolize/dev-prettier/index.json"
 }

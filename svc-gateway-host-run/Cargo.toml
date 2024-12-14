@@ -1,11 +1,11 @@
 [package]
-name = "intertwine-svc-gateway-host-run"
+name = "symbolize-svc-gateway-host-run"
 version = "0.1.0"
 edition = "2021"
 publish = false
 
 [[bin]]
-name = "intertwine-svc-gateway-host-run"
+name = "symbolize-svc-gateway-host-run"
 path = "src/mod.rs"
 
 [dependencies]
@@ -20,7 +20,7 @@ http-body = { workspace = true }
 http-body-util = { workspace = true }
 hyper = { workspace = true }
 hyper-util = { workspace = true }
-intertwine-lib-hex = { workspace = true }
+symbolize-lib-hex = { workspace = true }
 mime = { workspace = true }
 ring = { workspace = true }
 rusqlite = { workspace = true }

@@ -1,5 +1,5 @@
 {
-  "name": "@intertwine/dev-prettier",
+  "name": "@symbolize/dev-prettier",
   "type": "module",
   "prettier": "./index.json"
 }

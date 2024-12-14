@@ -1,8 +1,8 @@
 import type * as conveyContext from '@/context.ts'
 import type * as conveyFragment from '@/fragment.ts'
 import * as conveyMarker from '@/marker.ts'
-import * as compute from '@intertwine/lib-compute'
-import type * as contrast from '@intertwine/lib-contrast'
+import * as compute from '@symbolize/lib-compute'
+import type * as contrast from '@symbolize/lib-contrast'
 
 export function text(attrs: {
   readonly content: compute.NodeOpt<string>

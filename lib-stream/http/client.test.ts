@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import type * as streamContext from '@/context.ts'
 import * as streamHttpClient from '@/http/client.ts'
-import type * as random from '@intertwine/lib-random'
-import * as test from '@intertwine/lib-test'
-//import * as time from '@intertwine/lib-time'
-import type * as timeTest from '@intertwine/lib-time/test.ts'
+import type * as random from '@symbolize/lib-random'
+import * as test from '@symbolize/lib-test'
+//import * as time from '@symbolize/lib-time'
+import type * as timeTest from '@symbolize/lib-time/test.ts'
 
 export const url = import.meta.url
 

@@ -1,10 +1,10 @@
-import type * as compute from '@intertwine/lib-compute'
-import type * as contrast from '@intertwine/lib-contrast'
-import type * as convey from '@intertwine/lib-convey'
-import type * as random from '@intertwine/lib-random'
-import type * as stream from '@intertwine/lib-stream'
-import type * as test from '@intertwine/lib-test'
-import type * as timeTest from '@intertwine/lib-time/test.ts'
+import type * as compute from '@symbolize/lib-compute'
+import type * as contrast from '@symbolize/lib-contrast'
+import type * as convey from '@symbolize/lib-convey'
+import type * as random from '@symbolize/lib-random'
+import type * as stream from '@symbolize/lib-stream'
+import type * as test from '@symbolize/lib-test'
+import type * as timeTest from '@symbolize/lib-time/test.ts'
 
 export const all: test.TestCollection<
   compute.Context &
@@ -14,14 +14,14 @@ export const all: test.TestCollection<
     stream.Context &
     timeTest.Context
 > = () => [
-  import('@intertwine/lib-collection/index.test.ts'),
-  import('@intertwine/lib-compute/index.test.ts'),
-  import('@intertwine/lib-contrast/index.test.ts'),
-  import('@intertwine/lib-convey/index.test.ts'),
-  import('@intertwine/lib-error/index.test.ts'),
-  import('@intertwine/lib-hex/index.test.ts'),
-  import('@intertwine/lib-payload/index.test.ts'),
-  import('@intertwine/lib-random/index.test.ts'),
-  import('@intertwine/lib-stream/index.test.ts'),
-  import('@intertwine/lib-time/index.test.ts'),
+  import('@symbolize/lib-collection/index.test.ts'),
+  import('@symbolize/lib-compute/index.test.ts'),
+  import('@symbolize/lib-contrast/index.test.ts'),
+  import('@symbolize/lib-convey/index.test.ts'),
+  import('@symbolize/lib-error/index.test.ts'),
+  import('@symbolize/lib-hex/index.test.ts'),
+  import('@symbolize/lib-payload/index.test.ts'),
+  import('@symbolize/lib-random/index.test.ts'),
+  import('@symbolize/lib-stream/index.test.ts'),
+  import('@symbolize/lib-time/index.test.ts'),
 ]

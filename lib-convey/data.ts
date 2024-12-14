@@ -1,4 +1,4 @@
-import type * as contrast from '@intertwine/lib-contrast'
+import type * as contrast from '@symbolize/lib-contrast'
 
 export function svgPreserveAspectRatio(data: {
   readonly align: SvgPreserveAspectRatio['align']

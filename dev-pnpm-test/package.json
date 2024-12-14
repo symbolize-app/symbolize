@@ -1,26 +1,26 @@
 {
-  "name": "@intertwine/dev-pnpm-test",
+  "name": "@symbolize/dev-pnpm-test",
   "type": "module",
   "bin": "main.ts",
   "dependencies": {
-    "@intertwine/dev-prettier": "workspace:*",
-    "@intertwine/dev-tsconfig": "workspace:*",
-    "@intertwine/lib-collection": "workspace:*",
-    "@intertwine/lib-compute": "workspace:*",
-    "@intertwine/lib-contrast": "workspace:*",
-    "@intertwine/lib-convey": "workspace:*",
-    "@intertwine/lib-error": "workspace:*",
-    "@intertwine/lib-hex": "workspace:*",
-    "@intertwine/lib-payload": "workspace:*",
-    "@intertwine/lib-random": "workspace:*",
-    "@intertwine/lib-stream": "workspace:*",
-    "@intertwine/lib-test": "workspace:*",
-    "@intertwine/lib-test-runner": "workspace:*",
-    "@intertwine/lib-time": "workspace:*",
-    "@intertwine/svc-auth-guest-view": "workspace:*"
+    "@symbolize/dev-prettier": "workspace:*",
+    "@symbolize/dev-tsconfig": "workspace:*",
+    "@symbolize/lib-collection": "workspace:*",
+    "@symbolize/lib-compute": "workspace:*",
+    "@symbolize/lib-contrast": "workspace:*",
+    "@symbolize/lib-convey": "workspace:*",
+    "@symbolize/lib-error": "workspace:*",
+    "@symbolize/lib-hex": "workspace:*",
+    "@symbolize/lib-payload": "workspace:*",
+    "@symbolize/lib-random": "workspace:*",
+    "@symbolize/lib-stream": "workspace:*",
+    "@symbolize/lib-test": "workspace:*",
+    "@symbolize/lib-test-runner": "workspace:*",
+    "@symbolize/lib-time": "workspace:*",
+    "@symbolize/svc-auth-guest-view": "workspace:*"
   },
   "devDependencies": {
     "typescript": "5.4.5"
   },
-  "prettier": "@intertwine/dev-prettier/index.json"
+  "prettier": "@symbolize/dev-prettier/index.json"
 }

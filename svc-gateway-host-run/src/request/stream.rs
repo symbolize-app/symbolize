@@ -5,7 +5,7 @@ use http::Method;
 use http_body_util::BodyDataStream;
 use http_body_util::BodyExt as _;
 use hyper::body::Incoming as IncomingBody;
-use intertwine_lib_hex::FromHex as _;
+use symbolize_lib_hex::FromHex as _;
 
 #[derive(Debug)]
 pub struct StreamRequest<S> {

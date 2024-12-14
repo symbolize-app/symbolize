@@ -1,6 +1,6 @@
 import * as convey from '@/index.ts'
-import type * as compute from '@intertwine/lib-compute'
-import type * as contrast from '@intertwine/lib-contrast'
+import type * as compute from '@symbolize/lib-compute'
+import type * as contrast from '@symbolize/lib-contrast'
 
 export const url = import.meta.url
 

@@ -11,7 +11,7 @@
     "tsBuildInfoFile": "build/tsc/tsconfig.tsbuildinfo"
   },
   "exclude": [],
-  "extends": "@intertwine/dev-tsconfig/tsconfig.json",
+  "extends": "@symbolize/dev-tsconfig/tsconfig.json",
   "include": [],
   "references": [
     { "path": "./dev-esbuild" },

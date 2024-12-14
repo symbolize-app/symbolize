@@ -11,72 +11,72 @@ importers:
 
   .:
     devDependencies:
-      '@intertwine/dev-esbuild':
-        specifier: workspace:*
-        version: link:dev-esbuild
-      '@intertwine/dev-node-loader':
-        specifier: workspace:*
-        version: link:dev-node-loader
-      '@intertwine/dev-node-suppress':
-        specifier: workspace:*
-        version: link:dev-node-suppress
-      '@intertwine/dev-pnpm-test':
-        specifier: workspace:*
-        version: link:dev-pnpm-test
-      '@intertwine/dev-prettier':
-        specifier: workspace:*
-        version: link:dev-prettier
-      '@intertwine/dev-tsconfig':
-        specifier: workspace:*
-        version: link:dev-tsconfig
-      '@intertwine/eslint-config':
-        specifier: workspace:@intertwine/dev-eslint@*
-        version: link:dev-eslint
-      '@intertwine/lib-collection':
-        specifier: workspace:*
-        version: link:lib-collection
-      '@intertwine/lib-compute':
-        specifier: workspace:*
-        version: link:lib-compute
-      '@intertwine/lib-concurrency':
-        specifier: workspace:*
-        version: link:lib-concurrency
-      '@intertwine/lib-contrast':
-        specifier: workspace:*
-        version: link:lib-contrast
-      '@intertwine/lib-error':
-        specifier: workspace:*
-        version: link:lib-error
-      '@intertwine/lib-hex':
-        specifier: workspace:*
-        version: link:lib-hex-ts
-      '@intertwine/lib-payload':
-        specifier: workspace:*
-        version: link:lib-payload
-      '@intertwine/lib-random':
-        specifier: workspace:*
-        version: link:lib-random
-      '@intertwine/lib-stream':
-        specifier: workspace:*
-        version: link:lib-stream
-      '@intertwine/lib-test':
-        specifier: workspace:*
-        version: link:lib-test
-      '@intertwine/lib-time':
-        specifier: workspace:*
-        version: link:lib-time
-      '@intertwine/svc-auth-guest-read':
-        specifier: workspace:*
-        version: link:svc-auth-guest-read
-      '@intertwine/svc-auth-guest-view':
-        specifier: workspace:*
-        version: link:svc-auth-guest-view
-      '@intertwine/svc-gateway-guest-run':
-        specifier: workspace:*
-        version: link:svc-gateway-guest-run
       '@sinonjs/fake-timers':
         specifier: 11.1.0
         version: 11.1.0
+      '@symbolize/dev-esbuild':
+        specifier: workspace:*
+        version: link:dev-esbuild
+      '@symbolize/dev-node-loader':
+        specifier: workspace:*
+        version: link:dev-node-loader
+      '@symbolize/dev-node-suppress':
+        specifier: workspace:*
+        version: link:dev-node-suppress
+      '@symbolize/dev-pnpm-test':
+        specifier: workspace:*
+        version: link:dev-pnpm-test
+      '@symbolize/dev-prettier':
+        specifier: workspace:*
+        version: link:dev-prettier
+      '@symbolize/dev-tsconfig':
+        specifier: workspace:*
+        version: link:dev-tsconfig
+      '@symbolize/eslint-config':
+        specifier: workspace:@symbolize/dev-eslint@*
+        version: link:dev-eslint
+      '@symbolize/lib-collection':
+        specifier: workspace:*
+        version: link:lib-collection
+      '@symbolize/lib-compute':
+        specifier: workspace:*
+        version: link:lib-compute
+      '@symbolize/lib-concurrency':
+        specifier: workspace:*
+        version: link:lib-concurrency
+      '@symbolize/lib-contrast':
+        specifier: workspace:*
+        version: link:lib-contrast
+      '@symbolize/lib-error':
+        specifier: workspace:*
+        version: link:lib-error
+      '@symbolize/lib-hex':
+        specifier: workspace:*
+        version: link:lib-hex-ts
+      '@symbolize/lib-payload':
+        specifier: workspace:*
+        version: link:lib-payload
+      '@symbolize/lib-random':
+        specifier: workspace:*
+        version: link:lib-random
+      '@symbolize/lib-stream':
+        specifier: workspace:*
+        version: link:lib-stream
+      '@symbolize/lib-test':
+        specifier: workspace:*
+        version: link:lib-test
+      '@symbolize/lib-time':
+        specifier: workspace:*
+        version: link:lib-time
+      '@symbolize/svc-auth-guest-read':
+        specifier: workspace:*
+        version: link:svc-auth-guest-read
+      '@symbolize/svc-auth-guest-view':
+        specifier: workspace:*
+        version: link:svc-auth-guest-view
+      '@symbolize/svc-gateway-guest-run':
+        specifier: workspace:*
+        version: link:svc-gateway-guest-run
       '@types/better-sqlite3':
         specifier: 7.6.11
         version: 7.6.11
@@ -158,19 +158,19 @@ importers:
 
   dev-esbuild:
     dependencies:
-      '@intertwine/dev-prettier':
+      '@symbolize/dev-prettier':
         specifier: workspace:*
         version: link:../dev-prettier
-      '@intertwine/dev-tsconfig':
+      '@symbolize/dev-tsconfig':
         specifier: workspace:*
         version: link:../dev-tsconfig
-      '@intertwine/lib-collection':
+      '@symbolize/lib-collection':
         specifier: workspace:*
         version: link:../lib-collection
-      '@intertwine/lib-payload':
+      '@symbolize/lib-payload':
         specifier: workspace:*
         version: link:../lib-payload
-      '@intertwine/lib-time':
+      '@symbolize/lib-time':
         specifier: workspace:*
         version: link:../lib-time
       better-sqlite3:
@@ -194,13 +194,13 @@ importers:
 
   dev-node-loader:
     dependencies:
-      '@intertwine/dev-prettier':
+      '@symbolize/dev-prettier':
         specifier: workspace:*
         version: link:../dev-prettier
-      '@intertwine/dev-tsconfig':
+      '@symbolize/dev-tsconfig':
         specifier: workspace:*
         version: link:../dev-tsconfig
-      '@intertwine/lib-test':
+      '@symbolize/lib-test':
         specifier: workspace:*
         version: link:../lib-test
       esbuild:
@@ -213,13 +213,13 @@ importers:
 
   dev-node-suppress:
     dependencies:
-      '@intertwine/dev-prettier':
+      '@symbolize/dev-prettier':
         specifier: workspace:*
         version: link:../dev-prettier
-      '@intertwine/dev-tsconfig':
+      '@symbolize/dev-tsconfig':
         specifier: workspace:*
         version: link:../dev-tsconfig
-      '@intertwine/lib-test':
+      '@symbolize/lib-test':
         specifier: workspace:*
         version: link:../lib-test
     devDependencies:
@@ -229,49 +229,49 @@ importers:
 
   dev-pnpm-test:
     dependencies:
-      '@intertwine/dev-prettier':
+      '@symbolize/dev-prettier':
         specifier: workspace:*
         version: link:../dev-prettier
-      '@intertwine/dev-tsconfig':
+      '@symbolize/dev-tsconfig':
         specifier: workspace:*
         version: link:../dev-tsconfig
-      '@intertwine/lib-collection':
+      '@symbolize/lib-collection':
         specifier: workspace:*
         version: link:../lib-collection
-      '@intertwine/lib-compute':
+      '@symbolize/lib-compute':
         specifier: workspace:*
         version: link:../lib-compute
-      '@intertwine/lib-contrast':
+      '@symbolize/lib-contrast':
         specifier: workspace:*
         version: link:../lib-contrast
-      '@intertwine/lib-convey':
+      '@symbolize/lib-convey':
         specifier: workspace:*
         version: link:../lib-convey
-      '@intertwine/lib-error':
+      '@symbolize/lib-error':
         specifier: workspace:*
         version: link:../lib-error
-      '@intertwine/lib-hex':
+      '@symbolize/lib-hex':
         specifier: workspace:*
         version: link:../lib-hex-ts
-      '@intertwine/lib-payload':
+      '@symbolize/lib-payload':
         specifier: workspace:*
         version: link:../lib-payload
-      '@intertwine/lib-random':
+      '@symbolize/lib-random':
         specifier: workspace:*
         version: link:../lib-random
-      '@intertwine/lib-stream':
+      '@symbolize/lib-stream':
         specifier: workspace:*
         version: link:../lib-stream
-      '@intertwine/lib-test':
+      '@symbolize/lib-test':
         specifier: workspace:*
         version: link:../lib-test
-      '@intertwine/lib-test-runner':
+      '@symbolize/lib-test-runner':
         specifier: workspace:*
         version: link:../lib-test-runner
-      '@intertwine/lib-time':
+      '@symbolize/lib-time':
         specifier: workspace:*
         version: link:../lib-time
-      '@intertwine/svc-auth-guest-view':
+      '@symbolize/svc-auth-guest-view':
         specifier: workspace:*
         version: link:../svc-auth-guest-view
     devDependencies:
@@ -285,13 +285,13 @@ importers:
 
   lib-collection:
     dependencies:
-      '@intertwine/dev-prettier':
+      '@symbolize/dev-prettier':
         specifier: workspace:*
         version: link:../dev-prettier
-      '@intertwine/dev-tsconfig':
+      '@symbolize/dev-tsconfig':
         specifier: workspace:*
         version: link:../dev-tsconfig
-      '@intertwine/lib-test':
+      '@symbolize/lib-test':
         specifier: workspace:*
         version: link:../lib-test
     devDependencies:
@@ -301,13 +301,13 @@ importers:
 
   lib-compute:
     dependencies:
-      '@intertwine/dev-prettier':
+      '@symbolize/dev-prettier':
         specifier: workspace:*
         version: link:../dev-prettier
-      '@intertwine/dev-tsconfig':
+      '@symbolize/dev-tsconfig':
         specifier: workspace:*
         version: link:../dev-tsconfig
-      '@intertwine/lib-test':
+      '@symbolize/lib-test':
         specifier: workspace:*
         version: link:../lib-test
     devDependencies:
@@ -317,13 +317,13 @@ importers:
 
   lib-concurrency:
     dependencies:
-      '@intertwine/dev-prettier':
+      '@symbolize/dev-prettier':
         specifier: workspace:*
         version: link:../dev-prettier
-      '@intertwine/dev-tsconfig':
+      '@symbolize/dev-tsconfig':
         specifier: workspace:*
         version: link:../dev-tsconfig
-      '@intertwine/lib-test':
+      '@symbolize/lib-test':
         specifier: workspace:*
         version: link:../lib-test
     devDependencies:
@@ -333,16 +333,16 @@ importers:
 
   lib-contrast:
     dependencies:
-      '@intertwine/dev-prettier':
+      '@symbolize/dev-prettier':
         specifier: workspace:*
         version: link:../dev-prettier
-      '@intertwine/dev-tsconfig':
+      '@symbolize/dev-tsconfig':
         specifier: workspace:*
         version: link:../dev-tsconfig
-      '@intertwine/lib-collection':
+      '@symbolize/lib-collection':
         specifier: workspace:*
         version: link:../lib-collection
-      '@intertwine/lib-test':
+      '@symbolize/lib-test':
         specifier: workspace:*
         version: link:../lib-test
     devDependencies:
@@ -355,19 +355,19 @@ importers:
 
   lib-convey:
     dependencies:
-      '@intertwine/dev-prettier':
+      '@symbolize/dev-prettier':
         specifier: workspace:*
         version: link:../dev-prettier
-      '@intertwine/dev-tsconfig':
+      '@symbolize/dev-tsconfig':
         specifier: workspace:*
         version: link:../dev-tsconfig
-      '@intertwine/lib-compute':
+      '@symbolize/lib-compute':
         specifier: workspace:*
         version: link:../lib-compute
-      '@intertwine/lib-contrast':
+      '@symbolize/lib-contrast':
         specifier: workspace:*
         version: link:../lib-contrast
-      '@intertwine/lib-test':
+      '@symbolize/lib-test':
         specifier: workspace:*
         version: link:../lib-test
       happy-dom:
@@ -380,19 +380,19 @@ importers:
 
   lib-error:
     dependencies:
-      '@intertwine/dev-prettier':
+      '@symbolize/dev-prettier':
         specifier: workspace:*
         version: link:../dev-prettier
-      '@intertwine/dev-tsconfig':
+      '@symbolize/dev-tsconfig':
         specifier: workspace:*
         version: link:../dev-tsconfig
-      '@intertwine/lib-random':
+      '@symbolize/lib-random':
         specifier: workspace:*
         version: link:../lib-random
-      '@intertwine/lib-test':
+      '@symbolize/lib-test':
         specifier: workspace:*
         version: link:../lib-test
-      '@intertwine/lib-time':
+      '@symbolize/lib-time':
         specifier: workspace:*
         version: link:../lib-time
     devDependencies:
@@ -402,13 +402,13 @@ importers:
 
   lib-hex-ts:
     dependencies:
-      '@intertwine/dev-prettier':
+      '@symbolize/dev-prettier':
         specifier: workspace:*
         version: link:../dev-prettier
-      '@intertwine/dev-tsconfig':
+      '@symbolize/dev-tsconfig':
         specifier: workspace:*
         version: link:../dev-tsconfig
-      '@intertwine/lib-test':
+      '@symbolize/lib-test':
         specifier: workspace:*
         version: link:../lib-test
     devDependencies:
@@ -418,13 +418,13 @@ importers:
 
   lib-payload:
     dependencies:
-      '@intertwine/dev-prettier':
+      '@symbolize/dev-prettier':
         specifier: workspace:*
         version: link:../dev-prettier
-      '@intertwine/dev-tsconfig':
+      '@symbolize/dev-tsconfig':
         specifier: workspace:*
         version: link:../dev-tsconfig
-      '@intertwine/lib-test':
+      '@symbolize/lib-test':
         specifier: workspace:*
         version: link:../lib-test
     devDependencies:
@@ -434,16 +434,16 @@ importers:
 
   lib-random:
     dependencies:
-      '@intertwine/dev-prettier':
+      '@symbolize/dev-prettier':
         specifier: workspace:*
         version: link:../dev-prettier
-      '@intertwine/dev-tsconfig':
+      '@symbolize/dev-tsconfig':
         specifier: workspace:*
         version: link:../dev-tsconfig
-      '@intertwine/lib-hex':
+      '@symbolize/lib-hex':
         specifier: workspace:*
         version: link:../lib-hex-ts
-      '@intertwine/lib-test':
+      '@symbolize/lib-test':
         specifier: workspace:*
         version: link:../lib-test
       fast-mersenne-twister:
@@ -456,28 +456,28 @@ importers:
 
   lib-stream:
     dependencies:
-      '@intertwine/dev-prettier':
+      '@symbolize/dev-prettier':
         specifier: workspace:*
         version: link:../dev-prettier
-      '@intertwine/dev-tsconfig':
+      '@symbolize/dev-tsconfig':
         specifier: workspace:*
         version: link:../dev-tsconfig
-      '@intertwine/lib-collection':
+      '@symbolize/lib-collection':
         specifier: workspace:*
         version: link:../lib-collection
-      '@intertwine/lib-error':
+      '@symbolize/lib-error':
         specifier: workspace:*
         version: link:../lib-error
-      '@intertwine/lib-hex':
+      '@symbolize/lib-hex':
         specifier: workspace:*
         version: link:../lib-hex-ts
-      '@intertwine/lib-random':
+      '@symbolize/lib-random':
         specifier: workspace:*
         version: link:../lib-random
-      '@intertwine/lib-test':
+      '@symbolize/lib-test':
         specifier: workspace:*
         version: link:../lib-test
-      '@intertwine/lib-time':
+      '@symbolize/lib-time':
         specifier: workspace:*
         version: link:../lib-time
     devDependencies:
@@ -487,14 +487,14 @@ importers:
 
   lib-test:
     dependencies:
-      '@intertwine/dev-prettier':
+      '@symbolize/dev-prettier':
         specifier: workspace:*
         version: link:../dev-prettier
-      '@intertwine/dev-tsconfig':
+      '@symbolize/dev-tsconfig':
         specifier: workspace:*
         version: link:../dev-tsconfig
-      '@intertwine/eslint-config':
-        specifier: workspace:@intertwine/dev-eslint@*
+      '@symbolize/eslint-config':
+        specifier: workspace:@symbolize/dev-eslint@*
         version: link:../dev-eslint
     devDependencies:
       typescript:
@@ -503,19 +503,19 @@ importers:
 
   lib-test-runner:
     dependencies:
-      '@intertwine/dev-prettier':
+      '@symbolize/dev-prettier':
         specifier: workspace:*
         version: link:../dev-prettier
-      '@intertwine/dev-tsconfig':
+      '@symbolize/dev-tsconfig':
         specifier: workspace:*
         version: link:../dev-tsconfig
-      '@intertwine/eslint-config':
-        specifier: workspace:@intertwine/dev-eslint@*
+      '@symbolize/eslint-config':
+        specifier: workspace:@symbolize/dev-eslint@*
         version: link:../dev-eslint
-      '@intertwine/lib-test':
+      '@symbolize/lib-test':
         specifier: workspace:*
         version: link:../lib-test
-      '@intertwine/lib-time':
+      '@symbolize/lib-time':
         specifier: workspace:*
         version: link:../lib-time
       core-js-pure:
@@ -534,18 +534,18 @@ importers:
 
   lib-time:
     dependencies:
-      '@intertwine/dev-prettier':
-        specifier: workspace:*
-        version: link:../dev-prettier
-      '@intertwine/dev-tsconfig':
-        specifier: workspace:*
-        version: link:../dev-tsconfig
-      '@intertwine/lib-test':
-        specifier: workspace:*
-        version: link:../lib-test
       '@sinonjs/fake-timers':
         specifier: 11.1.0
         version: 11.1.0
+      '@symbolize/dev-prettier':
+        specifier: workspace:*
+        version: link:../dev-prettier
+      '@symbolize/dev-tsconfig':
+        specifier: workspace:*
+        version: link:../dev-tsconfig
+      '@symbolize/lib-test':
+        specifier: workspace:*
+        version: link:../lib-test
     devDependencies:
       typescript:
         specifier: 5.4.5
@@ -553,22 +553,22 @@ importers:
 
   svc-auth-guest-read:
     dependencies:
-      '@intertwine/dev-prettier':
+      '@symbolize/dev-prettier':
         specifier: workspace:*
         version: link:../dev-prettier
-      '@intertwine/dev-tsconfig':
+      '@symbolize/dev-tsconfig':
         specifier: workspace:*
         version: link:../dev-tsconfig
-      '@intertwine/lib-error':
+      '@symbolize/lib-error':
         specifier: workspace:*
         version: link:../lib-error
-      '@intertwine/lib-random':
+      '@symbolize/lib-random':
         specifier: workspace:*
         version: link:../lib-random
-      '@intertwine/lib-stream':
+      '@symbolize/lib-stream':
         specifier: workspace:*
         version: link:../lib-stream
-      '@intertwine/lib-time':
+      '@symbolize/lib-time':
         specifier: workspace:*
         version: link:../lib-time
     devDependencies:
@@ -578,34 +578,34 @@ importers:
 
   svc-auth-guest-view:
     dependencies:
-      '@intertwine/dev-prettier':
+      '@symbolize/dev-prettier':
         specifier: workspace:*
         version: link:../dev-prettier
-      '@intertwine/dev-tsconfig':
+      '@symbolize/dev-tsconfig':
         specifier: workspace:*
         version: link:../dev-tsconfig
-      '@intertwine/lib-compute':
+      '@symbolize/lib-compute':
         specifier: workspace:*
         version: link:../lib-compute
-      '@intertwine/lib-convey':
+      '@symbolize/lib-convey':
         specifier: workspace:*
         version: link:../lib-convey
-      '@intertwine/lib-error':
+      '@symbolize/lib-error':
         specifier: workspace:*
         version: link:../lib-error
-      '@intertwine/lib-hex':
+      '@symbolize/lib-hex':
         specifier: workspace:*
         version: link:../lib-hex-ts
-      '@intertwine/lib-random':
+      '@symbolize/lib-random':
         specifier: workspace:*
         version: link:../lib-random
-      '@intertwine/lib-stream':
+      '@symbolize/lib-stream':
         specifier: workspace:*
         version: link:../lib-stream
-      '@intertwine/lib-test':
+      '@symbolize/lib-test':
         specifier: workspace:*
         version: link:../lib-test
-      '@intertwine/lib-time':
+      '@symbolize/lib-time':
         specifier: workspace:*
         version: link:../lib-time
     devDependencies:
@@ -615,46 +615,46 @@ importers:
 
   svc-gateway-guest-run:
     dependencies:
-      '@intertwine/dev-pnpm-test':
+      '@symbolize/dev-pnpm-test':
         specifier: workspace:*
         version: link:../dev-pnpm-test
-      '@intertwine/dev-prettier':
+      '@symbolize/dev-prettier':
         specifier: workspace:*
         version: link:../dev-prettier
-      '@intertwine/dev-tsconfig':
+      '@symbolize/dev-tsconfig':
         specifier: workspace:*
         version: link:../dev-tsconfig
-      '@intertwine/lib-collection':
+      '@symbolize/lib-collection':
         specifier: workspace:*
         version: link:../lib-collection
-      '@intertwine/lib-compute':
+      '@symbolize/lib-compute':
         specifier: workspace:*
         version: link:../lib-compute
-      '@intertwine/lib-convey':
+      '@symbolize/lib-convey':
         specifier: workspace:*
         version: link:../lib-convey
-      '@intertwine/lib-hex':
+      '@symbolize/lib-hex':
         specifier: workspace:*
         version: link:../lib-hex-ts
-      '@intertwine/lib-random':
+      '@symbolize/lib-random':
         specifier: workspace:*
         version: link:../lib-random
-      '@intertwine/lib-stream':
+      '@symbolize/lib-stream':
         specifier: workspace:*
         version: link:../lib-stream
-      '@intertwine/lib-test':
+      '@symbolize/lib-test':
         specifier: workspace:*
         version: link:../lib-test
-      '@intertwine/lib-test-runner':
+      '@symbolize/lib-test-runner':
         specifier: workspace:*
         version: link:../lib-test-runner
-      '@intertwine/lib-time':
+      '@symbolize/lib-time':
         specifier: workspace:*
         version: link:../lib-time
-      '@intertwine/svc-auth-guest-read':
+      '@symbolize/svc-auth-guest-read':
         specifier: workspace:*
         version: link:../svc-auth-guest-read
-      '@intertwine/svc-auth-guest-view':
+      '@symbolize/svc-auth-guest-view':
         specifier: workspace:*
         version: link:../svc-auth-guest-view
     devDependencies:

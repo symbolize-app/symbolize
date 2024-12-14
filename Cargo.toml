@@ -22,7 +22,7 @@ http-body = { version = "1.0.0", features = [] }
 http-body-util = { version = "0.1.2", features = [] }
 hyper = { version = "1.0.1", features = ["http2", "server"] }
 hyper-util = { version = "0.1.1", features = ["tokio"] }
-intertwine-lib-hex = { version="0.1.0", path = "./lib-hex-rs" }
+symbolize-lib-hex = { version="0.1.0", path = "./lib-hex-rs" }
 mime = { version = "0.3.17", features = [] }
 mockall = { version = "0.12.1", features = [] }
 nix = { version = "0.27.1", features = ["signal"] }

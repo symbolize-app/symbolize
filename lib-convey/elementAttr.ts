@@ -1,8 +1,8 @@
 import type * as conveyContext from '@/context.ts'
 import type * as conveyData from '@/data.ts'
 import type * as conveyFragment from '@/fragment.ts'
-import type * as compute from '@intertwine/lib-compute'
-import type * as contrast from '@intertwine/lib-contrast'
+import type * as compute from '@symbolize/lib-compute'
+import type * as contrast from '@symbolize/lib-contrast'
 
 export type Listener<SpecificEvent> = (
   event: SpecificEvent,

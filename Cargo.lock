@@ -620,69 +620,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "intertwine-dev-cargo-build"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "clap",
- "serde",
- "serde_json",
- "tokio",
-]
-
-[[package]]
-name = "intertwine-dev-watchman-client"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "backon",
- "clap",
- "nix",
- "tokio",
- "watchman_client",
-]
-
-[[package]]
-name = "intertwine-lib-hex"
-version = "0.1.0"
-dependencies = [
- "anyhow",
-]
-
-[[package]]
-name = "intertwine-svc-gateway-host-run"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "bytes 1.5.0",
- "crossbeam",
- "dashmap",
- "form_urlencoded",
- "futures 0.3.30",
- "http",
- "http-body",
- "http-body-util",
- "hyper",
- "hyper-util",
- "intertwine-lib-hex",
- "mime",
- "mockall",
- "ring",
- "rusqlite",
- "rustls",
- "rustls-pemfile",
- "thiserror",
- "tokio",
- "tokio-rustls",
- "tokio-stream",
- "tokio-util 0.7.10",
-]
-
-[[package]]
-name = "intertwine-svc-search-host-read"
-version = "0.1.0"
-
-[[package]]
 name = "iovec"
 version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1135,6 +1072,69 @@ name = "subtle"
 version = "2.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "81cdd64d312baedb58e21336b31bc043b77e01cc99033ce76ef539f78e965ebc"
+
+[[package]]
+name = "symbolize-dev-cargo-build"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "serde",
+ "serde_json",
+ "tokio",
+]
+
+[[package]]
+name = "symbolize-dev-watchman-client"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "backon",
+ "clap",
+ "nix",
+ "tokio",
+ "watchman_client",
+]
+
+[[package]]
+name = "symbolize-lib-hex"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+]
+
+[[package]]
+name = "symbolize-svc-gateway-host-run"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "bytes 1.5.0",
+ "crossbeam",
+ "dashmap",
+ "form_urlencoded",
+ "futures 0.3.30",
+ "http",
+ "http-body",
+ "http-body-util",
+ "hyper",
+ "hyper-util",
+ "mime",
+ "mockall",
+ "ring",
+ "rusqlite",
+ "rustls",
+ "rustls-pemfile",
+ "symbolize-lib-hex",
+ "thiserror",
+ "tokio",
+ "tokio-rustls",
+ "tokio-stream",
+ "tokio-util 0.7.10",
+]
+
+[[package]]
+name = "symbolize-svc-search-host-read"
+version = "0.1.0"
 
 [[package]]
 name = "syn"

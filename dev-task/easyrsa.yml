@@ -5,11 +5,11 @@ run: when_changed
 tasks:
   server:build:
     status:
-      - easyrsa verify-cert intertwine-gateway
+      - easyrsa verify-cert symbolize-gateway
     deps:
       - ca:build
     cmds:
-      - easyrsa --san=IP:::1 build-server-full intertwine-gateway
+      - easyrsa --san=IP:::1 build-server-full symbolize-gateway
 
   ca:build:
     status:

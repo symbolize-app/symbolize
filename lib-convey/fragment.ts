@@ -3,8 +3,8 @@ import * as conveyEmpty from '@/empty.ts'
 import * as conveyMarker from '@/marker.ts'
 import * as conveyRange from '@/range.ts'
 import * as conveyText from '@/text.ts'
-import type * as compute from '@intertwine/lib-compute'
-import type * as contrast from '@intertwine/lib-contrast'
+import type * as compute from '@symbolize/lib-compute'
+import type * as contrast from '@symbolize/lib-contrast'
 
 export interface Fragment<CustomContext = unknown> {
   readonly [conveyMarker.fragmentMarker]: null

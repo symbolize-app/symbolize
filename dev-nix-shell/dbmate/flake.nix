@@ -11,7 +11,7 @@
       in
         {
           packages.default = pkgs.buildEnv {
-            name = "intertwine-dbmate";
+            name = "symbolize-dbmate";
             buildInputs = [];
             paths = [
               pkgs.dbmate

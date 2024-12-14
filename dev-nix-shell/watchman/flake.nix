@@ -11,7 +11,7 @@
       in
         {
           packages.default = pkgs.buildEnv {
-            name = "intertwine-watchman";
+            name = "symbolize-watchman";
             buildInputs = [
               pkgs.watchman
             ];

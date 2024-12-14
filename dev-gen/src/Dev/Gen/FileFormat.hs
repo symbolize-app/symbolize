@@ -159,7 +159,7 @@ instance Aeson.ToJSON TaskfileCommand where
 instance Aeson.FromJSON TaskfileCommand
 
 typeScriptConfigExtends :: Text
-typeScriptConfigExtends = "@intertwine/dev-tsconfig/tsconfig.json"
+typeScriptConfigExtends = "@symbolize/dev-tsconfig/tsconfig.json"
 
 typeScriptConfigInclude :: Vector Text
 typeScriptConfigInclude = ["./**/*.ts", "./**/*.js", "./**/*.cjs"]

@@ -11,7 +11,7 @@
       in
         {
           packages.default = pkgs.buildEnv {
-            name = "intertwine-woff2";
+            name = "symbolize-woff2";
             buildInputs = [
               pkgs.woff2
             ];

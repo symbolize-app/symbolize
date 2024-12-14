@@ -2,7 +2,7 @@ use crate::header::pair::HeaderPair;
 use http::header::InvalidHeaderValue;
 use http::HeaderValue;
 use hyper::header::HeaderName;
-use intertwine_lib_hex::ToHex as _;
+use symbolize_lib_hex::ToHex as _;
 
 #[derive(Clone, Debug)]
 pub struct ResponseStreamId(pub [u8; 256]);

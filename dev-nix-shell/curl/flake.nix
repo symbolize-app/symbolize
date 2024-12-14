@@ -11,7 +11,7 @@
       in
         {
           packages.default = pkgs.buildEnv {
-            name = "intertwine-curl";
+            name = "symbolize-curl";
             buildInputs = [
               pkgs.curl
             ];

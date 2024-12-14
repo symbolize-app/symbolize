@@ -11,7 +11,7 @@
       in
         {
           packages.default = pkgs.buildEnv {
-            name = "intertwine-dasel";
+            name = "symbolize-dasel";
             buildInputs = [
               pkgs.dasel
             ];

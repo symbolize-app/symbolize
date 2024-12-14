@@ -1,8 +1,8 @@
 import type * as conveyContext from '@/context.ts'
 import * as conveyFragment from '@/fragment.ts'
 import * as conveyMarker from '@/marker.ts'
-import type * as compute from '@intertwine/lib-compute'
-import type * as contrast from '@intertwine/lib-contrast'
+import type * as compute from '@symbolize/lib-compute'
+import type * as contrast from '@symbolize/lib-contrast'
 
 export function range<CustomContext = unknown>(attrs: {
   readonly content: readonly conveyFragment.FragmentOpt<CustomContext>[]

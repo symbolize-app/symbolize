@@ -136,7 +136,7 @@ async fn process_events(child: &mut Child) -> Result<()> {
         profile,
         executable,
         fresh,
-      }) if target.name.starts_with("intertwine-")
+      }) if target.name.starts_with("symbolize-")
         && profile.test
         && !fresh =>
       {

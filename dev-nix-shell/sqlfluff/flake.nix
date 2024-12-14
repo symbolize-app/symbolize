@@ -11,7 +11,7 @@
       in
         {
           packages.default = pkgs.buildEnv {
-            name = "intertwine-sqlfluff";
+            name = "symbolize-sqlfluff";
             buildInputs = [
               pkgs.sqlfluff
             ];

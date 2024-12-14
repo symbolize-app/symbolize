@@ -1,4 +1,4 @@
-name: intertwine-dev-stack-bin
+name: symbolize-dev-stack-bin
 
 dependencies:
   - base >= 4.7 && < 5

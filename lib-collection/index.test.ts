@@ -1,4 +1,4 @@
-import type * as test from '@intertwine/lib-test'
+import type * as test from '@symbolize/lib-test'
 
 export const all: test.TestCollection = () => [
   import('@/applyTemplate.test.ts'),

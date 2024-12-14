@@ -1,11 +1,11 @@
 [package]
-name = "intertwine-dev-watchman-client"
+name = "symbolize-dev-watchman-client"
 version = "0.1.0"
 edition = "2021"
 publish = false
 
 [[bin]]
-name = "intertwine-dev-watchman-client"
+name = "symbolize-dev-watchman-client"
 path = "src/mod.rs"
 
 [dependencies]

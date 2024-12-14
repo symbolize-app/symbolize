@@ -1,5 +1,5 @@
 import type * as conveyScheduler from '@/scheduler.ts'
-import * as compute from '@intertwine/lib-compute'
+import * as compute from '@symbolize/lib-compute'
 
 export interface Context {
   readonly convey: Convey

@@ -1,6 +1,6 @@
 import type * as timeTest from '@/test.ts'
-import * as test from '@intertwine/lib-test'
-import * as time from '@intertwine/lib-time'
+import * as test from '@symbolize/lib-test'
+import * as time from '@symbolize/lib-time'
 
 export const url = import.meta.url
 

@@ -11,7 +11,7 @@
       in
         {
           packages.default = pkgs.buildEnv {
-            name = "intertwine-task";
+            name = "symbolize-task";
             buildInputs = [
               pkgs.go-task
             ];
