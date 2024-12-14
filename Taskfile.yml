@@ -226,6 +226,11 @@ tasks:
       - svc-auth-guest-read:link-build-dir
       - svc-auth-guest-view:link-build-dir
       - svc-gateway-guest-run:link-build-dir
+  security:
+    aliases:
+      - s
+    deps:
+      - cargo:security
   test:release:
     aliases:
       - tr

@@ -156,6 +156,12 @@ tasks:
       - cargo:lock:check
       - pnpm:lock:check
 
+  security:
+    aliases:
+      - s
+    deps:
+      - cargo:security
+
   test:release:
     aliases:
       - tr

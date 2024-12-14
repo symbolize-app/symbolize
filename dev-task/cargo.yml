@@ -251,17 +251,19 @@ tasks:
       - l
     deps:
       - clippy:lint:check
-      - deny:lint
 
   lint:fix:
     aliases:
       - lf
     deps:
       - clippy:lint:fix
-      - deny:lint
 
   lock:
     cmd: cargo metadata --format-version=1 >/dev/null
 
   lock:check:
     cmd: cargo metadata --locked --format-version=1 >/dev/null
+
+  security:
+    deps:
+      - deny:lint

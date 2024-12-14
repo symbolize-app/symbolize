@@ -7,6 +7,7 @@
     ".pki",
     ".stack-bin",
     ".tantivy",
+    "/art/favicon.png",
     "build",
     "node_modules",
     "result",
