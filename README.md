@@ -70,3 +70,7 @@ Chrome & Firefox:
 ## Commands
 
 - `task c`
+
+## License
+
+This project is licensed under the terms of the [MIT license](LICENSE-MIT) and the [Apache License (Version 2.0)](LICENSE-APACHE), at your option.

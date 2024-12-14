@@ -1,8 +1,9 @@
 [package]
 name = "symbolize-svc-search-host-read"
-version = "0.1.0"
-edition = "2021"
 publish = false
+version.workspace = true
+edition.workspace = true
+license.workspace = true
 
 [dependencies]
 
