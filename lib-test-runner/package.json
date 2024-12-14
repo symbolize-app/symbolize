@@ -1,10 +1,10 @@
 {
   "name": "@symbolize/lib-test-runner",
   "type": "module",
+  "version": "0.1.0",
   "dependencies": {
     "@symbolize/dev-prettier": "workspace:*",
     "@symbolize/dev-tsconfig": "workspace:*",
-    "@symbolize/eslint-config": "workspace:@symbolize/dev-eslint@*",
     "@symbolize/lib-test": "workspace:*",
     "@symbolize/lib-time": "workspace:*",
     "core-js-pure": "3.36.0",

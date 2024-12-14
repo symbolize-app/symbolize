@@ -1,16 +1,17 @@
 {
   "name": "@symbolize/lib-error",
   "type": "module",
+  "version": "0.1.0",
   "dependencies": {
     "@symbolize/dev-prettier": "workspace:*",
     "@symbolize/dev-tsconfig": "workspace:*",
     "@symbolize/lib-random": "workspace:*",
-    "@symbolize/lib-time": "workspace:*",
-    "@symbolize/lib-test": "workspace:*"
+    "@symbolize/lib-test": "workspace:*",
+    "@symbolize/lib-time": "workspace:*"
   },
   "devDependencies": {
-    "typescript": "5.4.5",
-    "@symbolize/lib-test": "workspace:*"
+    "@symbolize/lib-test": "workspace:*",
+    "typescript": "5.4.5"
   },
   "prettier": "@symbolize/dev-prettier/index.json"
 }

@@ -1,5 +1,6 @@
 {
-  "name": "@symbolize/dev-eslint",
+  "name": "@symbolize/eslint-config",
   "type": "module",
+  "version": "0.1.0",
   "prettier": "@symbolize/dev-prettier/index.json"
 }

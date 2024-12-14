@@ -1,5 +1,6 @@
 {
   "name": "@symbolize/dev-prettier",
   "type": "module",
+  "version": "0.1.0",
   "prettier": "./index.json"
 }
