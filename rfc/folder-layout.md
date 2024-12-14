@@ -7,7 +7,7 @@
 - book (long form, chapters, glossary, index)
 - cal (physica/virtual meetups, in-site events)
 - chat (private, group)
-- connect (integrations, ActivityPub, Git, Intertwine)
+- connect (integrations, ActivityPub, Git, Symbolize)
 - feed (content subscriptions)
 - forum (long-form communication, public, private)
 - frame (header, footer, nav)

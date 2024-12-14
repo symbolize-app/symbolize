@@ -205,7 +205,7 @@ Rich text links and data links can reference self and other root and sub- object
 
 When a data link type restriction is used, the type can match any linked root or sub- object.
 
-Sub-object anchor IDs are auto-generated "slugs" (same as other slugs in Intertwine). Saved to the database to preserve history to avoid broken links.
+Sub-object anchor IDs are auto-generated "slugs" (same as other slugs in Symbolize). Saved to the database to preserve history to avoid broken links.
 
 ## Headers
 
