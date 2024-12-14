@@ -2,6 +2,7 @@
   "name": "@symbolize/lib-time",
   "type": "module",
   "version": "0.1.0",
+  "license": "(MIT OR Apache-2.0)",
   "dependencies": {
     "@sinonjs/fake-timers": "11.1.0",
     "@symbolize/dev-prettier": "workspace:*",

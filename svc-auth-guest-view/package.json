@@ -2,6 +2,7 @@
   "name": "@symbolize/svc-auth-guest-view",
   "type": "module",
   "version": "0.1.0",
+  "license": "(MIT OR Apache-2.0)",
   "dependencies": {
     "@symbolize/dev-prettier": "workspace:*",
     "@symbolize/dev-tsconfig": "workspace:*",
