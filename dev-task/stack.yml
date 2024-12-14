@@ -59,7 +59,7 @@ tasks:
     vars:
       DIST_DIR:
         sh: realpath --relative-to . $(sh -c "$(cd {{.NAME}} && stack config env --work-dir build/stack-work-{{.MODE}}) echo \$HASKELL_DIST_DIR")
-      FULL_TARGET: intertwine-{{.NAME}}-{{.TARGET}}
+      FULL_TARGET: symbolize-{{.NAME}}-{{.TARGET}}
     cmds:
       # HACK: Reference all variables here, so Task doesn't think they're unused
       - cmd: 'true # /{{.WATCH}}/{{.MODE}}/{{.NAME}}/{{.TARGET}}/{{.ARGS}}/'
@@ -208,7 +208,7 @@ tasks:
       vars:
         - MODE
         - NAME
-    cmd: stack ghci --work-dir build/stack-work-{{.MODE}} intertwine-{{.NAME}}
+    cmd: stack ghci --work-dir build/stack-work-{{.MODE}} symbolize-{{.NAME}}
 
   repl-target:debug:
     internal: true

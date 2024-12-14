@@ -1,5 +1,5 @@
 [package]
-name = "intertwine-lib-hex"
+name = "symbolize-lib-hex"
 version = "0.1.0"
 edition = "2021"
 publish = false

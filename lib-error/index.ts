@@ -1,5 +1,5 @@
-import type * as random from '@intertwine/lib-random'
-import * as time from '@intertwine/lib-time'
+import type * as random from '@symbolize/lib-random'
+import * as time from '@symbolize/lib-time'
 
 export interface RetryConfig {
   readonly maxAttempts: number

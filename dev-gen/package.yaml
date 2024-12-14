@@ -1,4 +1,4 @@
-name: intertwine-dev-gen
+name: symbolize-dev-gen
 version: 0.0.0
 
 dependencies:
@@ -36,7 +36,7 @@ library:
   source-dirs: src
 
 executables:
-  intertwine-dev-gen-exe:
+  symbolize-dev-gen-exe:
     main: Main.hs
     source-dirs: app
     ghc-options:
@@ -44,10 +44,10 @@ executables:
       - -rtsopts
       - -with-rtsopts=-N
     dependencies:
-      - intertwine-dev-gen
+      - symbolize-dev-gen
 
 tests:
-  intertwine-dev-gen-test:
+  symbolize-dev-gen-test:
     main: Spec.hs
     source-dirs: test
     ghc-options:
@@ -55,5 +55,5 @@ tests:
       - -rtsopts
       - -with-rtsopts=-N
     dependencies:
-      - intertwine-dev-gen
+      - symbolize-dev-gen
       - hspec

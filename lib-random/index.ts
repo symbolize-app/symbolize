@@ -1,4 +1,4 @@
-import * as hex from '@intertwine/lib-hex'
+import * as hex from '@symbolize/lib-hex'
 
 export interface Context {
   readonly random: Random

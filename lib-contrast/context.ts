@@ -1,7 +1,7 @@
 import * as contrastAtomIntern from '@/atomIntern.ts'
 import type * as contrastExpressionIntern from '@/expressionIntern.ts'
 import * as contrastGeneratedName from '@/generatedName.ts'
-import * as collection from '@intertwine/lib-collection'
+import * as collection from '@symbolize/lib-collection'
 
 export interface Context {
   readonly contrast: Contrast

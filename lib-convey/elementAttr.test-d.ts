@@ -1,7 +1,7 @@
 import type * as conveyData from '@/data.ts'
 import type * as conveyElementAttrTest from '@/elementAttr.test-d.ts'
 import type * as conveyElementAttr from '@/elementAttr.ts'
-import type * as compute from '@intertwine/lib-compute'
+import type * as compute from '@symbolize/lib-compute'
 
 export type TestAttrs<
   CustomContext,

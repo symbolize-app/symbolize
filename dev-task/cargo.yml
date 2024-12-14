@@ -79,11 +79,11 @@ tasks:
         WATCH: '{{.WATCH}}'
         RESTART: false
         MODE: rust
-        COMMAND: build/target/{{.TASK_CARGO_BUILD_MODE}}/intertwine-dev-cargo-build --mode {{.MODE}} {{if eq (toString .CLIPPY) "true"}}--clippy="{{.CLIPPY_ARGS}}"{{end}}
+        COMMAND: build/target/{{.TASK_CARGO_BUILD_MODE}}/symbolize-dev-cargo-build --mode {{.MODE}} {{if eq (toString .CLIPPY) "true"}}--clippy="{{.CLIPPY_ARGS}}"{{end}}
 
   execute-build:prep:
     internal: true
-    cmd: cargo build --locked {{if eq .TASK_CARGO_BUILD_MODE "release"}}--release{{end}} --package intertwine-dev-cargo-build
+    cmd: cargo build --locked {{if eq .TASK_CARGO_BUILD_MODE "release"}}--release{{end}} --package symbolize-dev-cargo-build
 
   execute-package:
     internal: true
@@ -104,7 +104,7 @@ tasks:
           WATCH: '{{.WATCH}}'
           RESTART: '{{.RESTART}}'
           MODE: executable
-          COMMAND: build/target/{{.MODE}}/intertwine-{{.NAME | trimSuffix "-rs"}}{{if eq (toString .TEST) "true"}}-test{{end}} {{.ARGS}} {{.CLI_ARGS}}
+          COMMAND: build/target/{{.MODE}}/symbolize-{{.NAME | trimSuffix "-rs"}}{{if eq (toString .TEST) "true"}}-test{{end}} {{.ARGS}} {{.CLI_ARGS}}
 
   execute-package:run:debug:
     internal: true

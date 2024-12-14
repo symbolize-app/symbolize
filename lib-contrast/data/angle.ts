@@ -1,4 +1,4 @@
-import * as collection from '@intertwine/lib-collection'
+import * as collection from '@symbolize/lib-collection'
 
 const angleMarker = Symbol('angleMarker')
 

@@ -1,10 +1,10 @@
 import type * as streamContext from '@/context.ts'
 import * as streamSink from '@/sink.ts'
 import * as streamSource from '@/source.ts'
-import * as error from '@intertwine/lib-error'
-import * as hex from '@intertwine/lib-hex'
-import type * as random from '@intertwine/lib-random'
-import type * as time from '@intertwine/lib-time'
+import * as error from '@symbolize/lib-error'
+import * as hex from '@symbolize/lib-hex'
+import type * as random from '@symbolize/lib-random'
+import type * as time from '@symbolize/lib-time'
 
 const maxAttempts: number = 40
 const minDelayMs: number = 100

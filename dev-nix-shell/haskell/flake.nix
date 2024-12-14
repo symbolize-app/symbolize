@@ -14,7 +14,7 @@
       in
         {
           packages.default = pkgs.buildEnv {
-            name = "intertwine-haskell";
+            name = "symbolize-haskell";
             buildInputs = [
               pkgs.zlib
               pkgs.haskell.compiler.ghc946

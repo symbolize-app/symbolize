@@ -11,7 +11,7 @@
       in
         {
           packages.default = pkgs.buildEnv {
-            name = "intertwine-easyrsa";
+            name = "symbolize-easyrsa";
             buildInputs = [
               pkgs.easyrsa
             ];

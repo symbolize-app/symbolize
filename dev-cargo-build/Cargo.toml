@@ -1,11 +1,11 @@
 [package]
-name = "intertwine-dev-cargo-build"
+name = "symbolize-dev-cargo-build"
 version = "0.1.0"
 edition = "2021"
 publish = false
 
 [[bin]]
-name = "intertwine-dev-cargo-build"
+name = "symbolize-dev-cargo-build"
 path = "src/mod.rs"
 
 [dependencies]

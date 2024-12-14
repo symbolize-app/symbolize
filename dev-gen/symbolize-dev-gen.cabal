@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 
-name:           intertwine-dev-gen
+name:           symbolize-dev-gen
 version:        0.0.0
 build-type:     Simple
 
@@ -18,7 +18,7 @@ library
       Dev.Gen.Interpret
       Dev.Gen.Package
   other-modules:
-      Paths_intertwine_dev_gen
+      Paths_symbolize_dev_gen
   hs-source-dirs:
       src
   default-extensions:
@@ -50,10 +50,10 @@ library
     , yaml
   default-language: GHC2021
 
-executable intertwine-dev-gen-exe
+executable symbolize-dev-gen-exe
   main-is: Main.hs
   other-modules:
-      Paths_intertwine_dev_gen
+      Paths_symbolize_dev_gen
   hs-source-dirs:
       app
   default-extensions:
@@ -76,9 +76,9 @@ executable intertwine-dev-gen-exe
       aeson
     , base >=4.7 && <5
     , filepath
-    , intertwine-dev-gen
     , optparse-applicative
     , relude
+    , symbolize-dev-gen
     , toml-parser
     , typed-process
     , unliftio
@@ -87,14 +87,14 @@ executable intertwine-dev-gen-exe
     , yaml
   default-language: GHC2021
 
-test-suite intertwine-dev-gen-test
+test-suite symbolize-dev-gen-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
       Dev.Gen.ExecSpec
       Dev.Gen.InterpretSpec
       Dev.Gen.PackageSpec
-      Paths_intertwine_dev_gen
+      Paths_symbolize_dev_gen
   hs-source-dirs:
       test
   default-extensions:
@@ -118,9 +118,9 @@ test-suite intertwine-dev-gen-test
     , base >=4.7 && <5
     , filepath
     , hspec
-    , intertwine-dev-gen
     , optparse-applicative
     , relude
+    , symbolize-dev-gen
     , toml-parser
     , typed-process
     , unliftio

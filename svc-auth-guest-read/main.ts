@@ -1,6 +1,6 @@
-import type * as random from '@intertwine/lib-random'
-import * as stream from '@intertwine/lib-stream'
-import * as time from '@intertwine/lib-time'
+import type * as random from '@symbolize/lib-random'
+import * as stream from '@symbolize/lib-stream'
+import * as time from '@symbolize/lib-time'
 
 export function main(
   ctx: random.Context &

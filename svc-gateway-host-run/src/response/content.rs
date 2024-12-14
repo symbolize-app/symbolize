@@ -6,7 +6,7 @@ use crate::response::data as svc_response_data;
 use crate::response::error as svc_response_error;
 use anyhow::Result;
 use http::StatusCode;
-use intertwine_lib_hex::ToHex as _;
+use symbolize_lib_hex::ToHex as _;
 
 const SERVICE_WORKER_SHELL_PATH: &str =
   "svc-gateway-guest-run/serviceWorkerShell.js";

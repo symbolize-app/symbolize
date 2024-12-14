@@ -1,7 +1,7 @@
 import * as contrastAtom from '@/atom.ts'
 import type * as contrastContext from '@/context.ts'
 import type * as contrastRule from '@/rule.ts'
-import * as test from '@intertwine/lib-test'
+import * as test from '@symbolize/lib-test'
 import prettierPostcss from 'prettier/plugins/postcss.mjs'
 import * as prettier from 'prettier/standalone.mjs'
 

@@ -1,7 +1,7 @@
 import * as convey from '@/index.ts'
-import * as contrast from '@intertwine/lib-contrast'
-import * as contrastTest from '@intertwine/lib-contrast/test.ts'
-import * as test from '@intertwine/lib-test'
+import * as contrast from '@symbolize/lib-contrast'
+import * as contrastTest from '@symbolize/lib-contrast/test.ts'
+import * as test from '@symbolize/lib-test'
 
 export const url = import.meta.url
 

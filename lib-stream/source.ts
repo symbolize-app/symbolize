@@ -1,4 +1,4 @@
-import * as time from '@intertwine/lib-time'
+import * as time from '@symbolize/lib-time'
 
 const highWaterMark = 16
 const timeoutMs = 1_000

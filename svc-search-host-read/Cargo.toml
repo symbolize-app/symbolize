@@ -1,5 +1,5 @@
 [package]
-name = "intertwine-svc-search-host-read"
+name = "symbolize-svc-search-host-read"
 version = "0.1.0"
 edition = "2021"
 publish = false

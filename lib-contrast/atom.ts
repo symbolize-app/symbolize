@@ -2,7 +2,7 @@ import type * as contrastAtomIntern from '@/atomIntern.ts'
 import type * as contrastContext from '@/context.ts'
 import * as contrastExpression from '@/expression.ts'
 import type * as contrastRule from '@/rule.ts'
-import * as collection from '@intertwine/lib-collection'
+import * as collection from '@symbolize/lib-collection'
 
 class Atom {
   constructor(

@@ -2,8 +2,8 @@ import * as conveyElementAttr from '@/elementAttr.ts'
 import type * as conveyHtmlAttr from '@/htmlAttr.ts'
 import type * as conveyMathAttr from '@/mathAttr.ts'
 import type * as conveySvgAttr from '@/svgAttr.ts'
-import type * as compute from '@intertwine/lib-compute'
-import * as contrast from '@intertwine/lib-contrast'
+import type * as compute from '@symbolize/lib-compute'
+import * as contrast from '@symbolize/lib-contrast'
 
 type Attr = {
   readonly [Key in keyof conveyElementAttr.AllAttrs as conveyElementAttr.AllAttrs[Key]['kind'] extends (

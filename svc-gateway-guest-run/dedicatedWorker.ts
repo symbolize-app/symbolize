@@ -1,6 +1,6 @@
-import * as random from '@intertwine/lib-random'
-import * as stream from '@intertwine/lib-stream'
-import * as time from '@intertwine/lib-time'
+import * as random from '@symbolize/lib-random'
+import * as stream from '@symbolize/lib-stream'
+import * as time from '@symbolize/lib-time'
 
 function main(): void {
   const timeObj = time.time()
@@ -12,7 +12,7 @@ function main(): void {
     time: timeObj,
   }
 
-  const entryPoints = [import('@intertwine/svc-auth-guest-read/main.ts')]
+  const entryPoints = [import('@symbolize/svc-auth-guest-read/main.ts')]
 
   for (const entryPoint of entryPoints) {
     void (async () => {

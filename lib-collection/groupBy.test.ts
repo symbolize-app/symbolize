@@ -1,5 +1,5 @@
 import { groupBy } from '@/groupBy.ts'
-import * as test from '@intertwine/lib-test'
+import * as test from '@symbolize/lib-test'
 
 export const url = import.meta.url
 

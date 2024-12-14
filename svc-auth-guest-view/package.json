@@ -1,20 +1,20 @@
 {
-  "name": "@intertwine/svc-auth-guest-view",
+  "name": "@symbolize/svc-auth-guest-view",
   "type": "module",
   "dependencies": {
-    "@intertwine/dev-prettier": "workspace:*",
-    "@intertwine/dev-tsconfig": "workspace:*",
-    "@intertwine/lib-compute": "workspace:*",
-    "@intertwine/lib-convey": "workspace:*",
-    "@intertwine/lib-error": "workspace:*",
-    "@intertwine/lib-hex": "workspace:*",
-    "@intertwine/lib-random": "workspace:*",
-    "@intertwine/lib-stream": "workspace:*",
-    "@intertwine/lib-test": "workspace:*",
-    "@intertwine/lib-time": "workspace:*"
+    "@symbolize/dev-prettier": "workspace:*",
+    "@symbolize/dev-tsconfig": "workspace:*",
+    "@symbolize/lib-compute": "workspace:*",
+    "@symbolize/lib-convey": "workspace:*",
+    "@symbolize/lib-error": "workspace:*",
+    "@symbolize/lib-hex": "workspace:*",
+    "@symbolize/lib-random": "workspace:*",
+    "@symbolize/lib-stream": "workspace:*",
+    "@symbolize/lib-test": "workspace:*",
+    "@symbolize/lib-time": "workspace:*"
   },
   "devDependencies": {
     "typescript": "5.4.5"
   },
-  "prettier": "@intertwine/dev-prettier/index.json"
+  "prettier": "@symbolize/dev-prettier/index.json"
 }

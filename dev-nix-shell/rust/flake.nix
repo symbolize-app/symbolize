@@ -13,7 +13,7 @@
       in
         {
           packages.default = pkgs.buildEnv {
-            name = "intertwine-rust";
+            name = "symbolize-rust";
             buildInputs = [
               pkgs.openssl
               (pkgs.rust-bin.nightly."2023-12-09".default.override {

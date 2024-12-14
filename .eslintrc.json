@@ -1,5 +1,5 @@
 {
-  "extends": ["@intertwine"],
+  "extends": ["@symbolize"],
   "parserOptions": {
     "EXPERIMENTAL_useProjectService": true,
     "tsconfigRootDir": "."

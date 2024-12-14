@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 
-name:           intertwine-dev-stack-bin
+name:           symbolize-dev-stack-bin
 version:        0.0.0
 build-type:     Simple
 
@@ -12,7 +12,7 @@ library
   exposed-modules:
       Lib
   other-modules:
-      Paths_intertwine_dev_stack_bin
+      Paths_symbolize_dev_stack_bin
   hs-source-dirs:
       src
   default-extensions:

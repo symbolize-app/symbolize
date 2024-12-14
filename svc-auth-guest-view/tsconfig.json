@@ -11,7 +11,7 @@
     "tsBuildInfoFile": "build/tsc/tsconfig.tsbuildinfo"
   },
   "exclude": ["build/**", "node_modules/**"],
-  "extends": "@intertwine/dev-tsconfig/tsconfig.json",
+  "extends": "@symbolize/dev-tsconfig/tsconfig.json",
   "include": ["./**/*.ts", "./**/*.js", "./**/*.cjs"],
   "references": [
     { "path": "../lib-compute" },

@@ -18,12 +18,12 @@
         ];
         pkgs = import nixpkgs { inherit system overlays; };
         node-loader = pkgs.writeShellScriptBin "node-loader" ''
-          node --experimental-loader @intertwine/dev-node-loader/index.js $@
+          node --experimental-loader @symbolize/dev-node-loader/index.js $@
         '';
       in
         {
           packages.default = pkgs.buildEnv {
-            name = "intertwine-node";
+            name = "symbolize-node";
             buildInputs = [
               pkgs.nodejs_22
               pkgs.nodejs_22.pkgs.node2nix

@@ -1,15 +1,15 @@
 {
-  "name": "@intertwine/lib-random",
+  "name": "@symbolize/lib-random",
   "type": "module",
   "dependencies": {
-    "@intertwine/dev-prettier": "workspace:*",
-    "@intertwine/dev-tsconfig": "workspace:*",
-    "@intertwine/lib-hex": "workspace:*",
-    "@intertwine/lib-test": "workspace:*",
+    "@symbolize/dev-prettier": "workspace:*",
+    "@symbolize/dev-tsconfig": "workspace:*",
+    "@symbolize/lib-hex": "workspace:*",
+    "@symbolize/lib-test": "workspace:*",
     "fast-mersenne-twister": "1.0.3"
   },
   "devDependencies": {
     "typescript": "5.4.5"
   },
-  "prettier": "@intertwine/dev-prettier/index.json"
+  "prettier": "@symbolize/dev-prettier/index.json"
 }

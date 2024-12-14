@@ -11,7 +11,7 @@
       in
         {
           packages.default = pkgs.buildEnv {
-            name = "intertwine-sqlite";
+            name = "symbolize-sqlite";
             buildInputs = [
               pkgs.sqlite-interactive
             ];

@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 
-import * as test from '@intertwine/lib-test'
-import type * as time from '@intertwine/lib-time'
+import * as test from '@symbolize/lib-test'
+import type * as time from '@symbolize/lib-time'
 import arrayFromAsync from 'core-js-pure/actual/array/from-async'
 import * as diff from 'diff'
 import ms from 'ms'

@@ -1,8 +1,8 @@
 import * as streamSink from '@/sink.ts'
 import * as streamSource from '@/source.ts'
 import type * as streamWorkerConnection from '@/worker/connection.ts'
-import * as collection from '@intertwine/lib-collection'
-import type * as time from '@intertwine/lib-time'
+import * as collection from '@symbolize/lib-collection'
+import type * as time from '@symbolize/lib-time'
 
 declare const self: Readonly<DedicatedWorkerGlobalScope>
 

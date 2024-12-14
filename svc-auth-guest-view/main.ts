@@ -1,9 +1,9 @@
-import * as compute from '@intertwine/lib-compute'
-import * as contrast from '@intertwine/lib-contrast'
-import * as convey from '@intertwine/lib-convey'
-import type * as random from '@intertwine/lib-random'
-import type * as stream from '@intertwine/lib-stream'
-import type * as time from '@intertwine/lib-time'
+import * as compute from '@symbolize/lib-compute'
+import * as contrast from '@symbolize/lib-contrast'
+import * as convey from '@symbolize/lib-convey'
+import type * as random from '@symbolize/lib-random'
+import type * as stream from '@symbolize/lib-stream'
+import type * as time from '@symbolize/lib-time'
 
 const fillVar = contrast.var_<contrast.Color>()
 
@@ -112,7 +112,7 @@ const custom = convey.defineCustom<
           head.querySelector('title')?.remove()
         },
 
-        content: 'Intertwine Custom',
+        content: 'Symbolize Custom',
       }),
     }),
     convey.html.div({

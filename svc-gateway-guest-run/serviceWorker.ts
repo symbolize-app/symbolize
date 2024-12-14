@@ -3,8 +3,8 @@ import fontCss from '@/font.css'
 import loaderCss from '@/loader.css'
 import mainHtml from '@/main.html'
 import resetCss from '@/reset.css'
-import * as collection from '@intertwine/lib-collection'
-import * as time from '@intertwine/lib-time'
+import * as collection from '@symbolize/lib-collection'
+import * as time from '@symbolize/lib-time'
 
 declare const self: Readonly<ServiceWorkerGlobalScope>
 declare const version: bigint
