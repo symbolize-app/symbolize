@@ -1,10 +1,10 @@
 {
   "name": "@symbolize/lib-test",
   "type": "module",
+  "version": "0.1.0",
   "dependencies": {
     "@symbolize/dev-prettier": "workspace:*",
-    "@symbolize/dev-tsconfig": "workspace:*",
-    "@symbolize/eslint-config": "workspace:@symbolize/dev-eslint@*"
+    "@symbolize/dev-tsconfig": "workspace:*"
   },
   "devDependencies": {
     "typescript": "5.4.5"

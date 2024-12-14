@@ -204,12 +204,12 @@ tasks:
   pnpm:link-build-dirs:
     deps:
       - dev-esbuild:link-build-dir
-      - dev-eslint:link-build-dir
       - dev-node-loader:link-build-dir
       - dev-node-suppress:link-build-dir
       - dev-pnpm-test:link-build-dir
       - dev-prettier:link-build-dir
       - dev-tsconfig:link-build-dir
+      - dev-eslint:link-build-dir
       - lib-collection:link-build-dir
       - lib-compute:link-build-dir
       - lib-concurrency:link-build-dir

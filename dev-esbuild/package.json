@@ -1,6 +1,7 @@
 {
   "name": "@symbolize/dev-esbuild",
   "type": "module",
+  "version": "0.1.0",
   "bin": "main.ts",
   "dependencies": {
     "@symbolize/dev-prettier": "workspace:*",

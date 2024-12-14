@@ -1,11 +1,12 @@
 {
   "name": "@symbolize/dev-node-loader",
   "type": "module",
+  "version": "0.1.0",
   "dependencies": {
     "@symbolize/dev-prettier": "workspace:*",
     "@symbolize/dev-tsconfig": "workspace:*",
-    "esbuild": "0.19.5",
-    "@symbolize/lib-test": "workspace:*"
+    "@symbolize/lib-test": "workspace:*",
+    "esbuild": "0.19.5"
   },
   "devDependencies": {
     "typescript": "5.4.5"

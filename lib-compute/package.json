@@ -1,6 +1,7 @@
 {
   "name": "@symbolize/lib-compute",
   "type": "module",
+  "version": "0.1.0",
   "dependencies": {
     "@symbolize/dev-prettier": "workspace:*",
     "@symbolize/dev-tsconfig": "workspace:*",

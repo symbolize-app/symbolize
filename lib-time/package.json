@@ -1,11 +1,12 @@
 {
   "name": "@symbolize/lib-time",
   "type": "module",
+  "version": "0.1.0",
   "dependencies": {
+    "@sinonjs/fake-timers": "11.1.0",
     "@symbolize/dev-prettier": "workspace:*",
     "@symbolize/dev-tsconfig": "workspace:*",
-    "@symbolize/lib-test": "workspace:*",
-    "@sinonjs/fake-timers": "11.1.0"
+    "@symbolize/lib-test": "workspace:*"
   },
   "devDependencies": {
     "typescript": "5.4.5"

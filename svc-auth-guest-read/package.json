@@ -1,13 +1,14 @@
 {
   "name": "@symbolize/svc-auth-guest-read",
   "type": "module",
+  "version": "0.1.0",
   "dependencies": {
     "@symbolize/dev-prettier": "workspace:*",
     "@symbolize/dev-tsconfig": "workspace:*",
+    "@symbolize/lib-error": "workspace:*",
     "@symbolize/lib-random": "workspace:*",
     "@symbolize/lib-stream": "workspace:*",
-    "@symbolize/lib-time": "workspace:*",
-    "@symbolize/lib-error": "workspace:*"
+    "@symbolize/lib-time": "workspace:*"
   },
   "devDependencies": {
     "typescript": "5.4.5"
