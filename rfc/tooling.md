@@ -29,8 +29,6 @@
 - https://github.com/tantivy-search/tantivy
 - https://github.com/hyperium/hyper
 - https://github.com/rusqlite/rusqlite
-- https://github.com/cberner/fuser
-- https://github.com/foundationdb-rs/foundationdb-rs
 - https://github.com/awslabs/aws-sdk-rust/tree/main/sdk/s3
 
 ## Store
@@ -38,18 +36,13 @@
 - https://www.sqlite.org/index.html
 - https://github.com/amacneil/dbmate
 - https://github.com/sqlfluff/sqlfluff
-- https://github.com/apple/foundationdb
 - https://www.tigrisdata.com/
 
 ## Hosting
 
 - https://fly.io/
 - https://ns1.com/
-- https://www.backblaze.com/cloud-storage
+- https://uptimerobot.com/
 - https://www.mailersend.com/
 - https://www.hcaptcha.com/
 - https://www.zoho.com/mail/
-
-## Deploy
-
-- https://www.terraform.io/
