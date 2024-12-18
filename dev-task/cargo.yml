@@ -13,7 +13,7 @@ tasks:
   bin:install:
     cmds:
       # To avoid painful conflicts, don't use lockfile
-      - cargo install cargo-deny --version 0.14.3
+      - cargo install cargo-deny --version 0.14.23 --locked
       - cargo install tantivy-cli --version 0.22.1
 
   build:debug:
