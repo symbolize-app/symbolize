@@ -7,6 +7,7 @@
     dbmate.url = "path:./dbmate";
     easyrsa.url = "path:./easyrsa";
     fd.url = "path:./fd";
+    git.url = "path:./git";
     haskell.url = "path:./haskell";
     node.url = "path:./node";
     overmind.url = "path:./overmind";
@@ -19,7 +20,7 @@
     woff2.url = "path:./woff2";
   };
 
-  outputs = { nixpkgs, flake-utils, curl, dasel, dbmate, easyrsa, fd, haskell, node, overmind, rust, sqlfluff, sqlite, task, unzip, watchman, woff2, ... }:
+  outputs = { nixpkgs, flake-utils, curl, dasel, dbmate, easyrsa, fd, git, haskell, node, overmind, rust, sqlfluff, sqlite, task, unzip, watchman, woff2, ... }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs { inherit system; };
@@ -31,6 +32,7 @@
               dasel.packages.${system}.default
               easyrsa.packages.${system}.default
               fd.packages.${system}.default
+              git.packages.${system}.default
               haskell.packages.${system}.default
               node.packages.${system}.default
               overmind.packages.${system}.default
@@ -58,6 +60,8 @@
               echo $(easyrsa --version | head -n 4)
               fd --version
               ghc --version
+              git --version
+              echo "gt $(gt --version)"
               echo "stack $(stack --version)"
               echo "node $(node --version)"
               echo "pnpm v$(pnpm --version)"
