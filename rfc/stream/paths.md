@@ -1,10 +1,10 @@
-# Streams paths
+# Stream paths
 
 All distributed service boundaries are implemented with reactive streams, to make buffers explicit and bounded, and surface back-pressure from servers to clients.
 
 # Host-guest
 
-Guest services use HTTP/2 streams to communicate with host services.
+Read/write guest services (that run in a dedicated worker) use HTTP/2 streams to communicate with host services.
 
 The `gateway-guest-run` service establishes the connection using the Fetch API from a dedicated service worker. The `gateway-host-run` service handles the request using the `hyper` library.
 
@@ -20,6 +20,12 @@ As of July 2024, half duplex request streams are only supported in Chrome and Ed
 
 Within the browser, services communicate with each other using the Streams API. For one tab, all read and write services run on one dedicated worker and all view services run on one window.
 
+- View services may depend on each other
+- View services may depend on read/write services
+- Read/write services may depend on other read/write services
+
+If the stream is between a service worker and a window, the items in the stream must be "transferrable objects". Otherwise, any item type is allowed.
+
 To bridge the gap between a service worker and a window, the service worker (server) listens for a browser-level message. The window (client) posts a message event that includes a `ReadableStream` that the server will use to listen for future application-level events. The server then responds by posting back a browser-level message that includes another `ReadableStream`, this time for the client to listen to future application-level events.
 
 Two `ReadableStream` objects are also used for communication between any other service pairs (both in the service worker or both in the window). For this case, browser-level message passing is not used for coordination.
@@ -28,11 +34,11 @@ Two `ReadableStream` objects are also used for communication between any other s
 
 # Host-host
 
-Each host service runs in its own process and listens for HTTP/2 requests on its own port. In local development, all processes run in a shared environment, but in production they will be in isolated environments.
+On a single hosted instance, all host services run in the same process. They can directly enqueue items to the Rust channel.
 
-To establish a connection between host services, the client service makes an HTTP/2 request using `hyper` to the server. Because `hyper` supports full duplex, only one request is needed.
+To establish a connection between hosted instances, the follower instance makes an HTTP/2 request using `hyper` to the leader. Because `hyper` supports full duplex, only one request is needed. These connections are used for DB replication and write forwarding.
 
-For client requests forwarded by the host gateway to a specific host service, the host gateway will still generate new requests to the other host service, but will share an existing HTTP/2 connection is avaialble.
+For guest requests forwarded by the follower host gateway to a specific write leader instance, the follower gateway will still generate new requests to the other instance, but will use the main HTTP/2 connection.
 
 # Alternatives to HTTP/2 streams
 
@@ -73,4 +79,4 @@ Main advantages compared to HTTP/2 streams:
 - option for unreliable datagrams
 - connection migration during network changes
 
-As of 2024, more browsers are getting HTTP/3 and WebTransport support, and even the Rust `hyper` library has support. The main blocker is optionality to use Fly for host infrastructure, where QUIC support is still missing from Fly Proxy.
+As of 2024, more browsers are getting HTTP/3 and WebTransport support, and even the Rust `hyper` library has support. The main blocker is optionality to use Fly for hosting infrastructure, where QUIC support is still missing from Fly Proxy.

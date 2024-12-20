@@ -2,6 +2,8 @@
 
 ## Services
 
+Potential services:
+
 - auth (RBAC, groups, logins, alts)
 - blog (personal, community)
 - book (long form, chapters, glossary, index)
@@ -29,17 +31,7 @@
 - track (internal/external analytics)
 - vote (open votes, straw polls)
 
-### Standard
-
-Each service has a restricted scope for improved reliability and maintainability.
-
-- Host services run on trusted infrastructure
-- Guest services run on untrusted browsers
-- Read services don't make data changes
-- Write services do make data changes
-- View services render parts of the webpage
-
-This results in the following folders per service:
+Folders per service:
 
 - svc-<service>-doc
 - svc-<service>-guest-read
@@ -50,9 +42,7 @@ This results in the following folders per service:
 - svc-<service>-host-store
 - svc-<service>-host-write
 
-### Special\*
-
-Read/write switch to...
+\*Read/write switch to...
 
 - svc-<service>-guest-run
 - svc-<service>-host-run
