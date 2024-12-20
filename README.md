@@ -35,14 +35,6 @@ mkdir -p $HOME/.config/direnv
 echo 'source $HOME/.nix-profile/share/nix-direnv/direnvrc' >> $HOME/.config/direnv/direnvrc
 ```
 
-### pnpm
-
-1. Installed by Nix
-
-### Rust
-
-1. Installed by Nix
-
 ### Easy-RSA
 
 General:
@@ -58,9 +50,21 @@ sudo cp .pki/ca.crt /usr/local/share/ca-certificates
 sudo update-ca-certificates
 ```
 
+Arch Linux:
+
+```sh
+sudo trust anchor .pki/ca.crt
+```
+
 Chrome & Firefox:
 
 - Navigate settings UI to manually import `.pki/ca.crt`
+
+### Manual install
+
+```
+task i
+```
 
 ## Visual Studio Code
 

@@ -179,6 +179,7 @@ tasks:
     deps:
       - cargo:install
       - font:install
+      - pnpm:install
       - stack:install
   lint:check:
     aliases:
