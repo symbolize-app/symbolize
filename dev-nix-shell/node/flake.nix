@@ -27,6 +27,7 @@
             buildInputs = [
               pkgs.nodejs_22
               pkgs.nodejs_22.pkgs.node2nix
+              pkgs.node-packages."@withgraphite/graphite-cli"
               pkgs.node-packages.pnpm
               node-loader
             ];
