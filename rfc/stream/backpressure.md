@@ -1,4 +1,4 @@
-# Backpressure
+# Stream backpressure
 
 To avoid overloading services, each service needs its own bounded queue, work-in-progress limiter, and backpressure signal.
 
