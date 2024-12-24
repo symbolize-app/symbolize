@@ -36,8 +36,6 @@ If read-after-write consistency is needed, a shard version number can be given t
 
 "Write" services can perform write operations. When they use a shard, they need to acquire exclusive write ownership of the shard.
 
-Write event streams will also be scoped per-shard. So if a stream is established to an instance when another instance actually has ownership, the stream will terminate (giving the name of the correct instance).
-
 As a consistency check, the writer makes sure that its initial shard version number matches the shard version in FoundationDB when committing.
 
 To populate a page, a write service only uses FoundationDB (or Tigris) as the source.

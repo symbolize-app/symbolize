@@ -74,7 +74,7 @@ Content API:
 
 ## Code deduplication
 
-- Once duplicated event definitions are present in multiple services...
+- Once duplicated code (e.g. type definitions) is present in multiple services...
 - Service worker can create stub "export all from import by content ID" JS files
 - Used for all JS files, for simplicity, benefit is in the dups
 
