@@ -1,9 +1,7 @@
-# SQLite conventions
+# DB conventions
 
 ## Error handling
 
-- Enable enforcement of foreign-key constraints
-- Use strict tables for rigid typing
 - Disallow nulls for primary keys
   - Not needed for integers or tables without row IDs
 - Don't use autoincrement primary keys
@@ -34,24 +32,3 @@
 - Archived, archived at, archived by
 - Deleted, deleted at, deleted by
 - Revision
-
-## Write-Ahead Logs
-
-- Disable WAL auto-checkpoint
-  - Manually trigger when safe
-- Open DB in immutable mode for readers
-- Set journal mode to "delete" if permanently saving a DB
-
-## Tuning
-
-- Enable memory-mapped IO
-- Recommended to optimize DB on every connection close
-- Consider vacuuming
-- Set locking mode to exclusive
-- Open DB in "no mutex" mode
-
-## References
-
-- https://www.sqlite.org/datatype3.html
-- https://www.sqlite.org/stricttables.html
-- https://www.sqlite.org/wal.html

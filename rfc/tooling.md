@@ -6,6 +6,7 @@
 - https://nix.dev/
 - https://taskfile.dev/
 - https://github.com/DarthSim/overmind
+- https://www.haproxy.org/
 
 ## TypeScript
 
@@ -37,6 +38,7 @@
 - https://github.com/amacneil/dbmate
 - https://github.com/sqlfluff/sqlfluff
 - https://www.tigrisdata.com/
+- https://redis.io/
 
 ## Hosting
 
