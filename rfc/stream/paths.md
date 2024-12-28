@@ -2,7 +2,7 @@
 
 All distributed service boundaries are implemented with reactive streams, to make buffers explicit and bounded, and surface back-pressure from servers to clients.
 
-# Host-guest
+## Host-guest
 
 Read/write guest services (that run in a dedicated worker) use HTTP/2 streams to communicate with host services.
 
@@ -16,7 +16,7 @@ One complication of using two requests is that there is no guarantee from the br
 
 As of July 2024, half duplex request streams are only supported in Chrome and Edge. As a fallback for other browsers, the request stream will need to be re-initiated for every piece of data that needs sending. This will trigger HTTP request parsing, but will not require new TCP/TLS connections.
 
-# Guest-guest
+## Guest-guest
 
 Within the browser, services communicate with each other using the Streams API. For one tab, all read and write services run on one dedicated worker and all view services run on one window.
 
@@ -32,7 +32,7 @@ Two `ReadableStream` objects are also used for communication between any other s
 
 `ReadableStream` was used over simple messages or emitters because they support backpressure and assembling into pipelines.
 
-# Host-host
+## Host-host
 
 On a single hosted instance, all host services run in the same process. They can directly enqueue items to the Rust channel.
 
@@ -40,9 +40,9 @@ To establish a connection between hosted instances, the follower instance makes 
 
 For guest requests forwarded by the follower host gateway to a specific write leader instance, the follower gateway will still generate new requests to the other instance, but will use the main HTTP/2 connection.
 
-# Alternatives to HTTP/2 streams
+## Alternatives to HTTP/2 streams
 
-## Server-sent events
+### Server-sent events
 
 Implemented in browsers as early as 2010 via a long-running request where JSON objects are pulled out and surfaced to the JS event listeners.
 
@@ -52,7 +52,7 @@ Main drawbacks compared to HTTP/2 streams:
 - forced JSON usage
 - unidirectional
 
-## WebSockets
+### WebSockets
 
 Implemented in browsers also as early as 2010 via a separate TCP/TLS connection that bypasses the HTTP stack after an initial upgrade handshake.
 
@@ -63,7 +63,7 @@ Main drawbacks compared to HTTP/2 streams:
 - difficult to process upgrade handshake due to HTTP mismatches
 - complicated heartbeat management
 
-## WebTransport
+### WebTransport
 
 This API requires an HTTP/3 connection, which runs on QUIC, a network protocol built on UDP.
 

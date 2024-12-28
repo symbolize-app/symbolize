@@ -46,7 +46,7 @@ Sessions are pinned to various attributes. This simplifies session listing, and 
 
 To mitigate the UX effects (e.g. an author who frequently changes time zones or countries or VPN proxies), the web client can store multiple session tokens without terminating any.
 
-### Magic link algorithm
+## Magic link algorithm
 
 - Only valid for 5 minutes
 - Can only be used once
