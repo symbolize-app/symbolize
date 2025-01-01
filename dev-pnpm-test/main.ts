@@ -1,7 +1,7 @@
 #!/usr/bin/env node-loader
 import * as compute from '@symbolize/lib-compute'
 import * as contrast from '@symbolize/lib-contrast'
-import * as conveyNode from '@symbolize/lib-convey/index.node.ts'
+import * as hypertextNode from '@symbolize/lib-hypertext/index.node.ts'
 import * as randomTest from '@symbolize/lib-random/test.ts'
 import * as streamTest from '@symbolize/lib-stream/test.ts'
 import * as testRunner from '@symbolize/lib-test-runner'
@@ -21,12 +21,12 @@ export async function run(baseContext: time.Context): Promise<boolean> {
     contrast() {
       return contrast.contrast()
     },
-    convey(defer) {
-      const convey = conveyNode.convey()
+    hypertext(defer) {
+      const hypertext = hypertextNode.hypertext()
       defer(() => {
-        convey.dispose()
+        hypertext.dispose()
       })
-      return convey
+      return hypertext
     },
     random() {
       return randomTest.random()

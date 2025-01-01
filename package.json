@@ -17,6 +17,7 @@
     "@symbolize/lib-contrast": "workspace:*",
     "@symbolize/lib-error": "workspace:*",
     "@symbolize/lib-hex": "workspace:*",
+    "@symbolize/lib-hypertext": "workspace:*",
     "@symbolize/lib-payload": "workspace:*",
     "@symbolize/lib-random": "workspace:*",
     "@symbolize/lib-stream": "workspace:*",

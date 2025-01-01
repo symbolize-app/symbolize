@@ -1,15 +1,15 @@
 import * as compute from '@symbolize/lib-compute'
 import * as contrast from '@symbolize/lib-contrast'
-import * as convey from '@symbolize/lib-convey'
+import * as hypertext from '@symbolize/lib-hypertext'
 import type * as random from '@symbolize/lib-random'
 import type * as stream from '@symbolize/lib-stream'
 import type * as time from '@symbolize/lib-time'
 
 const fillVar = contrast.var_<contrast.Color>()
 
-const htmlStyle = convey.defineCustom((ctx) => {
-  const html = ctx.convey.document.documentElement
-  return convey.portal(html, {
+const htmlStyle = hypertext.defineCustom((ctx) => {
+  const html = ctx.hypertext.document.documentElement
+  return hypertext.portal(html, {
     style: [
       contrast.accent.color(
         contrast.rgb(
@@ -40,15 +40,15 @@ const htmlStyle = convey.defineCustom((ctx) => {
 
 const gridColorVar = contrast.var_<contrast.Color>()
 
-const bodyStyle = convey.defineCustom((ctx) => {
-  const body = ctx.convey.document.body
+const bodyStyle = hypertext.defineCustom((ctx) => {
+  const body = ctx.hypertext.document.body
   const transparent = contrast.rgb(
     contrast.pct(0),
     contrast.pct(0),
     contrast.pct(0),
     contrast.pct(0),
   )
-  return convey.portal(body, {
+  return hypertext.portal(body, {
     style: [
       contrast.overflow.x('hidden'),
       contrast.position('relative'),
@@ -95,19 +95,19 @@ const bodyStyle = convey.defineCustom((ctx) => {
   })
 })
 
-const custom = convey.defineCustom<
+const custom = hypertext.defineCustom<
   unknown,
   {
     readonly title: compute.NodeOpt<string>
   }
 >((ctx, attrs) => {
-  const head = ctx.convey.document.head
+  const head = ctx.hypertext.document.head
   const countState = compute.state(0)
   const extra = contrast.container.build()
 
   return [
-    convey.portal(head, {
-      content: convey.html.title({
+    hypertext.portal(head, {
+      content: hypertext.html.title({
         onAdd() {
           head.querySelector('title')?.remove()
         },
@@ -115,9 +115,9 @@ const custom = convey.defineCustom<
         content: 'Symbolize Custom',
       }),
     }),
-    convey.html.div({
+    hypertext.html.div({
       content: [
-        convey.html.h1({
+        hypertext.html.h1({
           style: [
             contrast.font.size(contrast.rem(2)),
             contrast.font.weight(700),
@@ -128,7 +128,7 @@ const custom = convey.defineCustom<
 
           content: 'The Tale of Peter Rabbit by Beatrix Potter',
         }),
-        convey.html.h2({
+        hypertext.html.h2({
           style: [
             contrast.font.size(contrast.rem(1.6)),
             contrast.font.weight(500),
@@ -139,7 +139,7 @@ const custom = convey.defineCustom<
 
           content: 'Chapter 1',
         }),
-        convey.html.p({
+        hypertext.html.p({
           style: [
             contrast.margin.oe(contrast.rlh(0.5)),
             contrast.size.max.w(contrast.length(60, 'rch')),
@@ -148,7 +148,7 @@ const custom = convey.defineCustom<
           content:
             'Once upon a time there were four little Rabbits, and their names were— Flopsy, Mopsy, Cotton-tail, and Peter.',
         }),
-        convey.html.p({
+        hypertext.html.p({
           style: [
             contrast.margin.oe(contrast.rlh(0.5)),
             contrast.size.max.w(contrast.length(60, 'rch')),
@@ -157,7 +157,7 @@ const custom = convey.defineCustom<
           content:
             'They lived with their Mother in a sand-bank, underneath the root of a very big fir-tree.',
         }),
-        convey.html.p({
+        hypertext.html.p({
           style: [contrast.size.max.w(contrast.length(60, 'rch'))],
 
           content:
@@ -165,7 +165,7 @@ const custom = convey.defineCustom<
         }),
       ],
     }),
-    convey.html.hr({
+    hypertext.html.hr({
       style: [
         contrast.border.style.oi('none'),
 
@@ -189,7 +189,7 @@ const custom = convey.defineCustom<
         contrast.margin.os(contrast.rlh(3)),
       ],
     }),
-    convey.html.div({
+    hypertext.html.div({
       style: compute.map(
         (count) => [
           count % 2 ?
@@ -237,7 +237,7 @@ const custom = convey.defineCustom<
         countState,
       ),
     }),
-    convey.svg.svg({
+    hypertext.svg.svg({
       style: [
         fillVar.set(
           contrast.c(
@@ -262,7 +262,7 @@ const custom = convey.defineCustom<
       viewBox: [0, 0, 100, 100],
       width: 50,
 
-      content: convey.svg.rect({
+      content: hypertext.svg.rect({
         style: [contrast.fill(fillVar)],
 
         height: 80,
@@ -271,7 +271,7 @@ const custom = convey.defineCustom<
         y: 10,
       }),
     }),
-    convey.math.math({
+    hypertext.math.math({
       style: [
         contrast.background.color(
           contrast.rgb(
@@ -292,8 +292,11 @@ const custom = convey.defineCustom<
                   contrast.select.and(
                     contrast.select.not(contrast.select.disabled()),
                     contrast.select.hover(),
-                    convey.select.attr({ display: 'block', nonce: 'x' }),
-                    convey.select.type('math', 'svg'),
+                    hypertext.select.attr({
+                      display: 'block',
+                      nonce: 'x',
+                    }),
+                    hypertext.select.type('math', 'svg'),
                   ),
                 ),
                 contrast.pct(0),
@@ -307,23 +310,23 @@ const custom = convey.defineCustom<
       nonce: 'x',
 
       content: [
-        convey.math.mi({ content: 'x' }),
-        convey.math.mo({ content: '+' }),
-        convey.math.mi({ content: 'y' }),
+        hypertext.math.mi({ content: 'x' }),
+        hypertext.math.mo({ content: '+' }),
+        hypertext.math.mi({ content: 'y' }),
       ],
     }),
-    convey.html.div({
+    hypertext.html.div({
       style: [
         contrast.container.name(extra),
         contrast.container.type('inline-size'),
       ],
 
       content: [
-        convey.html.input({
+        hypertext.html.input({
           checked: true,
           type: 'checkbox',
         }),
-        convey.html.input({
+        hypertext.html.input({
           style: [
             contrast.background.color(
               contrast.container.match(
@@ -350,13 +353,13 @@ const custom = convey.defineCustom<
 export async function main(
   ctx: compute.Context &
     contrast.Context &
-    convey.Context &
+    hypertext.Context &
     random.Context &
     stream.WorkerClientContext &
     time.Context,
 ): Promise<void> {
-  const html = ctx.convey.document.documentElement
-  const body = ctx.convey.document.body
+  const html = ctx.hypertext.document.documentElement
+  const body = ctx.hypertext.document.body
   try {
     const clientSource = ctx.streamClient.connect(
       'svc-auth-guest-read',
@@ -367,7 +370,7 @@ export async function main(
     )
     void clientSource.send(ctx, 'ping')
 
-    await convey
+    await hypertext
       .portal(body, {
         content: [
           htmlStyle({}),

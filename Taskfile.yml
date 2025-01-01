@@ -39,14 +39,14 @@ includes:
     taskfile: lib-concurrency
   lib-contrast:
     taskfile: lib-contrast
-  lib-convey:
-    taskfile: lib-convey
   lib-error:
     taskfile: lib-error
   lib-hex-rs:
     taskfile: lib-hex-rs
   lib-hex-ts:
     taskfile: lib-hex-ts
+  lib-hypertext:
+    taskfile: lib-hypertext
   lib-payload:
     taskfile: lib-payload
   lib-random:
@@ -215,9 +215,9 @@ tasks:
       - lib-compute:link-build-dir
       - lib-concurrency:link-build-dir
       - lib-contrast:link-build-dir
-      - lib-convey:link-build-dir
       - lib-error:link-build-dir
       - lib-hex-ts:link-build-dir
+      - lib-hypertext:link-build-dir
       - lib-payload:link-build-dir
       - lib-random:link-build-dir
       - lib-stream:link-build-dir

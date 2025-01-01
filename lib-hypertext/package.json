@@ -1,5 +1,5 @@
 {
-  "name": "@symbolize/svc-auth-guest-view",
+  "name": "@symbolize/lib-hypertext",
   "type": "module",
   "version": "0.1.0",
   "license": "(MIT OR Apache-2.0)",
@@ -7,13 +7,9 @@
     "@symbolize/dev-prettier": "workspace:*",
     "@symbolize/dev-tsconfig": "workspace:*",
     "@symbolize/lib-compute": "workspace:*",
-    "@symbolize/lib-error": "workspace:*",
-    "@symbolize/lib-hex": "workspace:*",
-    "@symbolize/lib-hypertext": "workspace:*",
-    "@symbolize/lib-random": "workspace:*",
-    "@symbolize/lib-stream": "workspace:*",
+    "@symbolize/lib-contrast": "workspace:*",
     "@symbolize/lib-test": "workspace:*",
-    "@symbolize/lib-time": "workspace:*"
+    "happy-dom": "13.6.2"
   },
   "devDependencies": {
     "typescript": "5.4.5"
