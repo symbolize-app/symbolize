@@ -4,15 +4,15 @@ import * as markupMarker from '@/marker.ts'
 import * as markupRange from '@/range.ts'
 import * as markupText from '@/text.ts'
 import type * as compute from '@symbolize/lib-compute'
-import type * as contrast from '@symbolize/lib-contrast'
+import type * as styling from '@symbolize/lib-styling'
 
 export interface Fragment<CustomContext = unknown> {
   readonly [markupMarker.fragmentMarker]: null
   add(
     ctx: compute.Context &
-      contrast.Context &
       CustomContext &
-      markupContext.Context,
+      markupContext.Context &
+      styling.Context,
   ): Promise<void>
   nodes(): IterableIterator<globalThis.Node>
   remove(): Promise<void>

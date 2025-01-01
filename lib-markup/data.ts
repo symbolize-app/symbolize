@@ -1,4 +1,4 @@
-import type * as contrast from '@symbolize/lib-contrast'
+import type * as styling from '@symbolize/lib-styling'
 
 export function svgPreserveAspectRatio(data: {
   readonly align: SvgPreserveAspectRatio['align']
@@ -44,7 +44,7 @@ class SvgPreserveAspectRatio {
 
 export type { SvgPreserveAspectRatio }
 
-export type SvgLengthPctOpt = contrast.Pct | SvgLength | SvgLength['value']
+export type SvgLengthPctOpt = styling.Pct | SvgLength | SvgLength['value']
 
 export type SvgLengthUnit =
   | 'cm'
@@ -56,7 +56,7 @@ export type SvgLengthUnit =
   | 'pt'
   | 'px'
 
-export type SvgLength = contrast.Length<SvgLengthUnit>
+export type SvgLength = styling.Length<SvgLengthUnit>
 
 export function rect(data: {
   readonly height: number

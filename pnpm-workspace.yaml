@@ -9,13 +9,13 @@ packages:
   - lib-collection
   - lib-compute
   - lib-concurrency
-  - lib-contrast
   - lib-error
   - lib-hex-ts
   - lib-markup
   - lib-payload
   - lib-random
   - lib-stream
+  - lib-styling
   - lib-test
   - lib-test-runner
   - lib-time

@@ -2,15 +2,15 @@
 import * as markup from '@/index.ts'
 import * as markupTest from '@/test.ts'
 import * as compute from '@symbolize/lib-compute'
-import * as contrast from '@symbolize/lib-contrast'
-import * as contrastTest from '@symbolize/lib-contrast/test.ts'
+import * as styling from '@symbolize/lib-styling'
+import * as stylingTest from '@symbolize/lib-styling/test.ts'
 import * as test from '@symbolize/lib-test'
 
 export const url = import.meta.url
 
 export const tests = {
   async ['div advanced'](
-    ctx: compute.Context & contrast.Context & markup.Context,
+    ctx: compute.Context & markup.Context & styling.Context,
   ): Promise<void> {
     const custom = markup.defineCustom<
       unknown,
@@ -50,7 +50,7 @@ export const tests = {
   },
 
   async ['div pure'](
-    ctx: compute.Context & contrast.Context & markup.Context,
+    ctx: compute.Context & markup.Context & styling.Context,
   ): Promise<void> {
     const [clickCallback, clickCallbackHistory] =
       test.repeatMockWithHistory(1, (_event: Readonly<MouseEvent>) => {})
@@ -79,7 +79,7 @@ export const tests = {
   },
 
   async ['div class names'](
-    ctx: compute.Context & contrast.Context & markup.Context,
+    ctx: compute.Context & markup.Context & styling.Context,
   ): Promise<void> {
     const fragment = markup.html.div({
       className: ['x', 'y'],
@@ -91,7 +91,7 @@ export const tests = {
   },
 
   async ['div state'](
-    ctx: compute.Context & contrast.Context & markup.Context,
+    ctx: compute.Context & markup.Context & styling.Context,
   ): Promise<void> {
     const x = compute.state('a')
 
@@ -114,7 +114,7 @@ export const tests = {
   },
 
   async ['div string null'](
-    ctx: compute.Context & contrast.Context & markup.Context,
+    ctx: compute.Context & markup.Context & styling.Context,
   ): Promise<void> {
     const title = compute.state<string | null>('a')
 
@@ -133,7 +133,7 @@ export const tests = {
   },
 
   async ['div on add'](
-    ctx: compute.Context & contrast.Context & markup.Context,
+    ctx: compute.Context & markup.Context & styling.Context,
   ): Promise<void> {
     const show = compute.state(false)
     const [stepCallback, stepCallbackHistory] = test.repeatMockWithHistory(
@@ -190,11 +190,11 @@ export const tests = {
   },
 
   async ['div style'](
-    ctx: compute.Context & contrast.Context & markup.Context,
+    ctx: compute.Context & markup.Context & styling.Context,
   ): Promise<void> {
     for (let i = 0; i < 2; i += 1) {
       const fragment = markup.html.div({
-        style: [contrast.background.size('contain')],
+        style: [styling.background.size('contain')],
       })
       const body = await markupTest.addFragmentToBody(ctx, fragment)
       const div = body.querySelector('div')
@@ -203,11 +203,11 @@ export const tests = {
       test.assertDeepEquals(
         await Promise.all(
           [...ctx.markup.styleLayer.cssRules].map(async (item) =>
-            contrastTest.formatCode(item.cssText),
+            stylingTest.formatCode(item.cssText),
           ),
         ),
         [
-          contrastTest.dedent(`
+          stylingTest.dedent(`
             .a0 {
               background-size: contain;
             }
@@ -220,14 +220,14 @@ export const tests = {
   },
 
   async ['div computation style'](
-    ctx: compute.Context & contrast.Context & markup.Context,
+    ctx: compute.Context & markup.Context & styling.Context,
   ): Promise<void> {
     for (let i = 0; i < 2; i += 1) {
-      const x = compute.state<contrast.Length | null>(contrast.px(1))
+      const x = compute.state<styling.Length | null>(styling.px(1))
 
       const fragment = markup.html.div({
         style: compute.map(
-          (x) => (x !== null ? contrast.padding.os(x) : null),
+          (x) => (x !== null ? styling.padding.os(x) : null),
           x,
         ),
       })
@@ -238,16 +238,16 @@ export const tests = {
       test.assertDeepEquals(
         await Promise.all(
           [...ctx.markup.styleLayer.cssRules].map(async (item) =>
-            contrastTest.formatCode(item.cssText),
+            stylingTest.formatCode(item.cssText),
           ),
         ),
         [
-          contrastTest.dedent(`
+          stylingTest.dedent(`
             .a0 {
               padding-block-start: 1px;
             }
           `),
-          contrastTest.dedent(`
+          stylingTest.dedent(`
             .a1 {
               padding-block-start: 2px;
             }
@@ -256,22 +256,22 @@ export const tests = {
       )
 
       await compute.txn(ctx, async () => {
-        await compute.set(ctx, x, contrast.px(2))
+        await compute.set(ctx, x, styling.px(2))
       })
       test.assertDeepEquals([...div.classList.values()], ['a1'])
       test.assertDeepEquals(
         await Promise.all(
           [...ctx.markup.styleLayer.cssRules].map(async (item) =>
-            contrastTest.formatCode(item.cssText),
+            stylingTest.formatCode(item.cssText),
           ),
         ),
         [
-          contrastTest.dedent(`
+          stylingTest.dedent(`
             .a0 {
               padding-block-start: 1px;
             }
           `),
-          contrastTest.dedent(`
+          stylingTest.dedent(`
             .a1 {
               padding-block-start: 2px;
             }
@@ -286,16 +286,16 @@ export const tests = {
       test.assertDeepEquals(
         await Promise.all(
           [...ctx.markup.styleLayer.cssRules].map(async (item) =>
-            contrastTest.formatCode(item.cssText),
+            stylingTest.formatCode(item.cssText),
           ),
         ),
         [
-          contrastTest.dedent(`
+          stylingTest.dedent(`
             .a0 {
               padding-block-start: 1px;
             }
           `),
-          contrastTest.dedent(`
+          stylingTest.dedent(`
             .a1 {
               padding-block-start: 2px;
             }
@@ -308,7 +308,7 @@ export const tests = {
   },
 
   async ['button pure'](
-    ctx: compute.Context & contrast.Context & markup.Context,
+    ctx: compute.Context & markup.Context & styling.Context,
   ): Promise<void> {
     const fragment = markup.html.button({
       formMethod: 'get',
@@ -324,7 +324,7 @@ export const tests = {
   },
 
   async ['button boolean false'](
-    ctx: compute.Context & contrast.Context & markup.Context,
+    ctx: compute.Context & markup.Context & styling.Context,
   ): Promise<void> {
     const disabled = compute.state(true)
 
@@ -346,7 +346,7 @@ export const tests = {
   },
 
   async ['input checkbox pure'](
-    ctx: compute.Context & contrast.Context & markup.Context,
+    ctx: compute.Context & markup.Context & styling.Context,
   ): Promise<void> {
     const fragment = markup.html.input({
       checked: true,
@@ -362,7 +362,7 @@ export const tests = {
   },
 
   async ['input text pure'](
-    ctx: compute.Context & contrast.Context & markup.Context,
+    ctx: compute.Context & markup.Context & styling.Context,
   ): Promise<void> {
     const fragment = markup.html.input({
       autocomplete: ['section-x', 'email'],

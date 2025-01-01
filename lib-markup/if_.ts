@@ -3,7 +3,7 @@ import * as markupElement from '@/element.ts'
 import * as markupFragment from '@/fragment.ts'
 import * as markupMarker from '@/marker.ts'
 import * as compute from '@symbolize/lib-compute'
-import type * as contrast from '@symbolize/lib-contrast'
+import type * as styling from '@symbolize/lib-styling'
 
 type Falsy = '' | 0 | 0n | false | null | undefined
 
@@ -38,9 +38,9 @@ class If_<Value, CustomContext = unknown>
 
   async add(
     ctx: compute.Context &
-      contrast.Context &
       CustomContext &
-      markupContext.Context,
+      markupContext.Context &
+      styling.Context,
   ): Promise<void> {
     this.mutableStartComment = ctx.markup.document.createComment('')
     this.mutableEndComment = ctx.markup.document.createComment('')

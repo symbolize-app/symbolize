@@ -2,14 +2,14 @@
 import * as markup from '@/index.ts'
 import * as markupTest from '@/test.ts'
 import * as compute from '@symbolize/lib-compute'
-import type * as contrast from '@symbolize/lib-contrast'
+import type * as styling from '@symbolize/lib-styling'
 import * as test from '@symbolize/lib-test'
 
 export const url = import.meta.url
 
 export const tests = {
   async ['if basic'](
-    ctx: compute.Context & contrast.Context & markup.Context,
+    ctx: compute.Context & markup.Context & styling.Context,
   ): Promise<void> {
     const y = compute.state({ x: 2 } as { readonly x: number } | null)
 
@@ -64,7 +64,7 @@ export const tests = {
   },
 
   async ['if inner count'](
-    ctx: compute.Context & contrast.Context & markup.Context,
+    ctx: compute.Context & markup.Context & styling.Context,
   ): Promise<void> {
     const x = compute.state('a')
 
@@ -97,7 +97,7 @@ export const tests = {
   },
 
   async ['if lazy true'](
-    ctx: compute.Context & contrast.Context & markup.Context,
+    ctx: compute.Context & markup.Context & styling.Context,
   ): Promise<void> {
     const fragment = markup.if_(
       () =>
@@ -112,7 +112,7 @@ export const tests = {
   },
 
   async ['if lazy false'](
-    ctx: compute.Context & contrast.Context & markup.Context,
+    ctx: compute.Context & markup.Context & styling.Context,
   ): Promise<void> {
     const fragment = markup.if_(
       () =>
@@ -127,7 +127,7 @@ export const tests = {
   },
 
   async ['if nested'](
-    ctx: compute.Context & contrast.Context & markup.Context,
+    ctx: compute.Context & markup.Context & styling.Context,
   ): Promise<void> {
     const x = compute.state(true)
     const y = compute.state(true)

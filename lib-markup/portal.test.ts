@@ -2,14 +2,14 @@
 import * as markup from '@/index.ts'
 import * as markupTest from '@/test.ts'
 import type * as compute from '@symbolize/lib-compute'
-import * as contrast from '@symbolize/lib-contrast'
+import * as styling from '@symbolize/lib-styling'
 import * as test from '@symbolize/lib-test'
 
 export const url = import.meta.url
 
 export const tests = {
   async ['add and remove'](
-    ctx: compute.Context & contrast.Context & markup.Context,
+    ctx: compute.Context & markup.Context & styling.Context,
   ): Promise<void> {
     const [clickCallback, clickCallbackHistory] =
       test.repeatMockWithHistory(1, (_event: Readonly<MouseEvent>) => {})
@@ -31,8 +31,8 @@ export const tests = {
     const fragment = markup.portal(div, {
       id: 'y',
       onClick: clickCallback,
-      style: contrast.background.color(
-        contrast.rgb(contrast.pct(100), contrast.pct(0), contrast.pct(0)),
+      style: styling.background.color(
+        styling.rgb(styling.pct(100), styling.pct(0), styling.pct(0)),
       ),
       tabIndex: 1,
 

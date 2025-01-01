@@ -3,7 +3,7 @@ import type * as markupHtmlAttr from '@/htmlAttr.ts'
 import type * as markupMathAttr from '@/mathAttr.ts'
 import type * as markupSvgAttr from '@/svgAttr.ts'
 import type * as compute from '@symbolize/lib-compute'
-import * as contrast from '@symbolize/lib-contrast'
+import * as styling from '@symbolize/lib-styling'
 
 type Attr = {
   readonly [Key in keyof markupElementAttr.AllAttrs as markupElementAttr.AllAttrs[Key]['kind'] extends (
@@ -27,14 +27,14 @@ export const select = {
   /**
    * @see https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors
    */
-  attr(values: Attr): contrast.SelectTerm {
+  attr(values: Attr): styling.SelectTerm {
     const terms = Object.entries(values).map(([key, value]) =>
-      contrast.select.term(compileAttrPair, () => [
+      styling.select.term(compileAttrPair, () => [
         key as keyof Attr,
         value,
       ]),
     )
-    return contrast.select.term(compileAttr, (ctx) =>
+    return styling.select.term(compileAttr, (ctx) =>
       terms.map((term) => term.compile(ctx)),
     )
   },
@@ -42,8 +42,8 @@ export const select = {
   /**
    * @see https://developer.mozilla.org/en-US/docs/Web/CSS/Type_selectors
    */
-  type(value: Type, ...values: readonly Type[]): contrast.SelectTerm {
-    return contrast.select.term(compileType, () => [value, ...values])
+  type(value: Type, ...values: readonly Type[]): styling.SelectTerm {
+    return styling.select.term(compileType, () => [value, ...values])
   },
 }
 

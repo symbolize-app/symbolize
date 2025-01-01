@@ -3,7 +3,7 @@ import * as markupElementAttr from '@/elementAttr.ts'
 import * as markupFragment from '@/fragment.ts'
 import * as markupMarker from '@/marker.ts'
 import * as compute from '@symbolize/lib-compute'
-import * as contrast from '@symbolize/lib-contrast'
+import * as styling from '@symbolize/lib-styling'
 
 export function replaceBetween(
   startNode: Readonly<Node>,
@@ -78,9 +78,9 @@ class MutableElementFragment<CustomContext = unknown>
 
   async add(
     ctx: compute.Context &
-      contrast.Context &
       CustomContext &
-      markupContext.Context,
+      markupContext.Context &
+      styling.Context,
   ): Promise<void> {
     this.mutableElement = this.create(ctx)
 
@@ -191,9 +191,9 @@ class MutableElementFragment<CustomContext = unknown>
 
   private async appendFragment(
     ctx: compute.Context &
-      contrast.Context &
       CustomContext &
-      markupContext.Context,
+      markupContext.Context &
+      styling.Context,
     fragment: markupFragment.FragmentOpt<CustomContext>,
   ): Promise<void> {
     const mutableFragment = markupFragment.toFragment(fragment)
@@ -261,10 +261,10 @@ class MutableElementFragment<CustomContext = unknown>
 
   private async bindStyle(
     ctx: compute.Context &
-      contrast.Context &
       CustomContext &
-      markupContext.Context,
-    value: compute.NodeOpt<contrast.AtomOpt>,
+      markupContext.Context &
+      styling.Context,
+    value: compute.NodeOpt<styling.AtomOpt>,
   ): Promise<void> {
     let oldClassNames: readonly string[] = []
     if (this.mode === ElementFragmentMode.portal) {
@@ -279,7 +279,7 @@ class MutableElementFragment<CustomContext = unknown>
         }
         this.mutableElement.classList.remove(...oldClassNames)
         const mutableClassNames: string[] = []
-        for (const rule of contrast.compile(ctx, value)) {
+        for (const rule of styling.compile(ctx, value)) {
           if (!ctx.markup.classNames.has(rule.className)) {
             ctx.markup.styleLayer.insertRule(
               rule.code,

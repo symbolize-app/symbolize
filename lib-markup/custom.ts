@@ -2,7 +2,7 @@ import type * as markupContext from '@/context.ts'
 import * as markupFragment from '@/fragment.ts'
 import * as markupMarker from '@/marker.ts'
 import * as compute from '@symbolize/lib-compute'
-import type * as contrast from '@symbolize/lib-contrast'
+import type * as styling from '@symbolize/lib-styling'
 
 export function defineCustom<
   CustomContext = unknown,
@@ -46,9 +46,9 @@ class Custom<
 
   async add(
     baseCtx: compute.Context &
-      contrast.Context &
       CustomContext &
-      markupContext.Context,
+      markupContext.Context &
+      styling.Context,
   ): Promise<void> {
     const ctx: compute.Context &
       CustomContext &

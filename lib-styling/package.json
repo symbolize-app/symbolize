@@ -1,0 +1,17 @@
+{
+  "name": "@symbolize/lib-styling",
+  "type": "module",
+  "version": "0.1.0",
+  "license": "(MIT OR Apache-2.0)",
+  "dependencies": {
+    "@symbolize/dev-prettier": "workspace:*",
+    "@symbolize/dev-tsconfig": "workspace:*",
+    "@symbolize/lib-collection": "workspace:*",
+    "@symbolize/lib-test": "workspace:*"
+  },
+  "devDependencies": {
+    "prettier": "3.2.5",
+    "typescript": "5.4.5"
+  },
+  "prettier": "@symbolize/dev-prettier/index.json"
+}
