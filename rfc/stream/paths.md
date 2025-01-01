@@ -79,4 +79,4 @@ Main advantages compared to HTTP/2 streams:
 - option for unreliable datagrams
 - connection migration during network changes
 
-As of 2024, more browsers are getting HTTP/3 and WebTransport support, and even the Rust `hyper` library has support. The main blocker is optionality to use Fly for hosting infrastructure, where QUIC support is still missing from Fly Proxy.
+As of 2024, more browsers are getting HTTP/3 and WebTransport support, and even the Rust `hyper` library has support.

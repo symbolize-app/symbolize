@@ -6,7 +6,6 @@
 - https://nix.dev/
 - https://taskfile.dev/
 - https://github.com/DarthSim/overmind
-- https://www.haproxy.org/
 
 ## TypeScript
 
@@ -31,20 +30,24 @@
 - https://github.com/hyperium/hyper
 - https://github.com/rusqlite/rusqlite
 - https://github.com/awslabs/aws-sdk-rust/tree/main/sdk/s3
+- https://github.com/aembke/fred.rs
+- https://github.com/lettre/lettre
 
 ## Store
 
 - https://www.sqlite.org/index.html
 - https://github.com/amacneil/dbmate
 - https://github.com/sqlfluff/sqlfluff
-- https://www.tigrisdata.com/
-- https://redis.io/
+- https://en.wikipedia.org/wiki/Amazon_S3#S3_API_and_competing_services
+- https://valkey.io/
 
-## Hosting
+## Communication
 
-- https://fly.io/
-- https://ns1.com/
-- https://uptimerobot.com/
-- https://www.mailersend.com/
-- https://www.hcaptcha.com/
-- https://www.zoho.com/mail/
+- https://en.wikipedia.org/wiki/Simple_Mail_Transfer_Protocol
+
+## Dev infra
+
+- https://www.haproxy.org/
+- https://min.io/
+- https://github.com/staktrace/maildir
+- https://www.thunderbird.net/

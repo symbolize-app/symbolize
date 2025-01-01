@@ -67,14 +67,6 @@ Each stream has its own internal queue and own high water mark. Once the queue r
 
 Socket receive and send buffer sizes are [tunable](https://man7.org/linux/man-pages/man2/setsockopt.2.html) per socket.
 
-## Fly
-
-Fly [load balancing](https://fly.io/docs/reference/load-balancing/) and [autoscaling](https://fly.io/docs/apps/autostart-stop/) purely uses ["concurrency" configuration](https://fly.io/docs/reference/configuration/#services-concurrency). You can choose if TCP connection concurrency is measured or HTTP request concurrency is measured. Then you can set a soft limit (triggers load shift or scale up) and a hard limit (queues traffic).
-
-It sounds like request-based concurrency [triggers connection pooling](https://community.fly.io/t/what-does-type-connections-mean-for-setting-hard-limit-value/8844/2), so that should be a good option for long-lived HTTP/2 request streams.
-
-On the other hand, a good HTTP/2 stack may get [better performance](https://fly.io/docs/networking/services/#http) when configured as TCP pass-through.
-
 ## Buffer tuning
 
 - Start with small/reasonable size queues

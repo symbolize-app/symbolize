@@ -6,7 +6,7 @@ A single instance will be the write leader for all DB shards. All write requests
 
 If the leader becomes unreachable, a new leader will need to be selected. Any instance can take the write leader lease if the previous leader's lease has expired. An leader will continuously renew its lease while active.
 
-This will be done with Lua scripts and an expiring key in Redis.
+This will be done with Lua scripts and an expiring key in Valkey.
 
 If a leader ever finds that that its lease expires (local timer) or its lease renewal fails (external transaction), it should cancel all active and pending requests and then exit to avoid data corruption.
 
@@ -52,6 +52,6 @@ If synchronous follower writes are causing too much overhead, asynchronous, indi
 
 There may be a way to force a refresh of the WAL-index (shared memory) file for incorporating remote changes. This could involve safely updating the file while respecting locks, or triggering an internal reconciliation process.
 
-## Alternatives to Redis-based lease
+## Alternatives to Valkey-based lease
 
-Instead of Redis, it would be fine to use etcd or Fly.io's built in Consul cluster. Or even embedding Raft consensus into the app. But for now, Redis is the simplest solution.
+Instead of Valkey, it would be fine to use etcd. Or even embedding Raft consensus into the app. But for now, Valkey is the simplest solution.
