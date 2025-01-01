@@ -1,7 +1,7 @@
 import type * as markupData from '@/data.ts'
 import type * as markupElementAttrTest from '@/elementAttr.test-d.ts'
 import type * as markupElementAttr from '@/elementAttr.ts'
-import type * as compute from '@symbolize/lib-compute'
+import type * as dataflow from '@symbolize/lib-dataflow'
 
 export type TestAttrs<
   CustomContext,
@@ -53,7 +53,7 @@ type TestWritableAttrs<BaseElement extends Element> = {
     never
   : Key]: Key extends keyof markupElementAttrTest.OverrideMap ?
     markupElementAttrTest.OverrideMap[Key]
-  : compute.NodeOpt<
+  : dataflow.NodeOpt<
       BaseElement[Key] extends boolean ? boolean
       : BaseElement[Key] extends SVGAnimatedLength ?
         markupData.SvgLengthPctOpt | null

@@ -1,7 +1,7 @@
 import type * as markupContext from '@/context.ts'
 import type * as markupData from '@/data.ts'
 import type * as markupFragment from '@/fragment.ts'
-import type * as compute from '@symbolize/lib-compute'
+import type * as dataflow from '@symbolize/lib-dataflow'
 import type * as styling from '@symbolize/lib-styling'
 
 export type Listener<SpecificEvent> = (
@@ -159,7 +159,7 @@ export type Attrs<CustomContext, BaseElement extends Element> = PickAttrs<
 > & {
   readonly content?: markupFragment.FragmentOpt<CustomContext>
   readonly onAdd?: Listener<OnAddEvent<BaseElement>>
-  readonly style?: compute.NodeOpt<styling.AtomOpt>
+  readonly style?: dataflow.NodeOpt<styling.AtomOpt>
 }
 
 export interface OnAddEvent<BaseElement extends Element> {
@@ -192,7 +192,7 @@ export enum ElementAttrKind {
 interface BooleanAttrDefinition<Type> {
   readonly kind: ElementAttrKind.boolean
   readonly name: string
-  readonly type?: compute.NodeOpt<Type>
+  readonly type?: dataflow.NodeOpt<Type>
 }
 
 function booleanAttr<Type = boolean>(
@@ -232,7 +232,7 @@ function onAddAttr(): OnAddAttrDefinition {
 interface StringAttrDefinition<Type> {
   readonly kind: ElementAttrKind.string
   readonly name: string
-  readonly type?: compute.NodeOpt<Type | null>
+  readonly type?: dataflow.NodeOpt<Type | null>
 }
 
 function stringAttr<Type = string>(

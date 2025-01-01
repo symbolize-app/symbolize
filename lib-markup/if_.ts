@@ -2,17 +2,17 @@ import type * as markupContext from '@/context.ts'
 import * as markupElement from '@/element.ts'
 import * as markupFragment from '@/fragment.ts'
 import * as markupMarker from '@/marker.ts'
-import * as compute from '@symbolize/lib-compute'
+import * as dataflow from '@symbolize/lib-dataflow'
 import type * as styling from '@symbolize/lib-styling'
 
 type Falsy = '' | 0 | 0n | false | null | undefined
 
 export function if_<CustomContext, Value>(
   ifBranch: (
-    value: compute.Computation<Exclude<Value, Falsy>>,
+    value: dataflow.Computation<Exclude<Value, Falsy>>,
   ) => markupFragment.FragmentOpt<CustomContext>,
   elseBranch: () => markupFragment.FragmentOpt<CustomContext>,
-  condition: compute.NodeOpt<Value>,
+  condition: dataflow.NodeOpt<Value>,
 ): markupFragment.Fragment<CustomContext> {
   return new If_(ifBranch, elseBranch, condition)
 }
@@ -26,19 +26,19 @@ class If_<Value, CustomContext = unknown>
     null
   private mutableInnerNodes: readonly Node[] | null = null
   private mutableStartComment: Comment | null = null
-  private mutableSub: compute.Computation<void> | null = null
+  private mutableSub: dataflow.Computation<void> | null = null
 
   constructor(
     private readonly ifBranch: (
-      value: compute.Computation<Exclude<Value, Falsy>>,
+      value: dataflow.Computation<Exclude<Value, Falsy>>,
     ) => markupFragment.FragmentOpt<CustomContext>,
     private readonly elseBranch: () => markupFragment.FragmentOpt<CustomContext>,
-    private readonly condition: compute.NodeOpt<Value>,
+    private readonly condition: dataflow.NodeOpt<Value>,
   ) {}
 
   async add(
-    ctx: compute.Context &
-      CustomContext &
+    ctx: CustomContext &
+      dataflow.Context &
       markupContext.Context &
       styling.Context,
   ): Promise<void> {
@@ -47,13 +47,13 @@ class If_<Value, CustomContext = unknown>
 
     let ifResult:
       | [
-          compute.Mutation<Exclude<Value, Falsy>>,
+          dataflow.Mutation<Exclude<Value, Falsy>>,
           markupFragment.Fragment<CustomContext>,
         ]
       | null = null
     let elseFragment: markupFragment.Fragment<CustomContext> | null = null
 
-    this.mutableSub = await compute.effect(async (value) => {
+    this.mutableSub = await dataflow.effect(async (value) => {
       if (value) {
         const truthyValue = value as Exclude<Value, Falsy>
         if (elseFragment) {
@@ -61,7 +61,7 @@ class If_<Value, CustomContext = unknown>
           elseFragment = null
         }
         if (!ifResult) {
-          const ifState = compute.state(truthyValue)
+          const ifState = dataflow.state(truthyValue)
           const ifFragment = markupFragment.toFragment(
             this.ifBranch(ifState),
           )
@@ -81,8 +81,8 @@ class If_<Value, CustomContext = unknown>
           this.mutableFragment = ifFragment
         } else {
           const [ifState] = ifResult
-          await compute.txn(ctx, async () => {
-            await compute.set(ctx, ifState, truthyValue)
+          await dataflow.txn(ctx, async () => {
+            await dataflow.set(ctx, ifState, truthyValue)
           })
         }
       } else {
@@ -132,7 +132,7 @@ class If_<Value, CustomContext = unknown>
     }
 
     if (this.mutableSub) {
-      compute.unsubscribe(this.mutableSub)
+      dataflow.unsubscribe(this.mutableSub)
       this.mutableSub = null
     }
 

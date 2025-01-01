@@ -2,7 +2,7 @@ import type * as markupContext from '@/context.ts'
 import * as markupElementAttr from '@/elementAttr.ts'
 import * as markupFragment from '@/fragment.ts'
 import * as markupMarker from '@/marker.ts'
-import * as compute from '@symbolize/lib-compute'
+import * as dataflow from '@symbolize/lib-dataflow'
 import * as styling from '@symbolize/lib-styling'
 
 export function replaceBetween(
@@ -66,7 +66,7 @@ class MutableElementFragment<CustomContext = unknown>
   readonly [markupMarker.fragmentMarker]: null = null
   private readonly mutableDeferred: (() => Promise<void> | void)[] = []
   private mutableElement: SupportedElement | null = null
-  private readonly mutableSubs: compute.Computation<unknown>[] = []
+  private readonly mutableSubs: dataflow.Computation<unknown>[] = []
 
   constructor(
     private readonly create: (
@@ -77,8 +77,8 @@ class MutableElementFragment<CustomContext = unknown>
   ) {}
 
   async add(
-    ctx: compute.Context &
-      CustomContext &
+    ctx: CustomContext &
+      dataflow.Context &
       markupContext.Context &
       styling.Context,
   ): Promise<void> {
@@ -154,18 +154,18 @@ class MutableElementFragment<CustomContext = unknown>
       await callback()
     }
     for (const sub of this.mutableSubs) {
-      compute.unsubscribe(sub)
+      dataflow.unsubscribe(sub)
     }
 
     this.mutableElement = null
   }
 
-  subscribe(sub: compute.Computation<unknown>): void {
+  subscribe(sub: dataflow.Computation<unknown>): void {
     this.mutableSubs.push(sub)
   }
 
   private addEventListener(
-    ctx: compute.Context & CustomContext & markupContext.Context,
+    ctx: CustomContext & dataflow.Context & markupContext.Context,
     type: string,
     listener: (event: Readonly<Event>) => Promise<void> | void,
   ): void {
@@ -175,7 +175,7 @@ class MutableElementFragment<CustomContext = unknown>
     const elementListener = (event: Readonly<Event>): void => {
       void (async () => {
         return ctx.markup.scheduler.run(async () => {
-          return compute.txn(ctx, async () => {
+          return dataflow.txn(ctx, async () => {
             return listener(event)
           })
         })
@@ -190,8 +190,8 @@ class MutableElementFragment<CustomContext = unknown>
   }
 
   private async appendFragment(
-    ctx: compute.Context &
-      CustomContext &
+    ctx: CustomContext &
+      dataflow.Context &
       markupContext.Context &
       styling.Context,
     fragment: markupFragment.FragmentOpt<CustomContext>,
@@ -221,7 +221,7 @@ class MutableElementFragment<CustomContext = unknown>
       | markupElementAttr.ElementAttrKind.boolean
       | markupElementAttr.ElementAttrKind.string,
     name: string,
-    value: compute.NodeOpt<unknown>,
+    value: dataflow.NodeOpt<unknown>,
   ): Promise<void> {
     if (this.mutableElement && this.mode === ElementFragmentMode.portal) {
       const initialValue = this.mutableElement.getAttribute(name)
@@ -234,7 +234,7 @@ class MutableElementFragment<CustomContext = unknown>
       })
     }
     this.subscribe(
-      await compute.effect((value) => {
+      await dataflow.effect((value) => {
         if (!this.mutableElement) {
           return
         }
@@ -260,11 +260,11 @@ class MutableElementFragment<CustomContext = unknown>
   }
 
   private async bindStyle(
-    ctx: compute.Context &
-      CustomContext &
+    ctx: CustomContext &
+      dataflow.Context &
       markupContext.Context &
       styling.Context,
-    value: compute.NodeOpt<styling.AtomOpt>,
+    value: dataflow.NodeOpt<styling.AtomOpt>,
   ): Promise<void> {
     let oldClassNames: readonly string[] = []
     if (this.mode === ElementFragmentMode.portal) {
@@ -273,7 +273,7 @@ class MutableElementFragment<CustomContext = unknown>
       })
     }
     this.subscribe(
-      await compute.effect((value) => {
+      await dataflow.effect((value) => {
         if (!this.mutableElement) {
           return
         }

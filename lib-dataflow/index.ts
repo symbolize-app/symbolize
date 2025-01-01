@@ -1,8 +1,8 @@
 export interface Context {
-  readonly compute: Compute
+  readonly dataflow: Dataflow
 }
 
-export interface Compute {
+export interface Dataflow {
   readonly inProgressEpoch: Epoch | null
 
   beginTransaction(): void
@@ -14,7 +14,7 @@ export interface Compute {
   setState(mutableNodeImpl: CommitImpl<unknown>, newValue: unknown): void
 }
 
-class ComputeImpl implements Compute {
+class DataflowImpl implements Dataflow {
   private mutableEpoch: Epoch = new Epoch(0)
   private readonly mutableTransactions: [
     commitImpl: CommitImpl<unknown>,
@@ -76,8 +76,8 @@ class ComputeImpl implements Compute {
   }
 }
 
-export function compute(): Compute {
-  return new ComputeImpl()
+export function dataflow(): Dataflow {
+  return new DataflowImpl()
 }
 
 class Epoch {
@@ -302,13 +302,13 @@ export async function txn<T>(
 ): Promise<T> {
   let result: T
   try {
-    ctx.compute.beginTransaction()
+    ctx.dataflow.beginTransaction()
     result = await callback()
   } catch (error) {
-    ctx.compute.rollbackTransaction()
+    ctx.dataflow.rollbackTransaction()
     throw error
   }
-  await ctx.compute.commitTransaction()
+  await ctx.dataflow.commitTransaction()
   return result
 }
 
@@ -394,7 +394,7 @@ class StateImpl<Value> implements CommitImpl<Value> {
 
   // eslint-disable-next-line @typescript-eslint/require-await -- override
   async set(ctx: Context, newValue: Value): Promise<void> {
-    ctx.compute.setState(this, newValue)
+    ctx.dataflow.setState(this, newValue)
   }
 
   async update(newEpoch: Epoch): Promise<Value> {
@@ -522,7 +522,7 @@ class DerivedImpl<Value> implements ComputationImpl<Value> {
   }
 
   async set(ctx: Context, newValue: Value): Promise<void> {
-    const epoch = ctx.compute.inProgressEpoch
+    const epoch = ctx.dataflow.inProgressEpoch
     const computationValues =
       epoch ?
         await Promise.all(

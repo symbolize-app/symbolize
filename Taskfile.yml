@@ -33,10 +33,10 @@ includes:
     taskfile: dev-task/font.yml
   lib-collection:
     taskfile: lib-collection
-  lib-compute:
-    taskfile: lib-compute
   lib-concurrency:
     taskfile: lib-concurrency
+  lib-dataflow:
+    taskfile: lib-dataflow
   lib-error:
     taskfile: lib-error
   lib-hex-rs:
@@ -212,8 +212,8 @@ tasks:
       - dev-tsconfig:link-build-dir
       - dev-eslint:link-build-dir
       - lib-collection:link-build-dir
-      - lib-compute:link-build-dir
       - lib-concurrency:link-build-dir
+      - lib-dataflow:link-build-dir
       - lib-error:link-build-dir
       - lib-hex-ts:link-build-dir
       - lib-markup:link-build-dir

@@ -1,4 +1,4 @@
-import * as compute from '@symbolize/lib-compute'
+import * as dataflow from '@symbolize/lib-dataflow'
 import * as markup from '@symbolize/lib-markup'
 import type * as random from '@symbolize/lib-random'
 import type * as stream from '@symbolize/lib-stream'
@@ -90,11 +90,11 @@ const bodyStyle = markup.defineCustom((ctx) => {
 const custom = markup.defineCustom<
   unknown,
   {
-    readonly title: compute.NodeOpt<string>
+    readonly title: dataflow.NodeOpt<string>
   }
 >((ctx, attrs) => {
   const head = ctx.markup.document.head
-  const countState = compute.state(0)
+  const countState = dataflow.state(0)
   const extra = styling.container.build()
 
   return [
@@ -178,7 +178,7 @@ const custom = markup.defineCustom<
       ],
     }),
     markup.html.div({
-      style: compute.map(
+      style: dataflow.map(
         (count) => [
           count % 2 ?
             styling.background.color(
@@ -211,11 +211,11 @@ const custom = markup.defineCustom<
         countState,
       ),
 
-      onClick: compute.handler(async (_event, count) => {
-        await compute.set(ctx, countState, count + 1)
+      onClick: dataflow.handler(async (_event, count) => {
+        await dataflow.set(ctx, countState, count + 1)
       }, countState),
 
-      content: compute.map(
+      content: dataflow.map(
         (title, count) => `${title} / ${count}`,
         attrs.title,
         countState,
@@ -332,7 +332,7 @@ const custom = markup.defineCustom<
 })
 
 export async function main(
-  ctx: compute.Context &
+  ctx: dataflow.Context &
     markup.Context &
     random.Context &
     stream.WorkerClientContext &

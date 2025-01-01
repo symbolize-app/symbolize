@@ -14,7 +14,7 @@
   "extends": "@symbolize/dev-tsconfig/tsconfig.json",
   "include": ["./**/*.ts", "./**/*.js", "./**/*.cjs"],
   "references": [
-    { "path": "../lib-compute" },
+    { "path": "../lib-dataflow" },
     { "path": "../lib-styling" },
     { "path": "../lib-test" }
   ]

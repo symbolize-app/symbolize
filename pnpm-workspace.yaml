@@ -7,8 +7,8 @@ packages:
   - dev-prettier
   - dev-tsconfig
   - lib-collection
-  - lib-compute
   - lib-concurrency
+  - lib-dataflow
   - lib-error
   - lib-hex-ts
   - lib-markup

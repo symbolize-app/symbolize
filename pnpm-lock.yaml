@@ -35,12 +35,12 @@ importers:
       '@symbolize/lib-collection':
         specifier: workspace:*
         version: link:lib-collection
-      '@symbolize/lib-compute':
-        specifier: workspace:*
-        version: link:lib-compute
       '@symbolize/lib-concurrency':
         specifier: workspace:*
         version: link:lib-concurrency
+      '@symbolize/lib-dataflow':
+        specifier: workspace:*
+        version: link:lib-dataflow
       '@symbolize/lib-error':
         specifier: workspace:*
         version: link:lib-error
@@ -235,9 +235,9 @@ importers:
       '@symbolize/lib-collection':
         specifier: workspace:*
         version: link:../lib-collection
-      '@symbolize/lib-compute':
+      '@symbolize/lib-dataflow':
         specifier: workspace:*
-        version: link:../lib-compute
+        version: link:../lib-dataflow
       '@symbolize/lib-error':
         specifier: workspace:*
         version: link:../lib-error
@@ -296,7 +296,7 @@ importers:
         specifier: 5.4.5
         version: 5.4.5
 
-  lib-compute:
+  lib-concurrency:
     dependencies:
       '@symbolize/dev-prettier':
         specifier: workspace:*
@@ -312,7 +312,7 @@ importers:
         specifier: 5.4.5
         version: 5.4.5
 
-  lib-concurrency:
+  lib-dataflow:
     dependencies:
       '@symbolize/dev-prettier':
         specifier: workspace:*
@@ -374,9 +374,9 @@ importers:
       '@symbolize/dev-tsconfig':
         specifier: workspace:*
         version: link:../dev-tsconfig
-      '@symbolize/lib-compute':
+      '@symbolize/lib-dataflow':
         specifier: workspace:*
-        version: link:../lib-compute
+        version: link:../lib-dataflow
       '@symbolize/lib-styling':
         specifier: workspace:*
         version: link:../lib-styling
@@ -575,9 +575,9 @@ importers:
       '@symbolize/dev-tsconfig':
         specifier: workspace:*
         version: link:../dev-tsconfig
-      '@symbolize/lib-compute':
+      '@symbolize/lib-dataflow':
         specifier: workspace:*
-        version: link:../lib-compute
+        version: link:../lib-dataflow
       '@symbolize/lib-error':
         specifier: workspace:*
         version: link:../lib-error
@@ -618,9 +618,9 @@ importers:
       '@symbolize/lib-collection':
         specifier: workspace:*
         version: link:../lib-collection
-      '@symbolize/lib-compute':
+      '@symbolize/lib-dataflow':
         specifier: workspace:*
-        version: link:../lib-compute
+        version: link:../lib-dataflow
       '@symbolize/lib-hex':
         specifier: workspace:*
         version: link:../lib-hex-ts

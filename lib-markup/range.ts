@@ -1,7 +1,7 @@
 import type * as markupContext from '@/context.ts'
 import * as markupFragment from '@/fragment.ts'
 import * as markupMarker from '@/marker.ts'
-import type * as compute from '@symbolize/lib-compute'
+import type * as dataflow from '@symbolize/lib-dataflow'
 import type * as styling from '@symbolize/lib-styling'
 
 export function range<CustomContext = unknown>(attrs: {
@@ -23,8 +23,8 @@ class Range<CustomContext = unknown>
   ) {}
 
   async add(
-    ctx: compute.Context &
-      CustomContext &
+    ctx: CustomContext &
+      dataflow.Context &
       markupContext.Context &
       styling.Context,
   ): Promise<void> {

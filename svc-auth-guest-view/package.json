@@ -6,7 +6,7 @@
   "dependencies": {
     "@symbolize/dev-prettier": "workspace:*",
     "@symbolize/dev-tsconfig": "workspace:*",
-    "@symbolize/lib-compute": "workspace:*",
+    "@symbolize/lib-dataflow": "workspace:*",
     "@symbolize/lib-error": "workspace:*",
     "@symbolize/lib-hex": "workspace:*",
     "@symbolize/lib-markup": "workspace:*",

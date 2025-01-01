@@ -2,7 +2,7 @@ import * as markupElementAttr from '@/elementAttr.ts'
 import type * as markupHtmlAttr from '@/htmlAttr.ts'
 import type * as markupMathAttr from '@/mathAttr.ts'
 import type * as markupSvgAttr from '@/svgAttr.ts'
-import type * as compute from '@symbolize/lib-compute'
+import type * as dataflow from '@symbolize/lib-dataflow'
 import * as styling from '@symbolize/lib-styling'
 
 type Attr = {
@@ -12,7 +12,7 @@ type Attr = {
   ) ?
     Key
   : never]?: markupElementAttr.AllAttrs[Key]['type'] extends (
-    compute.NodeOpt<infer T>
+    dataflow.NodeOpt<infer T>
   ) ?
     T
   : never

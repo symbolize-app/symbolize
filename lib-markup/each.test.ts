@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import * as markup from '@/index.ts'
 import * as markupTest from '@/test.ts'
-import * as compute from '@symbolize/lib-compute'
+import * as dataflow from '@symbolize/lib-dataflow'
 import type * as styling from '@symbolize/lib-styling'
 import * as test from '@symbolize/lib-test'
 
@@ -9,7 +9,7 @@ export const url = import.meta.url
 
 export const tests = {
   async ['items pure'](
-    ctx: compute.Context & markup.Context & styling.Context,
+    ctx: dataflow.Context & markup.Context & styling.Context,
   ): Promise<void> {
     const fragment = markup.each(
       (x) => markup.html.div({ content: x }),
@@ -21,9 +21,9 @@ export const tests = {
   },
 
   async ['items inner state'](
-    ctx: compute.Context & markup.Context & styling.Context,
+    ctx: dataflow.Context & markup.Context & styling.Context,
   ): Promise<void> {
-    const items = compute.state([
+    const items = dataflow.state([
       { id: 0, name: 'a' },
       { id: 1, name: 'b' },
       { id: 2, name: 'c' },
@@ -36,10 +36,10 @@ export const tests = {
     const custom = markup.defineCustom<
       unknown,
       {
-        readonly name: compute.NodeOpt<string>
+        readonly name: dataflow.NodeOpt<string>
       }
     >(async (_ctx, attrs) => {
-      init(await compute.value(attrs.name))
+      init(await dataflow.value(attrs.name))
       return markup.html.div({ content: attrs.name })
     })
     const fragment = markup.each(
@@ -51,12 +51,12 @@ export const tests = {
     test.assertEquals(body.textContent, 'abc')
     test.assertDeepEquals(initHistory, [['a'], ['b'], ['c']])
 
-    await compute.txn(ctx, async () => {
-      await compute.set(ctx, items, [
+    await dataflow.txn(ctx, async () => {
+      await dataflow.set(ctx, items, [
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- simple test
-        (await compute.value(items[0]))!,
+        (await dataflow.value(items[0]))!,
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- simple test
-        (await compute.value(items[1]))!,
+        (await dataflow.value(items[1]))!,
         { id: 2, name: 'd' },
       ])
     })
@@ -65,9 +65,9 @@ export const tests = {
   },
 
   async ['items move'](
-    ctx: compute.Context & markup.Context & styling.Context,
+    ctx: dataflow.Context & markup.Context & styling.Context,
   ): Promise<void> {
-    const items = compute.state([
+    const items = dataflow.state([
       { id: 0, name: 'a' },
       { id: 1, name: 'b' },
       { id: 2, name: 'c' },
@@ -80,10 +80,10 @@ export const tests = {
     const custom = markup.defineCustom<
       unknown,
       {
-        readonly name: compute.NodeOpt<string>
+        readonly name: dataflow.NodeOpt<string>
       }
     >(async (_ctx, attrs) => {
-      init(await compute.value(attrs.name))
+      init(await dataflow.value(attrs.name))
       return markup.html.div({ content: attrs.name })
     })
     const fragment = markup.each(
@@ -95,14 +95,14 @@ export const tests = {
     test.assertEquals(body.textContent, 'abc')
     test.assertDeepEquals(initHistory, [['a'], ['b'], ['c']])
 
-    await compute.txn(ctx, async () => {
-      await compute.set(ctx, items, [
+    await dataflow.txn(ctx, async () => {
+      await dataflow.set(ctx, items, [
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- simple test
-        (await compute.value(items[2]))!,
+        (await dataflow.value(items[2]))!,
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- simple test
-        (await compute.value(items[0]))!,
+        (await dataflow.value(items[0]))!,
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- simple test
-        (await compute.value(items[1]))!,
+        (await dataflow.value(items[1]))!,
       ])
     })
     test.assertEquals(body.textContent, 'cab')
@@ -110,9 +110,9 @@ export const tests = {
   },
 
   async ['items remove'](
-    ctx: compute.Context & markup.Context & styling.Context,
+    ctx: dataflow.Context & markup.Context & styling.Context,
   ): Promise<void> {
-    const items = compute.state([
+    const items = dataflow.state([
       { id: 0, name: 'a' },
       { id: 1, name: 'b' },
       { id: 2, name: 'c' },
@@ -125,10 +125,10 @@ export const tests = {
     const custom = markup.defineCustom<
       unknown,
       {
-        readonly name: compute.NodeOpt<string>
+        readonly name: dataflow.NodeOpt<string>
       }
     >(async (_ctx, attrs) => {
-      init(await compute.value(attrs.name))
+      init(await dataflow.value(attrs.name))
       return markup.html.div({ content: attrs.name })
     })
     const fragment = markup.each(
@@ -140,12 +140,12 @@ export const tests = {
     test.assertEquals(body.textContent, 'abc')
     test.assertDeepEquals(initHistory, [['a'], ['b'], ['c']])
 
-    await compute.txn(ctx, async () => {
-      await compute.set(ctx, items, [
+    await dataflow.txn(ctx, async () => {
+      await dataflow.set(ctx, items, [
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- simple test
-        (await compute.value(items[0]))!,
+        (await dataflow.value(items[0]))!,
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- simple test
-        (await compute.value(items[2]))!,
+        (await dataflow.value(items[2]))!,
       ])
     })
     test.assertEquals(body.textContent, 'ac')
@@ -153,9 +153,9 @@ export const tests = {
   },
 
   async ['items add'](
-    ctx: compute.Context & markup.Context & styling.Context,
+    ctx: dataflow.Context & markup.Context & styling.Context,
   ): Promise<void> {
-    const items = compute.state([
+    const items = dataflow.state([
       { id: 0, name: 'a' },
       { id: 1, name: 'b' },
       { id: 2, name: 'c' },
@@ -168,10 +168,10 @@ export const tests = {
     const custom = markup.defineCustom<
       unknown,
       {
-        readonly name: compute.NodeOpt<string>
+        readonly name: dataflow.NodeOpt<string>
       }
     >(async (_ctx, attrs) => {
-      init(await compute.value(attrs.name))
+      init(await dataflow.value(attrs.name))
       return markup.html.div({ content: attrs.name })
     })
     const fragment = markup.each(
@@ -183,30 +183,30 @@ export const tests = {
     test.assertEquals(body.textContent, 'abc')
     test.assertDeepEquals(initHistory, [['a'], ['b'], ['c']])
 
-    await compute.txn(ctx, async () => {
-      await compute.set(ctx, items, [
+    await dataflow.txn(ctx, async () => {
+      await dataflow.set(ctx, items, [
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- simple test
-        (await compute.value(items[0]))!,
+        (await dataflow.value(items[0]))!,
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- simple test
-        (await compute.value(items[1]))!,
+        (await dataflow.value(items[1]))!,
         { id: 3, name: 'd' },
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- simple test
-        (await compute.value(items[2]))!,
+        (await dataflow.value(items[2]))!,
       ])
     })
     test.assertEquals(body.textContent, 'abdc')
     test.assertDeepEquals(initHistory, [['a'], ['b'], ['c'], ['d']])
 
     await fragment.remove()
-    await compute.txn(ctx, async () => {
-      await compute.set(ctx, items, [
+    await dataflow.txn(ctx, async () => {
+      await dataflow.set(ctx, items, [
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- simple test
-        (await compute.value(items[0]))!,
+        (await dataflow.value(items[0]))!,
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- simple test
-        (await compute.value(items[1]))!,
+        (await dataflow.value(items[1]))!,
         { id: 4, name: 'e' },
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- simple test
-        (await compute.value(items[2]))!,
+        (await dataflow.value(items[2]))!,
       ])
     })
     test.assertEquals(body.textContent, 'abdc')

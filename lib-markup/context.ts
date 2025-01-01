@@ -1,5 +1,5 @@
 import type * as markupScheduler from '@/scheduler.ts'
-import * as compute from '@symbolize/lib-compute'
+import * as dataflow from '@symbolize/lib-dataflow'
 
 export interface Context {
   readonly markup: Markup
@@ -45,19 +45,19 @@ export interface ScopedContext extends Context {
 
 export interface ScopedConvey {
   defer(callback: () => Promise<void> | void): void
-  subscribe(sub: compute.Computation<unknown>): void
+  subscribe(sub: dataflow.Computation<unknown>): void
 }
 
 export async function scopedEffect<
-  Args extends compute.NodeValueTuple<NodeOptArgs>,
-  NodeOptArgs extends compute.NodeOpt<unknown>[],
+  Args extends dataflow.NodeValueTuple<NodeOptArgs>,
+  NodeOptArgs extends dataflow.NodeOpt<unknown>[],
 >(
   ctx: ScopedContext,
   callback: (...args: Args) => Promise<void> | void,
   ...computations: NodeOptArgs
 ): Promise<void> {
   ctx.scopedConvey.subscribe(
-    await compute.effect(callback, ...(computations as never)),
+    await dataflow.effect(callback, ...(computations as never)),
   )
 }
 

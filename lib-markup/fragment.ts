@@ -3,14 +3,14 @@ import * as markupEmpty from '@/empty.ts'
 import * as markupMarker from '@/marker.ts'
 import * as markupRange from '@/range.ts'
 import * as markupText from '@/text.ts'
-import type * as compute from '@symbolize/lib-compute'
+import type * as dataflow from '@symbolize/lib-dataflow'
 import type * as styling from '@symbolize/lib-styling'
 
 export interface Fragment<CustomContext = unknown> {
   readonly [markupMarker.fragmentMarker]: null
   add(
-    ctx: compute.Context &
-      CustomContext &
+    ctx: CustomContext &
+      dataflow.Context &
       markupContext.Context &
       styling.Context,
   ): Promise<void>
@@ -19,7 +19,7 @@ export interface Fragment<CustomContext = unknown> {
 }
 
 export type FragmentOpt<CustomContext = unknown> =
-  | compute.NodeOpt<string>
+  | dataflow.NodeOpt<string>
   | Fragment<CustomContext>
   | readonly FragmentOpt<CustomContext>[]
   | null
