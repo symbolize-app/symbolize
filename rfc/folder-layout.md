@@ -55,7 +55,7 @@ Folders per service:
 ## Libraries
 
 - lib-content (schema, review, scheduling, blocks)
-- lib-convey
+- lib-markup
 - lib-http-rs
 - lib-http-ts
 - lib-store-rs

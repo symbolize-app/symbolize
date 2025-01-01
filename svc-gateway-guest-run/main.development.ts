@@ -1,6 +1,6 @@
 import * as compute from '@symbolize/lib-compute'
 import * as contrast from '@symbolize/lib-contrast'
-import * as conveyTestBrowser from '@symbolize/lib-convey/test.browser.ts'
+import * as markupTestBrowser from '@symbolize/lib-markup/test.browser.ts'
 import * as randomTest from '@symbolize/lib-random/test.ts'
 import * as streamTest from '@symbolize/lib-stream/test.ts'
 import * as testRunner from '@symbolize/lib-test-runner'
@@ -15,12 +15,12 @@ export async function main(ctx: time.Context): Promise<void> {
     contrast() {
       return contrast.contrast()
     },
-    convey(defer) {
-      const convey = conveyTestBrowser.convey()
+    markup(defer) {
+      const markup = markupTestBrowser.markup()
       defer(() => {
-        convey.dispose()
+        markup.dispose()
       })
-      return convey
+      return markup
     },
     random() {
       return randomTest.random()
