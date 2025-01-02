@@ -1,4 +1,4 @@
-import * as compute from '@symbolize/lib-compute'
+import * as dataflow from '@symbolize/lib-dataflow'
 import * as markupTestBrowser from '@symbolize/lib-markup/test.browser.ts'
 import * as randomTest from '@symbolize/lib-random/test.ts'
 import * as streamTest from '@symbolize/lib-stream/test.ts'
@@ -9,8 +9,8 @@ import * as timeTest from '@symbolize/lib-time/test.ts'
 
 export async function main(ctx: time.Context): Promise<void> {
   await testRunner.runAll(ctx, [import('@symbolize/dev-pnpm-test')], {
-    compute() {
-      return compute.compute()
+    dataflow() {
+      return dataflow.dataflow()
     },
     markup(defer) {
       const markup = markupTestBrowser.markup()

@@ -1,5 +1,5 @@
 import * as svcReload from '@/reload.ts'
-import * as compute from '@symbolize/lib-compute'
+import * as dataflow from '@symbolize/lib-dataflow'
 import type * as markup from '@symbolize/lib-markup'
 import * as markupBrowser from '@symbolize/lib-markup/index.browser.ts'
 import * as random from '@symbolize/lib-random'
@@ -16,13 +16,13 @@ function main(): void {
     { type: 'module' },
   )
 
-  const mainCtx: compute.Context &
+  const mainCtx: dataflow.Context &
     markup.Context &
     random.Context &
     stream.WorkerClientContext &
     styling.Context &
     time.Context = {
-    compute: compute.compute(),
+    dataflow: dataflow.dataflow(),
     markup: markupBrowser.markup(),
     random: random.random(),
     streamClient: stream.workerClient(worker),

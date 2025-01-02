@@ -1,5 +1,5 @@
 #!/usr/bin/env node-loader
-import * as compute from '@symbolize/lib-compute'
+import * as dataflow from '@symbolize/lib-dataflow'
 import * as markupNode from '@symbolize/lib-markup/index.node.ts'
 import * as randomTest from '@symbolize/lib-random/test.ts'
 import * as streamTest from '@symbolize/lib-stream/test.ts'
@@ -15,8 +15,8 @@ export async function run(baseContext: time.Context): Promise<boolean> {
     ...baseContext,
   }
   return testRunner.runAll(ctx, [import('@/index.ts')], {
-    compute() {
-      return compute.compute()
+    dataflow() {
+      return dataflow.dataflow()
     },
     markup(defer) {
       const markup = markupNode.markup()

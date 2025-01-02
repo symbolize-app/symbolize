@@ -1,6 +1,6 @@
 import * as markup from '@/index.ts'
 import * as markupTest from '@/test.ts'
-import type * as compute from '@symbolize/lib-compute'
+import type * as dataflow from '@symbolize/lib-dataflow'
 import * as styling from '@symbolize/lib-styling'
 import * as test from '@symbolize/lib-test'
 
@@ -8,7 +8,7 @@ export const url = import.meta.url
 
 export const tests = {
   async ['math pure'](
-    ctx: compute.Context & markup.Context & styling.Context,
+    ctx: dataflow.Context & markup.Context & styling.Context,
   ): Promise<void> {
     const fragment = markup.math.math({
       ariaDisabled: true,
@@ -24,7 +24,7 @@ export const tests = {
   },
 
   async ['mi pure'](
-    ctx: compute.Context & markup.Context & styling.Context,
+    ctx: dataflow.Context & markup.Context & styling.Context,
   ): Promise<void> {
     const fragment = markup.math.math({
       content: markup.math.mi({
@@ -41,7 +41,7 @@ export const tests = {
   },
 
   async ['mo pure'](
-    ctx: compute.Context & markup.Context & styling.Context,
+    ctx: dataflow.Context & markup.Context & styling.Context,
   ): Promise<void> {
     const fragment = markup.math.math({
       content: markup.math.mo({

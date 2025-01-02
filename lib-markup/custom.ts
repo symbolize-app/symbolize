@@ -1,7 +1,7 @@
 import type * as markupContext from '@/context.ts'
 import * as markupFragment from '@/fragment.ts'
 import * as markupMarker from '@/marker.ts'
-import * as compute from '@symbolize/lib-compute'
+import * as dataflow from '@symbolize/lib-dataflow'
 import type * as styling from '@symbolize/lib-styling'
 
 export function defineCustom<
@@ -9,7 +9,7 @@ export function defineCustom<
   Attrs extends object = Record<PropertyKey, never>,
 >(
   build: (
-    ctx: compute.Context & CustomContext & markupContext.ScopedContext,
+    ctx: CustomContext & dataflow.Context & markupContext.ScopedContext,
     attrs: Attrs,
   ) =>
     | markupFragment.FragmentOpt<CustomContext>
@@ -32,11 +32,11 @@ class Custom<
   private readonly mutableDeferred: (() => Promise<void> | void)[] = []
   private mutableFragment: markupFragment.Fragment<CustomContext> | null =
     null
-  private readonly mutableSubs: compute.Computation<unknown>[] = []
+  private readonly mutableSubs: dataflow.Computation<unknown>[] = []
 
   constructor(
     private readonly build: (
-      ctx: compute.Context & CustomContext & markupContext.ScopedContext,
+      ctx: CustomContext & dataflow.Context & markupContext.ScopedContext,
       attrs: Attrs,
     ) =>
       | markupFragment.FragmentOpt<CustomContext>
@@ -45,13 +45,13 @@ class Custom<
   ) {}
 
   async add(
-    baseCtx: compute.Context &
-      CustomContext &
+    baseCtx: CustomContext &
+      dataflow.Context &
       markupContext.Context &
       styling.Context,
   ): Promise<void> {
-    const ctx: compute.Context &
-      CustomContext &
+    const ctx: CustomContext &
+      dataflow.Context &
       markupContext.ScopedContext = {
       ...baseCtx,
       scopedConvey: this,
@@ -84,12 +84,12 @@ class Custom<
     }
     this.mutableDeferred.length = 0
     for (const sub of this.mutableSubs) {
-      compute.unsubscribe(sub)
+      dataflow.unsubscribe(sub)
     }
     this.mutableSubs.length = 0
   }
 
-  subscribe(sub: compute.Computation<unknown>): void {
+  subscribe(sub: dataflow.Computation<unknown>): void {
     this.mutableSubs.push(sub)
   }
 }

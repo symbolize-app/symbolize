@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import * as markup from '@/index.ts'
 import * as markupTest from '@/test.ts'
-import * as compute from '@symbolize/lib-compute'
+import * as dataflow from '@symbolize/lib-dataflow'
 import type * as styling from '@symbolize/lib-styling'
 import * as test from '@symbolize/lib-test'
 
@@ -9,7 +9,7 @@ export const url = import.meta.url
 
 export const tests = {
   async ['custom empty'](
-    ctx: compute.Context & markup.Context & styling.Context,
+    ctx: dataflow.Context & markup.Context & styling.Context,
   ): Promise<void> {
     const custom = markup.defineCustom((_ctx, _attrs) => {
       return null
@@ -20,16 +20,16 @@ export const tests = {
   },
 
   async ['custom pure'](
-    ctx: compute.Context & markup.Context & styling.Context,
+    ctx: dataflow.Context & markup.Context & styling.Context,
   ): Promise<void> {
     const custom = markup.defineCustom<
       unknown,
       {
-        readonly title: compute.NodeOpt<string>
+        readonly title: dataflow.NodeOpt<string>
       }
     >((_ctx, attrs) => {
       return markup.text({
-        content: compute.map((title) => `${title} / 0`, attrs.title),
+        content: dataflow.map((title) => `${title} / 0`, attrs.title),
       })
     })
 
@@ -39,7 +39,7 @@ export const tests = {
   },
 
   async ['custom effect'](
-    ctx: compute.Context & markup.Context & styling.Context,
+    ctx: dataflow.Context & markup.Context & styling.Context,
   ): Promise<void> {
     const [effectCallback, effectCallbackHistory] =
       test.repeatMockWithHistory(2, (_value: string) => {})
@@ -47,36 +47,36 @@ export const tests = {
     const custom = markup.defineCustom<
       unknown,
       {
-        readonly title: compute.NodeOpt<string>
+        readonly title: dataflow.NodeOpt<string>
       }
     >(async (ctx, attrs) => {
       await markup.scopedEffect(ctx, effectCallback, attrs.title)
       return attrs.title
     })
 
-    const x = compute.state('a')
+    const x = dataflow.state('a')
 
     const fragment = custom({ title: x })
     const body = await markupTest.addFragmentToBody(ctx, fragment)
     test.assertEquals(body.textContent, 'a')
     test.assertDeepEquals(effectCallbackHistory, [['a']])
 
-    await compute.txn(ctx, async () => {
-      await compute.set(ctx, x, 'b')
+    await dataflow.txn(ctx, async () => {
+      await dataflow.set(ctx, x, 'b')
     })
     test.assertEquals(body.textContent, 'b')
     test.assertDeepEquals(effectCallbackHistory, [['a'], ['b']])
 
     await fragment.remove()
-    await compute.txn(ctx, async () => {
-      await compute.set(ctx, x, 'c')
+    await dataflow.txn(ctx, async () => {
+      await dataflow.set(ctx, x, 'c')
     })
     test.assertEquals(body.textContent, 'b')
     test.assertDeepEquals(effectCallbackHistory, [['a'], ['b']])
   },
 
   async ['custom defer'](
-    ctx: compute.Context & markup.Context & styling.Context,
+    ctx: dataflow.Context & markup.Context & styling.Context,
   ): Promise<void> {
     const [deferCallback, deferCallbackHistory] =
       test.repeatMockWithHistory(2, () => {})
@@ -84,7 +84,7 @@ export const tests = {
     const custom = markup.defineCustom<
       unknown,
       {
-        readonly title: compute.NodeOpt<string>
+        readonly title: dataflow.NodeOpt<string>
       }
     >((ctx, attrs) => {
       markup.scopedDefer(ctx, deferCallback)

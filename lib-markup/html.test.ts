@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import * as markup from '@/index.ts'
 import * as markupTest from '@/test.ts'
-import * as compute from '@symbolize/lib-compute'
+import * as dataflow from '@symbolize/lib-dataflow'
 import * as styling from '@symbolize/lib-styling'
 import * as stylingTest from '@symbolize/lib-styling/test.ts'
 import * as test from '@symbolize/lib-test'
@@ -10,22 +10,22 @@ export const url = import.meta.url
 
 export const tests = {
   async ['div advanced'](
-    ctx: compute.Context & markup.Context & styling.Context,
+    ctx: dataflow.Context & markup.Context & styling.Context,
   ): Promise<void> {
     const custom = markup.defineCustom<
       unknown,
       {
-        readonly title: compute.NodeOpt<string>
+        readonly title: dataflow.NodeOpt<string>
       }
     >((ctx, attrs) => {
-      const countState = compute.state(0)
+      const countState = dataflow.state(0)
 
       return markup.html.div({
-        onClick: compute.handler(async (_event, count) => {
-          await compute.set(ctx, countState, count + 1)
+        onClick: dataflow.handler(async (_event, count) => {
+          await dataflow.set(ctx, countState, count + 1)
         }, countState),
 
-        content: compute.map(
+        content: dataflow.map(
           (title, count) => `${title} / ${count}`,
           attrs.title,
           countState,
@@ -50,7 +50,7 @@ export const tests = {
   },
 
   async ['div pure'](
-    ctx: compute.Context & markup.Context & styling.Context,
+    ctx: dataflow.Context & markup.Context & styling.Context,
   ): Promise<void> {
     const [clickCallback, clickCallbackHistory] =
       test.repeatMockWithHistory(1, (_event: Readonly<MouseEvent>) => {})
@@ -79,7 +79,7 @@ export const tests = {
   },
 
   async ['div class names'](
-    ctx: compute.Context & markup.Context & styling.Context,
+    ctx: dataflow.Context & markup.Context & styling.Context,
   ): Promise<void> {
     const fragment = markup.html.div({
       className: ['x', 'y'],
@@ -91,9 +91,9 @@ export const tests = {
   },
 
   async ['div state'](
-    ctx: compute.Context & markup.Context & styling.Context,
+    ctx: dataflow.Context & markup.Context & styling.Context,
   ): Promise<void> {
-    const x = compute.state('a')
+    const x = dataflow.state('a')
 
     const fragment = markup.html.div({ id: x })
     const body = await markupTest.addFragmentToBody(ctx, fragment)
@@ -101,22 +101,22 @@ export const tests = {
     test.assert(div)
     test.assertEquals(div.id, 'a')
 
-    await compute.txn(ctx, async () => {
-      await compute.set(ctx, x, 'b')
+    await dataflow.txn(ctx, async () => {
+      await dataflow.set(ctx, x, 'b')
     })
     test.assertEquals(div.id, 'b')
 
     await fragment.remove()
-    await compute.txn(ctx, async () => {
-      await compute.set(ctx, x, 'c')
+    await dataflow.txn(ctx, async () => {
+      await dataflow.set(ctx, x, 'c')
     })
     test.assertEquals(div.id, 'b')
   },
 
   async ['div string null'](
-    ctx: compute.Context & markup.Context & styling.Context,
+    ctx: dataflow.Context & markup.Context & styling.Context,
   ): Promise<void> {
-    const title = compute.state<string | null>('a')
+    const title = dataflow.state<string | null>('a')
 
     const fragment = markup.html.div({ title })
     const body = await markupTest.addFragmentToBody(ctx, fragment)
@@ -125,17 +125,17 @@ export const tests = {
     test.assertEquals(div.title, 'a')
     test.assertEquals(div.outerHTML, '<div title="a"></div>')
 
-    await compute.txn(ctx, async () => {
-      await compute.set(ctx, title, null)
+    await dataflow.txn(ctx, async () => {
+      await dataflow.set(ctx, title, null)
     })
     test.assertEquals(div.title, '')
     test.assertEquals(div.outerHTML, '<div></div>')
   },
 
   async ['div on add'](
-    ctx: compute.Context & markup.Context & styling.Context,
+    ctx: dataflow.Context & markup.Context & styling.Context,
   ): Promise<void> {
-    const show = compute.state(false)
+    const show = dataflow.state(false)
     const [stepCallback, stepCallbackHistory] = test.repeatMockWithHistory(
       6,
       (..._args: readonly unknown[]) => {},
@@ -167,16 +167,16 @@ export const tests = {
     const body = await markupTest.addFragmentToBody(ctx, fragment)
 
     stepCallback('start')
-    await compute.txn(ctx, async () => {
-      await compute.set(ctx, show, true)
+    await dataflow.txn(ctx, async () => {
+      await dataflow.set(ctx, show, true)
     })
     stepCallback('shown')
 
     const div = body.querySelector('div')
     test.assert(div)
 
-    await compute.txn(ctx, async () => {
-      await compute.set(ctx, show, false)
+    await dataflow.txn(ctx, async () => {
+      await dataflow.set(ctx, show, false)
     })
     stepCallback('hidden')
 
@@ -190,7 +190,7 @@ export const tests = {
   },
 
   async ['div style'](
-    ctx: compute.Context & markup.Context & styling.Context,
+    ctx: dataflow.Context & markup.Context & styling.Context,
   ): Promise<void> {
     for (let i = 0; i < 2; i += 1) {
       const fragment = markup.html.div({
@@ -220,13 +220,13 @@ export const tests = {
   },
 
   async ['div computation style'](
-    ctx: compute.Context & markup.Context & styling.Context,
+    ctx: dataflow.Context & markup.Context & styling.Context,
   ): Promise<void> {
     for (let i = 0; i < 2; i += 1) {
-      const x = compute.state<styling.Length | null>(styling.px(1))
+      const x = dataflow.state<styling.Length | null>(styling.px(1))
 
       const fragment = markup.html.div({
-        style: compute.map(
+        style: dataflow.map(
           (x) => (x !== null ? styling.padding.os(x) : null),
           x,
         ),
@@ -255,8 +255,8 @@ export const tests = {
         ].slice(0, 1 + i),
       )
 
-      await compute.txn(ctx, async () => {
-        await compute.set(ctx, x, styling.px(2))
+      await dataflow.txn(ctx, async () => {
+        await dataflow.set(ctx, x, styling.px(2))
       })
       test.assertDeepEquals([...div.classList.values()], ['a1'])
       test.assertDeepEquals(
@@ -279,8 +279,8 @@ export const tests = {
         ],
       )
 
-      await compute.txn(ctx, async () => {
-        await compute.set(ctx, x, null)
+      await dataflow.txn(ctx, async () => {
+        await dataflow.set(ctx, x, null)
       })
       test.assertDeepEquals([...div.classList.values()], [])
       test.assertDeepEquals(
@@ -308,7 +308,7 @@ export const tests = {
   },
 
   async ['button pure'](
-    ctx: compute.Context & markup.Context & styling.Context,
+    ctx: dataflow.Context & markup.Context & styling.Context,
   ): Promise<void> {
     const fragment = markup.html.button({
       formMethod: 'get',
@@ -324,9 +324,9 @@ export const tests = {
   },
 
   async ['button boolean false'](
-    ctx: compute.Context & markup.Context & styling.Context,
+    ctx: dataflow.Context & markup.Context & styling.Context,
   ): Promise<void> {
-    const disabled = compute.state(true)
+    const disabled = dataflow.state(true)
 
     const fragment = markup.html.button({ disabled, type: 'button' })
     const body = await markupTest.addFragmentToBody(ctx, fragment)
@@ -338,15 +338,15 @@ export const tests = {
       '<button disabled="" type="button"></button>',
     )
 
-    await compute.txn(ctx, async () => {
-      await compute.set(ctx, disabled, false)
+    await dataflow.txn(ctx, async () => {
+      await dataflow.set(ctx, disabled, false)
     })
     test.assertEquals(button.disabled, false)
     test.assertEquals(button.outerHTML, '<button type="button"></button>')
   },
 
   async ['input checkbox pure'](
-    ctx: compute.Context & markup.Context & styling.Context,
+    ctx: dataflow.Context & markup.Context & styling.Context,
   ): Promise<void> {
     const fragment = markup.html.input({
       checked: true,
@@ -362,7 +362,7 @@ export const tests = {
   },
 
   async ['input text pure'](
-    ctx: compute.Context & markup.Context & styling.Context,
+    ctx: dataflow.Context & markup.Context & styling.Context,
   ): Promise<void> {
     const fragment = markup.html.input({
       autocomplete: ['section-x', 'email'],

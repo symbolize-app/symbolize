@@ -1,4 +1,4 @@
-import type * as compute from '@symbolize/lib-compute'
+import type * as dataflow from '@symbolize/lib-dataflow'
 import type * as markup from '@symbolize/lib-markup'
 import type * as random from '@symbolize/lib-random'
 import type * as stream from '@symbolize/lib-stream'
@@ -7,7 +7,7 @@ import type * as test from '@symbolize/lib-test'
 import type * as timeTest from '@symbolize/lib-time/test.ts'
 
 export const all: test.TestCollection<
-  compute.Context &
+  dataflow.Context &
     markup.Context &
     random.Context &
     stream.Context &
@@ -15,7 +15,7 @@ export const all: test.TestCollection<
     timeTest.Context
 > = () => [
   import('@symbolize/lib-collection/index.test.ts'),
-  import('@symbolize/lib-compute/index.test.ts'),
+  import('@symbolize/lib-dataflow/index.test.ts'),
   import('@symbolize/lib-error/index.test.ts'),
   import('@symbolize/lib-hex/index.test.ts'),
   import('@symbolize/lib-markup/index.test.ts'),

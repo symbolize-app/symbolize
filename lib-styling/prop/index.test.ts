@@ -1,9 +1,9 @@
 import type * as styling from '@/index.ts'
-import type * as compute from '@symbolize/lib-compute'
+import type * as dataflow from '@symbolize/lib-dataflow'
 import type * as test from '@symbolize/lib-test'
 
 export const all: test.TestCollection<
-  compute.Context & styling.Context
+  dataflow.Context & styling.Context
 > = () => [
   import('@/prop/accent.test.ts'),
   import('@/prop/background.test.ts'),

@@ -6,5 +6,5 @@ tasks:
       vars:
         NAME: '{{.NAME}}'
 vars:
-  NAME: lib-compute
+  NAME: lib-dataflow
 version: '3'
