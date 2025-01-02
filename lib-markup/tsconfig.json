@@ -15,7 +15,7 @@
   "include": ["./**/*.ts", "./**/*.js", "./**/*.cjs"],
   "references": [
     { "path": "../lib-compute" },
-    { "path": "../lib-contrast" },
+    { "path": "../lib-styling" },
     { "path": "../lib-test" }
   ]
 }

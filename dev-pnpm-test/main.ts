@@ -1,9 +1,9 @@
 #!/usr/bin/env node-loader
 import * as compute from '@symbolize/lib-compute'
-import * as contrast from '@symbolize/lib-contrast'
 import * as markupNode from '@symbolize/lib-markup/index.node.ts'
 import * as randomTest from '@symbolize/lib-random/test.ts'
 import * as streamTest from '@symbolize/lib-stream/test.ts'
+import * as styling from '@symbolize/lib-styling'
 import * as testRunner from '@symbolize/lib-test-runner'
 import * as time from '@symbolize/lib-time'
 import * as timeTest from '@symbolize/lib-time/test.ts'
@@ -18,9 +18,6 @@ export async function run(baseContext: time.Context): Promise<boolean> {
     compute() {
       return compute.compute()
     },
-    contrast() {
-      return contrast.contrast()
-    },
     markup(defer) {
       const markup = markupNode.markup()
       defer(() => {
@@ -33,6 +30,9 @@ export async function run(baseContext: time.Context): Promise<boolean> {
     },
     stream() {
       return streamTest.stream()
+    },
+    styling() {
+      return styling.styling()
     },
     time() {
       return timeTest.time()

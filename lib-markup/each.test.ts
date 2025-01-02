@@ -2,14 +2,14 @@
 import * as markup from '@/index.ts'
 import * as markupTest from '@/test.ts'
 import * as compute from '@symbolize/lib-compute'
-import type * as contrast from '@symbolize/lib-contrast'
+import type * as styling from '@symbolize/lib-styling'
 import * as test from '@symbolize/lib-test'
 
 export const url = import.meta.url
 
 export const tests = {
   async ['items pure'](
-    ctx: compute.Context & contrast.Context & markup.Context,
+    ctx: compute.Context & markup.Context & styling.Context,
   ): Promise<void> {
     const fragment = markup.each(
       (x) => markup.html.div({ content: x }),
@@ -21,7 +21,7 @@ export const tests = {
   },
 
   async ['items inner state'](
-    ctx: compute.Context & contrast.Context & markup.Context,
+    ctx: compute.Context & markup.Context & styling.Context,
   ): Promise<void> {
     const items = compute.state([
       { id: 0, name: 'a' },
@@ -65,7 +65,7 @@ export const tests = {
   },
 
   async ['items move'](
-    ctx: compute.Context & contrast.Context & markup.Context,
+    ctx: compute.Context & markup.Context & styling.Context,
   ): Promise<void> {
     const items = compute.state([
       { id: 0, name: 'a' },
@@ -110,7 +110,7 @@ export const tests = {
   },
 
   async ['items remove'](
-    ctx: compute.Context & contrast.Context & markup.Context,
+    ctx: compute.Context & markup.Context & styling.Context,
   ): Promise<void> {
     const items = compute.state([
       { id: 0, name: 'a' },
@@ -153,7 +153,7 @@ export const tests = {
   },
 
   async ['items add'](
-    ctx: compute.Context & contrast.Context & markup.Context,
+    ctx: compute.Context & markup.Context & styling.Context,
   ): Promise<void> {
     const items = compute.state([
       { id: 0, name: 'a' },

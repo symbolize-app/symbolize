@@ -2,7 +2,7 @@ import type * as markupContext from '@/context.ts'
 import type * as markupFragment from '@/fragment.ts'
 import * as markupMarker from '@/marker.ts'
 import * as compute from '@symbolize/lib-compute'
-import type * as contrast from '@symbolize/lib-contrast'
+import type * as styling from '@symbolize/lib-styling'
 
 export function text(attrs: {
   readonly content: compute.NodeOpt<string>
@@ -18,7 +18,7 @@ class TextFragment implements markupFragment.Fragment {
   constructor(private readonly content: compute.NodeOpt<string>) {}
 
   async add(
-    ctx: compute.Context & contrast.Context & markupContext.Context,
+    ctx: compute.Context & markupContext.Context & styling.Context,
   ): Promise<void> {
     this.mutableNode = ctx.markup.document.createTextNode('')
     this.mutableSub = await compute.effect((value) => {

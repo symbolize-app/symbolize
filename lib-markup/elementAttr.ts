@@ -2,7 +2,7 @@ import type * as markupContext from '@/context.ts'
 import type * as markupData from '@/data.ts'
 import type * as markupFragment from '@/fragment.ts'
 import type * as compute from '@symbolize/lib-compute'
-import type * as contrast from '@symbolize/lib-contrast'
+import type * as styling from '@symbolize/lib-styling'
 
 export type Listener<SpecificEvent> = (
   event: SpecificEvent,
@@ -159,7 +159,7 @@ export type Attrs<CustomContext, BaseElement extends Element> = PickAttrs<
 > & {
   readonly content?: markupFragment.FragmentOpt<CustomContext>
   readonly onAdd?: Listener<OnAddEvent<BaseElement>>
-  readonly style?: compute.NodeOpt<contrast.AtomOpt>
+  readonly style?: compute.NodeOpt<styling.AtomOpt>
 }
 
 export interface OnAddEvent<BaseElement extends Element> {
@@ -253,9 +253,9 @@ function styleAttr(): StyleAttrDefinition {
 export type AllAttrs = Readonly<typeof allAttrs>
 
 // Redeclare these types locally, to avoid triggering https://github.com/microsoft/TypeScript/issues/47663
-type LengthUnit = contrast.LengthUnit
-type Length<Unit extends LengthUnit = LengthUnit> = contrast.Length<Unit>
-type Pct = contrast.Pct
+type LengthUnit = styling.LengthUnit
+type Length<Unit extends LengthUnit = LengthUnit> = styling.Length<Unit>
+type Pct = styling.Pct
 
 export const allAttrs = {
   accessKey: stringAttr('accesskey'),

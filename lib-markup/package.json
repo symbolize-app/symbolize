@@ -7,7 +7,7 @@
     "@symbolize/dev-prettier": "workspace:*",
     "@symbolize/dev-tsconfig": "workspace:*",
     "@symbolize/lib-compute": "workspace:*",
-    "@symbolize/lib-contrast": "workspace:*",
+    "@symbolize/lib-styling": "workspace:*",
     "@symbolize/lib-test": "workspace:*",
     "happy-dom": "13.6.2"
   },

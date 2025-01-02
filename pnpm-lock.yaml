@@ -41,9 +41,6 @@ importers:
       '@symbolize/lib-concurrency':
         specifier: workspace:*
         version: link:lib-concurrency
-      '@symbolize/lib-contrast':
-        specifier: workspace:*
-        version: link:lib-contrast
       '@symbolize/lib-error':
         specifier: workspace:*
         version: link:lib-error
@@ -59,6 +56,9 @@ importers:
       '@symbolize/lib-stream':
         specifier: workspace:*
         version: link:lib-stream
+      '@symbolize/lib-styling':
+        specifier: workspace:*
+        version: link:lib-styling
       '@symbolize/lib-test':
         specifier: workspace:*
         version: link:lib-test
@@ -238,9 +238,6 @@ importers:
       '@symbolize/lib-compute':
         specifier: workspace:*
         version: link:../lib-compute
-      '@symbolize/lib-contrast':
-        specifier: workspace:*
-        version: link:../lib-contrast
       '@symbolize/lib-error':
         specifier: workspace:*
         version: link:../lib-error
@@ -259,6 +256,9 @@ importers:
       '@symbolize/lib-stream':
         specifier: workspace:*
         version: link:../lib-stream
+      '@symbolize/lib-styling':
+        specifier: workspace:*
+        version: link:../lib-styling
       '@symbolize/lib-test':
         specifier: workspace:*
         version: link:../lib-test
@@ -328,28 +328,6 @@ importers:
         specifier: 5.4.5
         version: 5.4.5
 
-  lib-contrast:
-    dependencies:
-      '@symbolize/dev-prettier':
-        specifier: workspace:*
-        version: link:../dev-prettier
-      '@symbolize/dev-tsconfig':
-        specifier: workspace:*
-        version: link:../dev-tsconfig
-      '@symbolize/lib-collection':
-        specifier: workspace:*
-        version: link:../lib-collection
-      '@symbolize/lib-test':
-        specifier: workspace:*
-        version: link:../lib-test
-    devDependencies:
-      prettier:
-        specifier: 3.2.5
-        version: 3.2.5
-      typescript:
-        specifier: 5.4.5
-        version: 5.4.5
-
   lib-error:
     dependencies:
       '@symbolize/dev-prettier':
@@ -399,9 +377,9 @@ importers:
       '@symbolize/lib-compute':
         specifier: workspace:*
         version: link:../lib-compute
-      '@symbolize/lib-contrast':
+      '@symbolize/lib-styling':
         specifier: workspace:*
-        version: link:../lib-contrast
+        version: link:../lib-styling
       '@symbolize/lib-test':
         specifier: workspace:*
         version: link:../lib-test
@@ -478,6 +456,28 @@ importers:
         specifier: workspace:*
         version: link:../lib-time
     devDependencies:
+      typescript:
+        specifier: 5.4.5
+        version: 5.4.5
+
+  lib-styling:
+    dependencies:
+      '@symbolize/dev-prettier':
+        specifier: workspace:*
+        version: link:../dev-prettier
+      '@symbolize/dev-tsconfig':
+        specifier: workspace:*
+        version: link:../dev-tsconfig
+      '@symbolize/lib-collection':
+        specifier: workspace:*
+        version: link:../lib-collection
+      '@symbolize/lib-test':
+        specifier: workspace:*
+        version: link:../lib-test
+    devDependencies:
+      prettier:
+        specifier: 3.2.5
+        version: 3.2.5
       typescript:
         specifier: 5.4.5
         version: 5.4.5

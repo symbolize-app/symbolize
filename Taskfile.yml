@@ -37,8 +37,6 @@ includes:
     taskfile: lib-compute
   lib-concurrency:
     taskfile: lib-concurrency
-  lib-contrast:
-    taskfile: lib-contrast
   lib-error:
     taskfile: lib-error
   lib-hex-rs:
@@ -53,6 +51,8 @@ includes:
     taskfile: lib-random
   lib-stream:
     taskfile: lib-stream
+  lib-styling:
+    taskfile: lib-styling
   lib-test:
     taskfile: lib-test
   lib-test-runner:
@@ -214,13 +214,13 @@ tasks:
       - lib-collection:link-build-dir
       - lib-compute:link-build-dir
       - lib-concurrency:link-build-dir
-      - lib-contrast:link-build-dir
       - lib-error:link-build-dir
       - lib-hex-ts:link-build-dir
       - lib-markup:link-build-dir
       - lib-payload:link-build-dir
       - lib-random:link-build-dir
       - lib-stream:link-build-dir
+      - lib-styling:link-build-dir
       - lib-test:link-build-dir
       - lib-test-runner:link-build-dir
       - lib-time:link-build-dir
