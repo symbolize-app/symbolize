@@ -1,8 +1,8 @@
 import * as svcReload from '@/reload.ts'
 import * as compute from '@symbolize/lib-compute'
 import * as contrast from '@symbolize/lib-contrast'
-import type * as convey from '@symbolize/lib-convey'
-import * as conveyBrowser from '@symbolize/lib-convey/index.browser.ts'
+import type * as markup from '@symbolize/lib-markup'
+import * as markupBrowser from '@symbolize/lib-markup/index.browser.ts'
 import * as random from '@symbolize/lib-random'
 import * as stream from '@symbolize/lib-stream'
 import * as time from '@symbolize/lib-time'
@@ -18,13 +18,13 @@ function main(): void {
 
   const mainCtx: compute.Context &
     contrast.Context &
-    convey.Context &
+    markup.Context &
     random.Context &
     stream.WorkerClientContext &
     time.Context = {
     compute: compute.compute(),
     contrast: contrast.contrast(),
-    convey: conveyBrowser.convey(),
+    markup: markupBrowser.markup(),
     random: random.random(),
     streamClient: stream.workerClient(worker),
     time: time.time(),
