@@ -126,6 +126,7 @@ tasks:
   syncpack:lint:fix:
     cmds:
       - syncpack fix-mismatches
+      - syncpack format
       - task: syncpack:lint:check
 
   tsc:clean:
