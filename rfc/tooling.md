@@ -47,7 +47,7 @@
 
 ## Dev infra
 
-- https://www.haproxy.org/
+- https://caddyserver.com/
 - https://min.io/
 - https://github.com/staktrace/maildir
 - https://www.thunderbird.net/
