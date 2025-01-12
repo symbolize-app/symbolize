@@ -1,6 +1,8 @@
 use crate::context as svc_context;
 use crate::executor as svc_executor;
 use crate::handle as svc_handle;
+use crate::state::Context;
+use crate::state::State;
 use anyhow::anyhow;
 use anyhow::Result;
 use hyper::server::conn::http2;
@@ -16,6 +18,8 @@ use std::sync::Arc;
 use tokio::fs::read;
 use tokio::net::TcpListener;
 use tokio::net::TcpStream;
+use tokio::signal::unix::signal;
+use tokio::signal::unix::SignalKind;
 use tokio_rustls::server::TlsStream;
 use tokio_rustls::TlsAcceptor;
 use tokio_stream::wrappers::TcpListenerStream;
@@ -24,7 +28,24 @@ use tokio_util::task::TaskTracker;
 
 pub async fn serve(ctx: Arc<svc_context::ContextImpl>) -> Result<()> {
   let tls_server_config = Arc::new(build_tls_server_config().await?);
-  serve_tcp_accept(ctx, tls_server_config).await
+
+  tokio::spawn(serve_tcp_accept(ctx.clone(), tls_server_config));
+
+  receive_termination_signal(ctx).await?;
+
+  Ok(())
+}
+
+#[allow(clippy::print_stdout)]
+async fn receive_termination_signal(
+  ctx: Arc<svc_context::ContextImpl>,
+) -> Result<()> {
+  let mut sigint = signal(SignalKind::interrupt())?;
+  if sigint.recv().await.is_some() {
+    println!("Received interrupt signal, shutting down...");
+    ctx.state().cancellation_token().cancel();
+  }
+  Ok(())
 }
 
 async fn build_tls_server_config() -> Result<TlsServerConfig> {
