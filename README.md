@@ -4,7 +4,7 @@
 
 ### Nix package manager
 
-1. Install Nix 2.15.0
+1. Install Nix 2.15.0 (pinned via Determinate Systems 0.9.1 installer)
 1. Install init profile flake
 
 ```
