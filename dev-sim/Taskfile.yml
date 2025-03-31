@@ -1,0 +1,28 @@
+run: when_changed
+tasks:
+  test:debug:
+    aliases:
+      - test
+      - t
+    cmd:
+      task: :cargo:execute-package:test:debug
+      vars:
+        NAME: '{{.NAME}}'
+  test:debug:watch:
+    aliases:
+      - test:watch
+      - tw
+    cmd:
+      task: :cargo:execute-package:test:debug:watch
+      vars:
+        NAME: '{{.NAME}}'
+  test:release:
+    aliases:
+      - tr
+    cmd:
+      task: :cargo:execute-package:test:release
+      vars:
+        NAME: '{{.NAME}}'
+vars:
+  NAME: dev-sim
+version: '3'
