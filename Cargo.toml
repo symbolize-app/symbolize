@@ -1,6 +1,7 @@
 [workspace]
 members = [
   "dev-cargo-build",
+  "dev-sim",
   "dev-watchman-client",
   "lib-hex-rs",
   "svc-gateway-host-run",
