@@ -1085,6 +1085,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "symbolize-dev-sim"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "tokio",
+]
+
+[[package]]
 name = "symbolize-dev-watchman-client"
 version = "0.1.0"
 dependencies = [

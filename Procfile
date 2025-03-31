@@ -8,6 +8,7 @@ stack__build: task stack:build:watch
 stack__lint: task stack:lint:watch
 dev-gen__test: task dev-gen:test:watch
 dev-cargo-build__test: task dev-cargo-build:test:watch
+dev-sim__test: task dev-sim:test:watch
 dev-watchman-client__test: task dev-watchman-client:test:watch
 lib-hex-rs__test: task lib-hex-rs:test:watch
 svc-gateway-host-run__test: task svc-gateway-host-run:test:watch
