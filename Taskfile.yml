@@ -20,6 +20,8 @@ includes:
     taskfile: dev-pnpm-test
   dev-prettier:
     taskfile: dev-prettier
+  dev-sim:
+    taskfile: dev-sim
   dev-stack-bin:
     internal: true
     taskfile: dev-stack-bin
@@ -108,6 +110,7 @@ tasks:
       - cargo:t
     deps:
       - dev-cargo-build:test:debug
+      - dev-sim:test:debug
       - dev-watchman-client:test:debug
       - lib-hex-rs:test:debug
       - svc-gateway-host-run:test:debug
@@ -117,6 +120,7 @@ tasks:
       - cargo:tr
     deps:
       - dev-cargo-build:test:release
+      - dev-sim:test:release
       - dev-watchman-client:test:release
       - lib-hex-rs:test:release
       - svc-gateway-host-run:test:release
