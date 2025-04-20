@@ -14,6 +14,8 @@ pub async fn main() -> Result<()> {
 
   let mut ctx = svc_context::Context {
     stdout: stdout.clone(),
+    selected_connection_id: 0,
+    connections: vec![],
   };
 
   loop {

@@ -1,5 +1,8 @@
+use crate::begin as svc_begin;
 use crate::command as svc_command;
+use crate::connect as svc_connect;
 use crate::context as svc_context;
+use crate::disconnect as svc_disconnect;
 use crate::help as svc_help;
 use crate::parse as svc_parse;
 use anyhow::anyhow;
@@ -39,9 +42,11 @@ fn run_command(
   parameters: svc_command::CommandParameters,
 ) -> Result<svc_command::CommandStatus> {
   match parameters {
-    svc_command::CommandParameters::Begin {} => todo!(),
-    svc_command::CommandParameters::Connect {} => todo!(),
-    svc_command::CommandParameters::Disconnect {} => todo!(),
+    svc_command::CommandParameters::Begin {} => svc_begin::run(ctx),
+    svc_command::CommandParameters::Connect {} => svc_connect::run(ctx),
+    svc_command::CommandParameters::Disconnect {} => {
+      svc_disconnect::run(ctx)
+    }
     svc_command::CommandParameters::End {} => todo!(),
     svc_command::CommandParameters::Help {} => svc_help::run_help(ctx),
     svc_command::CommandParameters::Ping {} => todo!(),

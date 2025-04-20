@@ -19,9 +19,18 @@ pub fn parse_command_parameters(
   param_parts: &[&str],
 ) -> Result<svc_command::CommandParameters> {
   match id {
-    svc_command::CommandId::Begin => todo!(),
-    svc_command::CommandId::Connect => todo!(),
-    svc_command::CommandId::Disconnect => todo!(),
+    svc_command::CommandId::Begin => {
+      parse_parts_0(name, param_parts)?;
+      Ok(svc_command::CommandParameters::Begin {})
+    }
+    svc_command::CommandId::Connect => {
+      parse_parts_0(name, param_parts)?;
+      Ok(svc_command::CommandParameters::Connect {})
+    }
+    svc_command::CommandId::Disconnect => {
+      parse_parts_0(name, param_parts)?;
+      Ok(svc_command::CommandParameters::Disconnect {})
+    }
     svc_command::CommandId::End => todo!(),
     svc_command::CommandId::Help => {
       parse_parts_0(name, param_parts)?;
