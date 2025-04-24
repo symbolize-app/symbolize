@@ -68,7 +68,7 @@ class MutableHttpClient {
       console.log(
         `HTTP request stream ${hex.uint8ArrayToHex(responseStreamId)} starting...`,
       )
-      await ctx.stream.fetch(requestUrl, {
+      const response = await ctx.stream.fetch(requestUrl, {
         body: this.source.readable.pipeThrough(new TextEncoderStream(), {
           preventCancel: true,
         }),
@@ -76,6 +76,9 @@ class MutableHttpClient {
         method: 'POST',
         signal: abortController.signal,
       })
+      if (response.status !== 200) {
+        throw new Error(`bad response ${response.status}`)
+      }
     } catch (error_) {
       if (
         !(error_ instanceof DOMException && error_.name === 'AbortError')
@@ -124,7 +127,7 @@ class MutableHttpClient {
       method: 'POST',
     })
     if (response.status !== 200) {
-      throw new Error('bad response')
+      throw new Error(`bad response ${response.status}`)
     }
     const responseStreamIdString = response.headers.get(
       'response-stream-id',

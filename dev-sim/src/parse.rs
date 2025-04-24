@@ -31,7 +31,10 @@ pub fn parse_command_parameters(
       parse_parts_0(name, param_parts)?;
       Ok(svc_command::CommandParameters::Disconnect {})
     }
-    svc_command::CommandId::End => todo!(),
+    svc_command::CommandId::End => {
+      parse_parts_0(name, param_parts)?;
+      Ok(svc_command::CommandParameters::End {})
+    }
     svc_command::CommandId::Help => {
       parse_parts_0(name, param_parts)?;
       Ok(svc_command::CommandParameters::Help {})

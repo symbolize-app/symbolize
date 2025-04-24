@@ -3,8 +3,10 @@ use crate::command as svc_command;
 use crate::connect as svc_connect;
 use crate::context as svc_context;
 use crate::disconnect as svc_disconnect;
+use crate::end as svc_end;
 use crate::help as svc_help;
 use crate::parse as svc_parse;
+use crate::ping as svc_ping;
 use anyhow::anyhow;
 use anyhow::Result;
 
@@ -47,9 +49,9 @@ fn run_command(
     svc_command::CommandParameters::Disconnect {} => {
       svc_disconnect::run(ctx)
     }
-    svc_command::CommandParameters::End {} => todo!(),
+    svc_command::CommandParameters::End {} => svc_end::run(ctx),
     svc_command::CommandParameters::Help {} => svc_help::run_help(ctx),
-    svc_command::CommandParameters::Ping {} => todo!(),
+    svc_command::CommandParameters::Ping {} => svc_ping::run(ctx),
     svc_command::CommandParameters::Quit {} => Ok(run_quit()),
     svc_command::CommandParameters::Sleep {} => todo!(),
     svc_command::CommandParameters::Tempo {} => todo!(),

@@ -12,14 +12,19 @@ path = "src/mod.rs"
 [dependencies]
 anyhow = { workspace = true }
 bytes = { workspace = true }
+futures = { workspace = true }
+http-body = { workspace = true }
 http-body-util = { workspace = true }
 hyper = { workspace = true }
 hyper-util = { workspace = true }
+pin-project-lite = { workspace = true }
 rustyline-async = { workspace = true }
 rustls = { workspace = true }
 rustls-pemfile = { workspace = true }
+symbolize-lib-hex = { workspace = true }
 tokio = { workspace = true }
 tokio-rustls = { workspace = true }
+tokio-util = { workspace = true }
 
 [lints]
 workspace = true

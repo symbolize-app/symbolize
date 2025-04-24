@@ -32,6 +32,7 @@ symbolize-lib-hex = { version="0.1.0", path = "./lib-hex-rs" }
 mime = { version = "0.3.17", features = [] }
 mockall = { version = "0.12.1", features = [] }
 nix = { version = "0.27.1", features = ["signal"] }
+pin-project-lite = { version = "0.2.13", features = [] }
 ring = { version = "0.17.7", features = [] }
 rusqlite = { version = "0.30.0", features = ["bundled"] }
 rustls = { version = "0.22.4", features = ["logging", "ring", "tls12"] }
