@@ -91,6 +91,7 @@ impl DbImpl {
   pub async fn wait(&self) {
     // Drop all TXs, will raise RX errors
     while self.idle_connections.pop().is_some() {}
+    self.connection_task_tracker.close();
     self.connection_task_tracker.wait().await;
   }
 
