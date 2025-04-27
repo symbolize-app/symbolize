@@ -26,7 +26,7 @@ futures = { version = "0.3.30", features = [] }
 http = { version = "1.0.0", features = [] }
 http-body = { version = "1.0.0", features = [] }
 http-body-util = { version = "0.1.2", features = [] }
-hyper = { version = "1.0.1", features = ["http2", "server"] }
+hyper = { version = "1.0.1", features = ["client", "http2", "server"] }
 hyper-util = { version = "0.1.1", features = ["tokio"] }
 symbolize-lib-hex = { version="0.1.0", path = "./lib-hex-rs" }
 mime = { version = "0.3.17", features = [] }
