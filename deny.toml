@@ -8,7 +8,7 @@ notice = "deny"
 
 [licenses]
 unlicensed = "deny"
-allow = ["Apache-2.0", "BSD-3-Clause", "ISC", "LicenseRef-ring", "MIT", "Unicode-DFS-2016"]
+allow = ["Apache-2.0", "BSD-3-Clause", "ISC", "LicenseRef-ring", "MIT", "Unicode-DFS-2016", "Unlicense"]
 default = "deny"
 confidence-threshold = 0.8
 
