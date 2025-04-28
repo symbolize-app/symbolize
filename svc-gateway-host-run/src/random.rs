@@ -1,5 +1,5 @@
-use anyhow::anyhow;
 use anyhow::Error;
+use anyhow::anyhow;
 #[cfg(test)]
 use mockall::automock;
 #[cfg(test)]

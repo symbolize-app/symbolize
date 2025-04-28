@@ -7,8 +7,8 @@ use crate::end as svc_end;
 use crate::help as svc_help;
 use crate::parse as svc_parse;
 use crate::ping as svc_ping;
-use anyhow::anyhow;
 use anyhow::Result;
+use anyhow::anyhow;
 
 pub fn run_line(
   ctx: &mut svc_context::Context,

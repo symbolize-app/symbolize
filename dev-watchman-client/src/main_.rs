@@ -1,6 +1,6 @@
 use crate::nix_child::NixChild as _;
-use anyhow::anyhow;
 use anyhow::Result;
+use anyhow::anyhow;
 use backon::Retryable as _;
 use clap;
 use clap::Parser as _;
@@ -18,14 +18,14 @@ use tokio::select;
 use tokio::sync::Semaphore;
 use tokio::sync::TryAcquireError;
 use tokio::task::JoinSet;
+use watchman_client::CanonicalPath;
+use watchman_client::Connector;
+use watchman_client::SubscriptionData;
 use watchman_client::expr::Expr;
 use watchman_client::expr::NameTerm;
 use watchman_client::fields::NameOnly;
 use watchman_client::pdu::FileType;
 use watchman_client::pdu::SubscribeRequest;
-use watchman_client::CanonicalPath;
-use watchman_client::Connector;
-use watchman_client::SubscriptionData;
 
 #[derive(Clone, Debug, clap::Parser)]
 #[command(version)]
@@ -118,8 +118,8 @@ async fn watch_files(
     .resolve_root(CanonicalPath::canonicalize(root_path)?)
     .await?;
   println!(
-    "[watch] Resolved root: {:?} ({})",
-    root.project_root(),
+    "[watch] Resolved root: {} ({})",
+    root.project_root().display(),
     root.watcher()
   );
   let (mut subscription, _) = client

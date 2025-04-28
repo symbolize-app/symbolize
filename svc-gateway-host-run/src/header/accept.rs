@@ -1,7 +1,7 @@
 use crate::header::pair::HeaderPair;
 use anyhow::Error;
-use http::header;
 use http::HeaderValue;
+use http::header;
 use hyper::header::HeaderName;
 use mime;
 

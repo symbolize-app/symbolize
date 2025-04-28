@@ -1,7 +1,7 @@
 use std::thread;
 use std::thread::JoinHandle as StdJoinHandle;
-use tokio_util::task::task_tracker::TaskTrackerToken;
 use tokio_util::task::TaskTracker;
+use tokio_util::task::task_tracker::TaskTrackerToken;
 
 trait TaskTrackerStruct {
   fn token_(&self) -> TaskTrackerToken;

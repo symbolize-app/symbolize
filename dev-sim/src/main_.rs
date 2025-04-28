@@ -33,7 +33,7 @@ pub async fn main() -> Result<()> {
             Err(err) => {
               writeln!(stdout, "Error: {err}")?;
             }
-          };
+          }
         }
       }
       ReadlineEvent::Eof => {

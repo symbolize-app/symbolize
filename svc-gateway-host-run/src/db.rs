@@ -1,7 +1,7 @@
 use crate::task_tracker_ext::TaskTrackerExt as _;
-use anyhow::anyhow;
 use anyhow::Error;
 use anyhow::Result;
+use anyhow::anyhow;
 use crossbeam::queue::ArrayQueue;
 #[cfg(test)]
 use mockall::automock;

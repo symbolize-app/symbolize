@@ -1,7 +1,7 @@
 use crate::command as svc_command;
 use crate::context as svc_context;
-use anyhow::anyhow;
 use anyhow::Result;
+use anyhow::anyhow;
 use std::io::Write as _;
 
 pub fn run(

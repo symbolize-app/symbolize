@@ -1,6 +1,6 @@
 use crate::command as svc_command;
-use anyhow::anyhow;
 use anyhow::Result;
+use anyhow::anyhow;
 
 pub fn parse_command_id(
   name_part: &str,

@@ -1,4 +1,3 @@
-#![feature(imported_main)]
 #![feature(trait_alias)]
 
 pub mod context;
