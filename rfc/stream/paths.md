@@ -36,7 +36,7 @@ Two `ReadableStream` objects are also used for communication between any other s
 
 On a single hosted instance, all host services run in the same process. They can directly enqueue items to the Rust channel.
 
-To establish a connection between hosted instances, the follower instance makes an HTTP/2 request using `hyper` to the leader. Because `hyper` supports full duplex, only one request is needed. These connections are used for DB replication and write forwarding.
+To establish a connection between hosted instances, the follower instance makes two separate HTTP/2 requests using `hyper` to the leader, for request and response streams. This is because `hyper` only supports half duplex. These connections are used for DB replication and write forwarding.
 
 For guest requests forwarded by the follower host gateway to a specific write leader instance, the follower gateway will still generate new requests to the other instance, but will use the main HTTP/2 connection.
 

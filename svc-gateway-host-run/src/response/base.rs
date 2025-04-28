@@ -77,7 +77,7 @@ pub trait BuilderExt: BuilderStruct {
     Bytes: From<T>,
   {
     self.body_(Box::pin(
-      FullBody::new(Bytes::from(body)).map_err(anyhow::Error::new),
+      FullBody::new(Bytes::from(body)).map_err(Error::new),
     ))
   }
 

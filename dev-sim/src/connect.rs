@@ -1,9 +1,9 @@
+use crate::cancel_receiver_stream as svc_cancel_receiver_stream;
 use crate::command as svc_command;
 use crate::context as svc_context;
 use anyhow::anyhow;
 use anyhow::Result;
-use bytes::Bytes;
-use http_body_util::Empty;
+use futures::StreamExt;
 use hyper::client::conn::http2;
 use hyper::client::conn::http2::SendRequest;
 use hyper_util::rt::TokioExecutor;
@@ -18,35 +18,40 @@ use std::env;
 use std::io::Write as _;
 use std::net::Ipv6Addr;
 use std::net::SocketAddr;
+use std::pin::pin;
 use std::sync::Arc;
 use std::vec;
 use tokio;
 use tokio::fs::read;
 use tokio::net::TcpStream;
-use tokio::sync::watch;
+use tokio::sync::mpsc;
 use tokio_rustls::TlsConnector;
+use tokio_util::sync::CancellationToken;
 
 struct Context {
   stdout: SharedWriter,
   id: usize,
-  sender_tx: watch::Sender<Option<Result<SendRequest<Empty<Bytes>>>>>,
+  cancellation_token: CancellationToken,
+  send_request_rx: Option<mpsc::Receiver<svc_context::SimRequest>>,
 }
 
 pub fn run(
   ctx: &mut svc_context::Context,
 ) -> Result<svc_command::CommandStatus> {
-  let (sender_tx, sender_rx) = watch::channel(None);
   let id = ctx.connections.len();
+  let cancellation_token = CancellationToken::new();
+  let (send_request_tx, send_request_rx) = mpsc::channel(128);
   let sub_ctx = Context {
     stdout: ctx.stdout.clone(),
     id,
-    sender_tx: sender_tx.clone(),
+    cancellation_token: cancellation_token.clone(),
+    send_request_rx: Some(send_request_rx),
   };
   writeln!(ctx.stdout, "[c{id}] Connecting...")?;
   let sim_connection = svc_context::SimConnection {
     task: tokio::spawn(try_connect(sub_ctx)),
-    sender_tx,
-    sender_rx,
+    cancellation_token,
+    send_request_tx,
     selected_stream_id: 0,
     streams: vec![],
   };
@@ -60,8 +65,8 @@ async fn try_connect(mut ctx: Context) -> Result<()> {
   match connect(&mut ctx).await {
     Ok(()) => {}
     Err(err) => {
+      ctx.cancellation_token.cancel();
       writeln!(ctx.stdout, "[c{id}] Connect error: {err}")?;
-      ctx.sender_tx.send(Some(Err(anyhow!("[c{id}] {err}"))))?;
     }
   }
   Ok(())
@@ -85,13 +90,13 @@ async fn connect(ctx: &mut Context) -> Result<()> {
   let io = TokioIo::new(stream);
   let (sender, conn) = builder.handshake(io).await?;
   writeln!(ctx.stdout, "[c{id}] Connected")?;
-  let sender: SendRequest<Empty<Bytes>> = sender;
-  ctx.sender_tx.send(Some(Ok(sender)))?;
-  conn.await?;
+
+  let conn_task = tokio::spawn(conn);
+  handle_requests(ctx, sender).await?;
+
+  conn_task.await??;
   writeln!(ctx.stdout, "[c{id}] Disconnected")?;
-  ctx
-    .sender_tx
-    .send(Some(Err(anyhow!("[c{id}] disconnected"))))?;
+
   Ok(())
 }
 
@@ -109,4 +114,26 @@ async fn build_tls_client_config() -> Result<TlsClientConfig> {
       .with_root_certificates(root_cert_store)
       .with_no_client_auth(),
   )
+}
+
+async fn handle_requests(
+  ctx: &mut Context,
+  mut sender: SendRequest<svc_context::SimBody>,
+) -> Result<()> {
+  let send_request_rx = ctx
+    .send_request_rx
+    .take()
+    .ok_or_else(|| anyhow!("missing send request RX"))?;
+  let mut send_request_stream =
+    pin!(svc_cancel_receiver_stream::CancelReceiverStream::new(
+      ctx.cancellation_token.clone(),
+      send_request_rx
+    ));
+  while let Some((req, res_tx)) = send_request_stream.next().await {
+    let res = sender.send_request(req).await?;
+    res_tx
+      .send(res)
+      .map_err(|_| anyhow!("error sending response"))?;
+  }
+  Ok(())
 }

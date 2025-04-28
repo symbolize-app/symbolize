@@ -1203,14 +1203,19 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "bytes 1.5.0",
+ "futures 0.3.30",
+ "http-body",
  "http-body-util",
  "hyper",
  "hyper-util",
+ "pin-project-lite",
  "rustls",
  "rustls-pemfile",
  "rustyline-async",
+ "symbolize-lib-hex",
  "tokio",
  "tokio-rustls",
+ "tokio-util 0.7.10",
 ]
 
 [[package]]
