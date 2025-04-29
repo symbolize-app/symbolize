@@ -54,10 +54,11 @@ future-incompatible = "warn"
 let-underscore = "warn"
 nonstandard-style = "warn"
 refining-impl-trait = "warn"
-unused = "warn"
+unused = { level = "warn", priority = -1 }
 
 # Allowed by default
 absolute-paths-not-starting-with-crate = "warn"
+dead-code = "warn"
 deprecated-in-future = "warn"
 elided-lifetimes-in-paths = "warn"
 explicit-outlives-requirements = "warn"
@@ -82,20 +83,20 @@ unused-import-braces = "warn"
 unused-lifetimes = "warn"
 unused-macro-rules = "warn"
 unused-qualifications = "warn"
-unused-tuple-struct-fields = "warn"
 variant-size-differences = "warn"
 
 [workspace.lints.clippy]
-cargo = "warn"
+cargo = { level = "warn", priority = -1 }
+multiple_crate_versions = "allow"
 
 # Pedantic
-pedantic = "warn"
+pedantic = { level = "warn", priority = -1 }
 missing_errors_doc = "allow"
 missing_panics_doc = "allow"
 module_name_repetitions = "allow"
 
 # Style
-style = "warn"
+style = { level = "warn", priority = -1 }
 single_component_path_imports = "allow"
 
 # Restrictions

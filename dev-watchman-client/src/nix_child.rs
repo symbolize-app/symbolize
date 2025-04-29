@@ -1,5 +1,5 @@
-use anyhow::anyhow;
 use anyhow::Result;
+use anyhow::anyhow;
 use nix::sys::signal;
 use nix::sys::signal::Signal;
 use nix::unistd::Pid;

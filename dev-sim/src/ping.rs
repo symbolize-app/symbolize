@@ -1,7 +1,7 @@
 use crate::command as svc_command;
 use crate::context as svc_context;
-use anyhow::anyhow;
 use anyhow::Result;
+use anyhow::anyhow;
 
 pub fn run(
   ctx: &mut svc_context::Context,

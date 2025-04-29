@@ -1,5 +1,5 @@
-use anyhow::anyhow;
 use anyhow::Result;
+use anyhow::anyhow;
 use clap;
 use clap::Parser as _;
 use serde::Deserialize;
@@ -136,7 +136,7 @@ async fn process_events(child: &mut Child) -> Result<()> {
         profile,
         executable,
         fresh,
-      }) if target.name.starts_with("symbolize-")
+      }) if target.name.starts_with("symbolize")
         && profile.test
         && !fresh =>
       {
@@ -145,7 +145,7 @@ async fn process_events(child: &mut Child) -> Result<()> {
           .ok_or(anyhow!("missing parent"))?
           .parent()
           .ok_or(anyhow!("missing parent"))?
-          .join(format!("{}-test", target.name));
+          .join(format!("{}-test", target.name.replace('_', "-")));
         fs::copy(executable, destination).await?;
       }
       AnyEvent::Specific(Event::CompilerMessage { target, message }) => {

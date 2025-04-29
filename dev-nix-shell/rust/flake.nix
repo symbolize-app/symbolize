@@ -16,7 +16,7 @@
             name = "symbolize-rust";
             buildInputs = [
               pkgs.openssl
-              (pkgs.rust-bin.nightly."2023-12-09".default.override {
+              (pkgs.rust-bin.nightly."2025-04-28".default.override {
                 extensions = [
                   "rust-src"
                   "rust-analyzer"

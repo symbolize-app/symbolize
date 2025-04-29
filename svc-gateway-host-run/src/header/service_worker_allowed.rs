@@ -1,6 +1,6 @@
 use crate::header::pair::HeaderPair;
-use http::header::InvalidHeaderValue;
 use http::HeaderValue;
+use http::header::InvalidHeaderValue;
 use hyper::header::HeaderName;
 
 // https://www.w3.org/TR/service-workers/#service-worker-allowed

@@ -1,4 +1,3 @@
-#![feature(imported_main)]
 #![feature(never_type)]
 
 pub mod main_;
