@@ -3,10 +3,10 @@
 .env
 .font
 .pki
-.stack-bin
 .tantivy
 /art/favicon.png
 build
 node_modules
+relude-hlint.yaml
 result
 tmp

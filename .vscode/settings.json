@@ -59,7 +59,7 @@
   "haskell.manageHLS": "PATH",
   "haskell.plugin.hlint.config.flags": [
     "--hint",
-    ".stack-bin/relude-hlint.yaml",
+    "dev-hlint/relude-hlint.yaml",
     "--hint",
     "dev-hlint/base.yaml"
   ],

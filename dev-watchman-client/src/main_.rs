@@ -185,15 +185,15 @@ fn build_expr(cli: &Cli) -> Result<Expr> {
       Expr::Name(NameTerm {
         paths: vec![
           "package.yaml".into(),
-          "stack.yaml".into(),
-          "stack.yaml.lock".into(),
+          "cabal.project".into(),
+          "cabal.project.freeze".into(),
         ],
         wholename: false,
       }),
       Expr::Name(NameTerm {
         paths: vec![
           "dev-hlint/base.yaml".into(),
-          "dev-task/stack.yml".into(),
+          "dev-task/cabal.yml".into(),
         ],
         wholename: true,
       }),

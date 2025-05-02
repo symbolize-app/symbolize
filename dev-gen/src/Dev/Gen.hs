@@ -195,7 +195,8 @@ genPackageTypeScriptConfig pnpmPackage = do
           exclude = FileFormat.typeScriptConfigExclude,
           compilerOptions = FileFormat.typeScriptConfigCompilerOptions,
           references =
-            FileFormat.TypeScriptConfigReference . ("../" <>)
+            FileFormat.TypeScriptConfigReference
+              . ("../" <>)
               <$> typeScript.dependencies
         }
     )
@@ -292,7 +293,8 @@ genRootTypeScriptConfig pnpmPackages =
       exclude = [],
       compilerOptions = FileFormat.typeScriptConfigCompilerOptions,
       references =
-        FileFormat.TypeScriptConfigReference . ("./" <>)
+        FileFormat.TypeScriptConfigReference
+          . ("./" <>)
           <$> Package.foldTypeScriptPackageNames pnpmPackages
     }
 

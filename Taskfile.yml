@@ -1,4 +1,6 @@
 includes:
+  cabal:
+    taskfile: dev-task/cabal.yml
   cargo:
     taskfile: dev-task/cargo.yml
   dev-cargo-build:
@@ -22,9 +24,6 @@ includes:
     taskfile: dev-prettier
   dev-sim:
     taskfile: dev-sim
-  dev-stack-bin:
-    internal: true
-    taskfile: dev-stack-bin
   dev-tsconfig:
     taskfile: dev-tsconfig
   dev-watchman-client:
@@ -69,8 +68,6 @@ includes:
     taskfile: dev-task/pnpm.yml
   sqlite:
     taskfile: dev-task/sqlite.yml
-  stack:
-    taskfile: dev-task/stack.yml
   svc-auth-guest-read:
     taskfile: svc-auth-guest-read
   svc-auth-guest-view:
@@ -94,16 +91,16 @@ tasks:
       - build
       - b
     deps:
+      - cabal:build:debug
       - cargo:build:debug
       - pnpm:build:debug
-      - stack:build:debug
   build:release:
     aliases:
       - br
     deps:
+      - cabal:build:release
       - cargo:build:release
       - pnpm:build:release
-      - stack:build:release
   cargo:test:debug:
     aliases:
       - cargo:test
@@ -139,9 +136,9 @@ tasks:
       - lock:check
   clean:
     deps:
+      - cabal:clean
       - cargo:clean
       - pnpm:clean
-      - stack:clean
   dev:
     aliases:
       - d
@@ -153,27 +150,27 @@ tasks:
     aliases:
       - fc
     deps:
+      - cabal:format:check
       - cargo:format:check
       - pnpm:format:check
-      - stack:format:check
   format:fix:
     aliases:
       - format
       - f
     deps:
+      - cabal:format:fix
       - cargo:format:fix
       - pnpm:format:fix
-      - stack:format:fix
   gen:
     aliases:
       - g
     cmd:
-      task: stack:execute-target:run:{{.TASK_GEN_MODE}}
+      task: cabal:execute-target:run:{{.TASK_GEN_MODE}}
       vars:
         NAME: dev-gen
   gen:check:
     cmd:
-      task: stack:execute-target:run:{{.TASK_GEN_MODE}}
+      task: cabal:execute-target:run:{{.TASK_GEN_MODE}}
       vars:
         ARGS: --check
         NAME: dev-gen
@@ -181,27 +178,27 @@ tasks:
     aliases:
       - i
     deps:
+      - cabal:install
       - cargo:install
       - font:install
       - pnpm:install
-      - stack:install
   lint:check:
     aliases:
       - lint
       - l
     deps:
+      - cabal:lint
       - cargo:lint:check
       - pnpm:lint:check
       - sqlite:lint:check
-      - stack:lint
   lint:fix:
     aliases:
       - lf
     deps:
+      - cabal:lint
       - cargo:lint:fix
       - pnpm:lint:fix
       - sqlite:lint:fix
-      - stack:lint
   lock:check:
     deps:
       - cargo:lock:check
@@ -240,7 +237,7 @@ tasks:
     aliases:
       - tr
     deps:
+      - cabal:test:release
       - cargo:test:release
       - pnpm:test
-      - stack:test:release
 version: '3'

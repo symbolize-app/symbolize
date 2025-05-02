@@ -4,8 +4,8 @@ pnpm__esbuild__build: task pnpm:esbuild:build:watch
 pnpm__test: task pnpm:test:watch
 pnpm__tsc__build: task pnpm:tsc:build:watch
 pnpm__eslint__lint__check: task pnpm:eslint:lint:check:watch
-stack__build: task stack:build:watch
-stack__lint: task stack:lint:watch
+cabal__build: task cabal:build:watch
+cabal__lint: task cabal:lint:watch
 dev-gen__test: task dev-gen:test:watch
 dev-cargo-build__test: task dev-cargo-build:test:watch
 dev-sim__test: task dev-sim:test:watch
