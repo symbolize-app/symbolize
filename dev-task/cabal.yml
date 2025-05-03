@@ -166,7 +166,7 @@ tasks:
       VERSION:
         sh: grep 'any\.relude' cabal.project.freeze | sed -ne 's/.*==\([^,]*\).*/\1/p'
     cmds:
-      - curl --fail --silent --show-error "https://raw.githubusercontent.com/kowainik/relude/v{{.VERSION}}/.hlint.yaml" -o dev-hlint/relude-hlint.yaml || curl --fail --silent --show-error "https://raw.githubusercontent.com/kowainik/relude/38b54f9d539a615cb4a7bcf4b8236bb2064f9d92/.hlint.yaml" -o dev-hlint/relude-hlint.yaml
+      - curl --fail --silent --show-error "https://raw.githubusercontent.com/kowainik/relude/v{{.VERSION}}/.hlint.yaml" -o dev-hlint/relude-hlint.yaml
 
   lint:
     aliases:
