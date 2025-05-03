@@ -15,7 +15,7 @@
           (import ./easyrsa.nix)
           (import ./fd.nix)
           (import ./git.nix)
-          #(import ./haskell.nix)
+          (import ./haskell.nix)
           (import ./node.nix)
           (import ./overmind.nix)
           (import ./rust.nix { inherit rust-overlay; })
@@ -37,7 +37,7 @@
               pkgs.symbolize-easyrsa
               pkgs.symbolize-fd
               pkgs.symbolize-git
-              #pkgs.symbolize-haskell
+              pkgs.symbolize-haskell
               pkgs.symbolize-node
               pkgs.symbolize-overmind
               pkgs.symbolize-rust
@@ -51,20 +51,20 @@
 
             shellHook = ''
               export PATH=${pkgs.symbolize-node}/lib/node_modules/.bin:$PATH
+              cabal --version | head -n 1
               cargo --version
               curl --version | head -n 1
               dasel --version
               dbmate --version
               echo $(easyrsa --version | head -n 4)
               fd --version
-              #ghc --version
+              ghc --version
               git --version
               echo "gt $(gt --version)"
               echo "node $(node --version)"
               echo "pnpm v$(pnpm --version)"
               overmind --version
               rustc --version
-              #echo "stack $(stack --version)"
               sqlfluff --version
               echo "sqlite3 v$(sqlite3 --version)"
               task --version

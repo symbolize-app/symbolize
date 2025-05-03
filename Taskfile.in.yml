@@ -3,6 +3,9 @@ version: '3'
 run: when_changed
 
 includes:
+  cabal:
+    taskfile: dev-task/cabal.yml
+
   cargo:
     taskfile: dev-task/cargo.yml
 
@@ -12,10 +15,6 @@ includes:
   dev-nix-shell:
     internal: true
     taskfile: dev-nix-shell
-
-  dev-stack-bin:
-    internal: true
-    taskfile: dev-stack-bin
 
   easyrsa:
     taskfile: dev-task/easyrsa.yml
@@ -35,9 +34,6 @@ includes:
   sqlite:
     taskfile: dev-task/sqlite.yml
 
-  stack:
-    taskfile: dev-task/stack.yml
-
   svc-gateway-host-store:
     taskfile: svc-gateway-host-store
 
@@ -53,17 +49,17 @@ tasks:
       - build
       - b
     deps:
+      - cabal:build:debug
       - cargo:build:debug
       - pnpm:build:debug
-      - stack:build:debug
 
   build:release:
     aliases:
       - br
     deps:
+      - cabal:build:release
       - cargo:build:release
       - pnpm:build:release
-      - stack:build:release
 
   check:
     aliases:
@@ -80,9 +76,9 @@ tasks:
 
   clean:
     deps:
+      - cabal:clean
       - cargo:clean
       - pnpm:clean
-      - stack:clean
 
   dev:
     aliases:
@@ -96,30 +92,30 @@ tasks:
     aliases:
       - fc
     deps:
+      - cabal:format:check
       - cargo:format:check
       - pnpm:format:check
-      - stack:format:check
 
   format:fix:
     aliases:
       - format
       - f
     deps:
+      - cabal:format:fix
       - cargo:format:fix
       - pnpm:format:fix
-      - stack:format:fix
 
   gen:
     aliases:
       - g
     cmd:
-      task: stack:execute-target:run:{{.TASK_GEN_MODE}}
+      task: cabal:execute-target:run:{{.TASK_GEN_MODE}}
       vars:
         NAME: dev-gen
 
   gen:check:
     cmd:
-      task: stack:execute-target:run:{{.TASK_GEN_MODE}}
+      task: cabal:execute-target:run:{{.TASK_GEN_MODE}}
       vars:
         NAME: dev-gen
         ARGS: '--check'
@@ -128,29 +124,29 @@ tasks:
     aliases:
       - i
     deps:
+      - cabal:install
       - cargo:install
       - font:install
       - pnpm:install
-      - stack:install
 
   lint:check:
     aliases:
       - lint
       - l
     deps:
+      - cabal:lint
       - cargo:lint:check
       - pnpm:lint:check
       - sqlite:lint:check
-      - stack:lint
 
   lint:fix:
     aliases:
       - lf
     deps:
+      - cabal:lint
       - cargo:lint:fix
       - pnpm:lint:fix
       - sqlite:lint:fix
-      - stack:lint
 
   lock:check:
     deps:
@@ -167,6 +163,6 @@ tasks:
     aliases:
       - tr
     deps:
+      - cabal:test:release
       - cargo:test:release
       - pnpm:test
-      - stack:test:release

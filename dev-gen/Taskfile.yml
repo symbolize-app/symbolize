@@ -10,13 +10,7 @@ tasks:
     aliases:
       - repl
     cmd:
-      task: :stack:repl:debug
-      vars:
-        NAME: '{{.NAME}}'
-
-  repl:release:
-    cmd:
-      task: :stack:repl:release
+      task: :cabal:repl-target:debug
       vars:
         NAME: '{{.NAME}}'
 
@@ -25,7 +19,7 @@ tasks:
       - test
       - t
     cmd:
-      task: :stack:execute-target:test:debug
+      task: :cabal:execute-target:test:debug
       vars:
         NAME: '{{.NAME}}'
 
@@ -34,7 +28,7 @@ tasks:
       - test:watch
       - tw
     cmd:
-      task: :stack:execute-target:test:debug:watch
+      task: :cabal:execute-target:test:debug:watch
       vars:
         NAME: '{{.NAME}}'
 
@@ -42,7 +36,7 @@ tasks:
     aliases:
       - tr
     cmd:
-      task: :stack:execute-target:test:release
+      task: :cabal:execute-target:test:release
       vars:
         NAME: '{{.NAME}}'
 

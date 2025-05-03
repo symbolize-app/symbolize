@@ -12,7 +12,7 @@ tasks:
     aliases:
       - build
       - b
-    cmd: stack build --test --no-run-tests --keep-going
+    cmd: cabal build all --builddir=build/dist-newstyle-debug --enable-tests
 
   build:debug:watch:
     aliases:
@@ -24,12 +24,12 @@ tasks:
         WATCH: true
         RESTART: false
         MODE: haskell
-        COMMAND: stack build --test --no-run-tests --keep-going
+        COMMAND: cabal build all --builddir=build/dist-newstyle-debug --enable-tests
 
   build:release:
     aliases:
       - br
-    cmd: stack build --work-dir build/stack-work-release --test --no-run-tests --keep-going {{.RELEASE_OPTIONS}}
+    cmd: cabal build all --builddir=build/dist-newstyle-release --enable-tests {{.RELEASE_OPTIONS}}
 
   clean:
     deps:
@@ -45,7 +45,7 @@ tasks:
     requires:
       vars:
         - MODE
-    cmd: stack clean --work-dir build/stack-work-{{.MODE}} --full
+    cmd: cabal clean --builddir build/dist-newstyle-{{.MODE}}
 
   execute-target:
     internal: true
@@ -57,9 +57,8 @@ tasks:
         - TARGET
         - ARGS
     vars:
-      DIST_DIR:
-        sh: realpath --relative-to . $(sh -c "$(cd {{.NAME}} && stack config env --work-dir build/stack-work-{{.MODE}}) echo \$HASKELL_DIST_DIR")
-      FULL_TARGET: symbolize-{{.NAME}}-{{.TARGET}}
+      FULL_TARGET:
+        sh: cabal list-bin {{.NAME}}{{.TARGET}} --builddir=build/dist-newstyle-{{.MODE}}
     cmds:
       # HACK: Reference all variables here, so Task doesn't think they're unused
       - cmd: 'true # /{{.WATCH}}/{{.MODE}}/{{.NAME}}/{{.TARGET}}/{{.ARGS}}/'
@@ -69,7 +68,7 @@ tasks:
           WATCH: '{{.WATCH}}'
           RESTART: false
           MODE: executable
-          COMMAND: '{{.DIST_DIR}}/build/{{.FULL_TARGET}}/{{.FULL_TARGET}} {{.ARGS}} {{.CLI_ARGS}}'
+          COMMAND: '{{.FULL_TARGET}} {{.ARGS}} {{.CLI_ARGS}}'
 
   execute-target:run:debug:
     internal: true
@@ -84,7 +83,7 @@ tasks:
         WATCH: false
         MODE: debug
         NAME: '{{.NAME}}'
-        TARGET: exe
+        TARGET: ''
         ARGS: '{{.ARGS}}'
 
   execute-target:run:release:
@@ -100,7 +99,7 @@ tasks:
         WATCH: false
         MODE: release
         NAME: '{{.NAME}}'
-        TARGET: exe
+        TARGET: ''
         ARGS: '{{.ARGS}}'
 
   execute-target:test:debug:
@@ -116,7 +115,7 @@ tasks:
         WATCH: false
         MODE: debug
         NAME: '{{.NAME}}'
-        TARGET: test
+        TARGET: ':tests'
         ARGS: '{{.ARGS}}'
 
   execute-target:test:debug:watch:
@@ -132,7 +131,7 @@ tasks:
         WATCH: true
         MODE: debug
         NAME: '{{.NAME}}'
-        TARGET: test
+        TARGET: ':tests'
         ARGS: '{{.ARGS}}'
 
   execute-target:test:release:
@@ -148,7 +147,7 @@ tasks:
         WATCH: false
         MODE: release
         NAME: '{{.NAME}}'
-        TARGET: test
+        TARGET: ':tests'
         ARGS: '{{.ARGS}}'
 
   format:check:
@@ -163,12 +162,11 @@ tasks:
     cmd: ormolu --mode inplace {{.FIND_FILES}}
 
   install:
-    deps:
-      - :dev-stack-bin:install
-
-  link-build-dirs:
-    deps:
-      - :dev-gen:link-build-dir
+    vars:
+      VERSION:
+        sh: grep 'any\.relude' cabal.project.freeze | sed -ne 's/.*==\([^,]*\).*/\1/p'
+    cmds:
+      - curl --fail --silent --show-error "https://raw.githubusercontent.com/kowainik/relude/v{{.VERSION}}/.hlint.yaml" -o dev-hlint/relude-hlint.yaml || curl --fail --silent --show-error "https://raw.githubusercontent.com/kowainik/relude/38b54f9d539a615cb4a7bcf4b8236bb2064f9d92/.hlint.yaml" -o dev-hlint/relude-hlint.yaml
 
   lint:
     aliases:
@@ -183,16 +181,13 @@ tasks:
     requires:
       vars:
         - WATCH
-    vars:
-      STACK_LOCAL_BIN_PATH:
-        sh: realpath --relative-to . {{.STACK_LOCAL_BIN_PATH}}
     cmd:
       task: :watchman:client
       vars:
         WATCH: '{{.WATCH}}'
         RESTART: false
         MODE: haskell
-        COMMAND: hlint --hint {{.STACK_LOCAL_BIN_PATH}}/relude-hlint.yaml --hint dev-hlint/base.yaml --threads {{.FIND_FILES}}
+        COMMAND: hlint --hint dev-hlint/relude-hlint.yaml --hint dev-hlint/base.yaml --threads {{.FIND_FILES}}
 
   lint:watch:
     aliases:
@@ -202,39 +197,12 @@ tasks:
       vars:
         WATCH: true
 
-  repl-target:
-    internal: true
-    requires:
-      vars:
-        - MODE
-        - NAME
-    cmd: stack ghci --work-dir build/stack-work-{{.MODE}} symbolize-{{.NAME}}
-
   repl-target:debug:
     internal: true
     requires:
       vars:
         - NAME
-    deps:
-      - build:debug
-    cmd:
-      task: repl-target
-      vars:
-        MODE: debug
-        NAME: '{{.NAME}}'
-
-  repl-target:release:
-    internal: true
-    requires:
-      vars:
-        - NAME
-    deps:
-      - build:release
-    cmd:
-      task: repl-target
-      vars:
-        MODE: release
-        NAME: '{{.NAME}}'
+    cmd: cabal repl {{.NAME}} --builddir build/dist-newstyle-debug
 
   test:debug:
     aliases:
