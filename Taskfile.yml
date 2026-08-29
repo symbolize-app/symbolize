@@ -11,9 +11,6 @@ includes:
     taskfile: dev-eslint
   dev-gen:
     taskfile: dev-gen
-  dev-nix-shell:
-    internal: true
-    taskfile: dev-nix-shell
   dev-node-loader:
     taskfile: dev-node-loader
   dev-node-suppress:

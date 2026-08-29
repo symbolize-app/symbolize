@@ -1,11 +1,12 @@
 {
   "ignore_dirs": [
     ".cargo",
-    ".direnv",
+    ".devenv",
     ".env",
     ".font",
     ".pki",
     ".tantivy",
+    ".tmp",
     "/art/favicon.png",
     "build",
     "node_modules",

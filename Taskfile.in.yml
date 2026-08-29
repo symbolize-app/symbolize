@@ -12,10 +12,6 @@ includes:
   dev-gen:
     taskfile: dev-gen
 
-  dev-nix-shell:
-    internal: true
-    taskfile: dev-nix-shell
-
   easyrsa:
     taskfile: dev-task/easyrsa.yml
 

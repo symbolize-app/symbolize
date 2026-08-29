@@ -6,5 +6,4 @@ tasks:
   update:
     aliases:
       - u
-    deps:
-      - :dev-nix-shell:update
+    cmd: devenv update
