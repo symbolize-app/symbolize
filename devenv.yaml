@@ -1,0 +1,8 @@
+require_version: '2.2.2'
+reload: false
+
+inputs:
+  nixpkgs:
+    url: github:NixOS/nixpkgs/46e634be05ce9dc6d4db8e664515ba10b78151ae
+  rust-overlay:
+    url: github:oxalica/rust-overlay/026e8fedefd6b167d92ed04b195c658d95ffc7a5

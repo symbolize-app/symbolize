@@ -1,7 +1,5 @@
-{ rust-overlay }: final: prev:
+final: prev:
 
-(import rust-overlay final prev)
-//
 {
   symbolize-rust = final.symlinkJoin {
     name = "symbolize-rust";

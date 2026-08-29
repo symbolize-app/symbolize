@@ -2,7 +2,7 @@
 
 ## Dev
 
-- https://direnv.net/
+- https://devenv.sh/
 - https://nix.dev/
 - https://taskfile.dev/
 - https://github.com/DarthSim/overmind

@@ -5,35 +5,34 @@
 ### Nix package manager
 
 1. Install Nix 2.15.0 (pinned via Determinate Systems 0.9.1 installer)
-1. Install init profile flake
+1. Install Devenv 2.2.2 in the default user profile
 
-```
+```sh
 curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix/tag/v0.9.1 | sh -s -- install
-nix profile install ./dev-nix-init
+nix profile install github:NixOS/nixpkgs/c27cdad491a991b11ed731760aa2ef8db0cb0410#devenv
 ```
 
 #### Upgrade
 
 1. Nix: uninstall, then reinstall
-1. Init profile flake: find and upgrade the profile
+1. Devenv: replace the pinned Devenv version and corresponding Nixpkgs revision below, then reinstall the profile entry
 
+```sh
+nix profile remove devenv
+nix profile install github:NixOS/nixpkgs/c27cdad491a991b11ed731760aa2ef8db0cb0410#devenv
 ```
-nix profile list
-nix profile upgrade <YOUR_PROFILE_ENTRY_INDEX>
-```
 
-### direnv
+### Devenv
 
-1. Installed by Nix
-1. [Hook into your shell](https://direnv.net/docs/hook.html)
+1. Hook Devenv into Zsh
 1. Allow this repo
-1. Use nix-direnv library
 
+```sh
+echo 'eval "$(devenv hook zsh)"' >> $HOME/.zshrc
+devenv allow
 ```
-direnv allow
-mkdir -p $HOME/.config/direnv
-echo 'source $HOME/.nix-profile/share/nix-direnv/direnvrc' >> $HOME/.config/direnv/direnvrc
-```
+
+Devenv auto-reload is disabled for this project so Watchman remains the sole file watcher.
 
 ### Easy-RSA
 
