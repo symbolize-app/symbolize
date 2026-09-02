@@ -1,5 +1,7 @@
 # Symbolize <img width="30" height="30" src="art/favicon.svg?raw=true"/>
 
+[Vision](vision.md)
+
 ## Setup
 
 ### Nix package manager
