@@ -1,0 +1,22 @@
+version: '3'
+
+run: when_changed
+
+tasks:
+  check:
+    dir: '{{.TASKFILE_DIR}}'
+    cmd: gleam check
+  format:check:
+    dir: '{{.TASKFILE_DIR}}'
+    cmd: gleam format --check src
+  build:
+    dir: '{{.TASKFILE_DIR}}'
+    cmd: gleam build
+  link-build-dir:
+    cmd:
+      task: :tmpfs:link-package-build-dir
+      vars:
+        NAME: '{{.NAME}}'
+
+vars:
+  NAME: dev-browser-test

@@ -55,9 +55,10 @@ impl Cli {
 )]
 enum Mode {
   Executable,
+  Gleam,
   Haskell,
   Rust,
-  TypeScript,
+  JavaScript,
 }
 
 #[allow(clippy::print_stderr)]
@@ -209,14 +210,25 @@ fn build_expr(cli: &Cli) -> Result<Expr> {
         wholename: true,
       }),
     ],
-    Mode::TypeScript => vec![
+    Mode::Gleam => vec![
+      Expr::Suffix(vec!["gleam".into()]),
+      Expr::Name(NameTerm {
+        paths: vec!["gleam.toml".into(), "manifest.toml".into()],
+        wholename: false,
+      }),
+      Expr::Name(NameTerm {
+        paths: vec!["Taskfile.yml".into()],
+        wholename: false,
+      }),
+    ],
+    Mode::JavaScript => vec![
       Expr::Suffix(vec![
         "cjs".into(),
         "css".into(),
         "html".into(),
         "js".into(),
+        "mjs".into(),
         "sql".into(),
-        "ts".into(),
         "txt".into(),
       ]),
       Expr::Name(NameTerm {
@@ -225,7 +237,6 @@ fn build_expr(cli: &Cli) -> Result<Expr> {
           "package.json".into(),
           "pnpm-lock.yaml".into(),
           "pnpm-workspace.yaml".into(),
-          "tsconfig.json".into(),
         ],
         wholename: false,
       }),

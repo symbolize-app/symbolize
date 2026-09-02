@@ -3,8 +3,8 @@ version: '3'
 run: when_changed
 
 vars:
-  ESLINT_ARGS: "--cache --cache-location build/eslint-cache --ignore-path .gitignore --max-warnings 0 --ext ts,js,cjs $(dasel -f tsconfig.json -r json -w - '.references.all().path')"
-  PRETTIER_ARGS: --ignore-path .gitignore --check '**/*'.{cjs,css,js,json,ts,html,md,yaml} '!pnpm-lock.yaml'
+  ESLINT_ARGS: "--cache --cache-location build/eslint-cache --ignore-path .gitignore --max-warnings 0 --ext js,cjs,mjs"
+  PRETTIER_ARGS: --ignore-path .gitignore --check '**/*'.{css,js,json,mjs,html,md,yaml} '!pnpm-lock.yaml' '!target-analyzer/**'
 
 tasks:
   build:debug:
@@ -13,14 +13,12 @@ tasks:
       - b
     deps:
       - esbuild:build:debug
-      - tsc:build
 
   build:release:
     aliases:
       - br
     deps:
       - esbuild:build:release
-      - tsc:build
 
   clean:
     deps:
@@ -31,47 +29,59 @@ tasks:
     deps:
       - esbuild:clean:debug
       - eslint:clean
-      - tsc:clean
 
   clean:release:
     deps:
       - esbuild:clean:release
       - eslint:clean
-      - tsc:clean
 
   esbuild:build:debug:
     aliases:
       - esbuild:build
       - esbuild:b
-    cmd: dev-esbuild --mode development
+    deps:
+      - :dev-esbuild:build
+    cmd: ./dev-esbuild/bin/dev-esbuild --mode development
 
   esbuild:build:debug:watch:
     aliases:
       - esbuild:build:watch
       - esbuild:bw
+    deps:
+      - :dev-esbuild:build
     cmd:
       task: :watchman:client
       vars:
         WATCH: true
         RESTART: false
-        MODE: type-script
-        COMMAND: dev-esbuild --mode development
+        MODE: javascript
+        COMMAND: ./dev-esbuild/bin/dev-esbuild --mode development
 
   esbuild:build:release:
-    cmd: dev-esbuild --mode production
+    deps:
+      - :dev-esbuild:build
+    cmd: ./dev-esbuild/bin/dev-esbuild --mode production
+
+  esbuild:test:browser:built:
+    cmds:
+      - task: :tmpfs:link-build-dirs
+      - task: esbuild:build:debug
+      - task: :dev-esbuild:test:browser:built
 
   esbuild:clean:debug:
-    cmd: dev-esbuild --mode development --clean
+    deps:
+      - :dev-esbuild:build
+    cmd: ./dev-esbuild/bin/dev-esbuild --mode development --clean
 
   esbuild:clean:release:
-    cmd: dev-esbuild --mode production --clean
+    deps:
+      - :dev-esbuild:build
+    cmd: ./dev-esbuild/bin/dev-esbuild --mode production --clean
 
   eslint:clean:
     cmd: rm build/eslint-cache
 
   eslint:lint:check:
-    deps:
-      - tsc:build
     cmd: eslint {{.ESLINT_ARGS}}
 
   eslint:lint:check:watch:
@@ -80,12 +90,10 @@ tasks:
       vars:
         WATCH: true
         RESTART: false
-        MODE: type-script
+        MODE: javascript
         COMMAND: eslint {{.ESLINT_ARGS}}
 
   eslint:lint:fix:
-    deps:
-      - tsc:build
     cmd: eslint {{.ESLINT_ARGS}} --fix
 
   format:check:
@@ -108,50 +116,20 @@ tasks:
       - l
     deps:
       - eslint:lint:check
-      - syncpack:lint:check
 
   lint:fix:
     aliases:
       - lf
     deps:
       - eslint:lint:fix
-      - syncpack:lint:fix
 
   lock:check:
     cmd: pnpm install --frozen-lockfile --lockfile-only
 
-  syncpack:lint:check:
-    cmd: syncpack lint
-
-  syncpack:lint:fix:
-    cmds:
-      - syncpack fix-mismatches
-      - syncpack format
-      - task: syncpack:lint:check
-
-  tsc:clean:
-    cmd: tsc --build --clean
-
-  tsc:build:
-    aliases:
-      - tsc:b
-    cmd: tsc --build --verbose
-
-  tsc:build:watch:
-    aliases:
-      - tsc:bw
-    cmd:
-      task: :watchman:client
-      vars:
-        WATCH: true
-        RESTART: false
-        MODE: type-script
-        COMMAND: tsc --build
-
   test:
     aliases:
       - t
-    cmd: dev-pnpm-test
+    cmd: task gleam:test
 
   test:watch:
     aliases:
@@ -161,5 +139,5 @@ tasks:
       vars:
         WATCH: true
         RESTART: false
-        MODE: type-script
-        COMMAND: dev-pnpm-test
+        MODE: gleam
+        COMMAND: task gleam:test

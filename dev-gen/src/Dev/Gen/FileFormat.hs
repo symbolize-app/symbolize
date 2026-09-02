@@ -7,18 +7,9 @@ module Dev.Gen.FileFormat
     TaskfileCommand (..),
     TaskfileInclude (..),
     TaskfileTask (..),
-    TypeScriptConfig (..),
-    TypeScriptConfigCompilerOptions (..),
-    TypeScriptConfigReference (..),
     WatchmanConfig (..),
     taskfileRun,
     taskfileVersion,
-    typeScriptConfigCompilerOptions,
-    typeScriptConfigCompilerOptionsDeclarationDir,
-    typeScriptConfigCompilerOptionsPaths,
-    typeScriptConfigExclude,
-    typeScriptConfigExtends,
-    typeScriptConfigInclude,
   )
 where
 
@@ -60,18 +51,6 @@ data PNPMPackageFile = PNPMPackageFile
   deriving stock (Show, Eq, Generic)
 
 instance Aeson.FromJSON PNPMPackageFile
-
-type TypeScriptConfig :: Type
-data TypeScriptConfig = TypeScriptConfig
-  { extends :: Text,
-    include :: Vector Text,
-    exclude :: Vector Text,
-    compilerOptions :: TypeScriptConfigCompilerOptions,
-    references :: Vector TypeScriptConfigReference
-  }
-  deriving stock (Show, Eq, Generic)
-
-instance Aeson.ToJSON TypeScriptConfig
 
 type PNPMWorkspace :: Type
 newtype PNPMWorkspace = PNPMWorkspace
@@ -157,57 +136,6 @@ instance Aeson.ToJSON TaskfileCommand where
   toEncoding = Aeson.genericToEncoding taskfileOptions
 
 instance Aeson.FromJSON TaskfileCommand
-
-typeScriptConfigExtends :: Text
-typeScriptConfigExtends = "@symbolize/dev-tsconfig/tsconfig.json"
-
-typeScriptConfigInclude :: Vector Text
-typeScriptConfigInclude = ["./**/*.ts", "./**/*.js", "./**/*.cjs"]
-
-typeScriptConfigExclude :: Vector Text
-typeScriptConfigExclude = ["build/**", "node_modules/**"]
-
-type TypeScriptConfigCompilerOptions :: Type
-data TypeScriptConfigCompilerOptions = TypeScriptConfigCompilerOptions
-  { declarationDir :: Text,
-    paths :: Map Text (Vector Text),
-    tsBuildInfoFile :: Text
-  }
-  deriving stock (Show, Eq, Generic)
-
-instance Aeson.ToJSON TypeScriptConfigCompilerOptions
-
-typeScriptConfigCompilerOptions :: TypeScriptConfigCompilerOptions
-typeScriptConfigCompilerOptions =
-  TypeScriptConfigCompilerOptions
-    { declarationDir = typeScriptConfigCompilerOptionsDeclarationDir,
-      paths = typeScriptConfigCompilerOptionsPaths,
-      tsBuildInfoFile = typeScriptConfigCompilerOptionsTSBuildInfoFile
-    }
-
-typeScriptConfigCompilerOptionsDeclarationDir :: Text
-typeScriptConfigCompilerOptionsDeclarationDir = "./build/tsc"
-
-typeScriptConfigCompilerOptionsPaths :: Map Text (Vector Text)
-typeScriptConfigCompilerOptionsPaths =
-  [ ("@/*.css", ["./*.css"]),
-    ("@/*.html", ["./*.html"]),
-    ("@/*.sql", ["./*.sql"]),
-    ("@/*.ts", ["./*.ts"]),
-    ("@/*.txt", ["./*.txt"])
-  ]
-
-typeScriptConfigCompilerOptionsTSBuildInfoFile :: Text
-typeScriptConfigCompilerOptionsTSBuildInfoFile =
-  "build/tsc/tsconfig.tsbuildinfo"
-
-type TypeScriptConfigReference :: Type
-newtype TypeScriptConfigReference = TypeScriptConfigReference
-  { path :: Text
-  }
-  deriving stock (Show, Eq, Generic)
-
-instance Aeson.ToJSON TypeScriptConfigReference
 
 watchmanConfigOptions :: Aeson.Options
 watchmanConfigOptions =

@@ -7,7 +7,7 @@
       "type": "shell",
       "command": "echo pnpm watch",
       "isBackground": true,
-      "problemMatcher": ["$tsc-watch"],
+      "problemMatcher": [],
       "group": "build",
       "presentation": {
         "reveal": "never",

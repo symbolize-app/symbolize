@@ -15,12 +15,21 @@ tasks:
       vars:
         - NAME
     status:
-      - test "$(readlink {{.NAME}}/build)" = ../build/{{.NAME}}
-      - test -d build/{{.NAME}}
+      - test -f {{.NAME}}/gleam.toml && test ! -L {{.NAME}}/build && test -d {{.NAME}}/build || test ! -f {{.NAME}}/gleam.toml && test "$(readlink {{.NAME}}/build)" = ../build/{{.NAME}} && test -d build/{{.NAME}}
     cmds:
-      - rm -rf {{.NAME}}/build
-      - ln -s ../build/{{.NAME}} {{.NAME}}/build
-      - mkdir -p build/{{.NAME}}
+      - |
+        if test -f {{.NAME}}/gleam.toml; then
+          if test -L {{.NAME}}/build; then
+            rm -f {{.NAME}}/build
+            mkdir -p {{.NAME}}/build
+          else
+            mkdir -p {{.NAME}}/build
+          fi
+        else
+          rm -rf {{.NAME}}/build
+          ln -s ../build/{{.NAME}} {{.NAME}}/build
+          mkdir -p build/{{.NAME}}
+        fi
 
   link-package-build-dirs:
     deps:

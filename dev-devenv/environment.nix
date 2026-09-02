@@ -6,7 +6,10 @@
     EASYRSA_NO_PASS = "1";
 
     NODE_OPTIONS_PRODUCTION = "--unhandled-rejections strict";
-    NODE_OPTIONS = "--require ${config.devenv.root}/dev-node-suppress/index.cjs --experimental-json-modules --unhandled-rejections strict";
+    NODE_OPTIONS = "--experimental-json-modules --unhandled-rejections strict";
+    NODE_PATH = "${config.devenv.root}/node_modules:${pkgs.symbolize-node}/lib/node_modules";
+    PUPPETEER_SKIP_DOWNLOAD = "true";
+    PUPPETEER_EXECUTABLE_PATH = "${pkgs.chromium}/bin/chromium";
 
     DATABASE_URL = "sqlite:svc-gateway-host-store/build/manifest.sqlite3";
     DBMATE_MIGRATIONS_DIR = "svc-gateway-host-store/migrate";

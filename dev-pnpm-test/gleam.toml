@@ -1,0 +1,21 @@
+name = "symbolize_dev_pnpm_test"
+version = "0.1.0"
+target = "javascript"
+gleam = ">= 1.18.1 and < 2.0.0"
+
+[javascript]
+runtime = "node"
+source_maps = true
+
+[dependencies]
+gleam_stdlib = ">= 1.0.5 and < 2.0.0"
+symbolize_lib_collection = { path = "../lib-collection" }
+symbolize_lib_dataflow = { path = "../lib-dataflow" }
+symbolize_lib_error = { path = "../lib-error" }
+symbolize_lib_hex = { path = "../lib-hex" }
+symbolize_lib_markup = { path = "../lib-markup" }
+symbolize_lib_payload = { path = "../lib-payload" }
+symbolize_lib_random = { path = "../lib-random" }
+symbolize_lib_stream = { path = "../lib-stream" }
+symbolize_lib_styling = { path = "../lib-styling" }
+symbolize_lib_time = { path = "../lib-time" }

@@ -1,9 +1,9 @@
-{ pkgs, ... }:
+{ inputs, pkgs, ... }:
 
 {
   packages = with pkgs; [
     curl
-    dasel
+    chromium
     dbmate
     easyrsa
     fd
@@ -18,5 +18,6 @@
     unzip
     watchman
     woff2
+    inputs.nixpkgs-gleam.legacyPackages.${pkgs.system}.gleam
   ];
 }

@@ -5,18 +5,14 @@ final: prev:
     nodejs = final.nodejs_22;
   };
 
-  symbolize-node-loader = final.writeShellScriptBin "node-loader" ''
-    node --experimental-loader @symbolize/dev-node-loader/index.js "$@"
-  '';
-
   symbolize-node = final.symlinkJoin {
     name = "symbolize-node";
     paths = [
       final.nodejs_22
       final.nodejs_22.pkgs.node2nix
-      final.symbolize-node-packages."@withgraphite/graphite-cli"
-      final.symbolize-node-packages.pnpm
-      final.symbolize-node-loader
+      final.symbolize-node-packages."@withgraphite/graphite-cli-1.6.1"
+      final.symbolize-node-packages."pnpm-10.10.0"
+      final.symbolize-node-packages."puppeteer-25.9.0"
     ];
   };
 }

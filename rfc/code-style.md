@@ -16,26 +16,16 @@ Other details:
 - Use a builder instead of letting a constructor become compilcated
 - Use `mod.rs` to "index" all source files
 
-## TypeScript
+## Gleam
 
-Basics controlled by ESLint and Prettier.
+Basics controlled by the Gleam formatter and compiler.
 
 Other details:
 
-- Don't put logic in a constructor
-  - If needed, introduce a static builder method
-- Hide implementation details inside class or interface methods
-- Make most data readonly
-
-### Classes
-
-- Use interfaces instead of object literal type aliases
-- Use class instances instead of object literals
-- Only export class types (except errors)
-- Don't export class types for purely-implementation classes
-- Export an optionally-async constructor function with the same name as the class
-- Use a readonly type alias if the class has mutable fields
-- Don't use class inheritance
+- Prefer records for data and `..default` updates for optional fields.
+- Keep type nesting shallow and use common types across APIs.
+- Use opaque types only for semantic boundaries that need representation hiding.
+- Keep Web API and JavaScript interop at explicit FFI boundaries.
 
 ## CSS
 

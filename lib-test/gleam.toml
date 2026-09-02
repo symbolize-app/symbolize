@@ -1,0 +1,13 @@
+name = "symbolize_lib_test"
+version = "0.1.0"
+target = "javascript"
+gleam = ">= 1.18.1 and < 2.0.0"
+
+[javascript]
+runtime = "node"
+source_maps = true
+
+[dependencies]
+gleam_stdlib = ">= 1.0.5 and < 2.0.0"
+symbolize_lib_dataflow = { path = "../lib-dataflow" }
+symbolize_lib_error = { path = "../lib-error" }

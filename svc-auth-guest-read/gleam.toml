@@ -1,0 +1,15 @@
+name = "symbolize_svc_auth_guest_read"
+version = "0.1.0"
+target = "javascript"
+gleam = ">= 1.18.1 and < 2.0.0"
+
+[javascript]
+runtime = "node"
+source_maps = true
+
+[dependencies]
+symbolize_dev_browser_test = { path = "../dev-browser-test" }
+gleam_stdlib = ">= 1.0.5 and < 2.0.0"
+symbolize_lib_dataflow = { path = "../lib-dataflow" }
+symbolize_lib_stream = { path = "../lib-stream" }
+symbolize_lib_time = { path = "../lib-time" }
