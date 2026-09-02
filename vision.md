@@ -1,6 +1,6 @@
-# Symbolize Vision
+# Symbolize vision
 
-## Why Community
+## Why community
 
 People build projects, organizations, products, movements, and other initiatives because they want to accomplish something with and for other people. To succeed online, they need to reach people and keep creating value for them.
 
@@ -12,7 +12,7 @@ Over time, this can compound. Content creates reach and participation; participa
 
 Community is therefore not merely an audience or an engagement layer around an initiative’s work. It can become part of the initiative’s ability to learn, create, reach people, and accomplish its purpose.
 
-## How Community Works
+## How community works
 
 A community must keep creating reasons for people to care, participate, and contribute. It does this through the value people create for one another, the relationships they build, and the shared knowledge and responsibility that accumulate over time.
 
@@ -28,7 +28,7 @@ Content carries much of the value a community creates. Conversations, answers, d
 
 That same content can also create external reach. Content made primarily for a community may be publicly useful, while content intended for a limited audience may be actively distributed in private. Who content serves, who can access it, and how it is distributed are separate questions that should be answered through intentional design.
 
-### Community Boundaries
+### Community boundaries
 
 Communities are not isolated systems. People participate in many communities, and ideas, knowledge, relationships, content, and opportunities move between them.
 
@@ -40,7 +40,7 @@ Participation is how a community develops capacity. People begin by receiving va
 
 As more people become capable of shaping and sustaining the community, its knowledge, relationships, and ability to act can compound rather than remaining dependent on a small central group.
 
-## Community Leadership
+## Community leadership
 
 Leadership is not the same as authority. Administrators, moderators, and other formal roles may hold particular powers and responsibilities, but agency and accountability are inherently distributed throughout every community. Everyone who participates can affect other people and shape the community through their actions, whether or not that influence is formally recognized.
 
@@ -50,7 +50,7 @@ Good communities cultivate this distributed leadership. As people care more, con
 
 That leadership does not stop at a community’s boundary. People participate in many communities, carrying knowledge, relationships, ideas, and opportunities between them. Effective outreach often grows from this ordinary participation: people contributing genuinely to other communities and building relationships there, rather than treating them simply as audiences to acquire.
 
-## What Symbolize Is
+## What Symbolize is
 
 Symbolize is a home for community leaders to build strong, healthy communities.
 
@@ -60,7 +60,7 @@ Publishing, discussion, knowledge, communication, participation, moderation, and
 
 Symbolize supports the people doing the work of community. It should extend their ability to lead, contribute, collaborate, and steward while preserving the human judgment, empathy, and relationships that healthy communities depend on.
 
-## Design Principles
+## Design principles
 
 Symbolize and the communities it supports are both complex systems shaped by many small decisions over time. Three principles guide those decisions: simplicity, empathy, and evolution.
 
