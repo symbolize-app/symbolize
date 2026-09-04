@@ -8,7 +8,7 @@ runtime = "node"
 source_maps = true
 
 [dependencies]
-gleam_stdlib = ">= 1.0.5 and < 2.0.0"
+gleam_stdlib = { path = "../vendor/gleam_stdlib-1.0.5" }
 symbolize_lib_collection = { path = "../lib-collection" }
 symbolize_lib_dataflow = { path = "../lib-dataflow" }
 symbolize_lib_error = { path = "../lib-error" }

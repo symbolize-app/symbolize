@@ -92,6 +92,11 @@ example_library = { path = "../vendor/example-library-1.2.3" }
 JavaScript or other build tooling should follow the same principle and import
 or read files from the versioned snapshot path when needed.
 
+All Gleam project dependencies must use local path specifications. The
+repository's vendor check rejects registry dependencies and locked manifest
+entries whose source is not `local`. The shared `gleam_stdlib` dependency is
+vendored as `gleam_stdlib-1.0.5`.
+
 ## Duplicate dependency ledger
 
 `dup.toml` records the dependency identities for which the closure contains

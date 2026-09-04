@@ -16,6 +16,7 @@ expected_dirs=(
   escalade-3.2.0
   get-caller-file-2.0.5
   get-east-asian-width-1.6.0
+  gleam_stdlib-1.0.5
   lilconfig-3.1.3
   mitt-3.0.1
   modern-tar-0.8.4
@@ -88,6 +89,52 @@ if len(ledger_duplicate_sets) != len(set(ledger_duplicate_sets)) or set(ledger_d
     raise SystemExit("vendor/dup.toml must contain exactly one entry for every duplicated upstream URL")
 PY
 
+python3 - "$vendor_root" <<'PY'
+import sys
+import tomllib
+from pathlib import Path
+
+vendor_root = Path(sys.argv[1])
+repository_root = vendor_root.parent
+ignored_parts = {".git", ".tmp", "build", "node_modules"}
+errors = []
+
+for path in repository_root.rglob("gleam.toml"):
+    if ignored_parts.intersection(path.parts):
+        continue
+    config = tomllib.loads(path.read_text())
+    for section_name in ("dependencies", "dev-dependencies"):
+        dependencies = config.get(section_name, {})
+        if not isinstance(dependencies, dict):
+            errors.append(f"{path}: [{section_name}] must be a table")
+            continue
+        for name, specification in dependencies.items():
+            if isinstance(specification, str):
+                errors.append(
+                    f"{path}: {section_name}.{name} uses a registry version constraint"
+                )
+            elif not isinstance(specification, dict) or not isinstance(
+                specification.get("path"), str
+            ):
+                errors.append(
+                    f"{path}: {section_name}.{name} must use a local path dependency"
+                )
+
+for path in repository_root.rglob("manifest.toml"):
+    if ignored_parts.intersection(path.parts):
+        continue
+    manifest = tomllib.loads(path.read_text())
+    for package in manifest.get("packages", []):
+        if package.get("source") != "local":
+            errors.append(
+                f"{path}: {package.get('name', '<unnamed>')} has non-local source "
+                f"{package.get('source', '<missing>')}"
+            )
+
+if errors:
+    raise SystemExit("Gleam dependencies must all be local paths:\n" + "\n".join(errors))
+PY
+
 for name in "${expected_dirs[@]}"; do
   dir="$vendor_root/$name"
   test -d "$dir"
@@ -121,6 +168,9 @@ while IFS= read -r path; do
 done < <(find "$vendor_root" \( -type f -o -type d \) -print)
 
 test -f "$vendor_root/puppeteer-25.9.0/runtime/puppeteer.mjs"
+test -f "$vendor_root/gleam_stdlib-1.0.5/gleam.toml"
+test -f "$vendor_root/gleam_stdlib-1.0.5/src/gleam/io.gleam"
+test -f "$vendor_root/gleam_stdlib-1.0.5/src/gleam_stdlib.mjs"
 test -f "$vendor_root/sqlite3-3.46.0/sqlite3.c"
 test -f "$vendor_root/sqlite3-3.46.0/sqlite3.h"
 test -f "$vendor_root/sqlite3-3.46.0/sqlite3ext.h"
