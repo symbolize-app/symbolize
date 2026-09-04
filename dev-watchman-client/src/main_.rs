@@ -232,18 +232,14 @@ fn build_expr(cli: &Cli) -> Result<Expr> {
         "txt".into(),
       ]),
       Expr::Name(NameTerm {
-        paths: vec![
-          ".eslintrc.json".into(),
-          "package.json".into(),
-          "pnpm-lock.yaml".into(),
-          "pnpm-workspace.yaml".into(),
-        ],
+        paths: vec![".eslintrc.json".into(), "vendor/README.md".into()],
         wholename: false,
       }),
       Expr::Name(NameTerm {
         paths: vec![
           "dev-eslint/index.json".into(),
-          "dev-task/pnpm.yml".into(),
+          "dev-task/node.yml".into(),
+          "dev-task/vendor.yml".into(),
         ],
         wholename: true,
       }),

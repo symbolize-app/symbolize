@@ -1,8 +1,0 @@
-packages:
-  - dev-esbuild
-  - dev-eslint
-  - dev-prettier
-  - lib-collection
-  - lib-dataflow
-  - lib-markup
-  - lib-styling

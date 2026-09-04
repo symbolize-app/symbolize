@@ -12,7 +12,6 @@
 - https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API
 - https://developer.mozilla.org/en-US/docs/Web/API/SharedWorker
 - https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API
-- https://pnpm.io/
 - https://prettier.io/
 - https://eslint.org/
 - https://esbuild.github.io/

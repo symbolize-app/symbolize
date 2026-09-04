@@ -1,6 +1,6 @@
 {
   "root": true,
-  "ignorePatterns": ["build/**", "node_modules/**"],
+  "ignorePatterns": ["build/**", "node_modules/**", "vendor/**"],
   "extends": ["eslint:recommended"],
   "rules": {
     "no-console": "off",

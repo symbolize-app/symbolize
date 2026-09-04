@@ -37,9 +37,11 @@ fn operation(
 fn check(page: browser.Page, server: browser.Server) -> Result(Nil, String) {
   case browser.failed_requests(page) {
     [] ->
-      case browser.report(page, server, [
-        "lib-error Chromium AbortController retry passed",
-      ]) {
+      case
+        browser.report(page, server, [
+          "lib-error Chromium AbortController retry passed",
+        ])
+      {
         Error(reason) -> Error(reason)
         Ok(Nil) -> {
           io.println("lib-error Chromium Gleam driver passed")

@@ -10,10 +10,9 @@ fd --version
 gleam --version
 ghc --version
 git --version
-echo "gt $(gt --version)"
 echo "node $(node --version)"
-echo "pnpm v$(pnpm --version)"
-echo "puppeteer $(node -e 'console.log(require(require.resolve("puppeteer/package.json")).version)')"
+echo "eslint $(eslint --version)"
+echo "prettier $(prettier --version)"
 overmind --version
 rustc --version
 sqlfluff --version

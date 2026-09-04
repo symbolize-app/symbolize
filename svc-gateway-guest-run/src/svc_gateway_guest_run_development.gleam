@@ -1,5 +1,5 @@
 // This is the development-only equivalent of the source repository's
-// svc-gateway-guest-run/main.development.ts -> dev-pnpm-test graph. The test
+// svc-gateway-guest-run/main.development.ts -> dev-node-test graph. The test
 // suites themselves live with their migrated packages; this module is only
 // the static browser entry that keeps that graph discoverable by esbuild.
 import gleam/io

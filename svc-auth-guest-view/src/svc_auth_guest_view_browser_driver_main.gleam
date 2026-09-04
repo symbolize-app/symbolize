@@ -107,10 +107,12 @@ fn operation(
                               {
                                 Error(reason) -> Error(reason)
                                 Ok(Nil) ->
-                                  case browser.report(page, server, [
-                                    "svc-auth-guest-view custom content mounted",
-                                    "client data pong",
-                                  ]) {
+                                  case
+                                    browser.report(page, server, [
+                                      "svc-auth-guest-view custom content mounted",
+                                      "client data pong",
+                                    ])
+                                  {
                                     Error(reason) -> Error(reason)
                                     Ok(Nil) -> {
                                       io.println(

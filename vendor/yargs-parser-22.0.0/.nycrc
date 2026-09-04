@@ -1,0 +1,13 @@
+{
+  "exclude": [
+    "build/test/**",
+    "test/**"
+  ],
+  "reporter": [
+    "html",
+    "text"
+  ],
+  "lines": 99.5,
+  "branches": "97",
+  "statements": "99.5"
+}

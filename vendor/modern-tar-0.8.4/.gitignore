@@ -1,0 +1,17 @@
+node_modules
+.pnpm-store
+dist
+*.log
+.DS_Store
+.mise.toml
+*.tsbuildinfo
+coverage
+.hegel
+AGENT.md
+CLAUDE.md
+
+benchmarks/data
+benchmarks/*.js
+benchmarks/**/*.js
+docs/
+tmp

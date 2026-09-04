@@ -1,4 +1,9 @@
-import { build as esbuildBuild } from 'esbuild'
+const { build: esbuildBuild } = await import(
+  new URL(
+    '../../../../../vendor/esbuild-0.19.5/symbolize.mjs',
+    import.meta.url,
+  )
+)
 import { List, Result$Error, Result$Ok, toBitArray } from './gleam.mjs'
 
 const resolveBase = Symbol('resolveBase')

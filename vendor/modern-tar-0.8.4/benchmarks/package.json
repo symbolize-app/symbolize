@@ -1,0 +1,24 @@
+{
+	"name": "modern-tar-benchmarks",
+	"private": true,
+	"version": "0.0.0",
+	"type": "module",
+	"scripts": {
+		"bench": "node --expose-gc --experimental-strip-types run.bench.ts",
+		"bench:pack": "node --expose-gc --experimental-strip-types run.pack.ts",
+		"bench:unpack": "node --expose-gc --experimental-strip-types run.unpack.ts",
+		"deopt": "dexnode run.unpack.ts -- --expose-gc --experimental-strip-types ",
+		"fixtures": "node --experimental-strip-types fixtures/generate.ts"
+	},
+	"dependencies": {
+		"mitata": "^1.0.34",
+		"modern-tar": "file:..",
+		"tar": "^7.5.22",
+		"tar-fs": "^3.1.3"
+	},
+	"devDependencies": {
+		"@types/node": "^26.1.2",
+		"@types/tar-fs": "^2.0.4",
+		"typescript": "^7.0.2"
+	}
+}

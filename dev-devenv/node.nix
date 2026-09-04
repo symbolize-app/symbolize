@@ -10,9 +10,8 @@ final: prev:
     paths = [
       final.nodejs_22
       final.nodejs_22.pkgs.node2nix
-      final.symbolize-node-packages."@withgraphite/graphite-cli-1.6.1"
-      final.symbolize-node-packages."pnpm-10.10.0"
-      final.symbolize-node-packages."puppeteer-25.9.0"
+      final.symbolize-node-packages."eslint-8.56.0"
+      final.symbolize-node-packages."prettier-3.2.5"
     ];
   };
 }

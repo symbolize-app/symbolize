@@ -1,6 +1,6 @@
 import dev_browser_test as browser
-import gleam/io
 import gleam/bit_array
+import gleam/io
 import gleam/option.{type Option, None, Some}
 import gleam/string
 import lib_dataflow as dataflow
