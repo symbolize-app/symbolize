@@ -36,6 +36,11 @@ devenv allow
 
 Devenv auto-reload is disabled for this project so Watchman remains the sole file watcher.
 
+Devenv provides Node, Chromium, ESLint, Prettier, and the native toolchain.
+The remaining JavaScript build/runtime dependencies are checked out under
+`vendor/` and are used through explicit paths; no Node package-manager install
+is required.
+
 ### Easy-RSA
 
 General:
@@ -66,6 +71,10 @@ Chrome & Firefox:
 ```
 task i
 ```
+
+`task i` installs the non-Node development tools managed by the repository.
+Node dependencies are provided by Devenv or built from the snapshots in
+`vendor/` as part of the normal build.
 
 ## Visual Studio Code
 

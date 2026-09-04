@@ -1,4 +1,3 @@
-import { createRequire } from 'node:module'
 import { createServer } from 'node:http'
 import { createSecureServer } from 'node:http2'
 import { execFile } from 'node:child_process'
@@ -14,8 +13,20 @@ import {
   Option$Some,
 } from '../gleam_stdlib/gleam/option.mjs'
 
-const require = createRequire(import.meta.url)
-const puppeteer = require('puppeteer')
+const { default: puppeteer } = await import(
+  new URL(
+    '../../../../../vendor/puppeteer-25.9.0/runtime/puppeteer.mjs',
+    import.meta.url,
+  )
+)
+
+function launch_options(args = []) {
+  const executablePath = process.env.SYMBOLIZE_CHROMIUM_EXECUTABLE
+  if (executablePath === undefined) {
+    throw new Error('SYMBOLIZE_CHROMIUM_EXECUTABLE is not set')
+  }
+  return { args, executablePath, headless: true }
+}
 
 export function listen(handler, onError, done) {
   listenServer(createServer, handler, onError, done)
@@ -145,26 +156,17 @@ export function end(response, body) {
 }
 
 export function launch(done) {
-  puppeteer
-    .launch({
-      headless: true,
-    })
-    .then(
-      (browser) => done(Result$Ok(browser)),
-      (error) => done(Result$Error(String(error))),
-    )
+  puppeteer.launch(launch_options()).then(
+    (browser) => done(Result$Ok(browser)),
+    (error) => done(Result$Error(String(error))),
+  )
 }
 
 export function launch_insecure(done) {
-  puppeteer
-    .launch({
-      args: ['--ignore-certificate-errors'],
-      headless: true,
-    })
-    .then(
-      (browser) => done(Result$Ok(browser)),
-      (error) => done(Result$Error(String(error))),
-    )
+  puppeteer.launch(launch_options(['--ignore-certificate-errors'])).then(
+    (browser) => done(Result$Ok(browser)),
+    (error) => done(Result$Error(String(error))),
+  )
 }
 
 export function new_page(browser, onConsole, onError, onFailed, done) {

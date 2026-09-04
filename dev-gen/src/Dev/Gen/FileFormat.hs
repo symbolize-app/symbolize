@@ -1,8 +1,6 @@
 module Dev.Gen.FileFormat
   ( CargoWorkspace (..),
     CargoWorkspaceWorkspace (..),
-    PNPMPackageFile (..),
-    PNPMWorkspace (..),
     Taskfile (..),
     TaskfileCommand (..),
     TaskfileInclude (..),
@@ -41,24 +39,6 @@ newtype CargoWorkspaceWorkspace = CargoWorkspaceWorkspace
 
 instance Toml.FromValue CargoWorkspaceWorkspace where
   fromValue = Toml.parseTableFromValue (CargoWorkspaceWorkspace . fromList <$> Toml.reqKey "members")
-
-type PNPMPackageFile :: Type
-data PNPMPackageFile = PNPMPackageFile
-  { name :: Text,
-    dependencies :: Maybe (Map Text Text),
-    devDependencies :: Maybe (Map Text Text)
-  }
-  deriving stock (Show, Eq, Generic)
-
-instance Aeson.FromJSON PNPMPackageFile
-
-type PNPMWorkspace :: Type
-newtype PNPMWorkspace = PNPMWorkspace
-  { packages :: Vector Text
-  }
-  deriving stock (Show, Eq, Generic)
-
-instance Aeson.FromJSON PNPMWorkspace
 
 taskfileOptions :: Aeson.Options
 taskfileOptions =

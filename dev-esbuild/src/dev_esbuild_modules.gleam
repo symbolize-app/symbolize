@@ -1,11 +1,10 @@
-import gleam/dict.{type Dict}
 import gleam/option.{type Option, None, Some}
 import gleam/result
 import gleam/set.{type Set}
 import gleam/string
 
 pub type Context {
-  Context(outbase: String, pnpm_package_versions: Dict(String, String))
+  Context(outbase: String)
 }
 
 pub type Resolver {
@@ -17,7 +16,7 @@ pub type Resolver {
 }
 
 pub fn context(outbase: String) -> Context {
-  Context(outbase, dict.new())
+  Context(outbase)
 }
 
 pub fn resolver(context: Context, entry_points: List(String)) -> Resolver {
@@ -119,32 +118,7 @@ fn convert_regular_out_path(
   context: Context,
   relative: String,
 ) -> Result(#(Context, String), String) {
-  case pnpm_match(relative) {
-    None -> Ok(#(context, relative))
-    Some(#(package, version, suffix)) -> {
-      case dict.get(context.pnpm_package_versions, package) {
-        Error(Nil) ->
-          Ok(#(
-            Context(
-              context.outbase,
-              dict.insert(context.pnpm_package_versions, package, version),
-            ),
-            ".pnpm-" <> package <> "/" <> suffix,
-          ))
-        Ok(previous) if previous == version ->
-          Ok(#(context, ".pnpm-" <> package <> "/" <> suffix))
-        Ok(previous) ->
-          Error(
-            "Ambiguous versions found for "
-            <> package
-            <> ": "
-            <> previous
-            <> " / "
-            <> version,
-          )
-      }
-    }
-  }
+  Ok(#(context, relative))
 }
 
 fn generated_gateway_entry(path: String) -> Option(String) {
@@ -187,7 +161,9 @@ fn generated_development_entry(path: String) -> Option(String) {
 // a stable logical output path before imports are rewritten.
 fn generated_module_output_path(path: String) -> Option(String) {
   case string.split(path, on: "/") {
-    [_, "build", _, "javascript", "prelude.mjs"] -> Some(".gleam/prelude")
+    ["build", _, "javascript", "prelude.mjs"] -> Some(".gleam/prelude")
+    ["build", _, "javascript", package, ..module_parts] ->
+      generated_package_output_path(package, module_parts)
     [_, "build", _, "javascript", package, ..module_parts] ->
       generated_package_output_path(package, module_parts)
     _ -> None
@@ -332,46 +308,6 @@ pub fn relative_import(
         True -> relative
         False -> "./" <> relative
       }
-  }
-}
-
-fn pnpm_match(relative: String) -> Option(#(String, String, String)) {
-  let prefix = "node_modules/.pnpm/"
-  case string.starts_with(relative, prefix) {
-    False -> None
-    True -> {
-      let rest = string.drop_start(relative, string.length(prefix))
-      case string.split_once(rest, on: "/") {
-        Error(Nil) -> None
-        Ok(#(package_version, after_package)) ->
-          case split_package_version(package_version) {
-            None -> None
-            Some(#(package, version)) ->
-              case string.starts_with(after_package, "node_modules/") {
-                False -> None
-                True -> {
-                  let dependency_path =
-                    string.drop_start(
-                      after_package,
-                      string.length("node_modules/"),
-                    )
-                  case string.split_once(dependency_path, on: "/") {
-                    Error(Nil) -> None
-                    Ok(#(_, suffix)) -> Some(#(package, version, suffix))
-                  }
-                }
-              }
-          }
-      }
-    }
-  }
-}
-
-fn split_package_version(value: String) -> Option(#(String, String)) {
-  case string.split_once(string.reverse(value), on: "@") {
-    Error(Nil) -> None
-    Ok(#(reversed_version, reversed_package)) ->
-      Some(#(string.reverse(reversed_package), string.reverse(reversed_version)))
   }
 }
 

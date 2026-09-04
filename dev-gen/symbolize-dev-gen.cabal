@@ -93,7 +93,6 @@ test-suite symbolize-dev-gen-test
   other-modules:
       Dev.Gen.ExecSpec
       Dev.Gen.InterpretSpec
-      Dev.Gen.PackageSpec
       Paths_symbolize_dev_gen
   hs-source-dirs:
       test

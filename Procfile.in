@@ -1,8 +1,8 @@
 watchman__server: task watchman:server
 cargo__build__clippy: task cargo:build:clippy:watch
-pnpm__esbuild__build: task pnpm:esbuild:build:watch
-pnpm__test: task pnpm:test:watch
-pnpm__eslint__lint__check: task pnpm:eslint:lint:check:watch
+node__esbuild__build: task node:esbuild:build:watch
+node__test: task node:test:watch
+node__eslint__lint__check: task node:eslint:lint:check:watch
 cabal__build: task cabal:build:watch
 cabal__lint: task cabal:lint:watch
 dev-gen__test: task dev-gen:test:watch

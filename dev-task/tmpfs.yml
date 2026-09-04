@@ -33,7 +33,7 @@ tasks:
 
   link-package-build-dirs:
     deps:
-      - :pnpm:link-build-dirs
+      - :node:link-build-dirs
       - :sqlite:link-build-dirs
 
   link-root-build-dir:

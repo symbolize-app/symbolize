@@ -13,8 +13,8 @@ includes:
     taskfile: dev-eslint
   dev-gen:
     taskfile: dev-gen
-  dev-pnpm-test:
-    taskfile: dev-pnpm-test
+  dev-node-test:
+    taskfile: dev-node-test
   dev-prettier:
     taskfile: dev-prettier
   dev-sim:
@@ -57,8 +57,10 @@ includes:
     taskfile: dev-task/nix.yml
   overmind:
     taskfile: dev-task/overmind.yml
-  pnpm:
-    taskfile: dev-task/pnpm.yml
+  node:
+    taskfile: dev-task/node.yml
+  vendor:
+    taskfile: dev-task/vendor.yml
   sqlite:
     taskfile: dev-task/sqlite.yml
   svc-auth-guest-read:
@@ -86,14 +88,14 @@ tasks:
     deps:
       - cabal:build:debug
       - cargo:build:debug
-      - pnpm:build:debug
+      - node:build:debug
   build:release:
     aliases:
       - br
     deps:
       - cabal:build:release
       - cargo:build:release
-      - pnpm:build:release
+      - node:build:release
   cargo:test:debug:
     aliases:
       - cargo:test
@@ -122,6 +124,7 @@ tasks:
       - echo "✅"
     deps:
       - build:release
+      - vendor:check
       - gen:check
       - test:release
       - format:check
@@ -131,7 +134,8 @@ tasks:
     deps:
       - cabal:clean
       - cargo:clean
-      - pnpm:clean
+      - node:clean
+      - vendor:clean
   dev:
     aliases:
       - d
@@ -145,7 +149,7 @@ tasks:
     deps:
       - cabal:format:check
       - cargo:format:check
-      - pnpm:format:check
+      - node:format:check
   format:fix:
     aliases:
       - format
@@ -153,7 +157,7 @@ tasks:
     deps:
       - cabal:format:fix
       - cargo:format:fix
-      - pnpm:format:fix
+      - node:format:fix
   gen:
     aliases:
       - g
@@ -171,7 +175,7 @@ tasks:
     deps:
       - dev-browser-test:check
       - dev-esbuild:check
-      - dev-pnpm-test:check
+      - dev-node-test:check
       - lib-concurrency:check
       - lib-collection:check
       - lib-dataflow:check
@@ -192,7 +196,7 @@ tasks:
     deps:
       - dev-browser-test:format:check
       - dev-esbuild:format:check
-      - dev-pnpm-test:format:check
+      - dev-node-test:format:check
       - lib-concurrency:format:check
       - lib-collection:format:check
       - lib-dataflow:format:check
@@ -212,7 +216,7 @@ tasks:
   gleam:test:
     deps:
       - dev-esbuild:test
-      - dev-pnpm-test:test
+      - dev-node-test:test
       - lib-concurrency:test
       - lib-collection:test
       - lib-dataflow:test
@@ -231,7 +235,7 @@ tasks:
       - svc-gateway-guest-run:test
   gleam:test:browser:
     cmds:
-      - task pnpm:esbuild:test:browser:built
+      - task node:esbuild:test:browser:built
       - task lib-concurrency:test:browser
       - task lib-dataflow:test:browser
       - task lib-markup:test:browser
@@ -250,7 +254,6 @@ tasks:
       - cabal:install
       - cargo:install
       - font:install
-      - pnpm:install
   lint:check:
     aliases:
       - lint
@@ -258,7 +261,7 @@ tasks:
     deps:
       - cabal:lint
       - cargo:lint:check
-      - pnpm:lint:check
+      - node:lint:check
       - sqlite:lint:check
   lint:fix:
     aliases:
@@ -266,17 +269,16 @@ tasks:
     deps:
       - cabal:lint
       - cargo:lint:fix
-      - pnpm:lint:fix
+      - node:lint:fix
       - sqlite:lint:fix
   lock:check:
     deps:
       - cargo:lock:check
-      - pnpm:lock:check
-  pnpm:link-build-dirs:
+  node:link-build-dirs:
     deps:
       - dev-browser-test:link-build-dir
       - dev-esbuild:link-build-dir
-      - dev-pnpm-test:link-build-dir
+      - dev-node-test:link-build-dir
       - dev-prettier:link-build-dir
       - dev-eslint:link-build-dir
       - lib-collection:link-build-dir
@@ -296,5 +298,5 @@ tasks:
     deps:
       - cabal:test:release
       - cargo:test:release
-      - pnpm:test
+      - node:test
 version: '3'

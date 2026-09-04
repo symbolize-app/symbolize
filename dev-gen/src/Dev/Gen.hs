@@ -5,7 +5,6 @@ where
 
 import Control.Applicative ((*>))
 import Data.Foldable (foldMap')
-import Data.Traversable (for)
 import Data.Vector (Vector)
 import Data.Vector qualified as Vector
 import Dev.Gen.Exec qualified as Exec
@@ -27,7 +26,6 @@ type Input :: Type
 data Input = Input
   { cargoWorkspace :: FileFormat.CargoWorkspace,
     gitIgnore :: Vector Text,
-    pnpmPackageFiles :: Vector (Text, FileFormat.PNPMPackageFile),
     procfileInput :: Vector Text,
     rootTaskfileInput :: FileFormat.Taskfile
   }
@@ -49,7 +47,6 @@ asyncReadFiles =
   Input
     <$> Exec.async (Exec.readTOML "Cargo.toml")
     <*> Exec.async (Exec.readLines ".gitignore")
-    <*> Exec.async readPNPMPackageFiles
     <*> Exec.async (Exec.readLines "Procfile.in")
     <*> Exec.async (Exec.readYAML "Taskfile.in.yml")
 
@@ -61,13 +58,10 @@ genFiles i =
       rootTaskfile =
         genRootTaskfile
           i.cargoWorkspace
-          pnpmPackages
           i.rootTaskfileInput,
       sqlFluffIgnore = i.gitIgnore,
       watchmanConfig = genWatchmanConfig i.gitIgnore
     }
-  where
-    pnpmPackages = Package.transformPNPM i.pnpmPackageFiles
 
 writeFiles :: Output -> Exec.ExecConcurrently ()
 writeFiles o =
@@ -77,24 +71,6 @@ writeFiles o =
     *> Exec.async (Exec.writeYAML "Taskfile.yml" o.rootTaskfile)
     *> Exec.async (Exec.writeLines ".sqlfluffignore" o.sqlFluffIgnore)
     *> Exec.async (Exec.writeJSON ".watchmanconfig" o.watchmanConfig)
-
-readPNPMPackageFiles ::
-  Exec.Exec (Vector (Text, FileFormat.PNPMPackageFile))
-readPNPMPackageFiles = do
-  pnpmWorkspace <-
-    Exec.readYAML "pnpm-workspace.yaml" ::
-      Exec.Exec FileFormat.PNPMWorkspace
-  Exec.await $
-    for
-      pnpmWorkspace.packages
-      ( \package ->
-          (package,)
-            <$> Exec.async
-              ( Exec.readJSON
-                  ( FilePath (package <> "/package.json")
-                  )
-              )
-      )
 
 genPackageTaskfiles ::
   FileFormat.CargoWorkspace ->
@@ -163,12 +139,10 @@ genProcfile cargoWorkspace procfileInput =
 
 genRootTaskfile ::
   FileFormat.CargoWorkspace ->
-  Vector Package.PNPM ->
   FileFormat.Taskfile ->
   FileFormat.Taskfile
-genRootTaskfile cargoWorkspace pnpmPackages rootTaskfileInput =
+genRootTaskfile cargoWorkspace rootTaskfileInput =
   let cargoPackageNames = cargoWorkspace.workspace.members
-      pnpmPackageNames = (.name) <$> pnpmPackages
       newIncludes =
         fromList
           . toList
@@ -180,7 +154,7 @@ genRootTaskfile cargoWorkspace pnpmPackages rootTaskfileInput =
                     }
                 )
             )
-            <$> (cargoPackageNames <> pnpmPackageNames)
+            <$> cargoPackageNames
       newTasks =
         [ ( "cargo:test:debug",
             FileFormat.TaskfileTask
@@ -199,17 +173,6 @@ genRootTaskfile cargoWorkspace pnpmPackages rootTaskfileInput =
                 deps =
                   Just
                     ( (<> ":test:release") <$> cargoPackageNames
-                    ),
-                cmd = Nothing,
-                cmds = Nothing
-              }
-          ),
-          ( "pnpm:link-build-dirs",
-            FileFormat.TaskfileTask
-              { aliases = Nothing,
-                deps =
-                  Just
-                    ( (<> ":link-build-dir") <$> pnpmPackageNames
                     ),
                 cmd = Nothing,
                 cmds = Nothing

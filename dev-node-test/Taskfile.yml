@@ -1,0 +1,24 @@
+run: when_changed
+tasks:
+  check:
+    dir: '{{.TASKFILE_DIR}}'
+    cmd: gleam check
+  format:check:
+    dir: '{{.TASKFILE_DIR}}'
+    cmd: gleam format --check src
+  test:
+    deps:
+      - build
+    dir: '{{.TASKFILE_DIR}}'
+    cmd: gleam run --module dev_node_test_main
+  build:
+    dir: '{{.TASKFILE_DIR}}'
+    cmd: gleam build
+  link-build-dir:
+    cmd:
+      task: :tmpfs:link-package-build-dir
+      vars:
+        NAME: '{{.NAME}}'
+vars:
+  NAME: dev-node-test
+version: '3'
