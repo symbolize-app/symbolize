@@ -7,7 +7,7 @@
 # You should check this file into your source control repository.
 
 packages = [
-  { name = "gleam_stdlib", version = "1.0.5", build_tools = ["gleam"], requirements = [], otp_app = "gleam_stdlib", source = "hex", outer_checksum = "CEE5B6C076A85B45F60C585F4316C63EC8B7127C119D5738C3958A9C4D50404E" },
+  { name = "gleam_stdlib", version = "1.0.5", build_tools = ["gleam"], requirements = [], source = "local", path = "../vendor/gleam_stdlib-1.0.5" },
   { name = "symbolize_dev_browser_test", version = "0.1.0", build_tools = ["gleam"], requirements = ["gleam_stdlib", "symbolize_lib_dataflow"], source = "local", path = "../dev-browser-test" },
   { name = "symbolize_lib_collection", version = "0.1.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], source = "local", path = "../lib-collection" },
   { name = "symbolize_lib_dataflow", version = "0.1.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], source = "local", path = "../lib-dataflow" },
@@ -22,7 +22,7 @@ packages = [
 ]
 
 [requirements]
-gleam_stdlib = { version = ">= 1.0.5 and < 2.0.0" }
+gleam_stdlib = { path = "../vendor/gleam_stdlib-1.0.5" }
 symbolize_lib_collection = { path = "../lib-collection" }
 symbolize_lib_dataflow = { path = "../lib-dataflow" }
 symbolize_lib_error = { path = "../lib-error" }
