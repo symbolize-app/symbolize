@@ -3,20 +3,9 @@
   "type": "module",
   "version": "0.1.0",
   "license": "(MIT OR Apache-2.0)",
-  "bin": "main.ts",
+  "bin": "bin/dev-esbuild",
   "dependencies": {
-    "@symbolize/dev-prettier": "workspace:*",
-    "@symbolize/dev-tsconfig": "workspace:*",
-    "@symbolize/lib-collection": "workspace:*",
-    "@symbolize/lib-payload": "workspace:*",
-    "@symbolize/lib-time": "workspace:*",
     "better-sqlite3": "11.1.2",
-    "esbuild": "0.19.5",
-    "ms": "2.1.3",
-    "zod": "3.22.4"
-  },
-  "devDependencies": {
-    "typescript": "5.4.5"
-  },
-  "prettier": "@symbolize/dev-prettier/index.json"
+    "esbuild": "0.19.5"
+  }
 }

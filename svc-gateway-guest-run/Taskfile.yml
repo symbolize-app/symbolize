@@ -1,5 +1,29 @@
 run: when_changed
 tasks:
+  check:
+    dir: '{{.TASKFILE_DIR}}'
+    cmd: gleam check
+  format:check:
+    dir: '{{.TASKFILE_DIR}}'
+    cmd: gleam format --check src
+  build:
+    dir: '{{.TASKFILE_DIR}}'
+    cmd: gleam build
+  test:
+    deps:
+      - build
+    dir: '{{.TASKFILE_DIR}}'
+    cmd: gleam run --module svc_gateway_guest_run_service_worker_test_main
+  test:browser:
+    deps:
+      - build
+    dir: '{{.TASKFILE_DIR}}'
+    cmd: gleam run --module svc_gateway_guest_run_browser_driver_main
+  test:browser:service-worker:
+    deps:
+      - build
+    dir: '{{.TASKFILE_DIR}}'
+    cmd: gleam run --module svc_gateway_guest_run_service_worker_browser_driver_main
   link-build-dir:
     cmd:
       task: :tmpfs:link-package-build-dir

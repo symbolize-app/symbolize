@@ -35,10 +35,8 @@ data Input = Input
 type Output :: Type
 data Output = Output
   { packageTaskfiles :: Vector (FilePath, FileFormat.Taskfile),
-    packageTypeScriptConfigs :: Vector (FilePath, FileFormat.TypeScriptConfig),
     procfile :: Vector Text,
     rootTaskfile :: FileFormat.Taskfile,
-    rootTypeScriptConfig :: FileFormat.TypeScriptConfig,
     sqlFluffIgnore :: Vector Text,
     watchmanConfig :: FileFormat.WatchmanConfig
   }
@@ -58,15 +56,13 @@ asyncReadFiles =
 genFiles :: Input -> Output
 genFiles i =
   Output
-    { packageTaskfiles = genPackageTaskfiles i.cargoWorkspace pnpmPackages,
-      packageTypeScriptConfigs = genPackageTypeScriptConfigs pnpmPackages,
+    { packageTaskfiles = genPackageTaskfiles i.cargoWorkspace,
       procfile = genProcfile i.cargoWorkspace i.procfileInput,
       rootTaskfile =
         genRootTaskfile
           i.cargoWorkspace
           pnpmPackages
           i.rootTaskfileInput,
-      rootTypeScriptConfig = genRootTypeScriptConfig pnpmPackages,
       sqlFluffIgnore = i.gitIgnore,
       watchmanConfig = genWatchmanConfig i.gitIgnore
     }
@@ -77,10 +73,8 @@ writeFiles :: Output -> Exec.ExecConcurrently ()
 writeFiles o =
   pass
     *> asyncWriteAll Exec.writeYAML o.packageTaskfiles
-    *> asyncWriteAll Exec.writeJSON o.packageTypeScriptConfigs
     *> Exec.async (Exec.writeLines "Procfile" o.procfile)
     *> Exec.async (Exec.writeYAML "Taskfile.yml" o.rootTaskfile)
-    *> Exec.async (Exec.writeJSON "tsconfig.json" o.rootTypeScriptConfig)
     *> Exec.async (Exec.writeLines ".sqlfluffignore" o.sqlFluffIgnore)
     *> Exec.async (Exec.writeJSON ".watchmanconfig" o.watchmanConfig)
 
@@ -104,11 +98,9 @@ readPNPMPackageFiles = do
 
 genPackageTaskfiles ::
   FileFormat.CargoWorkspace ->
-  Vector Package.PNPM ->
   Vector (FilePath, FileFormat.Taskfile)
-genPackageTaskfiles cargoWorkspace pnpmPackages =
-  (genCargoPackageTaskfile <$> cargoWorkspace.workspace.members)
-    <> (genPNPMPackageTaskfile <$> pnpmPackages)
+genPackageTaskfiles cargoWorkspace =
+  genCargoPackageTaskfile <$> cargoWorkspace.workspace.members
 
 genCargoPackageTaskfile :: Text -> (FilePath, FileFormat.Taskfile)
 genCargoPackageTaskfile cargoPackageName =
@@ -150,56 +142,6 @@ genCargoTask name aliases =
         cmds = Nothing
       }
   )
-
-genPNPMPackageTaskfile :: Package.PNPM -> (FilePath, FileFormat.Taskfile)
-genPNPMPackageTaskfile pnpmPackage =
-  ( FilePath (pnpmPackage.name <> "/Taskfile.yml"),
-    FileFormat.Taskfile
-      { version = FileFormat.taskfileVersion,
-        run = FileFormat.taskfileRun,
-        includes = Nothing,
-        vars = Just [("NAME", pnpmPackage.name)],
-        tasks =
-          [ ( "link-build-dir",
-              FileFormat.TaskfileTask
-                { aliases = Nothing,
-                  deps = Nothing,
-                  cmd =
-                    Just
-                      ( FileFormat.TaskfileCommand
-                          { task = ":tmpfs:link-package-build-dir",
-                            vars = Just [("NAME", "{{.NAME}}")]
-                          }
-                      ),
-                  cmds = Nothing
-                }
-            )
-          ]
-      }
-  )
-
-genPackageTypeScriptConfigs ::
-  Vector Package.PNPM -> Vector (FilePath, FileFormat.TypeScriptConfig)
-genPackageTypeScriptConfigs = Vector.mapMaybe genPackageTypeScriptConfig
-
-genPackageTypeScriptConfig ::
-  Package.PNPM ->
-  Maybe (FilePath, FileFormat.TypeScriptConfig)
-genPackageTypeScriptConfig pnpmPackage = do
-  typeScript <- pnpmPackage.typeScript
-  pure
-    ( FilePath (pnpmPackage.name <> "/tsconfig.json"),
-      FileFormat.TypeScriptConfig
-        { extends = FileFormat.typeScriptConfigExtends,
-          include = FileFormat.typeScriptConfigInclude,
-          exclude = FileFormat.typeScriptConfigExclude,
-          compilerOptions = FileFormat.typeScriptConfigCompilerOptions,
-          references =
-            FileFormat.TypeScriptConfigReference
-              . ("../" <>)
-              <$> typeScript.dependencies
-        }
-    )
 
 genProcfile ::
   FileFormat.CargoWorkspace ->
@@ -282,21 +224,6 @@ genRootTaskfile cargoWorkspace pnpmPackages rootTaskfileInput =
           vars = rootTaskfileInput.vars,
           tasks = rootTaskfileInput.tasks <> newTasks
         }
-
-genRootTypeScriptConfig ::
-  Vector Package.PNPM ->
-  FileFormat.TypeScriptConfig
-genRootTypeScriptConfig pnpmPackages =
-  FileFormat.TypeScriptConfig
-    { extends = FileFormat.typeScriptConfigExtends,
-      include = [],
-      exclude = [],
-      compilerOptions = FileFormat.typeScriptConfigCompilerOptions,
-      references =
-        FileFormat.TypeScriptConfigReference
-          . ("./" <>)
-          <$> Package.foldTypeScriptPackageNames pnpmPackages
-    }
 
 genWatchmanConfig :: Vector Text -> FileFormat.WatchmanConfig
 genWatchmanConfig gitIgnore =

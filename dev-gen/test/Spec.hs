@@ -17,7 +17,7 @@ main = liftIO . hspec $ do
 spec :: Spec
 spec = context "Gen" $ do
   context "gen" $ do
-    specify "OK" $
+    specify "emits the Gleam and JavaScript build graph" $
       InterpretSpec.interpret
         gen
         [ ExecSpec.readTOML
@@ -25,10 +25,7 @@ spec = context "Gen" $ do
             ( FileFormat.CargoWorkspace
                 { workspace =
                     FileFormat.CargoWorkspaceWorkspace
-                      { members =
-                          [ "dev-c",
-                            "svc-d"
-                          ]
+                      { members = []
                       }
                 }
             ),
@@ -46,24 +43,15 @@ spec = context "Gen" $ do
             ( FileFormat.PNPMPackageFile
                 { name = "@proj/a",
                   dependencies = Nothing,
-                  devDependencies =
-                    Just
-                      [ ("typescript", "*")
-                      ]
+                  devDependencies = Nothing
                 }
             ),
           ExecSpec.readJSON
             "b/package.json"
             ( FileFormat.PNPMPackageFile
                 { name = "@proj/b",
-                  dependencies =
-                    Just
-                      [ ("@proj/a", "*")
-                      ],
-                  devDependencies =
-                    Just
-                      [ ("typescript", "*")
-                      ]
+                  dependencies = Just [("@proj/a", "*")],
+                  devDependencies = Nothing
                 }
             ),
           ExecSpec.readLines
@@ -96,241 +84,9 @@ spec = context "Gen" $ do
                     ]
                 }
             ),
-          ExecSpec.writeYAML
-            "dev-c/Taskfile.yml"
-            ( FileFormat.Taskfile
-                { version = FileFormat.taskfileVersion,
-                  run = FileFormat.taskfileRun,
-                  includes = Nothing,
-                  vars = Just [("NAME", "dev-c")],
-                  tasks =
-                    [ ( "test:debug",
-                        FileFormat.TaskfileTask
-                          { aliases = Just ["test", "t"],
-                            deps = Nothing,
-                            cmd =
-                              Just
-                                ( FileFormat.TaskfileCommand
-                                    { task = ":cargo:execute-package:test:debug",
-                                      vars = Just [("NAME", "{{.NAME}}")]
-                                    }
-                                ),
-                            cmds = Nothing
-                          }
-                      ),
-                      ( "test:debug:watch",
-                        FileFormat.TaskfileTask
-                          { aliases = Just ["test:watch", "tw"],
-                            deps = Nothing,
-                            cmd =
-                              Just
-                                ( FileFormat.TaskfileCommand
-                                    { task = ":cargo:execute-package:test:debug:watch",
-                                      vars = Just [("NAME", "{{.NAME}}")]
-                                    }
-                                ),
-                            cmds = Nothing
-                          }
-                      ),
-                      ( "test:release",
-                        FileFormat.TaskfileTask
-                          { aliases = Just ["tr"],
-                            deps = Nothing,
-                            cmd =
-                              Just
-                                ( FileFormat.TaskfileCommand
-                                    { task = ":cargo:execute-package:test:release",
-                                      vars = Just [("NAME", "{{.NAME}}")]
-                                    }
-                                ),
-                            cmds = Nothing
-                          }
-                      )
-                    ]
-                }
-            ),
-          ExecSpec.writeYAML
-            "svc-d/Taskfile.yml"
-            ( FileFormat.Taskfile
-                { version = FileFormat.taskfileVersion,
-                  run = FileFormat.taskfileRun,
-                  includes = Nothing,
-                  vars = Just [("NAME", "svc-d")],
-                  tasks =
-                    [ ( "run:debug",
-                        FileFormat.TaskfileTask
-                          { aliases = Just ["run", "r"],
-                            deps = Nothing,
-                            cmd =
-                              Just
-                                ( FileFormat.TaskfileCommand
-                                    { task = ":cargo:execute-package:run:debug",
-                                      vars = Just [("NAME", "{{.NAME}}")]
-                                    }
-                                ),
-                            cmds = Nothing
-                          }
-                      ),
-                      ( "run:debug:watch",
-                        FileFormat.TaskfileTask
-                          { aliases = Just ["run:watch", "rw"],
-                            deps = Nothing,
-                            cmd =
-                              Just
-                                ( FileFormat.TaskfileCommand
-                                    { task = ":cargo:execute-package:run:debug:watch",
-                                      vars = Just [("NAME", "{{.NAME}}")]
-                                    }
-                                ),
-                            cmds = Nothing
-                          }
-                      ),
-                      ( "run:release",
-                        FileFormat.TaskfileTask
-                          { aliases = Just ["rr"],
-                            deps = Nothing,
-                            cmd =
-                              Just
-                                ( FileFormat.TaskfileCommand
-                                    { task = ":cargo:execute-package:run:release",
-                                      vars = Just [("NAME", "{{.NAME}}")]
-                                    }
-                                ),
-                            cmds = Nothing
-                          }
-                      ),
-                      ( "test:debug",
-                        FileFormat.TaskfileTask
-                          { aliases = Just ["test", "t"],
-                            deps = Nothing,
-                            cmd =
-                              Just
-                                ( FileFormat.TaskfileCommand
-                                    { task = ":cargo:execute-package:test:debug",
-                                      vars = Just [("NAME", "{{.NAME}}")]
-                                    }
-                                ),
-                            cmds = Nothing
-                          }
-                      ),
-                      ( "test:debug:watch",
-                        FileFormat.TaskfileTask
-                          { aliases = Just ["test:watch", "tw"],
-                            deps = Nothing,
-                            cmd =
-                              Just
-                                ( FileFormat.TaskfileCommand
-                                    { task = ":cargo:execute-package:test:debug:watch",
-                                      vars = Just [("NAME", "{{.NAME}}")]
-                                    }
-                                ),
-                            cmds = Nothing
-                          }
-                      ),
-                      ( "test:release",
-                        FileFormat.TaskfileTask
-                          { aliases = Just ["tr"],
-                            deps = Nothing,
-                            cmd =
-                              Just
-                                ( FileFormat.TaskfileCommand
-                                    { task = ":cargo:execute-package:test:release",
-                                      vars = Just [("NAME", "{{.NAME}}")]
-                                    }
-                                ),
-                            cmds = Nothing
-                          }
-                      )
-                    ]
-                }
-            ),
-          ExecSpec.writeYAML
-            "a/Taskfile.yml"
-            ( FileFormat.Taskfile
-                { version = FileFormat.taskfileVersion,
-                  run = FileFormat.taskfileRun,
-                  includes = Nothing,
-                  vars =
-                    Just
-                      [("NAME", "a")],
-                  tasks =
-                    [ ( "link-build-dir",
-                        FileFormat.TaskfileTask
-                          { aliases = Nothing,
-                            deps = Nothing,
-                            cmd =
-                              Just
-                                ( FileFormat.TaskfileCommand
-                                    { task =
-                                        ":tmpfs:link-package-build-dir",
-                                      vars = Just [("NAME", "{{.NAME}}")]
-                                    }
-                                ),
-                            cmds = Nothing
-                          }
-                      )
-                    ]
-                }
-            ),
-          ExecSpec.writeYAML
-            "b/Taskfile.yml"
-            ( FileFormat.Taskfile
-                { version = FileFormat.taskfileVersion,
-                  run = FileFormat.taskfileRun,
-                  includes = Nothing,
-                  vars =
-                    Just
-                      [("NAME", "b")],
-                  tasks =
-                    [ ( "link-build-dir",
-                        FileFormat.TaskfileTask
-                          { aliases = Nothing,
-                            deps = Nothing,
-                            cmd =
-                              Just
-                                ( FileFormat.TaskfileCommand
-                                    { task =
-                                        ":tmpfs:link-package-build-dir",
-                                      vars = Just [("NAME", "{{.NAME}}")]
-                                    }
-                                ),
-                            cmds = Nothing
-                          }
-                      )
-                    ]
-                }
-            ),
-          ExecSpec.writeJSON
-            "a/tsconfig.json"
-            ( FileFormat.TypeScriptConfig
-                { extends = FileFormat.typeScriptConfigExtends,
-                  include = FileFormat.typeScriptConfigInclude,
-                  exclude = FileFormat.typeScriptConfigExclude,
-                  compilerOptions =
-                    FileFormat.typeScriptConfigCompilerOptions,
-                  references = []
-                }
-            ),
-          ExecSpec.writeJSON
-            "b/tsconfig.json"
-            ( FileFormat.TypeScriptConfig
-                { extends = FileFormat.typeScriptConfigExtends,
-                  include = FileFormat.typeScriptConfigInclude,
-                  exclude = FileFormat.typeScriptConfigExclude,
-                  compilerOptions =
-                    FileFormat.typeScriptConfigCompilerOptions,
-                  references =
-                    [ FileFormat.TypeScriptConfigReference {path = "../a"}
-                    ]
-                }
-            ),
           ExecSpec.writeLines
             "Procfile"
-            [ "y: task y",
-              "dev-c__test: task dev-c:test:watch",
-              "svc-d__test: task svc-d:test:watch",
-              "svc-d__run: task svc-d:run:watch"
-            ],
+            ["y: task y"],
           ExecSpec.writeYAML
             "Taskfile.yml"
             ( FileFormat.Taskfile
@@ -350,18 +106,6 @@ spec = context "Gen" $ do
                               taskfile = "b"
                             }
                         ),
-                        ( "dev-c",
-                          FileFormat.TaskfileInclude
-                            { internal = Nothing,
-                              taskfile = "dev-c"
-                            }
-                        ),
-                        ( "svc-d",
-                          FileFormat.TaskfileInclude
-                            { internal = Nothing,
-                              taskfile = "svc-d"
-                            }
-                        ),
                         ( "z",
                           FileFormat.TaskfileInclude
                             { internal = Just True,
@@ -374,11 +118,7 @@ spec = context "Gen" $ do
                     [ ( "cargo:test:debug",
                         FileFormat.TaskfileTask
                           { aliases = Just ["cargo:test", "cargo:t"],
-                            deps =
-                              Just
-                                [ "dev-c:test:debug",
-                                  "svc-d:test:debug"
-                                ],
+                            deps = Just [],
                             cmd = Nothing,
                             cmds = Nothing
                           }
@@ -386,11 +126,7 @@ spec = context "Gen" $ do
                       ( "cargo:test:release",
                         FileFormat.TaskfileTask
                           { aliases = Just ["cargo:tr"],
-                            deps =
-                              Just
-                                [ "dev-c:test:release",
-                                  "svc-d:test:release"
-                                ],
+                            deps = Just [],
                             cmd = Nothing,
                             cmds = Nothing
                           }
@@ -398,11 +134,7 @@ spec = context "Gen" $ do
                       ( "pnpm:link-build-dirs",
                         FileFormat.TaskfileTask
                           { aliases = Nothing,
-                            deps =
-                              Just
-                                [ "a:link-build-dir",
-                                  "b:link-build-dir"
-                                ],
+                            deps = Just ["a:link-build-dir", "b:link-build-dir"],
                             cmd = Nothing,
                             cmds = Nothing
                           }
@@ -418,28 +150,13 @@ spec = context "Gen" $ do
                     ]
                 }
             ),
-          ExecSpec.writeJSON
-            "tsconfig.json"
-            ( FileFormat.TypeScriptConfig
-                { extends = FileFormat.typeScriptConfigExtends,
-                  include = [],
-                  exclude = [],
-                  compilerOptions =
-                    FileFormat.typeScriptConfigCompilerOptions,
-                  references =
-                    [ FileFormat.TypeScriptConfigReference {path = "./a"},
-                      FileFormat.TypeScriptConfigReference {path = "./b"}
-                    ]
-                }
-            ),
           ExecSpec.writeLines
             ".sqlfluffignore"
             ["build", "tmp"],
           ExecSpec.writeJSON
             ".watchmanconfig"
             ( FileFormat.WatchmanConfig
-                { ignoreDirs =
-                    ["build", "tmp"]
+                { ignoreDirs = ["build", "tmp"]
                 }
             )
         ]

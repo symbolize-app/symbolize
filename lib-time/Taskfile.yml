@@ -1,5 +1,24 @@
 run: when_changed
 tasks:
+  check:
+    dir: '{{.TASKFILE_DIR}}'
+    cmd: gleam check
+  format:check:
+    dir: '{{.TASKFILE_DIR}}'
+    cmd: gleam format --check src
+  test:
+    deps:
+      - build
+    dir: '{{.TASKFILE_DIR}}'
+    cmd: gleam run --module lib_time_test_main
+  build:
+    dir: '{{.TASKFILE_DIR}}'
+    cmd: gleam build
+  test:browser:
+    deps:
+      - build
+    dir: '{{.TASKFILE_DIR}}/../dev-browser-test'
+    cmd: gleam run --module lib_time_browser_driver_main
   link-build-dir:
     cmd:
       task: :tmpfs:link-package-build-dir

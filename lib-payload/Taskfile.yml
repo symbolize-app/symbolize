@@ -1,5 +1,14 @@
 run: when_changed
 tasks:
+  check:
+    dir: '{{.TASKFILE_DIR}}'
+    cmd: gleam check
+  format:check:
+    dir: '{{.TASKFILE_DIR}}'
+    cmd: gleam format --check src
+  test:
+    dir: '{{.TASKFILE_DIR}}'
+    cmd: gleam run --module lib_payload_test_main
   link-build-dir:
     cmd:
       task: :tmpfs:link-package-build-dir

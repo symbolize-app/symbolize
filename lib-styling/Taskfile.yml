@@ -1,5 +1,34 @@
+version: '3'
 run: when_changed
 tasks:
+  build:
+    dir: '{{.TASKFILE_DIR}}'
+    cmd: gleam build
+  check:
+    dir: '{{.TASKFILE_DIR}}'
+    cmd: gleam check
+  format:check:
+    dir: '{{.TASKFILE_DIR}}'
+    cmd: gleam format --check src
+  test:
+    deps:
+      - build
+      - test:errors
+      - test:numeric
+    dir: '{{.TASKFILE_DIR}}'
+    cmd: gleam run --module lib_styling_test_main
+  test:errors:
+    deps:
+      - build
+    dir: '{{.TASKFILE_DIR}}'
+    cmd: >-
+      node --input-type=module -e 'import { toList } from "./build/dev/javascript/symbolize_lib_styling/gleam.mjs"; import * as atom from "./build/dev/javascript/symbolize_lib_styling/lib_styling_atom.mjs"; import * as expr from "./build/dev/javascript/symbolize_lib_styling/lib_styling_expr.mjs"; import * as context from "./build/dev/javascript/symbolize_lib_styling/lib_styling_context.mjs"; const value=expr.keyword("red"); try { atom.before(atom.after(atom.atom("background-color",value))); process.exit(1) } catch (error) { if (!String(error?.message ?? error).includes("background-color atom already has ::after pseudo-element")) { throw error } } try { expr.compile_scope_pure(context.styling(), expr.cascade(value,toList([expr.keyword("blue")]))) ; process.exit(1) } catch (error) { if (!String(error?.message ?? error).includes("Extra rules not allowed for scope conditions")) { throw error } } console.log("lib-styling generated JS error parity passed")'
+  test:numeric:
+    deps:
+      - build
+    dir: '{{.TASKFILE_DIR}}'
+    cmd: >-
+      node --input-type=module -e 'import * as atom from "./build/dev/javascript/symbolize_lib_styling/lib_styling_atom.mjs"; import * as context from "./build/dev/javascript/symbolize_lib_styling/lib_styling_context.mjs"; import * as data from "./build/dev/javascript/symbolize_lib_styling/lib_styling_data.mjs"; import * as expr from "./build/dev/javascript/symbolize_lib_styling/lib_styling_expr.mjs"; const values=[NaN,Infinity,-Infinity]; for (const value of values) { const expected=String(value); if (data.number_text(value)!==expected) throw new Error(`numeric formatter mismatch for ${expected}`); const expressions=[[expr.number(value),expected],[expr.length(data.length(value,data.LengthUnit$Px$const)),expected+"px"],[expr.pct(data.pct(value)),expected+"%"],[expr.angle(data.deg(value)),expected+"deg"]]; for (const [expression,expectedValue] of expressions) { const code=context.rule_code(atom.compile(context.styling(),atom.atom("x",expression))[1].head); if (code!==`.a0{x:${expectedValue}}`) throw new Error(`numeric expression mismatch: ${code}`); } } console.log("lib-styling generated JS numeric parity passed")'
   link-build-dir:
     cmd:
       task: :tmpfs:link-package-build-dir
@@ -7,4 +36,3 @@ tasks:
         NAME: '{{.NAME}}'
 vars:
   NAME: lib-styling
-version: '3'

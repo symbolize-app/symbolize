@@ -9,8 +9,26 @@ includes:
   cargo:
     taskfile: dev-task/cargo.yml
 
+  dev-browser-test:
+    taskfile: dev-browser-test
+
   dev-gen:
     taskfile: dev-gen
+
+  dev-esbuild:
+    taskfile: dev-esbuild
+
+  dev-eslint:
+    taskfile: dev-eslint
+
+  dev-pnpm-test:
+    taskfile: dev-pnpm-test
+
+  dev-prettier:
+    taskfile: dev-prettier
+
+  dev-watchman-client:
+    taskfile: dev-watchman-client
 
   easyrsa:
     taskfile: dev-task/easyrsa.yml
@@ -32,6 +50,54 @@ includes:
 
   svc-gateway-host-store:
     taskfile: svc-gateway-host-store
+
+  lib-collection:
+    taskfile: lib-collection
+
+  lib-concurrency:
+    taskfile: lib-concurrency
+
+  lib-dataflow:
+    taskfile: lib-dataflow
+
+  lib-error:
+    taskfile: lib-error
+
+  lib-hex:
+    taskfile: lib-hex
+
+  lib-markup:
+    taskfile: lib-markup
+
+  lib-payload:
+    taskfile: lib-payload
+
+  lib-random:
+    taskfile: lib-random
+
+  lib-stream:
+    taskfile: lib-stream
+
+  lib-styling:
+    taskfile: lib-styling
+
+  lib-test:
+    taskfile: lib-test
+
+  lib-test-runner:
+    taskfile: lib-test-runner
+
+  lib-time:
+    taskfile: lib-time
+
+  svc-auth-guest-read:
+    taskfile: svc-auth-guest-read
+
+  svc-auth-guest-view:
+    taskfile: svc-auth-guest-view
+
+  svc-gateway-guest-run:
+    taskfile: svc-gateway-guest-run
 
   tmpfs:
     taskfile: dev-task/tmpfs.yml
@@ -100,6 +166,100 @@ tasks:
       - cabal:format:fix
       - cargo:format:fix
       - pnpm:format:fix
+
+  gleam:check:
+    deps:
+      - dev-browser-test:check
+      - dev-esbuild:check
+      - dev-pnpm-test:check
+      - lib-concurrency:check
+      - lib-collection:check
+      - lib-dataflow:check
+      - lib-error:check
+      - lib-hex:check
+      - lib-markup:check
+      - lib-payload:check
+      - lib-random:check
+      - lib-styling:check
+      - lib-stream:check
+      - lib-test:check
+      - lib-test-runner:check
+      - lib-time:check
+      - svc-auth-guest-read:check
+      - svc-gateway-guest-run:check
+      - svc-auth-guest-view:check
+
+  gleam:format:check:
+    deps:
+      - dev-browser-test:format:check
+      - dev-esbuild:format:check
+      - dev-pnpm-test:format:check
+      - lib-concurrency:format:check
+      - lib-collection:format:check
+      - lib-dataflow:format:check
+      - lib-error:format:check
+      - lib-hex:format:check
+      - lib-markup:format:check
+      - lib-payload:format:check
+      - lib-random:format:check
+      - lib-styling:format:check
+      - lib-stream:format:check
+      - lib-test:format:check
+      - lib-test-runner:format:check
+      - lib-time:format:check
+      - svc-auth-guest-read:format:check
+      - svc-gateway-guest-run:format:check
+      - svc-auth-guest-view:format:check
+
+  gleam:test:
+    deps:
+      - dev-esbuild:test
+      - dev-pnpm-test:test
+      - lib-concurrency:test
+      - lib-collection:test
+      - lib-dataflow:test
+      - lib-error:test
+      - lib-hex:test
+      - lib-markup:test
+      - lib-payload:test
+      - lib-random:test
+      - lib-styling:test
+      - lib-stream:test
+      - lib-test:test
+      - lib-test-runner:test
+      - lib-stream:test:http
+      - lib-stream:test:custom
+      - lib-time:test
+      - svc-gateway-guest-run:test
+
+  gleam:test:browser:
+    cmds:
+      - task pnpm:esbuild:test:browser:built
+      - task lib-concurrency:test:browser
+      - task lib-dataflow:test:browser
+      - task lib-markup:test:browser
+      - task lib-random:test:browser
+      - task lib-error:test:browser
+      - task lib-time:test:browser
+      - task lib-stream:test:browser
+      - task svc-gateway-guest-run:test:browser
+      - task svc-gateway-guest-run:test:browser:service-worker
+      - task svc-auth-guest-read:test:browser
+      - task svc-auth-guest-view:test:browser
+
+  pnpm:link-build-dirs:
+    deps:
+      - dev-browser-test:link-build-dir
+      - dev-esbuild:link-build-dir
+      - dev-pnpm-test:link-build-dir
+      - dev-prettier:link-build-dir
+      - dev-eslint:link-build-dir
+      - lib-collection:link-build-dir
+      - lib-dataflow:link-build-dir
+      - lib-markup:link-build-dir
+      - lib-styling:link-build-dir
+      - lib-test:link-build-dir
+      - lib-test-runner:link-build-dir
 
   gen:
     aliases:

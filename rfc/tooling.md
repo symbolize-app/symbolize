@@ -7,14 +7,12 @@
 - https://taskfile.dev/
 - https://github.com/DarthSim/overmind
 
-## TypeScript
+## Browser and JavaScript tooling
 
 - https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API
 - https://developer.mozilla.org/en-US/docs/Web/API/SharedWorker
 - https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API
-- https://www.typescriptlang.org/
 - https://pnpm.io/
-- https://jamiemason.github.io/syncpack/
 - https://prettier.io/
 - https://eslint.org/
 - https://esbuild.github.io/

@@ -1,7 +1,3 @@
 {
-  "extends": ["@symbolize"],
-  "parserOptions": {
-    "EXPERIMENTAL_useProjectService": true,
-    "tsconfigRootDir": "."
-  }
+  "extends": ["@symbolize"]
 }

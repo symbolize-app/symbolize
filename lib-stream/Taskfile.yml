@@ -1,5 +1,35 @@
+version: '3'
 run: when_changed
 tasks:
+  check:
+    dir: '{{.TASKFILE_DIR}}'
+    cmd: gleam check
+  format:check:
+    dir: '{{.TASKFILE_DIR}}'
+    cmd: gleam format --check src
+  test:
+    deps:
+      - build
+    dir: '{{.TASKFILE_DIR}}'
+    cmd: gleam run --module lib_stream_test_main
+  test:http:
+    deps:
+      - build
+    dir: '{{.TASKFILE_DIR}}'
+    cmd: gleam run --module lib_stream_http_driver_main
+  test:custom:
+    deps:
+      - build
+    dir: '{{.TASKFILE_DIR}}'
+    cmd: gleam run --module lib_stream_custom_http_driver_main
+  build:
+    dir: '{{.TASKFILE_DIR}}'
+    cmd: gleam build
+  test:browser:
+    deps:
+      - build
+    dir: '{{.TASKFILE_DIR}}'
+    cmd: gleam run --module lib_stream_browser_driver_main
   link-build-dir:
     cmd:
       task: :tmpfs:link-package-build-dir
@@ -7,4 +37,3 @@ tasks:
         NAME: '{{.NAME}}'
 vars:
   NAME: lib-stream
-version: '3'

@@ -5,7 +5,7 @@ Main interactive interface here built on HTML / web tech.
 ## Overall goals
 
 - No external dependencies
-- No custom syntax, just plain TypeScript
+- No custom syntax, just plain Gleam
 - Direct access to web platform features
 
 ## Reactivity
@@ -21,7 +21,7 @@ Main interactive interface here built on HTML / web tech.
 - Ranges are also fragments
 - Comments used to delimit dynamic/conditional fragments
 - Syntax shortcuts for common operations where possible
-- Stronger TypeScript types than builtin library
+- Stronger Gleam types than the built-in browser bindings
 - Write using attributes, for easy simulated DOM compatibility
 - Allow removing any attribute
 - Events are serialized in async, reactive transactions
