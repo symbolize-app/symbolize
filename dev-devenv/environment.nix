@@ -7,9 +7,7 @@
 
     NODE_OPTIONS_PRODUCTION = "--unhandled-rejections strict";
     NODE_OPTIONS = "--experimental-json-modules --unhandled-rejections strict";
-    NODE_PATH = "${config.devenv.root}/node_modules:${pkgs.symbolize-node}/lib/node_modules";
-    PUPPETEER_SKIP_DOWNLOAD = "true";
-    PUPPETEER_EXECUTABLE_PATH = "${pkgs.chromium}/bin/chromium";
+    SYMBOLIZE_CHROMIUM_EXECUTABLE = "${pkgs.chromium}/bin/chromium";
 
     DATABASE_URL = "sqlite:svc-gateway-host-store/build/manifest.sqlite3";
     DBMATE_MIGRATIONS_DIR = "svc-gateway-host-store/migrate";
@@ -35,13 +33,31 @@
   };
 
   enterShell = ''
+    unset NODE_PATH
+
     if [ -f "$DEVENV_ROOT/.env" ]; then
       set -a
       . "$DEVENV_ROOT/.env"
       set +a
     fi
 
-    export PATH="${config.devenv.root}/node_modules/.bin:${pkgs.symbolize-node}/lib/node_modules/.bin:$PATH"
+    symbolize_clean_path=""
+    old_ifs="$IFS"
+    IFS=:
+    for symbolize_path_entry in $PATH; do
+      case "$symbolize_path_entry" in
+        */symbolize-node/*|*-symbolize-node/*) ;;
+        *)
+          if [ -n "$symbolize_clean_path" ]; then
+            symbolize_clean_path="$symbolize_clean_path:$symbolize_path_entry"
+          else
+            symbolize_clean_path="$symbolize_path_entry"
+          fi
+          ;;
+      esac
+    done
+    IFS="$old_ifs"
+    export PATH="${pkgs.symbolize-node}/bin:${pkgs.symbolize-node}/lib/node_modules/.bin:$symbolize_clean_path"
     export PATH="$CARGO_HOME/bin:$PATH"
 
     task --silent tmpfs:link-build-dirs

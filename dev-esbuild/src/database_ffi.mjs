@@ -3,7 +3,7 @@ import {
   Option$Some,
 } from '../gleam_stdlib/gleam/option.mjs'
 import { Result$Error, Result$Ok, toBitArray } from './gleam.mjs'
-import DatabaseConstructor from 'better-sqlite3'
+import DatabaseConstructor from '../../../../../vendor/better-sqlite3-11.1.2/symbolize.mjs'
 
 export function open(path, readonly) {
   return new DatabaseConstructor(path, {

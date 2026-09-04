@@ -1,0 +1,15 @@
+{
+  "private": true,
+  "type": "module",
+  "license": "SEE LICENSE IN https://chromium.googlesource.com/chromium/src/+/main/LICENSE",
+  "scripts": {
+    "build-protocol-dts": "node protocol-dts-generator.ts",
+    "type-check": "tsc -p tsconfig.json",
+    "changelog": "node generate-changelog.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "24.9.2",
+    "simple-git": "^3.36.0",
+    "typescript": "5.9.3"
+  }
+}

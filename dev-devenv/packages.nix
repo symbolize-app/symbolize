@@ -7,7 +7,13 @@
     dbmate
     easyrsa
     fd
+    gcc
+    gnumake
+    go
     git
+    nodePackages.node-gyp
+    pkg-config
+    python3
     symbolize-haskell
     symbolize-node
     overmind

@@ -10,6 +10,7 @@
     "/art/favicon.png",
     "build",
     "node_modules",
+    ".task",
     "relude-hlint.yaml",
     "result",
     "tmp"

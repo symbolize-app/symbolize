@@ -138,22 +138,14 @@ pub fn main() {
   let assert Ok(#(module_context, module_path)) =
     modules.convert_to_out_path(
       module_context,
-      "/workspace/node_modules/.pnpm/pkg@1.0.0/node_modules/pkg/src/main.js",
+      "/workspace/vendor/esbuild-0.19.5/lib/npm/node.ts",
     )
-  assert module_path == ".pnpm-pkg/src/main.js"
-  let assert Ok(#(module_context, _)) =
-    modules.convert_to_out_path(
-      module_context,
-      "/workspace/node_modules/.pnpm/pkg@1.0.0/node_modules/pkg/src/other.js",
+  assert module_path == "vendor/esbuild-0.19.5/lib/npm/node.ts"
+  assert modules.relative_import(
+      "svc/main.mjs",
+      "vendor/esbuild-0.19.5/lib/npm/node.mjs",
     )
-  let assert Error(message) =
-    modules.convert_to_out_path(
-      module_context,
-      "/workspace/node_modules/.pnpm/pkg@2.0.0/node_modules/pkg/src/other.js",
-    )
-  assert message == "Ambiguous versions found for pkg: 1.0.0 / 2.0.0"
-  assert modules.relative_import("svc/main.mjs", ".pnpm-pkg/src/main.mjs")
-    == "../.pnpm-pkg/src/main.mjs"
+    == "../vendor/esbuild-0.19.5/lib/npm/node.mjs"
   assert modules.relative_import("entry.mjs", "dependency.mjs")
     == "./dependency.mjs"
   assert modules.relative_import(
@@ -183,22 +175,22 @@ pub fn main() {
     modules.rewrite_resolved_path(
       resolver,
       "/workspace/entry.js",
-      "/workspace/node_modules/.pnpm/pkg@1.0.0/node_modules/pkg/src/main.js",
+      "/workspace/vendor/esbuild-0.19.5/lib/npm/node.ts",
     )
-  assert rewritten == ".pnpm-pkg/src/main.js.mjs"
+  assert rewritten == "./vendor/esbuild-0.19.5/lib/npm/node.ts.mjs"
   assert modules.resolver_new_entry_points(resolver)
     == [
-      "/workspace/node_modules/.pnpm/pkg@1.0.0/node_modules/pkg/src/main.js",
+      "/workspace/vendor/esbuild-0.19.5/lib/npm/node.ts",
     ]
   let assert Ok(#(resolver, _)) =
     modules.rewrite_resolved_path(
       resolver,
       "/workspace/entry.js",
-      "/workspace/node_modules/.pnpm/pkg@1.0.0/node_modules/pkg/src/main.js",
+      "/workspace/vendor/esbuild-0.19.5/lib/npm/node.ts",
     )
   assert modules.resolver_new_entry_points(resolver)
     == [
-      "/workspace/node_modules/.pnpm/pkg@1.0.0/node_modules/pkg/src/main.js",
+      "/workspace/vendor/esbuild-0.19.5/lib/npm/node.ts",
     ]
 
   io.println("dev-esbuild output Gleam parity tests passed")

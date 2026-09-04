@@ -1,0 +1,61 @@
+version: '3'
+
+run: when_changed
+
+vars:
+  ESBUILD_VENDOR_DIR: vendor/esbuild-0.19.5
+  BETTER_SQLITE3_VENDOR_DIR: vendor/better-sqlite3-11.1.2
+  SQLITE_VENDOR_DIR: vendor/sqlite3-3.46.0
+
+tasks:
+  check:
+    cmd: ./dev-task/vendor-check.sh
+
+  build:
+    deps:
+      - esbuild:build
+      - better-sqlite3:build
+
+  clean:
+    cmd: rm -rf build/vendor
+
+  esbuild:build:
+    sources:
+      - '{{.ESBUILD_VENDOR_DIR}}/**'
+    generates:
+      - build/vendor/esbuild/esbuild
+      - build/vendor/esbuild/main.js
+    cmds:
+      - mkdir -p build/vendor/esbuild
+      - >-
+        cd {{.ESBUILD_VENDOR_DIR}} &&
+        go build -trimpath -ldflags '-s -w'
+        -o ../../build/vendor/esbuild/esbuild
+        ./cmd/esbuild
+      - >-
+        build/vendor/esbuild/esbuild
+        {{.ESBUILD_VENDOR_DIR}}/lib/npm/node.ts
+        --outfile=build/vendor/esbuild/main.js
+        --bundle
+        --target=node12
+        --define:WASM=false
+        --define:ESBUILD_VERSION='"0.19.5"'
+        --external:esbuild
+        --platform=node
+        --log-level=warning
+
+  better-sqlite3:build:
+    sources:
+      - '{{.BETTER_SQLITE3_VENDOR_DIR}}/**'
+      - '{{.SQLITE_VENDOR_DIR}}/**'
+    generates:
+      - build/vendor/better-sqlite3/better_sqlite3.node
+    cmds:
+      - mkdir -p build/vendor/better-sqlite3
+      - >-
+        temp_dir=$(mktemp -d) &&
+        cp -a {{.BETTER_SQLITE3_VENDOR_DIR}}/. "$temp_dir/" &&
+        cp -a "$PWD/{{.SQLITE_VENDOR_DIR}}" "$temp_dir/deps/sqlite3" &&
+        node-gyp --directory "$temp_dir" rebuild --release &&
+        cp "$temp_dir/build/Release/better_sqlite3.node"
+        build/vendor/better-sqlite3/better_sqlite3.node

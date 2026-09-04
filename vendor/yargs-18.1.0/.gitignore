@@ -1,0 +1,12 @@
+.idea/
+build/
+node_modules/
+.nyc_output/
+*.swp
+test.js
+coverage
+example.*
+.DS_Store
+.npmrc
+test-docs.cjs
+test-docs.mjs
