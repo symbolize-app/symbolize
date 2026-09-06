@@ -10,12 +10,6 @@ vars:
     -D warnings
 
 tasks:
-  bin:install:
-    cmds:
-      # To avoid painful conflicts, don't use lockfile
-      - cargo install cargo-deny --version 0.14.23 --locked
-      - cargo install tantivy-cli --version 0.22.1
-
   build:debug:
     aliases:
       - build
@@ -83,7 +77,7 @@ tasks:
 
   execute-build:prep:
     internal: true
-    cmd: cargo build --locked {{if eq .TASK_CARGO_BUILD_MODE "release"}}--release{{end}} --package symbolize-dev-cargo-build
+    cmd: cargo build --offline --locked {{if eq .TASK_CARGO_BUILD_MODE "release"}}--release{{end}} --package symbolize-dev-cargo-build
 
   execute-package:
     internal: true
@@ -226,24 +220,31 @@ tasks:
           NAME: '{{.NAME}}'
           ARGS: '{{.ARGS}}'
 
-  fetch:
-    cmd: cargo fetch --locked
-
   format:check:
     aliases:
       - fc
-    cmd: cargo fmt --all -- --check
+    cmd: >-
+      cargo fmt
+      --package symbolize-dev-cargo-build
+      --package symbolize-dev-sim
+      --package symbolize-dev-watchman-client
+      --package symbolize-lib-hex
+      --package symbolize-svc-gateway-host-run
+      --package symbolize-svc-search-host-read
+      --check
 
   format:fix:
     aliases:
       - format
       - f
-    cmd: cargo fmt --all
-
-  install:
-    cmds:
-      - task: fetch
-      - task: bin:install
+    cmd: >-
+      cargo fmt
+      --package symbolize-dev-cargo-build
+      --package symbolize-dev-sim
+      --package symbolize-dev-watchman-client
+      --package symbolize-lib-hex
+      --package symbolize-svc-gateway-host-run
+      --package symbolize-svc-search-host-read
 
   lint:check:
     aliases:
@@ -259,10 +260,10 @@ tasks:
       - clippy:lint:fix
 
   lock:
-    cmd: cargo metadata --format-version=1 >/dev/null
+    cmd: cargo metadata --offline --format-version=1 >/dev/null
 
   lock:check:
-    cmd: cargo metadata --locked --format-version=1 >/dev/null
+    cmd: cargo metadata --locked --offline --format-version=1 >/dev/null
 
   security:
     deps:

@@ -1,0 +1,32 @@
+name: gen
+
+on:
+  pull_request:
+  push:
+    paths-ignore:
+      - '.github/ISSUE_TEMPLATE/**'
+    branches:
+      - master
+
+env:
+  RUSTFLAGS: -Dwarnings
+
+jobs:
+  check:
+    name: tool_${{ matrix.tool }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        tool: [bindings, yml, license, standalone]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Update toolchain
+        run: rustup update --no-self-update stable && rustup default stable
+      - name: Run
+        run: cargo run -p tool_${{ matrix.tool }}
+      - name: Check
+        shell: bash
+        run: |
+          git add -N .
+          git diff --exit-code || (echo '::error::Generated `tool_${{ matrix.tool }}` is out-of-date. Please run `cargo run -p tool_${{ matrix.tool }}`'; exit 1)

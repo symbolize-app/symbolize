@@ -1,0 +1,11 @@
+[package]
+name = "futures-example-imperative"
+version = "0.0.0"
+edition = "2018"
+publish = false
+
+[dependencies]
+futures = { path = "../../futures", features = ["thread-pool"] }
+
+[lints]
+workspace = true

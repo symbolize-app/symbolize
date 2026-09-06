@@ -2,9 +2,10 @@
 
 This directory contains the transitive closure of checked-out snapshots of
 upstream Git repositories that Symbolize depends on but that are not provided
-by Devenv. Vendored dependencies are consumed by direct paths into these
-snapshots; they are not installed by a package manager or linked through a
-workspace.
+by Devenv. Gleam dependencies and build adapters consume direct paths into
+these snapshots. Cargo dependencies retain their upstream manifests and are
+redirected by the root workspace's `[patch.crates-io]` table; nothing is
+installed by a package manager or linked through a vendor workspace.
 
 Each immediate child directory represents one upstream repository:
 
@@ -97,38 +98,99 @@ repository's vendor check rejects registry dependencies and locked manifest
 entries whose source is not `local`. The shared `gleam_stdlib` dependency is
 vendored as `gleam_stdlib-1.0.5`.
 
+## Cargo snapshots
+
+Rust library dependencies use the same snapshot layout, but their source of
+truth is the upstream Git repository and the full commit recorded in
+`.vendor.toml`, not the crates.io archive or Cargo's local cache. `.vendor.toml`
+strictly permits only `url` and `ref`:
+
+```toml
+url = "https://github.com/example/project"
+ref = "0123456789abcdef0123456789abcdef01234567"
+```
+
+The root workspace keeps its normal Cargo version constraints, and the root
+`[patch.crates-io]` table maps every active `(package name, version)` identity
+to a local path in these snapshots. Vendored Cargo manifests retain their
+upstream registry dependency declarations; Cargo applies the root patches
+when resolving the active graph. Multiple versions use unique patch aliases
+with `package = "..."`. The Cargo lockfile contains no registry or Git package
+sources. The outer workspace excludes `vendor/` because a monorepo snapshot
+may contain several package roots and multiple retained versions of a package.
+
+Cargo package-manager installations and fetch tasks are intentionally absent.
+Development binaries such as `cargo-deny` are supplied by Devenv, while
+library sources remain in this directory. `task vendor:check` validates the
+Git metadata, package mappings, root patch table, local Cargo paths, and
+lockfile closure.
+
 ## Duplicate dependency ledger
 
-`dup.toml` records the dependency identities for which the closure contains
-more than one snapshot, together with the reason they have not been
-normalized.
+Duplicate snapshot directories in `vendor/` are strictly prohibited unless
+truly exceptional circumstances require major rework to resolve. Duplicates
+must be actively resolved and normalized whenever feasible (such as upgrading
+consumers, updating callers to compatible releases, pruning obsolete flags,
+or consolidating shared dependencies). Retaining multiple snapshots of the
+same upstream repository is never an accepted convenience or permanent steady
+state.
 
-The ledger covers the immediate snapshot directories in `vendor/`. It does
-not reinterpret package-manager lockfiles that are retained inside an
-upstream repository snapshot as part of that repository's source history;
-those lockfiles are not inputs to Symbolize's direct-path resolution.
+Normal dependency maintenance is **never** exceptional. Routine version
+differences across transitive dependencies, packaging churn (such as Win32 raw
+C bindings across generational release tags), or obsolete execution models
+dragged in by unused compatibility flags must be resolved directly rather than
+tolerated as duplicates.
+
+"Exceptional circumstances requiring major rework" is strictly defined as:
+1. Two versions that are essentially different crates under the same name
+   (such as a total paradigm shift in macro syntax, type representation, or
+   design between generational versions, e.g. `bitflags` 1.x vs 2.x);
+2. Updating to a new API would change fundamental architectural code
+   structures across the consumer; or
+3. Resolving the duplicate would require deep, pervasive changes across a large
+   portion of the vendor closure where no compatible upstream releases or
+   straightforward migrations exist.
+
+`dup.toml` records the repository identities for which the closure contains
+more than one snapshot directory, together with the concrete technical blockers
+explaining why they have not been normalized.
+
+The ledger covers the immediate snapshot directories in `vendor/` (each named
+`<name>-<version-or-commit-date>`). It tracks upstream repository identities,
+not individual Cargo packages or internal architecture target subcrates within
+a multi-crate monorepo snapshot. It does not reinterpret package-manager
+lockfiles retained inside an upstream repository snapshot as part of that
+repository's source history; those lockfiles are not inputs to Symbolize's
+direct-path resolution.
 
 The file uses this schema:
 
 ```toml
 version = 1
 
-[[duplicate]]
-name = "example-library"
-snapshots = ["example-library-1.2.3", "example-library-2.0.0"]
-consumers = [
-  "example-tool-4.0.0: ^1.2.0",
-  "other-tool-7.0.0: ^2.0.0",
-]
-justification = "The consumers require incompatible APIs, and neither can be upgraded in this closure."
+# When all snapshot identities are normalized, no [[duplicate]] entries exist.
+# If an exceptional circumstance requires retaining multiple snapshots:
+# [[duplicate]]
+# name = "example-library"
+# snapshots = ["example-library-1.2.3", "example-library-2.0.0"]
+# consumers = [
+#   "example-tool-4.0.0: ^1.2.0",
+#   "other-tool-7.0.0: ^2.0.0",
+# ]
+# justification = "The consumers require fundamentally incompatible macro architectures, and upgrading either consumer requires pervasive rewrites across the closure."
 ```
 
-An unresolved `[[duplicate]]` entry must name every retained snapshot and its
-consumers, and its `justification` must identify a concrete technical blocker
-such as incompatible API or behavior, ABI/platform requirements, or an
-unavailable compatible upstream release. A statement such as “minor vendored
-source changes needed” is not sufficient. If no duplicate snapshots remain,
-`dup.toml` must still exist with `version = 1` and no `[[duplicate]]` records.
+An unresolved `[[duplicate]]` entry must name every retained snapshot directory
+and its consumers, and its `justification` must articulate a concrete technical
+blocker requiring major rework. Placeholders such as “minor vendored source
+changes needed” or boilerplate justifications are strictly rejected.
+
+The ledger is verified by `task vendor:check` against invalid entries: every
+entry must correspond to an actual set of duplicated snapshot directories in
+`vendor/`, list all and only those retained directories, and contain no entries
+for single snapshots, non-existent directories, or internal subcrates. If all
+snapshots are normalized, `dup.toml` must still exist declaring `version = 1`
+with an empty ledger.
 
 ## Requirements
 
@@ -136,8 +198,13 @@ source changes needed” is not sufficient. If no duplicate snapshots remain,
 - Include the upstream name and package version or commit date in every
   snapshot directory name.
 - Keep `.vendor.toml` alongside the snapshot it describes.
-- Keep `dup.toml` up to date whenever adding, removing, or collapsing a
-  snapshot with the same dependency identity as another snapshot.
+- Do not preserve upstream `.gitattributes` files; their rules would affect
+  future additions and checkouts within the vendored subtree.
+- Keep tracked upstream files even when an upstream `.gitignore` hides them;
+  the vendor check rejects any files left untracked below `vendor/`.
+- Duplicate snapshot directories are prohibited unless truly exceptional
+  circumstances require major rework to normalize; any retained duplicates must
+  be justified in `dup.toml`.
 - Do not put package-manager installations or Devenv state in this directory.
 - A generated artifact is allowed only when it is a deliberate, documented
   part of the direct-path adapter. For example,
@@ -156,9 +223,11 @@ Devenv configuration and dependencies remain in `devenv.*` and
 To update a vendored dependency, select the upstream Git commit, export that
 commit without its `.git` directory into a new versioned child directory, and
 write its full commit SHA and upstream URL to `.vendor.toml`. Recalculate the
-root's transitive dependency closure and add every newly required upstream
-repository unless it is supplied by Devenv. Update direct adapters and build
-tasks as needed, then run `task vendor:check` and the full repository check.
+root's transitive dependency closure and regenerate the root
+`[patch.crates-io]` table; do not rewrite upstream Cargo manifests merely to
+point at neighboring snapshots. Add every newly required upstream repository
+unless it is supplied by Devenv. Update direct adapters and build tasks as
+needed, then run `task vendor:check` and the full repository check.
 
 Native outputs are rebuilt for the current platform from the exact snapshots:
 esbuild is compiled with Go, and better-sqlite3 is compiled with node-gyp.

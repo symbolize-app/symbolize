@@ -1,0 +1,27 @@
+[package]
+name = "test_debugger_visualizer"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[lib]
+doc = false
+doctest = false
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(windows_debugger_visualizer)'] }
+
+[dependencies.windows]
+path = "../../libs/windows"
+features = [
+    "implement",
+    "Win32_System_Com",
+    "Win32_Foundation",
+]
+
+[dependencies.windows-core]
+path = "../../libs/core"
+
+[dev-dependencies]
+debugger_test = "0.1.0"
+debugger_test_parser = "0.1.0"

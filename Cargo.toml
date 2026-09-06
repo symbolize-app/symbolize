@@ -8,6 +8,7 @@ members = [
   "svc-search-host-read",
 ]
 resolver = "2"
+exclude = ["vendor"]
 
 [workspace.package]
 version = "0.1.0"
@@ -22,7 +23,7 @@ clap = { version = "4.4.12", features = ["color", "derive", "error-context", "he
 crossbeam = { version = "0.8.4", features = ["crossbeam-queue", "std"] }
 dashmap = { version = "6.0.1", features = [] }
 form_urlencoded = { version = "1.2.1", features = [] }
-futures = { version = "0.3.30", features = [] }
+futures = { version = "0.3.31", features = [] }
 http = { version = "1.0.0", features = [] }
 http-body = { version = "1.0.0", features = [] }
 http-body-util = { version = "0.1.2", features = [] }
@@ -47,6 +48,178 @@ tokio-stream = { version = "0.1.14", features = ["net"] }
 tokio-util = { version = "0.7.10", features = ["rt"] }
 watchman_client = { version = "0.8.0", features = [] }
 
+
+# Generated from the active Cargo.lock and vendor metadata; keep upstream
+# version constraints above and use aliases for packages with multiple versions.
+[patch.crates-io]
+addr2line = { path = "vendor/addr2line-0.21.0" }
+adler = { path = "vendor/adler-1.0.2" }
+ahash = { path = "vendor/ahash-0.8.7" }
+allocator-api2 = { path = "vendor/allocator-api2-0.2.16" }
+anstream = { path = "vendor/anstream-0.6.18/crates/anstream" }
+anstyle = { path = "vendor/anstyle-1.0.4/crates/anstyle" }
+anstyle-parse = { path = "vendor/anstyle-parse-0.2.3/crates/anstyle-parse" }
+anstyle-query = { path = "vendor/anstyle-query-1.0.0/crates/anstyle-query" }
+anstyle-wincon = { path = "vendor/anstyle-wincon-3.0.6/crates/anstyle-wincon" }
+anyhow = { path = "vendor/anyhow-1.0.79" }
+autocfg = { path = "vendor/autocfg-1.1.0" }
+backon = { path = "vendor/backon-1.2.0/backon" }
+backtrace = { path = "vendor/backtrace-rs-0.3.69" }
+base64 = { path = "vendor/rust-base64-0.21.7" }
+bitflags = { path = "vendor/bitflags-2.4.1" }
+bumpalo = { path = "vendor/bumpalo-3.16.0" }
+byteorder = { path = "vendor/byteorder-1.5.0" }
+bytes = { path = "vendor/bytes-1.5.0" }
+cc = { path = "vendor/cc-rs-1.0.83" }
+cfg-if = { path = "vendor/cfg-if-1.0.0" }
+clap = { path = "vendor/clap-4.4.13" }
+clap_builder = { path = "vendor/clap-4.4.13/clap_builder" }
+clap_derive = { path = "vendor/clap-4.4.13/clap_derive" }
+clap_lex = { path = "vendor/clap-4.4.13/clap_lex" }
+colorchoice = { path = "vendor/colorchoice-1.0.0/crates/colorchoice" }
+crossbeam = { path = "vendor/crossbeam-0.8.4" }
+crossbeam-channel = { path = "vendor/crossbeam-0.8.4/crossbeam-channel" }
+crossbeam-deque = { path = "vendor/crossbeam-0.8.4/crossbeam-deque" }
+crossbeam-epoch = { path = "vendor/crossbeam-0.8.4/crossbeam-epoch" }
+crossbeam-queue = { path = "vendor/crossbeam-0.8.4/crossbeam-queue" }
+crossbeam-utils = { path = "vendor/crossbeam-0.8.4/crossbeam-utils" }
+crossterm = { path = "vendor/crossterm-0.28.1" }
+crossterm_winapi = { path = "vendor/crossterm-winapi-0.9.1" }
+dashmap = { path = "vendor/dashmap-6.0.1" }
+downcast = { path = "vendor/downcast-rs-0.11.0" }
+either = { path = "vendor/either-1.9.0" }
+equivalent = { path = "vendor/equivalent-1.0.1" }
+errno = { path = "vendor/rust-errno-0.3.11" }
+fallible-iterator = { path = "vendor/rust-fallible-iterator-0.3.0" }
+fallible-streaming-iterator = { path = "vendor/fallible-streaming-iterator-0.1.9" }
+fastrand = { path = "vendor/fastrand-2.2.0" }
+fnv = { path = "vendor/rust-fnv-1.0.7" }
+form_urlencoded = { path = "vendor/rust-url-1.2.1/form_urlencoded" }
+fragile = { path = "vendor/fragile-2.0.0" }
+futures = { path = "vendor/futures-rs-0.3.31/futures" }
+futures-channel = { path = "vendor/futures-rs-0.3.31/futures-channel" }
+futures-core = { path = "vendor/futures-rs-0.3.31/futures-core" }
+futures-executor = { path = "vendor/futures-rs-0.3.31/futures-executor" }
+futures-io = { path = "vendor/futures-rs-0.3.31/futures-io" }
+futures-macro = { path = "vendor/futures-rs-0.3.31/futures-macro" }
+futures-sink = { path = "vendor/futures-rs-0.3.31/futures-sink" }
+futures-task = { path = "vendor/futures-rs-0.3.31/futures-task" }
+futures-util = { path = "vendor/futures-rs-0.3.31/futures-util" }
+getrandom = { path = "vendor/getrandom-0.2.12" }
+gimli = { path = "vendor/gimli-0.28.1" }
+gloo-timers = { path = "vendor/gloo-0.3.0/crates/timers" }
+h2 = { path = "vendor/h2-0.4.4" }
+hashbrown = { path = "vendor/hashbrown-0.14.3" }
+hashlink = { path = "vendor/hashlink-0.8.4" }
+heck = { path = "vendor/heck-0.4.1" }
+http = { path = "vendor/http-1.0.0" }
+http-body = { path = "vendor/http-body-1.0.0/http-body" }
+http-body-util = { path = "vendor/http-body-1.0.0/http-body-util" }
+httpdate = { path = "vendor/httpdate-1.0.3" }
+hyper = { path = "vendor/hyper-1.1.0" }
+hyper-util = { path = "vendor/hyper-util-0.1.2" }
+indexmap = { path = "vendor/indexmap-2.1.0" }
+is_terminal_polyfill = { path = "vendor/is_terminal_polyfill-1.70.1" }
+itertools = { path = "vendor/itertools-0.11.0" }
+itoa = { path = "vendor/itoa-1.0.10" }
+js-sys = { path = "vendor/wasm-bindgen-0.3.72/crates/js-sys" }
+lazy_static = { path = "vendor/lazy-static.rs-1.4.0" }
+libc = { path = "vendor/libc-0.2.171" }
+libsqlite3-sys = { path = "vendor/rusqlite-0.27.0/libsqlite3-sys" }
+linux-raw-sys = { path = "vendor/linux-raw-sys-0.4.15" }
+lock_api = { path = "vendor/parking_lot-0.12.1/lock_api" }
+log = { path = "vendor/log-0.4.20" }
+maplit = { path = "vendor/maplit-1.0.2" }
+memchr = { path = "vendor/memchr-2.7.1" }
+mime = { path = "vendor/mime-0.3.17" }
+miniz_oxide = { path = "vendor/miniz_oxide-0.7.1/miniz_oxide" }
+mio = { path = "vendor/mio-1.0.1" }
+mockall = { path = "vendor/mockall-0.12.1/mockall" }
+mockall_derive = { path = "vendor/mockall-0.12.1/mockall_derive" }
+nix = { path = "vendor/nix-0.27.1" }
+object = { path = "vendor/object-0.32.2" }
+once_cell = { path = "vendor/once_cell-1.19.0" }
+parking_lot = { path = "vendor/parking_lot-0.12.1" }
+parking_lot_core = { path = "vendor/parking_lot-0.12.1/core" }
+percent-encoding = { path = "vendor/rust-url-1.2.1/percent_encoding" }
+pin-project = { path = "vendor/pin-project-1.1.10" }
+pin-project-internal = { path = "vendor/pin-project-1.1.10/pin-project-internal" }
+pin-project-lite = { path = "vendor/pin-project-lite-0.2.13" }
+pin-utils = { path = "vendor/pin-utils-0.1.0" }
+pkg-config = { path = "vendor/pkg-config-rs-0.3.28" }
+predicates = { path = "vendor/predicates-rs-3.0.4" }
+predicates-core = { path = "vendor/predicates-rs-3.0.4/crates/core" }
+predicates-tree = { path = "vendor/predicates-rs-3.0.4/crates/tree" }
+proc-macro2 = { path = "vendor/proc-macro2-1.0.94" }
+quote = { path = "vendor/quote-1.0.35" }
+ring = { path = "vendor/ring-0.17.7" }
+rusqlite = { path = "vendor/rusqlite-0.27.0" }
+rustc-demangle = { path = "vendor/rustc-demangle-0.1.23" }
+rustix = { path = "vendor/rustix-0.38.44" }
+rustls = { path = "vendor/rustls-0.22.4/rustls" }
+rustls-pemfile = { path = "vendor/pemfile-2.0.0" }
+rustls-pki-types = { path = "vendor/pki-types-1.1.0" }
+rustls-webpki = { path = "vendor/webpki-0.102.1" }
+rustyline-async = { path = "vendor/rustyline-async-0.4.5" }
+ryu = { path = "vendor/ryu-1.0.16" }
+scopeguard = { path = "vendor/scopeguard-1.2.0" }
+serde = { path = "vendor/serde-1.0.194/serde" }
+serde_bser = { path = "vendor/watchman-0.8.0/watchman/rust/serde_bser" }
+serde_derive = { path = "vendor/serde-1.0.194/serde_derive" }
+serde_json = { path = "vendor/json-1.0.111" }
+signal-hook = { path = "vendor/signal-hook-0.3.17" }
+signal-hook-mio = { path = "vendor/signal-hook-mio-0.2.4/signal-hook-mio" }
+signal-hook-registry = { path = "vendor/signal-hook-0.3.17/signal-hook-registry" }
+slab = { path = "vendor/slab-0.4.9" }
+smallvec = { path = "vendor/rust-smallvec-1.11.2" }
+socket2 = { path = "vendor/socket2-0.5.5" }
+spin = { path = "vendor/spin-rs-0.9.8" }
+strsim = { path = "vendor/strsim-rs-0.10.0" }
+subtle = { path = "vendor/subtle-2.5.0" }
+syn = { path = "vendor/syn-2.0.100" }
+termtree = { path = "vendor/termtree-0.4.1" }
+thingbuf = { path = "vendor/thingbuf-0.1.6" }
+thiserror = { path = "vendor/thiserror-1.0.56" }
+thiserror-impl = { path = "vendor/thiserror-1.0.56/impl" }
+tokio = { path = "vendor/tokio-1.39.2/tokio" }
+tokio-macros = { path = "vendor/tokio-1.39.2/tokio-macros" }
+tokio-rustls = { path = "vendor/tokio-rustls-0.25.0" }
+tokio-stream = { path = "vendor/tokio-stream-0.1.14/tokio-stream" }
+tokio-util = { path = "vendor/tokio-util-0.7.10/tokio-util" }
+tracing = { path = "vendor/tracing-0.1.40/tracing" }
+tracing-core = { path = "vendor/tracing-0.1.40/tracing-core" }
+try-lock = { path = "vendor/try-lock-0.2.5" }
+unicode-ident = { path = "vendor/unicode-ident-1.0.12" }
+unicode-segmentation = { path = "vendor/unicode-segmentation-1.12.0" }
+unicode-width = { path = "vendor/unicode-width-0.2.0" }
+untrusted = { path = "vendor/untrusted-0.9.0" }
+utf8parse = { path = "vendor/vte-0.2.1/utf8parse" }
+vcpkg = { path = "vendor/vcpkg-rs-0.2.15" }
+version_check = { path = "vendor/version_check-0.9.4" }
+want = { path = "vendor/want-0.3.1" }
+wasi = { path = "vendor/wasi-0.11.0+wasi-snapshot-preview1" }
+wasm-bindgen = { path = "vendor/wasm-bindgen-0.3.72" }
+wasm-bindgen-backend = { path = "vendor/wasm-bindgen-0.3.72/crates/backend" }
+wasm-bindgen-macro = { path = "vendor/wasm-bindgen-0.3.72/crates/macro" }
+wasm-bindgen-macro-support = { path = "vendor/wasm-bindgen-0.3.72/crates/macro-support" }
+wasm-bindgen-shared = { path = "vendor/wasm-bindgen-0.3.72/crates/shared" }
+watchman_client = { path = "vendor/watchman-0.8.0/watchman/rust/watchman_client" }
+winapi = { path = "vendor/winapi-rs-0.3.9" }
+winapi-i686-pc-windows-gnu = { path = "vendor/winapi-rs-0.3.9/i686" }
+winapi-x86_64-pc-windows-gnu = { path = "vendor/winapi-rs-0.3.9/x86_64" }
+windows-sys = { path = "vendor/windows-rs-0.52.6/crates/libs/sys" }
+windows-targets = { path = "vendor/windows-rs-0.52.6/crates/libs/targets" }
+windows_aarch64_gnullvm = { path = "vendor/windows-rs-0.52.6/crates/targets/aarch64_gnullvm" }
+windows_aarch64_msvc = { path = "vendor/windows-rs-0.52.6/crates/targets/aarch64_msvc" }
+windows_i686_gnu = { path = "vendor/windows-rs-0.52.6/crates/targets/i686_gnu" }
+windows_i686_gnullvm = { path = "vendor/windows-rs-0.52.6/crates/targets/i686_gnullvm" }
+windows_i686_msvc = { path = "vendor/windows-rs-0.52.6/crates/targets/i686_msvc" }
+windows_x86_64_gnu = { path = "vendor/windows-rs-0.52.6/crates/targets/x86_64_gnu" }
+windows_x86_64_gnullvm = { path = "vendor/windows-rs-0.52.6/crates/targets/x86_64_gnullvm" }
+windows_x86_64_msvc = { path = "vendor/windows-rs-0.52.6/crates/targets/x86_64_msvc" }
+zerocopy = { path = "vendor/zerocopy-0.7.32" }
+zerocopy-derive = { path = "vendor/zerocopy-0.7.32/zerocopy-derive" }
+zeroize = { path = "vendor/utils-1.7.0/zeroize" }
 
 [workspace.lints.rust]
 # Groups

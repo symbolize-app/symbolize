@@ -1,0 +1,23 @@
+name: Release
+
+permissions:
+  contents: read
+
+on:
+  push:
+    tags:
+      - v[0-9]+.*
+
+defaults:
+  run:
+    shell: bash --noprofile --norc -CeEuxo pipefail {0}
+
+jobs:
+  create-release:
+    if: github.repository_owner == 'taiki-e'
+    uses: taiki-e/github-actions/.github/workflows/create-release.yml@main
+    with:
+      crates: pin-project-internal,.
+    permissions:
+      contents: write
+    secrets: inherit

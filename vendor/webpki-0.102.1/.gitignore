@@ -1,0 +1,15 @@
+*~
+
+# Cargo Junk
+Cargo.lock
+target/
+
+# IntelliJ junk
+*.iml
+.idea
+
+# Benchmark data
+benches/*.der
+
+# Python virtualenv
+.venv

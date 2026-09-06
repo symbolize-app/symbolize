@@ -1,0 +1,27 @@
+[workspace]
+members = [
+  "futures",
+  "futures-core",
+  "futures-channel",
+  "futures-executor",
+  "futures-io",
+  "futures-macro",
+  "futures-sink",
+  "futures-task",
+  "futures-util",
+  "futures-test",
+
+  "futures/tests/macro-tests",
+  "futures/tests/macro-reexport",
+  "futures/tests/no-std",
+
+  "examples/functional",
+  "examples/imperative",
+]
+
+[workspace.lints.rust]
+missing_debug_implementations = "warn"
+rust_2018_idioms = "warn"
+single_use_lifetimes = "warn"
+unreachable_pub = "warn"
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(futures_sanitizer)'] }

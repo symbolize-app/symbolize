@@ -1,0 +1,12 @@
+[package]
+name = "sample_memory_buffer"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[dependencies.windows]
+path = "../../../libs/windows"
+features = [
+    "Foundation",
+    "Win32_System_WinRT",
+]

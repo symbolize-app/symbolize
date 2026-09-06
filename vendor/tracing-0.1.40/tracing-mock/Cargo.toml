@@ -1,0 +1,31 @@
+## BIG SCARY NOTE
+# This Cargo.toml does not match the repo conventions YET
+# Before releasing to crates.io: make it so!
+
+[package]
+name = "tracing-mock"
+version = "0.1.0"
+authors = [
+    "Eliza Weisman <eliza@buoyant.io>",
+    "Tokio Contributors <team@tokio.rs>",
+]
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/tokio-rs/tracing"
+homepage = "https://tokio.rs"
+edition = "2018"
+rust-version = "1.56.0"
+publish = false
+
+[dependencies]
+tracing = { path = "../tracing", version = "0.1.35", features = ["std", "attributes"], default-features = false }
+tracing-core = { path = "../tracing-core", version = "0.1.28", default-features = false }
+tracing-subscriber = { path = "../tracing-subscriber", version = "0.3", default-features = false, features = ["registry"], optional = true }
+tokio-test = { version = "0.4.2", optional = true }
+
+# Fix minimal-versions; tokio-test fails with otherwise acceptable 0.1.0
+tokio-stream = { version = "0.1.9", optional = true }
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]

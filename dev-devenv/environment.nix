@@ -58,9 +58,6 @@
     done
     IFS="$old_ifs"
     export PATH="${pkgs.symbolize-node}/bin:${pkgs.symbolize-node}/lib/node_modules/.bin:$symbolize_clean_path"
-    export PATH="$CARGO_HOME/bin:$PATH"
-
-    task --silent tmpfs:link-build-dirs
 
     echo "Run devenv-tool-versions to list development tool versions."
   '';

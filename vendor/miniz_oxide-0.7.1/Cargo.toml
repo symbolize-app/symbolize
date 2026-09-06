@@ -1,0 +1,46 @@
+[package]
+name = "miniz_oxide_c_api"
+authors = [ "Frommi <daniil.liferenko@gmail.com>", "oyvindln <oyvindln@users.noreply.github.com>",]
+version = "0.3.0"
+build = "src/build.rs"
+license = "MIT"
+readme = "README.md"
+keywords = [ "zlib", "miniz", "deflate", "encoding",]
+categories = [ "compression",]
+repository = "https://github.com/Frommi/miniz_oxide"
+homepage = "https://github.com/Frommi/miniz_oxide/"
+documentation = "https://docs.rs/miniz_oxide_c_api"
+description = "DEFLATE compression and decompression API designed to be Rust drop-in replacement for miniz"
+edition = "2018"
+exclude = [ "benches/data/*", "/*.sh", "/redefine.txt", "fuzz/*", "tests/*", "miniz/*",]
+
+[lib]
+name = "miniz_oxide_c_api"
+
+[dependencies]
+libc = "0.2.22"
+crc32fast = "1.2.0"
+
+[build-dependencies]
+cc = "1.0"
+
+[features]
+default = []
+miniz_zip = [ "build_stub_miniz",]
+fuzzing = [ "build_orig_miniz", "no_c_export",]
+benching = [ "build_orig_miniz", "no_c_export",]
+build_orig_miniz = []
+build_stub_miniz = []
+no_c_export = []
+libc_stub = []
+simd = [ "miniz_oxide/simd",]
+
+[dependencies.miniz_oxide]
+path = "miniz_oxide"
+version = "0.7.1"
+
+[profile.dev]
+panic = "abort"
+
+[profile.release]
+panic = "abort"

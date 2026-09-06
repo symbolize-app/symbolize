@@ -1,0 +1,66 @@
+[[example]]
+name = "tcp_server"
+required-features = [ "os-poll", "net",]
+
+[[example]]
+name = "tcp_listenfd_server"
+required-features = [ "os-poll", "net",]
+
+[[example]]
+name = "udp_server"
+required-features = [ "os-poll", "net",]
+
+[package]
+edition = "2021"
+rust-version = "1.70"
+name = "mio"
+version = "1.0.1"
+license = "MIT"
+authors = [ "Carl Lerche <me@carllerche.com>", "Thomas de Zeeuw <thomasdezeeuw@gmail.com>", "Tokio Contributors <team@tokio.rs>",]
+description = "Lightweight non-blocking I/O."
+homepage = "https://github.com/tokio-rs/mio"
+repository = "https://github.com/tokio-rs/mio"
+readme = "README.md"
+keywords = [ "io", "async", "non-blocking",]
+categories = [ "asynchronous",]
+include = [ "Cargo.toml", "LICENSE", "README.md", "CHANGELOG.md", "src/**/*.rs", "examples/**/*.rs",]
+
+[features]
+default = [ "log",]
+os-poll = []
+os-ext = [ "os-poll", "windows-sys/Win32_System_Pipes", "windows-sys/Win32_Security",]
+net = []
+
+[dev-dependencies]
+
+[dependencies.log]
+version = "0.4.8"
+optional = true
+
+[package.metadata.playground]
+features = [ "os-poll", "os-ext", "net",]
+
+[lints.rust.unexpected_cfgs]
+level = "warn"
+check-cfg = [ "cfg(mio_unsupported_force_poll_poll)", "cfg(mio_unsupported_force_waker_pipe)",]
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = [ "--cfg", "docsrs", "--generate-link-to-definition",]
+targets = [ "aarch64-apple-ios", "aarch64-linux-android", "wasm32-wasi", "x86_64-apple-darwin", "x86_64-pc-windows-gnu", "x86_64-pc-windows-msvc", "x86_64-unknown-dragonfly", "x86_64-unknown-freebsd", "x86_64-unknown-illumos", "x86_64-unknown-linux-gnu", "x86_64-unknown-netbsd", "x86_64-unknown-openbsd", "x86_64-unknown-hermit",]
+
+[target.'cfg(unix)'.dependencies.libc]
+version = "0.2.149"
+
+[target.'cfg(target_os = "hermit")'.dependencies.libc]
+version = "0.2.171"
+
+[target.'cfg(windows)'.dependencies.windows-sys]
+version = "0.52"
+features = [ "Wdk_Foundation", "Wdk_Storage_FileSystem", "Wdk_System_IO", "Win32_Foundation", "Win32_Networking_WinSock", "Win32_Storage_FileSystem", "Win32_System_IO", "Win32_System_WindowsProgramming",]
+
+[target.'cfg(target_os = "wasi")'.dependencies.wasi]
+version = "0.11.0"
+
+[target.'cfg(target_os = "wasi")'.dependencies.libc]
+version = "0.2.149"

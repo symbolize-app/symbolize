@@ -1,0 +1,4 @@
+LIBRARY URLMON.dll
+EXPORTS
+CreateUri@16
+CreateUriWithFragment@20

@@ -1,0 +1,22 @@
+[package]
+name = "windows-version"
+version = "0.1.1"
+authors = ["Microsoft"]
+edition = "2021"
+rust-version = "1.60"
+license = "MIT OR Apache-2.0"
+description = "Windows version information"
+repository = "https://github.com/microsoft/windows-rs"
+readme = "readme.md"
+categories = ["os::windows-apis"]
+
+[lints]
+workspace = true
+
+[package.metadata.docs.rs]
+default-target = "x86_64-pc-windows-msvc"
+targets = []
+
+[dependencies.windows-targets]
+version = "0.52.6"
+path = "../targets"

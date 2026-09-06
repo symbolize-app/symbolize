@@ -1,0 +1,18 @@
+[package]
+name = "test_cfg_generic"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[lib]
+doc = false
+doctest = false
+
+[dependencies.windows]
+path = "../../libs/windows"
+features = [
+    "Foundation_Collections",
+    "Media_Playback",
+    "Web_Http_Headers",
+    "Devices_Sms",
+]

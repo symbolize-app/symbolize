@@ -1,0 +1,19 @@
+[package]
+name = "sample_component_json_validator"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+jsonschema = { version = "0.18", default-features = false }
+serde_json = {version = "1.0", default-features = false }
+
+[dependencies.windows]
+path = "../../../libs/windows"
+features = [
+    "Win32_Foundation",
+    "Win32_System_Com",
+]

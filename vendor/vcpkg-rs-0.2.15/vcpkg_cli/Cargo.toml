@@ -1,0 +1,16 @@
+[package]
+name = "vcpkg_cli"
+version = "0.2.4"
+authors = ["Jim McGrath <jimmc2@gmail.com>"]
+license = "MIT/Apache-2.0"
+repository = "https://github.com/mcgoo/vcpkg-rs"
+documentation = "https://docs.rs/vcpkg"
+description = """
+A command line utility to investigate which libraries will be
+found by the vcpkg Cargo build helper.
+"""
+keywords = ["build-dependencies"]
+
+[dependencies]
+vcpkg = { version = "0.2.8", path = "../" }
+clap = "2.31"

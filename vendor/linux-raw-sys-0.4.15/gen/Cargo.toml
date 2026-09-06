@@ -1,0 +1,9 @@
+[package]
+name = "gen"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+bindgen = { version = "0.70.1", default-features = false }
+tempfile = "3.12.0"

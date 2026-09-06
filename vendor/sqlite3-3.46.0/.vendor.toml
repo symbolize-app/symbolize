@@ -1,4 +1,2 @@
 url = "https://github.com/sqlite/sqlite"
 ref = "bebe2d8be8acfd02592c4972f4ba32c3b4e4a33f"
-artifact = "SQLite 3.46.0 amalgamation"
-source_id = "96c92aba00c8375bc32fafcdf12429c58bd8aabfcadab6683e35bbb9cdebf19e"

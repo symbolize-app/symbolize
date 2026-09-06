@@ -1,4 +1,2 @@
 url = "https://github.com/puppeteer/puppeteer"
 ref = "21efe834b7094d53a1c0d633dc69deced17702d8"
-runtime = "runtime/puppeteer.mjs"
-runtime_source = "Puppeteer v25.9.0 package bundle"
