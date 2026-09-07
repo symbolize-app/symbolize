@@ -1,0 +1,5 @@
+LIBRARY api-ms-win-service-core-l1-1-1.dll
+EXPORTS
+EnumDependentServicesW@24
+EnumServicesStatusExW@40
+QueryServiceDynamicInformation@12

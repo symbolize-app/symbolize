@@ -1,0 +1,11 @@
+LIBRARY api-ms-win-core-processthreads-l1-1-2.dll
+EXPORTS
+GetProcessPriorityBoost
+GetSystemTimes
+GetThreadIOPendingFlag
+GetThreadInformation
+IsProcessCritical
+QueryProtectedPolicy
+SetProcessPriorityBoost
+SetProtectedPolicy
+SetThreadInformation

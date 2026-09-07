@@ -2,7 +2,7 @@ run: when_changed
 tasks:
   link-build-dir:
     cmd:
-      task: :tmpfs:link-package-build-dir
+      task: :build-dir:link-package-build-dir
       vars:
         NAME: '{{.NAME}}'
 vars:

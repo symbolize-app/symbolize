@@ -1,0 +1,370 @@
+cargo_cache:
+  folder: $CARGO_HOME/registry
+  fingerprint_script: cat Cargo.lock || echo ""
+
+env:
+  # Build by default; don't just check
+  BUILD: build
+  CLIPPYFLAGS: -D warnings -A unknown-lints
+  RUSTFLAGS: -D warnings
+  RUSTDOCFLAGS: -D warnings
+  TOOL: cargo
+  MSRV: 1.65.0
+  ZFLAGS:
+
+# Tests that don't require executing the build binaries
+build: &BUILD
+  build_script:
+    - . $HOME/.cargo/env || true
+    - $TOOL -Vv
+    - rustc -Vv
+    - $TOOL $BUILD $ZFLAGS --target $TARGET --all-targets --all-features
+    - $TOOL doc $ZFLAGS --no-deps --target $TARGET --all-features
+    - $TOOL clippy $ZFLAGS --target $TARGET --all-targets --all-features -- $CLIPPYFLAGS
+    - if [ -z "$NOHACK" ]; then mkdir -p $HOME/.cargo/bin; export PATH=$HOME/.cargo/bin:$PATH; fi
+    - if [ -z "$NOHACK" ]; then curl -LsSf https://github.com/taiki-e/cargo-hack/releases/latest/download/cargo-hack-${HOST:-$TARGET}.tar.gz | tar xzf - -C ~/.cargo/bin; fi
+    - if [ -z "$NOHACK" ]; then $TOOL hack $ZFLAGS check --target $TARGET --each-feature; fi
+
+# Tests that do require executing the binaries
+test: &TEST
+  << : *BUILD
+  test_script:
+    - . $HOME/.cargo/env || true
+    - $TOOL test --target $TARGET --all-features
+
+# Test FreeBSD in a full VM.  Test the i686 target too, in the
+# same VM.  The binary will be built in 32-bit mode, but will execute on a
+# 64-bit kernel and in a 64-bit environment.  Our tests don't execute any of
+# the system's binaries, so the environment shouldn't matter.
+task:
+  env:
+    TARGET: x86_64-unknown-freebsd
+  matrix:
+    - name: FreeBSD 14 amd64 & i686
+      freebsd_instance:
+        image_family: freebsd-14-0-snap
+        cpu: 1
+      # Enable tests that would fail on FreeBSD 12
+      RUSTFLAGS: --cfg fbsd14 -D warnings
+      RUSTDOCFLAGS: --cfg fbsd14
+  setup_script:
+    - kldload mqueuefs
+    - fetch https://sh.rustup.rs -o rustup.sh
+    - sh rustup.sh -y --profile=minimal --default-toolchain $MSRV
+    - . $HOME/.cargo/env
+    - rustup target add i686-unknown-freebsd
+    - rustup component add clippy
+  << : *TEST
+  i386_test_script:
+    - . $HOME/.cargo/env
+    - cargo build --target i686-unknown-freebsd --all-features
+    - cargo doc --no-deps --target i686-unknown-freebsd --all-features
+    - cargo test --target i686-unknown-freebsd --all-features
+  i386_feature_script:
+    - . $HOME/.cargo/env
+    - if [ -z "$NOHACK" ]; then cargo hack check --each-feature --target i686-unknown-freebsd; fi
+  before_cache_script: rm -rf $CARGO_HOME/registry/index
+
+# Test macOS aarch64 in a full VM
+task:
+  name: macOS aarch64
+  env:
+    TARGET: aarch64-apple-darwin
+  macos_instance:
+    image: ghcr.io/cirruslabs/macos-ventura-base:latest
+  setup_script:
+    - curl --proto '=https' --tlsv1.2 -sSf -o rustup.sh https://sh.rustup.rs
+    - sh rustup.sh -y --profile=minimal --default-toolchain $MSRV
+    - . $HOME/.cargo/env
+    - rustup component add clippy
+  << : *TEST
+  before_cache_script: rm -rf $CARGO_HOME/registry/index
+
+# Use cross for QEMU-based testing
+# cross needs to execute Docker, so we must use Cirrus's Docker Builder task.
+task:
+  depends_on:
+    - FreeBSD 14 amd64 & i686
+    - Linux x86_64
+    - macOS aarch64
+    - Rust Formatter
+    - OpenBSD x86_64
+    - Minver
+    - Rust Stable
+  env:
+    RUST_TEST_THREADS: 1            # QEMU works best with 1 thread
+    HOME: /tmp/home
+    HOST: x86_64-unknown-linux-gnu
+    PATH: $HOME/.cargo/bin:$PATH
+    RUSTFLAGS: --cfg qemu -D warnings
+    TOOL: cross
+  matrix:
+    - name: Linux arm gnueabi
+      env:
+        TARGET: arm-unknown-linux-gnueabi
+    - name: Linux armv7 gnueabihf
+      env:
+        TARGET: armv7-unknown-linux-gnueabihf
+    - name: Linux i686
+      env:
+        TARGET: i686-unknown-linux-gnu
+    - name: Linux i686 musl
+      env:
+        TARGET: i686-unknown-linux-musl
+    - name: Linux MIPS
+      env:
+        TARGET: mips-unknown-linux-gnu
+    - name: Linux MIPS64
+      env:
+        TARGET: mips64-unknown-linux-gnuabi64
+    - name: Linux MIPS64 el
+      env:
+        TARGET: mips64el-unknown-linux-gnuabi64
+    - name: Linux mipsel
+      env:
+        TARGET: mipsel-unknown-linux-gnu
+    - name: Linux powerpc64le
+      env:
+        TARGET: powerpc64le-unknown-linux-gnu
+  compute_engine_instance:
+    image_project: cirrus-images
+    image: family/docker-builder
+    platform: linux
+    cpu: 1                          # Since QEMU will only use 1 thread
+    memory: 4G
+  setup_script:
+    - mkdir /tmp/home
+    - curl --proto '=https' --tlsv1.2 -sSf -o rustup.sh https://sh.rustup.rs
+    - sh rustup.sh -y --profile=minimal --default-toolchain $MSRV
+    - . $HOME/.cargo/env
+    - cargo install cross --version 0.2.5
+  << : *TEST
+  before_cache_script: rm -rf $CARGO_HOME/registry/index
+
+# Tasks for Linux native builds
+task:
+  matrix:
+    - name: Linux aarch64
+      arm_container:
+        image: rust:1.65.0
+        cpu: 1
+      depends_on:
+        - FreeBSD 14 amd64 & i686
+        - Linux x86_64
+        - macOS aarch64
+        - Rust Formatter
+        - OpenBSD x86_64
+        - Minver
+        - Rust Stable
+      env:
+        TARGET: aarch64-unknown-linux-gnu
+    - name: Linux x86_64
+      container:
+        image: rust:1.65.0
+        cpu: 1
+      env:
+        TARGET: x86_64-unknown-linux-gnu
+    - name: Linux x86_64 musl
+      container:
+        image: rust:1.65.0
+        cpu: 1
+      depends_on:
+        - FreeBSD 14 amd64 & i686
+        - Linux x86_64
+        - macOS aarch64
+        - Rust Formatter
+        - OpenBSD x86_64
+        - Minver
+        - Rust Stable
+      env:
+        TARGET: x86_64-unknown-linux-musl
+  setup_script:
+    - rustup target add $TARGET
+    - rustup component add clippy
+  << : *TEST
+  before_cache_script: rm -rf $CARGO_HOME/registry/index
+
+task:
+  name: Rust Stable
+  container:
+    image: rust:latest
+    cpu: 1
+  env:
+    TARGET: x86_64-unknown-linux-gnu
+  setup_script:
+    - rustup component add clippy
+  << : *TEST
+  before_cache_script: rm -rf $CARGO_HOME/registry/index
+
+# Tasks for cross-compiling, but no testing
+task:
+  container:
+    image: rust:1.65.0
+    cpu: 1
+  depends_on:
+    - FreeBSD 14 amd64 & i686
+    - Linux x86_64
+    - macOS aarch64
+    - Rust Formatter
+    - OpenBSD x86_64
+    - Minver
+    - Rust Stable
+  env:
+    BUILD: check
+    HOST: x86_64-unknown-linux-gnu
+  matrix:
+    # Cross claims to support Android, but when it tries to run Nix's tests it
+    # reports undefined symbol references.
+    - name: Android aarch64
+      env:
+        TARGET: aarch64-linux-android
+    - name: Android arm
+      env:
+        TARGET: arm-linux-androideabi
+    - name: Android armv7
+      env:
+        TARGET: armv7-linux-androideabi
+    - name: Android i686
+      env:
+        TARGET: i686-linux-android
+    - name: Android x86_64
+      env:
+        TARGET: x86_64-linux-android
+    - name: Linux arm-musleabi
+      env:
+        TARGET: arm-unknown-linux-musleabi
+    - name: Fuchsia x86_64
+      env:
+        TARGET: x86_64-fuchsia
+    - name: Illumos
+      env:
+        TARGET: x86_64-unknown-illumos
+    # Cross claims to support running tests on iOS, but it actually doesn't.
+    # https://github.com/rust-embedded/cross/issues/535
+    - name: iOS aarch64
+      env:
+        # cargo hack tries to invoke the iphonesimulator SDK for iOS
+        NOHACK: 1
+        TARGET: aarch64-apple-ios
+    # Cross claims to support Linux powerpc64, but it really doesn't.
+    # https://github.com/rust-embedded/cross/issues/441
+    - name: Linux powerpc64
+      env:
+        TARGET: powerpc64-unknown-linux-gnu
+    - name: Linux s390x
+      env:
+        TARGET: s390x-unknown-linux-gnu
+    - name: Linux x32
+      env:
+        TARGET: x86_64-unknown-linux-gnux32
+    - name: NetBSD x86_64
+      env:
+        TARGET: x86_64-unknown-netbsd
+  setup_script:
+    - rustup target add $TARGET
+    - rustup component add clippy
+  << : *BUILD
+  before_cache_script: rm -rf $CARGO_HOME/registry/index
+
+task:
+  container:
+    # Redox's MSRV policy is unclear.  Until they define it, use nightly.
+    image: rustlang/rust:nightly
+    cpu: 1
+  depends_on:
+    - FreeBSD 14 amd64 & i686
+    - Linux x86_64
+    - macOS aarch64
+    - Rust Formatter
+    - OpenBSD x86_64
+    - Minver
+    - Rust Stable
+  env:
+    BUILD: check
+  name: Redox x86_64
+  env:
+    HOST: x86_64-unknown-linux-gnu
+    TARGET: x86_64-unknown-redox
+    CLIPPYFLAGS: -D warnings
+  setup_script:
+    - rustup target add $TARGET
+    - rustup component add clippy
+  << : *BUILD
+  before_cache_script: rm -rf $CARGO_HOME/registry/index
+
+## Rust Tier 3 targets can't use Rustup
+task:
+  container:
+    image: rustlang/rust:nightly
+    cpu: 1
+  env:
+    BUILD: check
+    HOST: x86_64-unknown-linux-gnu
+    ZFLAGS: -Zbuild-std
+    CLIPPYFLAGS: -D warnings
+  matrix:
+    - name: DragonFly BSD x86_64
+      depends_on:
+        - FreeBSD 14 amd64 & i686
+        - Linux x86_64
+        - macOS aarch64
+        - Rust Formatter
+        - OpenBSD x86_64
+        - Minver
+        - Rust Stable
+      env:
+        TARGET: x86_64-unknown-dragonfly
+    - name: OpenBSD x86_64
+      env:
+        TARGET: x86_64-unknown-openbsd
+    - name: Linux armv7 uclibceabihf
+      depends_on:
+        - FreeBSD 14 amd64 & i686
+        - Linux x86_64
+        - macOS aarch64
+        - Rust Formatter
+        - OpenBSD x86_64
+        - Minver
+        - Rust Stable
+      env:
+        TARGET: armv7-unknown-linux-uclibceabihf
+    - name: Haiku x86_64
+      depends_on:
+        - FreeBSD 14 amd64 & i686
+        - Linux x86_64
+        - macOS aarch64
+        - Rust Formatter
+        - OpenBSD x86_64
+        - Minver
+        - Rust Stable
+      env:
+        TARGET: x86_64-unknown-haiku
+  setup_script:
+    - rustup component add rust-src
+  << : *BUILD
+  before_cache_script: rm -rf $CARGO_HOME/registry/index
+
+# Test that we can build with the lowest version of all dependencies.
+# "cargo test" doesn't work because some of our dev-dependencies, like
+# rand, can't build with their own minimal dependencies.
+task:
+  name: Minver
+  env:
+    HOST: x86_64-unknown-linux-gnu
+  container:
+    image: rustlang/rust:nightly
+    cpu: 1
+  setup_script:
+    - cargo update -Zminimal-versions
+  check_script:
+    - cargo check
+  before_cache_script: rm -rf $CARGO_HOME/registry/index
+
+# Tasks that checks if the code is formatted right using `cargo fmt` tool
+task:
+  name: Rust Formatter
+  container:
+    image: rust:latest
+    cpu: 1
+  setup_script: rustup component add rustfmt
+  test_script: cargo fmt --all -- --check **/*.rs

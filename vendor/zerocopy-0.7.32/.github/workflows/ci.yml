@@ -1,0 +1,477 @@
+name: Build & Tests
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - v0.6.x
+  merge_group:
+
+permissions: read-all
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: -Dwarnings
+  RUSTDOCFLAGS: -Dwarnings
+  # `ZC_NIGHTLY_XXX` are flags that we add to `XXX` only on the nightly
+  # toolchain.
+  ZC_NIGHTLY_RUSTFLAGS: -Zrandomize-layout
+  ZC_NIGHTLY_MIRIFLAGS: "-Zmiri-strict-provenance -Zmiri-backtrace=full"
+
+jobs:
+  build_test:
+    runs-on: ubuntu-latest
+    # Generate and populate the global Cargo registry and cache first. Each
+    # job in the matrix runs in parallel, so without populating the cache
+    # first, most jobs would duplicate the work of downloading crates from
+    # the internet. Populating the cache first ensures that this work only
+    # happens once.
+    needs: generate_cache
+
+    strategy:
+      # By default, this is set to `true`, which means that a single CI job
+      # failure will cause all outstanding jobs to be canceled. This slows down
+      # development because it means that errors need to be encountered and
+      # fixed one at a time.
+      fail-fast: false
+      matrix:
+        # See `INTERNAL.md` for an explanation of these pinned toolchain
+        # versions.
+        toolchain: [ "msrv", "stable", "nightly" ]
+        target: [
+          "i686-unknown-linux-gnu",
+          "x86_64-unknown-linux-gnu",
+          "arm-unknown-linux-gnueabi",
+          "aarch64-unknown-linux-gnu",
+          "powerpc-unknown-linux-gnu",
+          "powerpc64-unknown-linux-gnu",
+          "riscv64gc-unknown-linux-gnu",
+          "s390x-unknown-linux-gnu",
+          "wasm32-wasi"
+        ]
+        features: [ "--no-default-features", "", "--features __internal_use_only_features_that_work_on_stable", "--all-features" ]
+        crate: [ "zerocopy", "zerocopy-derive" ]
+        exclude:
+          # Exclude any combination which uses a non-nightly toolchain but
+          # enables nightly features.
+          - toolchain: "msrv"
+            features: "--all-features"
+          - toolchain: "stable"
+            features: "--all-features"
+          # Exclude any combination for the zerocopy-derive crate which
+          # uses zerocopy features.
+          - crate: "zerocopy-derive"
+            features: "--no-default-features"
+          - crate: "zerocopy-derive"
+            features: "--features __internal_use_only_features_that_work_on_stable"
+          - crate: "zerocopy-derive"
+            features: "--all-features"
+
+    name: Build & Test (crate:${{ matrix.crate }}, toolchain:${{ matrix.toolchain }}, target:${{ matrix.target }}, features:${{ matrix.features }})
+
+    steps:
+    - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+    - uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3.3.2
+      with:
+        path: |
+          ~/.cargo/
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.toml') }}
+
+    - name: Configure environment variables
+      run: |
+        set -eo pipefail
+
+        # We use toolchain descriptors ("msrv", "stable", and "nightly") in the
+        # matrix. This step converts the current descriptor to a particular
+        # toolchain version by looking up the corresponding key in `Cargo.toml`. It
+        # sets the `ZC_TOOLCHAIN` environment variable for use in the next step
+        # (toolchain installation) because GitHub variable interpolation doesn't
+        # support running arbitrary commands. In other words, we can't rewrite:
+        #
+        #   toolchain: $ {{ env.ZC_TOOLCHAIN }}
+        #
+        # ...to:
+        #
+        #   toolchain: $ {{ ./cargo.sh --version matrix.toolchain }} # hypothetical syntax
+        ZC_TOOLCHAIN="$(./cargo.sh --version ${{ matrix.toolchain }})"
+        echo "Found that the '${{ matrix.toolchain }}' toolchain is $ZC_TOOLCHAIN" | tee -a $GITHUB_STEP_SUMMARY
+        echo "ZC_TOOLCHAIN=$ZC_TOOLCHAIN" >> $GITHUB_ENV
+
+        if [[ '${{ matrix.toolchain }}' == 'nightly' ]]; then
+          RUSTFLAGS="$RUSTFLAGS $ZC_NIGHTLY_RUSTFLAGS"
+          MIRIFLAGS="$MIRIFLAGS $ZC_NIGHTLY_MIRIFLAGS"
+          echo "Using nightly toolchain; setting RUSTFLAGS='$RUSTFLAGS' and MIRIFLAGS='$MIRIFLAGS'" | tee -a $GITHUB_STEP_SUMMARY
+          echo "RUSTFLAGS=$RUSTFLAGS" >> $GITHUB_ENV
+          echo "MIRIFLAGS=$MIRIFLAGS" >> $GITHUB_ENV
+        else
+          echo "Using non-nightly toolchain; not modifying RUSTFLAGS='$RUSTFLAGS' or MIRIFLAGS='$MIRIFLAGS'" | tee -a $GITHUB_STEP_SUMMARY
+        fi
+
+    - name: Install Rust with ${{ matrix.toolchain }} toolchain (${{ env.ZC_TOOLCHAIN }}) and target ${{ matrix.target }}
+      uses: dtolnay/rust-toolchain@00b49be78f40fba4e87296b2ead62868750bdd83 # stable
+      with:
+          toolchain: ${{ env.ZC_TOOLCHAIN }}
+          targets: ${{ matrix.target }}
+          # We require the `rust-src` component to ensure that the compiler
+          # error output generated during UI tests matches that generated on
+          # local developer machines; see
+          # https://github.com/rust-lang/rust/issues/116433.
+          #
+          # Only nightly has a working Miri, so we skip installing on all other
+          # toolchains. This expression is effectively a ternary expression -
+          # see [1] for details.
+          #
+          # [1] https://github.com/actions/runner/issues/409#issuecomment-752775072
+          components: clippy, rust-src ${{ matrix.toolchain == 'nightly' && ', miri' || '' }}
+
+    - name: Rust Cache
+      uses: Swatinem/rust-cache@3cf7f8cc28d1b4e7d01e3783be10a97d55d483c8 # v2.7.1
+      with:
+        key: "${{ matrix.target }}"
+
+    - name: Check
+      run: ./cargo.sh +${{ matrix.toolchain }} check --package ${{ matrix.crate }} --target ${{ matrix.target }} ${{ matrix.features }} --verbose
+
+    - name: Build
+      run: ./cargo.sh +${{ matrix.toolchain }} build --package ${{ matrix.crate }} --target ${{ matrix.target }} ${{ matrix.features }} --verbose
+
+    # When building tests for the i686 target, we need certain libraries which
+    # are not installed by default; `gcc-multilib` includes these libraries.
+    - name: Install gcc-multilib
+      # Per [1]:
+      #
+      #   Note: Always run `sudo apt-get update` before installing a package. In
+      #   case the `apt` index is stale, this command fetches and re-indexes any
+      #   available packages, which helps prevent package installation failures.
+      #
+      # [1] https://docs.github.com/en/actions/using-github-hosted-runners/customizing-github-hosted-runners
+      run: |
+        sudo apt-get update
+        sudo apt-get install gcc-multilib
+      if: contains(matrix.target, 'i686')
+
+    - name: Run tests
+      run: |
+        ./cargo.sh +${{ matrix.toolchain }} test \
+          --package ${{ matrix.crate }} \
+          --target ${{ matrix.target }} \
+          ${{ matrix.features }} \
+          --verbose \
+          -- \
+          --skip ui
+
+        if [ "${{ matrix.features }}" != "--no-default-features" -a "${{ matrix.features }}" != "" ]; then
+          # Run UI tests separately, treating warnings as warnings (rather than
+          # as errors, as we do everywhere else in our CI tests). This allows
+          # our UI tests to more accurately reflect what users will see, and
+          # also ensures that we're not spuriously relying on warnings being
+          # errors to ensure compilation failure (if we were, then our code
+          # would be unsound whenever -Dwarnings is not enabled).
+          #
+          # TODO(#560), TODO(#187): Once we migrate to the ui-test crate, we
+          # likely won't have to special-case the UI tests like this.
+          RUSTFLAGS="$RUSTFLAGS -Wwarnings" ./cargo.sh +${{ matrix.toolchain }} test \
+            --package ${{ matrix.crate }} \
+            --target ${{ matrix.target }} \
+            ${{ matrix.features }} \
+            --verbose \
+            ui
+        fi
+
+      # Only run tests when targetting x86 (32- or 64-bit) - we're executing on
+      # x86_64, so we can't run tests for any non-x86 target.
+      #
+      # TODO(https://github.com/dtolnay/trybuild/issues/184#issuecomment-1269097742):
+      # Run compile tests when building for other targets.
+      if: contains(matrix.target, 'x86_64') || contains(matrix.target, 'i686')
+
+    - name: Run tests under Miri
+      run: |
+        # Work around https://github.com/rust-lang/miri/issues/3125
+        [ "${{ matrix.target }}" == "aarch64-unknown-linux-gnu" ] && cargo clean
+      
+        # Run under both the stacked borrows model (default) and under the tree 
+        # borrows model to ensure we're compliant with both.
+        for EXTRA_FLAGS in "" "-Zmiri-tree-borrows"; do
+          MIRIFLAGS="$MIRIFLAGS $EXTRA_FLAGS" ./cargo.sh +${{ matrix.toolchain }} \
+            miri test \
+            --package ${{ matrix.crate }} \
+            --target ${{ matrix.target }} \
+            ${{ matrix.features }}
+        done
+      # Only nightly has a working Miri, so we skip installing on all other
+      # toolchains.
+      #
+      # TODO(#22): Re-enable testing on riscv64gc-unknown-linux-gnu and/or
+      # wasm32-wasi once those work.
+      if: matrix.toolchain == 'nightly' && matrix.target != 'riscv64gc-unknown-linux-gnu' && matrix.target != 'wasm32-wasi'
+
+    - name: Clippy check
+      run: ./cargo.sh +${{ matrix.toolchain }} clippy --package ${{ matrix.crate }} --target ${{ matrix.target }} ${{ matrix.features }} --tests --verbose
+      # Clippy improves the accuracy of lints over time, and fixes bugs. Only
+      # running Clippy on nightly allows us to avoid having to write code which
+      # is compatible with older versions of Clippy, which sometimes requires
+      # hacks to work around limitations that are fixed in more recent versions.
+      if: matrix.toolchain == 'nightly'
+
+    - name: Cargo doc
+      # We pass --document-private-items and --document-hidden items to ensure that 
+      # documentation always builds even for these items. This makes future changes to 
+      # make those items public/non-hidden more painless. Note that 
+      # --document-hidden-items is unstable; if a future release breaks or removes it,
+      # we can just update CI to no longer pass that flag.
+      run: |
+        # Include arguments passed during docs.rs deployments to make sure those
+        # work properly.
+        METADATA_DOCS_RS_RUSTDOC_ARGS="$(cargo metadata --format-version 1 | \
+          jq -r ".packages[] | select(.name == \"zerocopy\").metadata.docs.rs.\"rustdoc-args\".[]" | tr '\n' ' ')"
+        export RUSTDOCFLAGS="${{ matrix.toolchain == 'nightly' && '-Z unstable-options --document-hidden-items' || '' }} $RUSTDOCFLAGS $METADATA_DOCS_RS_RUSTDOC_ARGS"
+        ./cargo.sh +${{ matrix.toolchain }} doc --document-private-items --package ${{ matrix.crate }} ${{ matrix.features }}
+      # When the `byteorder` feature is disabled, `cargo doc` fails because we
+      # link to the `byteorder` module in doc comments. This isn't a big deal
+      # because we primarily care about `cargo doc` working for `docs.rs`, which
+      # enables the `byteorder` feature.
+      if: matrix.features != '--no-default-features'
+
+    # Check semver compatibility with the most recently-published version on
+    # crates.io. We do this in the matrix rather than in its own job so that it
+    # gets run on different targets. Some of our API is target-specific (e.g.,
+    # SIMD type impls), and so we need to run on each target.
+    #
+    # TODO(https://github.com/obi1kenobi/cargo-semver-checks-action/issues/54):
+    # Currently we don't actually do anything with `matrix.target`, so we're
+    # just duplicating work by running this job multiple times, each time
+    # targetting the host platform.
+    - name: Check semver compatibility
+      uses: obi1kenobi/cargo-semver-checks-action@e275dda72e250d4df5b564e969e1348d67fefa52 # v2.2
+      with:
+        # Don't semver check zerocopy-derive; as a proc macro, it doesn't have
+        # an API that cargo-semver-checks can understand.
+        package: zerocopy
+        feature-group: all-features
+        # TODO: Set this to the specific nightly we have pinned in CI. Not a big
+        # deal since this isn't affected by the trybuild stderr files, which is
+        # the reason we need to pin to a specific nightly.
+        rust-toolchain: nightly
+      if: matrix.crate == 'zerocopy' && matrix.features == '--all-features' && matrix.toolchain == 'nightly'
+
+  kani:
+    runs-on: ubuntu-latest        
+    name: 'Run tests under Kani'
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - uses: model-checking/kani-github-action@e621a98d839036c62e96cd5fa33ac5d076729f94 # v1.0
+        with:
+          args: "--package zerocopy --all-features --output-format=terse --randomize-layout --memory-safety-checks --overflow-checks --undefined-function-checks --unwinding-checks"
+
+  check_fmt:
+    runs-on: ubuntu-latest
+    name: Check Rust formatting
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - name: Check Rust formatting
+        run: |
+          set -eo pipefail
+          cargo fmt --check -p zerocopy
+          cargo fmt --check -p zerocopy-derive
+          shopt -s globstar
+          rustfmt --check tests/**/*.rs
+          rustfmt --check zerocopy-derive/tests/**/*.rs
+
+  check_readme:
+    needs: generate_cache
+    runs-on: ubuntu-latest
+    name: Check README.md
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+      - uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3.3.2
+        with:
+          path: |
+            ~/.cargo/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.toml') }}
+
+      - name: Check README.md
+        run: |
+          set -eo pipefail
+
+          # Install again in case the installation failed during the
+          # `generate_cache` step. We treat that step as best-effort and
+          # suppress all errors from it.
+          cargo install cargo-readme --version 3.2.0
+
+          diff <(./generate-readme.sh) README.md
+          exit $?
+
+  check_msrv:
+    needs: generate_cache
+    runs-on: ubuntu-latest
+    name: Check MSRVs match
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+      - uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3.3.2
+        with:
+          path: |
+            ~/.cargo/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.toml') }}
+
+      # Make sure that the MSRV in zerocopy's and zerocopy-derive's `Cargo.toml`
+      # files are the same. In CI, we test with a single MSRV (the one indicated
+      # in zerocopy's `Cargo.toml`), so it's important that:
+      # - zerocopy-derive's MSRV is not lower than zerocopy's (we don't test with
+      #   a lower MSRV in CI, so we couldn't guarantee that zerocopy-derive
+      #   actually built and ran on a lower MSRV)
+      # - zerocopy-derive's MSRV is not higher than zerocopy's (this would mean
+      #   that compiling zerocopy with the `derive` feature enabled would fail
+      #   on its own published MSRV)
+      - name: Check MSRVs match
+        run: |
+          set -eo pipefail
+
+          # Usage: msrv <crate-name>
+          function msrv {
+            cargo metadata --format-version 1 | jq -r ".packages[] | select(.name == \"$1\").rust_version"
+          }
+
+          ver_zerocopy=$(msrv zerocopy)
+          ver_zerocopy_derive=$(msrv zerocopy-derive)
+
+          if [[ "$ver_zerocopy" == "$ver_zerocopy_derive" ]]; then
+            echo "Same MSRV ($ver_zerocopy) found for zerocopy and zerocopy-derive." | tee -a $GITHUB_STEP_SUMMARY
+            exit 0
+          else
+            echo "Different MSRVs found for zerocopy ($ver_zerocopy) and zerocopy-derive ($ver_zerocopy_derive)." \
+              | tee -a $GITHUB_STEP_SUMMARY >&2
+            exit 1
+          fi
+
+  check_versions:
+    needs: generate_cache
+    runs-on: ubuntu-latest
+    name: Check crate versions match
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+      - uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3.3.2
+        with:
+          path: |
+            ~/.cargo/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.toml') }}
+
+      # Make sure that both crates are at the same version, and that zerocopy
+      # depends exactly upon the current version of zerocopy-derive. See
+      # `INTERNAL.md` for an explanation of why we do this.
+      - name: Check crate versions match
+        run: |
+          set -eo pipefail
+
+          # Usage: version <crate-name>
+          function version {
+            cargo metadata --format-version 1 | jq -r ".packages[] | select(.name == \"$1\").version"
+          }
+
+          ver_zerocopy=$(version zerocopy)
+          ver_zerocopy_derive=$(version zerocopy-derive)
+
+          # Usage: dependency-version <kind> <target>
+          function dependency-version {
+            KIND="$1"
+            TARGET="$2"
+            cargo metadata --format-version 1 \
+              | jq -r ".packages[] | select(.name == \"zerocopy\").dependencies[] | select((.name == \"zerocopy-derive\") and .kind == $KIND and .target == $TARGET).req"
+          }
+
+          # The non-dev dependency version (kind `null` filters out the dev
+          # dependency, and target `null` filters out the targeted version).
+          zerocopy_derive_dep_ver=$(dependency-version null null)
+
+          # The non-dev dependency, targeted version (kind `null` filters out
+          # the dev dependency).
+          zerocopy_derive_targeted_ver=$(dependency-version null '"cfg(any())"')
+
+          # The dev dependency version (kind `"dev"` selects only the dev
+          # dependency).
+          zerocopy_derive_dev_dep_ver=$(dependency-version '"dev"' null)
+
+          function assert-match {
+            VER_A="$1"
+            VER_B="$2"
+            SUCCESS_MSG="$3"
+            FAILURE_MSG="$4"
+            if [[ "$ver_zerocopy" == "$ver_zerocopy_derive" ]]; then
+              echo "$SUCCESS_MSG" | tee -a $GITHUB_STEP_SUMMARY
+            else
+              echo "$FAILURE_MSG" | tee -a $GITHUB_STEP_SUMMARY >&2
+              exit 1
+            fi
+          }
+
+          assert-match "$ver_zerocopy" "$ver_zerocopy_derive" \
+            "Same crate version ($ver_zerocopy) found for zerocopy and zerocopy-derive." \
+            "Different crate versions found for zerocopy ($ver_zerocopy) and zerocopy-derive ($ver_zerocopy_derive)."
+
+          # Note the leading `=` sign - the dependency needs to be an exact one.
+          assert-match "=$ver_zerocopy_derive" "$zerocopy_derive_dep_ver" \
+            "zerocopy depends upon same version of zerocopy-derive in-tree ($zerocopy_derive_dep_ver)." \
+            "zerocopy depends upon different version of zerocopy-derive ($zerocopy_derive_dep_ver) than the one in-tree ($ver_zerocopy_derive)."
+
+          # Note the leading `=` sign - the dependency needs to be an exact one.
+          assert-match "=$ver_zerocopy_derive" "$zerocopy_derive_dev_dep_ver" \
+            "In dev mode, zerocopy depends upon same version of zerocopy-derive in-tree ($zerocopy_derive_dev_dep_ver)." \
+            "In dev mode, zerocopy depends upon different version of zerocopy-derive ($zerocopy_derive_dev_dep_ver) than the one in-tree ($ver_zerocopy_derive)."
+
+          assert-match "$zerocopy_derive_dep_ver" "$zerocopy_derive_targeted_ver" \
+            "Same crate version ($zerocopy_derive_dep_ver) found for optional and targeted zerocopy-derive dependency." \
+            "Different crate versions found for optional ($zerocopy_derive_dep_ver) and targeted ($zerocopy_derive_targeted_ver) dependency."
+
+  generate_cache:
+    runs-on: ubuntu-latest
+    name: Generate cache
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+      - uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3.3.2
+        with:
+          path: |
+            ~/.cargo/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.toml') }}
+
+      - name: Populate cache
+        run: |
+          # Ensure all dependencies are downloaded - both for our crates and for
+          # tools we use in CI. We don't care about these tools succeeding for
+          # two reasons: First, this entire job is best-effort since it's just a
+          # performance optimization. Second, there may be failures due to
+          # issues other than failing to download dependencies (e.g., `cargo
+          # metadata` called with a malformed `Cargo.toml`, build failure in our
+          # own crate or in dependencies, etc). For those reasons, we discard
+          # stderr and ignore status codes.
+          #
+          # For downloading our crates' dependencies in particular, note that
+          # there is no support for doing this directly [1], so we just check
+          # all crates using --tests.
+          #
+          # [1]  https://stackoverflow.com/a/42139535/836390
+          cargo check --workspace --tests            &> /dev/null || true
+          cargo metadata                             &> /dev/null || true
+          cargo install cargo-readme --version 3.2.0 &> /dev/null || true
+          cargo install --locked kani-verifier       &> /dev/null || true
+          cargo kani setup                           &> /dev/null || true
+
+  # Used to signal to branch protections that all other jobs have succeeded.
+  all-jobs-succeed:
+      name: All checks succeeded
+      # On failure, we run and unconditionally exit with a failing status code.
+      # On success, this job is skipped. Jobs skipped using `if:` are considered
+      # to have succeeded:
+      #
+      # https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/collaborating-on-repositories-with-code-quality-features/troubleshooting-required-status-checks#handling-skipped-but-required-checks
+      if: failure()
+      runs-on: ubuntu-latest
+      needs: [build_test, kani, check_fmt, check_readme, check_msrv, check_versions, generate_cache]
+      steps:
+        - name: Mark the job as failed
+          run: exit 1

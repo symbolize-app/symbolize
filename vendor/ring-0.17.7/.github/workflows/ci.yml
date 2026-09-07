@@ -1,0 +1,594 @@
+name: ci
+permissions:
+  contents: read
+on:
+  pull_request:
+  push:
+jobs:
+  rustfmt:
+    # Don't run duplicate `push` jobs for the repo owner's PRs.
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+
+    runs-on: ubuntu-22.04
+
+    steps:
+      - run: rustup --version
+
+      - uses: briansmith/actions-checkout@v4
+        with:
+          persist-credentials: false
+
+      - run: cargo fmt --all -- --check
+
+  clippy:
+    # Don't run duplicate `push` jobs for the repo owner's PRs.
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+
+    runs-on: ubuntu-22.04
+
+    steps:
+      - run: rustup --version
+
+      - uses: briansmith/actions-checkout@v4
+        with:
+          persist-credentials: false
+
+      - run: mk/clippy.sh
+
+  audit:
+    # Don't run duplicate `push` jobs for the repo owner's PRs.
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+
+    runs-on: ubuntu-22.04
+
+    steps:
+      - run: rustup --version
+
+      - uses: briansmith/actions-cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/cargo-audit
+            ~/.cargo/.crates.toml
+            ~/.cargo/.crates2.json
+          key: ${{ runner.os }}-v2-cargo-audit-locked-0.18.3
+
+      - run: cargo install cargo-audit  --locked --vers "0.18.3"
+
+      - uses: briansmith/actions-checkout@v4
+        with:
+          persist-credentials: false
+
+      - run: cargo generate-lockfile
+
+      - run: cargo audit --deny warnings
+
+  deny:
+    # Don't run duplicate `push` jobs for the repo owner's PRs.
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+
+    runs-on: ubuntu-22.04
+
+    steps:
+      - run: rustup --version
+
+      - uses: briansmith/actions-cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/cargo-deny
+            ~/.cargo/.crates.toml
+            ~/.cargo/.crates2.json
+          key: ${{ runner.os }}-v2-cargo-deny-locked-0.14.3
+
+      - run: cargo install cargo-deny --locked --vers "0.14.3"
+
+      - uses: briansmith/actions-checkout@v4
+        with:
+          persist-credentials: false
+
+      - run: cargo deny check
+
+  # Verify that documentation builds.
+  rustdoc:
+    # Don't run duplicate `push` jobs for the repo owner's PRs.
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+
+    runs-on: ubuntu-22.04
+
+    steps:
+      - run: rustup --version
+
+      - uses: briansmith/actions-checkout@v4
+        with:
+          persist-credentials: false
+
+      - run: |
+          cargo doc --all-features
+
+  package:
+    # Don't run duplicate `push` jobs for the repo owner's PRs.
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+
+    runs-on: windows-latest
+
+    steps:
+      - run: rustup --version
+
+      - uses: briansmith/actions-checkout@v4
+        with:
+          persist-credentials: false
+
+      - run: ./mk/install-build-tools.ps1
+
+      - run: echo "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\Llvm\x64\bin" >> $GITHUB_PATH
+        shell: bash
+
+      - run: sh mk/package.sh
+        shell: bash
+
+  # Intentionally excludes benchmarks for build performance reasons.
+  test:
+    # Don't run duplicate `push` jobs for the repo owner's PRs.
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+
+    runs-on: ${{ matrix.host_os }}
+
+    strategy:
+      matrix:
+        # XXX: See `test-features` below.
+        features:
+          - # Default
+
+        target:
+          - aarch64-apple-ios
+          - aarch64-apple-darwin
+          - aarch64-linux-android
+          - aarch64-pc-windows-msvc
+          - aarch64-unknown-linux-gnu
+          - aarch64-unknown-linux-musl
+          - arm-unknown-linux-gnueabi
+          - armv7-linux-androideabi
+          - armv7-unknown-linux-musleabihf
+          - i686-pc-windows-msvc
+          - i686-unknown-linux-gnu
+          - i686-unknown-linux-musl
+          - riscv64gc-unknown-linux-gnu
+          - wasm32-wasi
+          - x86_64-pc-windows-gnu
+          - x86_64-pc-windows-msvc
+          - x86_64-apple-darwin
+          - x86_64-unknown-linux-musl
+          - x86_64-unknown-linux-gnu
+
+        mode:
+          - # debug
+          - --release
+
+        rust_channel:
+          - stable
+          # Keep in sync with Cargo.toml and similar `rust_channel` sections.
+          - 1.61.0 # MSRV
+          # TODO: Move these to a daily/pre-release job.
+          # - nightly
+          # - beta
+
+        include:
+          - target: aarch64-apple-darwin
+            host_os: macos-14
+
+          - target: aarch64-apple-ios
+            host_os: macos-14
+            # TODO: Run in the emulator.
+            cargo_options: --no-run
+
+          - target: aarch64-linux-android
+            host_os: ubuntu-22.04
+            # TODO: https://github.com/briansmith/ring/issues/486
+            cargo_options: --no-run
+
+          - target: aarch64-pc-windows-msvc
+            host_os: windows-latest
+            # GitHub Actions doesn't have a way to run this target yet.
+            cargo_options: --no-run
+
+          - target: aarch64-unknown-linux-gnu
+            host_os: ubuntu-22.04
+
+          - target: aarch64-unknown-linux-musl
+            host_os: ubuntu-22.04
+
+          - target: arm-unknown-linux-gnueabi
+            host_os: ubuntu-22.04
+
+          - target: armv7-linux-androideabi
+            host_os: ubuntu-22.04
+            # TODO: https://github.com/briansmith/ring/issues/838
+            cargo_options: --no-run
+
+          - target: armv7-unknown-linux-musleabihf
+            host_os: ubuntu-22.04
+
+          - target: i686-pc-windows-msvc
+            host_os: windows-latest
+
+          - target: i686-unknown-linux-gnu
+            host_os: ubuntu-22.04
+
+          - target: i686-unknown-linux-musl
+            host_os: ubuntu-22.04
+
+          - target: mips-unknown-linux-gnu
+            mode: --release
+            rust_channel: 1.71.0 # No prebuilt toolchain for later versions.
+            host_os: ubuntu-22.04
+
+          - target: mips64el-unknown-linux-gnuabi64
+            mode: --release
+            rust_channel: 1.71.0 # No prebuilt toolchain for later versions.
+            host_os: ubuntu-22.04
+
+          - target: mipsel-unknown-linux-gnu
+            mode: --release
+            rust_channel: 1.71.0 # No prebuilt toolchain for later versions.
+            host_os: ubuntu-22.04
+
+          - target: powerpc-unknown-linux-gnu
+            mode: --release
+            rust_channel: stable
+            host_os: ubuntu-22.04
+
+          - target: powerpc64-unknown-linux-gnu
+            mode: --release
+            rust_channel: stable
+            host_os: ubuntu-22.04
+
+          - target: powerpc64le-unknown-linux-gnu
+            mode: --release
+            rust_channel: stable
+            host_os: ubuntu-22.04
+
+          - target: riscv64gc-unknown-linux-gnu
+            host_os: ubuntu-22.04
+
+          - target: s390x-unknown-linux-gnu
+            mode: --release
+            rust_channel: stable
+            host_os: ubuntu-22.04
+
+          - target: wasm32-wasi
+            host_os: ubuntu-22.04
+
+          - target: x86_64-pc-windows-gnu
+            host_os: windows-latest
+
+          - target: x86_64-pc-windows-msvc
+            host_os: windows-latest
+
+          - target: x86_64-apple-darwin
+            host_os: macos-13
+
+          - target: x86_64-unknown-linux-musl
+            host_os: ubuntu-22.04
+
+          - target: x86_64-unknown-linux-gnu
+            host_os: ubuntu-22.04
+
+    steps:
+      - if: ${{ contains(matrix.host_os, 'ubuntu') }}
+        run: sudo apt-get update -y
+
+      - uses: briansmith/actions-checkout@v4
+        with:
+          persist-credentials: false
+
+      - run: rustup toolchain add --profile=minimal ${{ matrix.rust_channel }}
+      - run: rustup target add --toolchain=${{ matrix.rust_channel }} ${{ matrix.target }}
+
+      - if: ${{ !contains(matrix.host_os, 'windows') }}
+        run: mk/install-build-tools.sh --target=${{ matrix.target }} ${{ matrix.features }}
+
+      - if: ${{ contains(matrix.host_os, 'windows') }}
+        run: ./mk/install-build-tools.ps1
+
+      - if: ${{ matrix.target == 'aarch64-pc-windows-msvc' }}
+        run: |
+          echo "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\Llvm\x64\bin" >> $GITHUB_PATH
+        shell: bash
+
+      - if: ${{ !contains(matrix.host_os, 'windows') }}
+        run: |
+          mk/cargo.sh +${{ matrix.rust_channel }} test -vv --target=${{ matrix.target }} ${{ matrix.cargo_options }} ${{ matrix.features }} ${{ matrix.mode }}
+
+      - if: ${{ contains(matrix.host_os, 'windows') }}
+        run: |
+          cargo +${{ matrix.rust_channel }} test -vv --target=${{ matrix.target }} ${{ matrix.cargo_options }} ${{ matrix.features }} ${{ matrix.mode }}
+
+      # Check that all the needed symbol renaming was done.
+      # TODO: Do this check on Windows too.
+
+      - if: ${{ (matrix.target != 'aarch64-apple-ios' || matrix.rust_channel != '1.61.0') &&
+                !contains(matrix.host_os, 'windows') }}
+        run: rustup toolchain install --component=llvm-tools-preview ${{ matrix.rust_channel }}
+
+      - if: ${{ (matrix.target != 'aarch64-apple-ios' || matrix.rust_channel != '1.61.0') &&
+                !contains(matrix.host_os, 'windows') }}
+        run: mk/check-symbol-prefixes.sh +${{ matrix.rust_channel }} --target=${{ matrix.target }}
+
+  test-bench:
+    # Don't run duplicate `push` jobs for the repo owner's PRs.
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+
+    runs-on: ubuntu-22.04
+
+    steps:
+      - run: sudo apt-get update -y
+
+      - uses: briansmith/actions-checkout@v4
+        with:
+          persist-credentials: false
+
+      - run: mk/install-build-tools.sh --target=x86_64-unknown-linux-gnu
+
+      - run: rustup --version
+
+      - run: cargo test -p ring-bench --all-features --all-targets
+
+  test-doc:
+    # Don't run duplicate `push` jobs for the repo owner's PRs.
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+
+    runs-on: ubuntu-22.04
+
+    strategy:
+      matrix:
+        rust_channel:
+          - stable
+          - nightly
+
+    steps:
+      - run: sudo apt-get update -y
+
+      - run: rustup toolchain add --profile=minimal ${{ matrix.rust_channel }}
+
+      - uses: briansmith/actions-checkout@v4
+        with:
+          persist-credentials: false
+
+      - run: |
+          cargo +${{ matrix.rust_channel }} test -vv --doc --all-features
+
+  # XXX: GitHub Actions won't let us test all the combinations of features in
+  # the "test" matrix because the resultant matrix would be larger than the
+  # maximum they allow.
+  test-features:
+    # Don't run duplicate `push` jobs for the repo owner's PRs.
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+
+    runs-on: ${{ matrix.host_os }}
+    strategy:
+      matrix:
+        features:
+          - --no-default-features
+          - --features=std,slow_tests
+
+        target:
+          - aarch64-unknown-linux-musl
+          - i686-pc-windows-msvc
+          - x86_64-unknown-linux-gnu
+
+        mode:
+          - --release
+
+        rust_channel:
+          - stable
+          - nightly
+          # Keep in sync with Cargo.toml and similar `rust_channel` sections.
+          - 1.61.0 # MSRV
+
+        include:
+          - target: aarch64-unknown-linux-musl
+            host_os: ubuntu-22.04
+
+          - target: i686-pc-windows-msvc
+            host_os: windows-latest
+
+          - target: x86_64-unknown-linux-gnu
+            host_os: ubuntu-22.04
+
+    steps:
+      - if: ${{ contains(matrix.host_os, 'ubuntu') }}
+        run: sudo apt-get update -y
+
+      - uses: briansmith/actions-checkout@v4
+        with:
+          persist-credentials: false
+
+      - run: rustup toolchain add --profile=minimal ${{ matrix.rust_channel }}
+      - run: rustup target add --toolchain=${{ matrix.rust_channel }} ${{ matrix.target }}
+
+      - if: ${{ !contains(matrix.host_os, 'windows') }}
+        run: mk/install-build-tools.sh --target=${{ matrix.target }} ${{ matrix.features }}
+
+      - if: ${{ contains(matrix.host_os, 'windows') }}
+        run: ./mk/install-build-tools.ps1
+
+      - if: ${{ matrix.target == 'aarch64-pc-windows-msvc' }}
+        run: |
+          echo "C:\Program Files (x86)\Microsoft Visual Studio\2022\Enterprise\VC\Tools\Llvm\x64\bin" >> $GITHUB_PATH
+        shell: bash
+
+      - if: ${{ !contains(matrix.host_os, 'windows') }}
+        run: |
+          mk/cargo.sh +${{ matrix.rust_channel }} test -vv --target=${{ matrix.target }} ${{ matrix.cargo_options }} ${{ matrix.features }} ${{ matrix.mode }}
+
+      - if: ${{ contains(matrix.host_os, 'windows') }}
+        run: |
+          cargo +${{ matrix.rust_channel }} test -vv --target=${{ matrix.target }} ${{ matrix.cargo_options }} ${{ matrix.features }} ${{ matrix.mode }}
+
+      # --all-targets doesn't run doctests: https://github.com/rust-lang/cargo/issues/6669
+      # Run doctests only on x86_64 to avoid cross-compilation hassles with `--no-run`.
+      - if: ${{ !contains(matrix.host_os, 'windows') && contains(matrix.target, 'x86_64') }}
+        run: |
+          mk/cargo.sh +${{ matrix.rust_channel }} test -vv --doc --target=${{ matrix.target }} ${{ matrix.cargo_options }} ${{ matrix.features }} ${{ matrix.mode }}
+
+      # Check that all the needed symbol renaming was done.
+      # TODO: Do this check on Windows too.
+
+      - if: ${{ (matrix.target != 'aarch64-apple-ios' || matrix.rust_channel != '1.61.0') &&
+          !contains(matrix.host_os, 'windows') }}
+        run: rustup toolchain install --component=llvm-tools-preview ${{ matrix.rust_channel }}
+
+      - if: ${{ (matrix.target != 'aarch64-apple-ios' || matrix.rust_channel != '1.61.0') &&
+          !contains(matrix.host_os, 'windows') }}
+        run: mk/check-symbol-prefixes.sh +${{ matrix.rust_channel }} --target=${{ matrix.target }}
+
+  # The wasm32-unknown-unknown targets have a different set of feature sets and
+  # an additional `webdriver` dimension.
+  test-wasm32-browser:
+    # Don't run duplicate `push` jobs for the repo owner's PRs.
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+
+    runs-on: ${{ matrix.host_os }}
+
+    strategy:
+      matrix:
+        features:
+          - --features=wasm32_unknown_unknown_js
+          - --no-default-features --features=wasm32_unknown_unknown_js
+
+        host_os:
+          - ubuntu-22.04
+        mode:
+          - # debug
+          - --release
+        rust_channel:
+          - stable
+          - beta
+          - nightly
+        target:
+          - wasm32-unknown-unknown
+        webdriver:
+          # TODO: Firefox is not in Ubuntu 22.04 images according to
+          # https://github.com/actions/runner-images/issues/5490 and our
+          # testing.
+          # - GECKODRIVER=$GECKOWEBDRIVER/geckodriver
+          - CHROMEDRIVER=$CHROMEWEBDRIVER/chromedriver
+
+    steps:
+      - if: ${{ contains(matrix.host_os, 'ubuntu') }}
+        run: sudo apt-get update -y
+
+      - uses: briansmith/actions-checkout@v4
+        with:
+          persist-credentials: false
+
+      - run: rustup toolchain add --profile=minimal ${{ matrix.rust_channel }}
+      - run: rustup target add --toolchain=${{ matrix.rust_channel }} ${{ matrix.target }}
+
+      - run: cargo +${{ matrix.rust_channel }} generate-lockfile
+
+      - run: mk/install-build-tools.sh --target=${{ matrix.target }} ${{ matrix.features }}
+
+      - run: |
+          ${{ matrix.webdriver }} mk/cargo.sh +${{ matrix.rust_channel }} test -vv --target=${{ matrix.target }} ${{ matrix.features }} ${{ matrix.mode }}
+
+      # Check that all the needed symbol renaming was done.
+      # TODO: Do this check on Windows too.
+      - run: rustup toolchain install --component=llvm-tools-preview ${{ matrix.rust_channel }}
+      - run: mk/check-symbol-prefixes.sh +${{ matrix.rust_channel }} --target=${{ matrix.target }}
+
+  coverage:
+    # Don't run duplicate `push` jobs for the repo owner's PRs.
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+
+    runs-on: ${{ matrix.host_os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        features:
+          # Enable all the library features so we can measure all the coverage.
+          # Don't enable `slow_tests` and other (test suite) features that are
+          # unuseful, or even counterproductive, for coverage testing.
+          # `slow_tests` is slow and it is running code that is already intended
+          # to be covered without it being enabled.
+          - --features=std
+
+        # TODO: targets
+        target:
+          - aarch64-unknown-linux-gnu      # Has assembly
+          - i686-unknown-linux-gnu         # Has assembly
+          # TODO: arm-unknown-linux-gnueabi # Has assembly but doesn't build w/ clang
+          # TODO: armv7-unknown-linux-gnueabihf # Has assembly but doesn't have profiler builtins
+          # TODO: powerpc-unknown-linux-gnu  No assembly 32-bit big-endian but doesn't have profiler builtins
+          - powerpc64-unknown-linux-gnu    # No assembly 64-bit big-endian with flags
+          - powerpc64le-unknown-linux-gnu  # No assembly 64-bit little-endian with flags
+          - riscv64gc-unknown-linux-gnu    # No assembly 64-bit little-endian without flags
+          - s390x-unknown-linux-gnu        # No assembly 64-bit big-endian
+          - x86_64-unknown-linux-musl      # Has assembly
+
+        mode:
+          - # debug
+
+        # Coverage collection is Nightly-only
+        # XXX: Starting with nightly-2024-02-14 there is a segfault when
+        # running the tests.
+        rust_channel:
+          - nightly-2024-02-13
+
+        # TODO: targets
+        include:
+          # TODO: Use the -musl target after
+          # https://github.com/rust-lang/rust/issues/79556 and
+          # https://github.com/rust-lang/rust/issues/79555 are fixed.
+          - target: aarch64-unknown-linux-gnu
+            host_os: ubuntu-22.04
+
+          # TODO: Use the -musl target after
+          # https://github.com/rust-lang/rust/issues/79556 and
+          # https://github.com/rust-lang/rust/issues/79555 are fixed.
+          - target: i686-unknown-linux-gnu
+            host_os: ubuntu-22.04
+
+          - target: powerpc64-unknown-linux-gnu
+            host_os: ubuntu-22.04
+
+          - target: powerpc64le-unknown-linux-gnu
+            host_os: ubuntu-22.04
+
+          - target: riscv64gc-unknown-linux-gnu
+            host_os: ubuntu-22.04
+
+          - target: s390x-unknown-linux-gnu
+            host_os: ubuntu-22.04
+
+          - target: x86_64-unknown-linux-musl
+            host_os: ubuntu-22.04
+
+          # TODO: Add an ARM target after
+          # https://github.com/rust-lang/rust/issues/79555 is fixed. This may
+          # require https://github.com/rust-lang/rust/issues/79555 to be fixed
+          # too.
+
+    steps:
+      - if: ${{ contains(matrix.host_os, 'ubuntu') }}
+        run: sudo apt-get update -y
+
+      - uses: briansmith/actions-checkout@v4
+        with:
+          persist-credentials: false
+
+      - run: rustup toolchain add --profile=minimal ${{ matrix.rust_channel }}
+      - run: rustup target add --toolchain=${{ matrix.rust_channel }} ${{ matrix.target }}
+
+      - if: ${{ !contains(matrix.host_os, 'windows') }}
+        run: RING_COVERAGE=1 mk/install-build-tools.sh --target=${{ matrix.target }} ${{ matrix.features }}
+
+      - if: ${{ !contains(matrix.host_os, 'windows') }}
+        run: |
+          RING_COVERAGE=1 mk/cargo.sh +${{ matrix.rust_channel }} test -vv --target=${{ matrix.target }} ${{ matrix.cargo_options }} ${{ matrix.features }} ${{ matrix.mode }}
+
+      - uses: briansmith/codecov-codecov-action@v3
+        with:
+          directory: ./target/${{ matrix.target }}/debug/coverage/reports
+          fail_ci_if_error: true
+          verbose: true

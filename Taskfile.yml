@@ -75,8 +75,8 @@ includes:
     taskfile: svc-gateway-host-store
   svc-search-host-read:
     taskfile: svc-search-host-read
-  tmpfs:
-    taskfile: dev-task/tmpfs.yml
+  build-dir:
+    taskfile: dev-task/build-dir.yml
   watchman:
     taskfile: dev-task/watchman.yml
 run: when_changed
@@ -252,7 +252,6 @@ tasks:
       - i
     deps:
       - cabal:install
-      - cargo:install
       - font:install
   lint:check:
     aliases:

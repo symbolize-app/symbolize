@@ -3,6 +3,7 @@
 {
   packages = with pkgs; [
     curl
+    inputs.nixpkgs-gleam.legacyPackages.${pkgs.system}.cargo-deny
     chromium
     dbmate
     easyrsa

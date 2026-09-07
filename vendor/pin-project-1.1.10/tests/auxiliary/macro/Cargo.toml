@@ -1,0 +1,19 @@
+[package]
+name = "pin-project-auxiliary-macro"
+version = "0.0.0"
+edition = "2021"
+rust-version = "1.56" # Prevent clippy from suggesting a code that requires a new version.
+publish = false
+
+[lib]
+name = "auxiliary_macro"
+path = "lib.rs"
+proc-macro = true
+
+[dependencies]
+proc-macro2 = "1"
+quote = "1"
+syn = { version = "2", default-features = false, features = ["parsing", "printing", "proc-macro", "full"] }
+
+[lints]
+workspace = true

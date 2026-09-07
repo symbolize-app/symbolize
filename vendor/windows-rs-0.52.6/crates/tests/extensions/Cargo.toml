@@ -1,0 +1,20 @@
+[package]
+name = "test_extensions"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[lib]
+doc = false
+doctest = false
+
+[dependencies.windows]
+path = "../../libs/windows"
+features = [
+    "Win32_Foundation",
+    "Win32_Security_Cryptography",   
+    "Win32_NetworkManagement_IpHelper",
+    "Win32_NetworkManagement_Ndis",
+    "Win32_Networking_WinSock",
+    "Win32_System_Threading",
+]

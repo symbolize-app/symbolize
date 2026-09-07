@@ -1,0 +1,7 @@
+LIBRARY api-ms-win-core-errorhandling-l1-1-1.dll
+EXPORTS
+AddVectoredContinueHandler
+AddVectoredExceptionHandler
+RemoveVectoredContinueHandler
+RemoveVectoredExceptionHandler
+RestoreLastError

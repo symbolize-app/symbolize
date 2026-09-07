@@ -1,0 +1,47 @@
+[[bench]]
+name = "benchmarks"
+harness = false
+required-features = [ "std",]
+
+[[example]]
+name = "base64"
+required-features = [ "std",]
+
+[[test]]
+name = "tests"
+required-features = [ "alloc",]
+
+[[test]]
+name = "encode"
+required-features = [ "alloc",]
+
+[package]
+name = "base64"
+version = "0.21.7"
+authors = [ "Alice Maz <alice@alicemaz.com>", "Marshall Pierce <marshall@mpierce.org>",]
+description = "encodes and decodes base64 as bytes or utf8"
+repository = "https://github.com/marshallpierce/rust-base64"
+documentation = "https://docs.rs/base64"
+readme = "README.md"
+keywords = [ "base64", "utf8", "encode", "decode", "no_std",]
+categories = [ "encoding",]
+license = "MIT OR Apache-2.0"
+edition = "2018"
+rust-version = "1.48.0"
+
+[dev-dependencies]
+
+[features]
+cargo-clippy = []
+default = [ "std",]
+alloc = []
+std = [ "alloc",]
+
+[profile.bench]
+debug = true
+
+[profile.test]
+opt-level = 3
+
+[package.metadata.docs.rs]
+rustdoc-args = [ "--generate-link-to-definition",]

@@ -1,4 +1,4 @@
-.cargo
+/.cargo
 .devenv
 .env
 .font
@@ -6,7 +6,8 @@
 .tantivy
 .tmp
 /art/favicon.png
-build
+/build
+/*/build
 node_modules
 .task
 relude-hlint.yaml

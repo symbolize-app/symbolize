@@ -26,7 +26,7 @@ tasks:
     cmd: gleam run --module svc_gateway_guest_run_service_worker_browser_driver_main
   link-build-dir:
     cmd:
-      task: :tmpfs:link-package-build-dir
+      task: :build-dir:link-package-build-dir
       vars:
         NAME: '{{.NAME}}'
 vars:

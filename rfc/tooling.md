@@ -23,7 +23,6 @@
 - https://doc.rust-lang.org/stable/cargo/
 - https://github.com/rust-lang/rust-clippy
 - https://github.com/EmbarkStudios/cargo-deny
-- https://github.com/tantivy-search/tantivy
 - https://github.com/hyperium/hyper
 - https://github.com/rusqlite/rusqlite
 - https://github.com/awslabs/aws-sdk-rust/tree/main/sdk/s3

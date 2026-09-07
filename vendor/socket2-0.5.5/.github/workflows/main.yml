@@ -1,0 +1,118 @@
+name: CI
+on:
+  push:
+    branches: [ master, "v0.4.x" ]
+  pull_request:
+    branches: [ master, "v0.4.x" ]
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: full
+jobs:
+  Test:
+    name: Test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        build: [stable, 1.63.0, beta, nightly, macos, windows]
+        include:
+          - build: stable
+            os: ubuntu-latest
+            rust: stable
+          - build: 1.63.0
+            os: ubuntu-latest
+            rust: 1.63.0
+          - build: beta
+            os: ubuntu-latest
+            rust: beta
+          - build: nightly
+            os: ubuntu-latest
+            rust: nightly
+          - build: macos
+            os: macos-latest
+            rust: stable
+          - build: windows
+            os: windows-latest
+            rust: stable
+    steps:
+    - uses: actions/checkout@v3
+    - uses: dtolnay/rust-toolchain@master
+      with:
+        toolchain: ${{ matrix.rust }}
+    - uses: taiki-e/install-action@cargo-hack
+    - name: Run tests
+      run: cargo hack test --feature-powerset && cargo hack test --feature-powerset --release
+  Rustfmt:
+    name: Rustfmt
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: dtolnay/rust-toolchain@stable
+    - name: Check formatting
+      run: cargo fmt --all -- --check
+  Check:
+    name: Check
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target: ["aarch64-apple-ios", "aarch64-linux-android", "x86_64-apple-darwin", "x86_64-unknown-fuchsia", "x86_64-pc-windows-msvc", "x86_64-pc-solaris", "x86_64-unknown-freebsd", "x86_64-unknown-illumos", "x86_64-unknown-linux-gnu", "x86_64-unknown-linux-musl", "x86_64-unknown-netbsd", "x86_64-unknown-redox", "armv7-linux-androideabi", "i686-linux-android"]
+    steps:
+    - uses: actions/checkout@v3
+    - uses: dtolnay/rust-toolchain@stable
+      with:
+        targets: ${{ matrix.target }}
+    - uses: taiki-e/install-action@cargo-hack
+    - name: Run check
+      run: cargo hack check --feature-powerset --all-targets --examples --bins --tests --target ${{ matrix.target }}
+  CheckTier3:
+    name: Check
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target: ["armv7-sony-vita-newlibeabihf"]
+    steps:
+    - uses: actions/checkout@v3
+    - uses: dtolnay/rust-toolchain@nightly
+      with:
+        components: "rust-src"
+    - uses: taiki-e/install-action@cargo-hack
+    - name: Run check
+      run: cargo hack check -Z build-std=std,panic_abort --feature-powerset --all-targets --examples --bins --tests --target ${{ matrix.target }}
+  Clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: dtolnay/rust-toolchain@stable
+    - name: Run Clippy
+      run: cargo clippy --all-targets --all-features -- -D warnings
+  Docs:
+    name: Docs
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target: ["aarch64-apple-ios", "aarch64-linux-android", "x86_64-apple-darwin", "x86_64-unknown-fuchsia", "x86_64-pc-windows-msvc", "x86_64-pc-solaris", "x86_64-unknown-freebsd", "x86_64-unknown-illumos", "x86_64-unknown-linux-gnu", "x86_64-unknown-linux-musl", "x86_64-unknown-netbsd", "x86_64-unknown-redox", "armv7-linux-androideabi", "i686-linux-android"]
+    steps:
+    - uses: actions/checkout@v3
+    - uses: dtolnay/rust-toolchain@nightly # NOTE: need nightly for `doc_cfg` feature.
+      with:
+        targets: ${{ matrix.target }}
+    - name: Check docs for docs.rs
+      run: RUSTDOCFLAGS="-D warnings --cfg docsrs" cargo doc --no-deps --all-features --target ${{ matrix.target }}
+  DocsTier3:
+    name: Docs
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target: ["armv7-sony-vita-newlibeabihf"]
+    steps:
+    - uses: actions/checkout@v3
+    - uses: dtolnay/rust-toolchain@nightly # NOTE: need nightly for `doc_cfg` feature.
+      with:
+        components: "rust-src"
+    - name: Check docs for docs.rs
+      run: RUSTDOCFLAGS="-D warnings --cfg docsrs" cargo doc -Z build-std=std,panic_abort --no-deps --all-features --target ${{ matrix.target }}

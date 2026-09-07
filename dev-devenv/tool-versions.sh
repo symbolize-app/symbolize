@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 cabal --version | head -n 1
+echo "cargo-deny $(cargo-deny --version)"
 echo "chromium $(chromium --version)"
 cargo --version
 curl --version | head -n 1

@@ -1,0 +1,21 @@
+error[E0277]: the trait bound `MyInt: bitflags::traits::Primitive` is not satisfied
+   --> tests/compile-fail/bitflags_custom_bits.rs:133:22
+    |
+133 |     struct Flags128: MyInt {
+    |                      ^^^^^ the trait `bitflags::traits::Primitive` is not implemented for `MyInt`
+    |
+    = help: the following other types implement trait `bitflags::traits::Primitive`:
+              isize
+              i8
+              i16
+              i32
+              i64
+              i128
+              usize
+              u8
+            and $N others
+note: required by a bound in `PublicFlags::Primitive`
+   --> src/traits.rs
+    |
+    |     type Primitive: Primitive;
+    |                     ^^^^^^^^^ required by this bound in `PublicFlags::Primitive`

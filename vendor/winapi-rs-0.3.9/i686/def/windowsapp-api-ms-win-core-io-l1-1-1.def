@@ -1,0 +1,4 @@
+LIBRARY api-ms-win-core-io-l1-1-1.dll
+EXPORTS
+CancelIo@4
+GetOverlappedResultEx@20

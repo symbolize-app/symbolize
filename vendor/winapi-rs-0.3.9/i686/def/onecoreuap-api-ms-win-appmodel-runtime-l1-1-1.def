@@ -1,0 +1,12 @@
+LIBRARY api-ms-win-appmodel-runtime-l1-1-1.dll
+EXPORTS
+GetApplicationUserModelIdFromToken@12
+GetPackageFamilyNameFromToken@12
+GetPackageFullNameFromToken@12
+GetStagedPackageOrigin@8
+OpenPackageInfoByFullNameForUser@16
+VerifyApplicationUserModelId@4
+VerifyPackageFamilyName@4
+VerifyPackageFullName@4
+VerifyPackageId@4
+VerifyPackageRelativeApplicationId@4

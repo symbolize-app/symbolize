@@ -1,0 +1,361 @@
+name: ci
+
+permissions:
+  contents: read
+
+on:
+  push:
+  pull_request:
+  merge_group:
+  schedule:
+    - cron: '0 18 * * *'
+
+jobs:
+  rustfmt:
+    name: Format
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Install rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
+
+      - name: Check formatting
+        run: cargo fmt --all -- --check
+
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Install rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+
+      - run: cargo clippy --all-features --all-targets -- --deny warnings
+
+  deny:
+    name: Cargo Deny
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Install rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install cargo deny
+        uses: taiki-e/install-action@cargo-deny
+
+      - run: cargo deny check
+
+  # Verify that documentation builds.
+  rustdoc:
+    name: Check for documentation errors
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        rust_channel:
+          - stable
+          - beta
+          - nightly
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Install rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.rust_channel }}
+
+      - name: cargo doc (all features)
+        run: cargo doc --all-features --document-private-items
+        env:
+          RUSTDOCFLAGS: ${{ matrix.rust_channel == 'nightly' && '-Dwarnings --cfg=docsrs' || '-Dwarnings' }}
+
+  package:
+    name: Cargo Package
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Install rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - run: cargo package --all-features
+
+  test:
+    name: Build+test
+    runs-on: ${{ matrix.host_os }}
+    strategy:
+      matrix:
+        features:
+          - # Default
+          - --features=alloc
+          - --all-features
+          - --no-default-features
+          - --no-default-features --features alloc,std,aws_lc_rs
+
+        mode:
+          - # debug
+          - --release
+
+        rust_channel:
+          - stable
+          - nightly
+          - beta
+
+        exclude:
+          - features: # Default
+          - features: --features=alloc
+          - features: --no-default-features
+          - features: --no-default-features --features alloc,std
+          - features: --no-default-features --features alloc,std,aws_lc_rs
+          - features: --all-features
+            mode: --release
+          - features: --all-features
+            mode: # debug
+            rust_channel: nightly
+          - features: --all-features
+            mode: # debug
+            rust_channel: beta
+
+        include:
+          - features: # Default
+            mode: # debug
+            rust_channel: stable
+            host_os: ubuntu-20.04
+
+          - features: --features=alloc
+            mode: # debug
+            rust_channel: stable
+            host_os: ubuntu-20.04
+
+          - features: --no-default-features
+            mode: # debug
+            rust_channel: stable
+            host_os: ubuntu-20.04
+
+          - features: --no-default-features --features alloc,std
+            mode: # debug
+            rust_channel: stable
+            host_os: ubuntu-20.04
+
+          - features: --all-features
+            mode: --release
+            rust_channel: stable
+            host_os: ubuntu-20.04
+
+          - features: --all-features
+            mode: # debug
+            rust_channel: nightly
+            host_os: ubuntu-20.04
+
+          - features: --all-features
+            mode: # debug
+            rust_channel: beta
+            host_os: ubuntu-20.04
+
+          - features: --all-features
+            mode: # debug
+            rust_channel: stable
+            host_os: macos-latest
+
+          - features: --all-features
+            mode: # debug
+            rust_channel: stable
+            host_os: windows-latest
+
+          - features: --all-features
+            mode: # debug
+            rust_channel: stable
+            host_os: ubuntu-latest
+
+          # check aws-lc-rs alone
+          - features: --no-default-features --features alloc,std,aws_lc_rs
+            mode: # debug
+            rust_channel: stable
+            host_os: macos-latest
+
+          - features: --no-default-features --features alloc,std,aws_lc_rs
+            mode: # debug
+            rust_channel: stable
+            host_os: windows-latest
+
+          - features: --no-default-features --features alloc,std,aws_lc_rs
+            mode: # debug
+            rust_channel: stable
+            host_os: ubuntu-latest
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Install rust ${{ matrix.rust_channel }} toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.rust_channel }}
+
+      - name: Install NASM for aws-lc-rs on Windows
+        if: runner.os == 'Windows'
+        uses: ilammy/setup-nasm@v1
+
+      - name: cargo test (${{ matrix.mode }}, ${{ matrix.features }})
+        run: cargo test -vv ${{ matrix.features }} ${{ matrix.mode }} -- --ignored
+        env:
+          RUSTFLAGS: "-D warnings"
+
+  msrv:
+    name: MSRV
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Install toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: "1.61"
+      - run: cargo check --lib --all-features
+
+  cross:
+    name: Check cross compilation targets
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Install rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install cross
+        uses: taiki-e/install-action@cross
+
+      - run: cross build --target i686-unknown-linux-gnu
+
+  semver:
+    name: Check semver compatibility
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Check semver
+        uses: obi1kenobi/cargo-semver-checks-action@v2
+
+  check-external-types:
+    name: Validate external types appearing in public API
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Install rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: nightly-2023-10-10
+          # ^ sync with https://github.com/awslabs/cargo-check-external-types/blob/main/rust-toolchain.toml
+
+      - run: cargo install --locked cargo-check-external-types
+
+      - name: run cargo-check-external-types
+        run: cargo check-external-types
+
+  coverage:
+    name: Measure coverage
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Install cargo-llvm-cov
+        uses: taiki-e/install-action@cargo-llvm-cov
+
+      - name: Install rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: llvm-tools
+
+      - name: Measure coverage
+        run: cargo llvm-cov --all-features --lcov --output-path ./lcov.info
+
+      - name: Report to codecov.io
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_UPLOAD_TOKEN }}
+          files: ./lcov.info
+          fail_ci_if_error: true
+          verbose: true
+
+  nostd:
+    name: Verify that no-std modes do not rely on libstd
+    runs-on: ubuntu-20.04
+    # a target without a pre-compiled libstd like this one will catch any use of libstd in the
+    # entire dependency graph whereas a target like x86_64-unknown-linux-gnu will not
+    env:
+      NOSTD_TARGET: x86_64-unknown-none
+    strategy:
+      matrix:
+        features:
+          - --no-default-features
+          - --no-default-features --features alloc
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Install rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: "$NOSTD_TARGET"
+
+      - name: check no-std mode
+        run: cargo check --target $NOSTD_TARGET ${{ matrix.features  }}
+
+  feature-powerset:
+    name: Feature Powerset
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Install stable toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install cargo hack
+        uses: taiki-e/install-action@cargo-hack
+
+      - name: Check feature powerset
+        run: cargo hack check --feature-powerset --no-dev-deps

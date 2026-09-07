@@ -1,0 +1,26 @@
+[package]
+name = "pin-project"
+version = "1.1.10"
+edition = "2021"
+rust-version = "1.56"
+license = "Apache-2.0 OR MIT"
+repository = "https://github.com/taiki-e/pin-project"
+keywords = [ "pin", "macros", "attribute",]
+categories = [ "no-std", "no-std::no-alloc", "rust-patterns",]
+exclude = [ "/.*", "/tools", "/DEVELOPMENT.md",]
+description = "A crate for safe and ergonomic pin-projection.\n"
+
+[lib]
+doc-scrape-examples = false
+
+[dev-dependencies]
+
+[dependencies.pin-project-internal]
+version = "=1.1.10"
+path = "pin-project-internal"
+
+[package.metadata.cargo_check_external_types]
+allowed_external_types = [ "pin_project_internal::*",]
+
+[package.metadata.docs.rs]
+targets = [ "x86_64-unknown-linux-gnu",]

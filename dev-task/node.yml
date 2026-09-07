@@ -64,7 +64,7 @@ tasks:
 
   esbuild:test:browser:built:
     cmds:
-      - task: :tmpfs:link-build-dirs
+      - task: :build-dir:link-build-dirs
       - task: esbuild:build:debug
       - task: :dev-esbuild:test:browser:built
 

@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+#
+# Runs `loom` tests, using `cargo nextest` if it's available, or `cargo test`
+# otherwise.
+#
+# Usage:
+#    All environment variables honored by `loom` can be used to configure `loom`
+#    test behavior. Default values are set for `LOOM_LOG` and
+#    `LOOM_MAX_PREEMPTIONS`, if those variables are unset when the script is
+#    invoked.
+#
+#    Any command-line arguments are passed through to the test invocation.
+set -euo pipefail
+set -x
+
+cd "$(dirname "$0")"/..
+TESTCMD=(test)
+
+# if cargo nextest is installed, use it instead!
+if cargo list | grep -q "nextest"; then
+    TESTCMD=(nextest run --cargo-profile loom)
+fi
+
+TESTCMD+=(--profile loom --lib)
+# pass through args
+TESTCMD+=(${@})
+
+RUSTFLAGS="--cfg loom ${RUSTFLAGS:-}" \
+    LOOM_LOG="${LOOM_LOG:-info}" \
+    LOOM_MAX_PREEMPTIONS="${LOOM_MAX_PREEMPTIONS:-2}" \
+    cargo ${TESTCMD[@]}

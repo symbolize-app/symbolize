@@ -1,0 +1,13 @@
+LIBRARY api-ms-win-core-memory-l1-1-2.dll
+EXPORTS
+AllocateUserPhysicalPages
+AllocateUserPhysicalPagesNuma
+DiscardVirtualMemory
+FreeUserPhysicalPages
+GetMemoryErrorHandlingCapabilities
+MapUserPhysicalPages
+OfferVirtualMemory
+ReclaimVirtualMemory
+RegisterBadMemoryNotification
+UnregisterBadMemoryNotification
+VirtualAllocExNuma

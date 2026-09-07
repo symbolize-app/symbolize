@@ -1,0 +1,27 @@
+[package]
+name = "test_enums"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[lib]
+doc = false
+doctest = false
+
+[dependencies.windows]
+path = "../../libs/windows"
+features = [
+    "Storage_Streams",
+    "Win32_Foundation",
+    "Win32_UI_WindowsAndMessaging",
+]
+
+[dependencies.windows-sys]
+path = "../../libs/sys"
+features = [
+    "Win32_Foundation",
+    "Win32_UI_WindowsAndMessaging",
+]
+
+[dev-dependencies]
+helpers = { package = "test_helpers", path = "../helpers" }

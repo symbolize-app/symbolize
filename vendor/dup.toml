@@ -1,4 +1,7 @@
 # Duplicate dependency ledger for the direct-path vendor closure.
-# Unresolved duplicates belong in [[duplicate]] entries. The absence of one
-# means that no duplicate snapshot identities are currently retained.
+# Duplicate vendor snapshots are strictly prohibited unless truly exceptional
+# circumstances require major rework to resolve. Unresolved duplicates belong
+# in [[duplicate]] entries. The absence of entries means that all snapshot
+# identities have been normalized.
 version = 1
+

@@ -11,7 +11,7 @@ tasks:
     cmd: gleam run --module lib_test_test_main
   link-build-dir:
     cmd:
-      task: :tmpfs:link-package-build-dir
+      task: :build-dir:link-package-build-dir
       vars:
         NAME: '{{.NAME}}'
 vars:

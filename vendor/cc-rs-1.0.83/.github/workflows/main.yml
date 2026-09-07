@@ -1,0 +1,138 @@
+name: CI
+on: [push, pull_request]
+
+env:
+  CARGO_INCREMENTAL: 0
+  CARGO_REGISTRIES_CRATES_IO_PROTOCOL: sparse
+
+jobs:
+  test:
+    name: Test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        build: [stable, beta, nightly, linux32, macos, aarch64-ios, win32, win64, mingw32, mingw64, windows-2019]
+        include:
+          - build: stable
+            os: ubuntu-latest
+            rust: stable
+            target: x86_64-unknown-linux-gnu
+          - build: beta
+            os: ubuntu-latest
+            rust: beta
+            target: x86_64-unknown-linux-gnu
+          - build: nightly
+            os: ubuntu-latest
+            rust: nightly
+            target: x86_64-unknown-linux-gnu
+          - build: linux32
+            os: ubuntu-latest
+            rust: stable
+            target: i686-unknown-linux-gnu
+          - build: macos
+            os: macos-latest
+            rust: stable
+            target: x86_64-apple-darwin
+          - build: aarch64-ios
+            os: macos-latest
+            rust: stable
+            target: aarch64-apple-ios
+            no_run: --no-run
+          - build: windows-aarch64
+            os: windows-latest
+            rust: stable
+            target: aarch64-pc-windows-msvc
+            no_run: --no-run
+          - build: win32
+            os: windows-2019
+            rust: stable-i686-msvc
+            target: i686-pc-windows-msvc
+          - build: win64
+            os: windows-latest
+            rust: stable
+            target: x86_64-pc-windows-msvc
+          - build: mingw32
+            # windows-latest, a.k.a. windows-2022, runner is equipped with
+            # a newer mingw toolchain, which appears to produce unexecutable
+            # mixed-language binaries in debug builds. Fall back to
+            # windows-2019 for now and revisit it later...
+            os: windows-2019
+            rust: stable-i686-gnu
+            target: i686-pc-windows-gnu
+          - build: mingw64
+            os: windows-latest
+            rust: stable-x86_64-gnu
+            target: x86_64-pc-windows-gnu
+          - build: windows-2019
+            os: windows-2019
+            rust: stable-x86_64
+            target: x86_64-pc-windows-msvc
+    steps:
+    - uses: actions/checkout@v3
+    - name: Install Rust (rustup)
+      run: |
+        set -euxo pipefail
+        rustup toolchain install ${{ matrix.rust }} --no-self-update --profile minimal --target ${{ matrix.target }}
+        rustup default ${{ matrix.rust }}
+      shell: bash
+    - name: Install g++-multilib
+      run: |
+        set -e
+        # Remove the ubuntu-toolchain-r/test PPA, which is added by default.
+        # Some packages were removed, and this is causing the g++multilib
+        # install to fail. Similar issue:
+        # https://github.com/scikit-learn/scikit-learn/issues/13928.
+        sudo add-apt-repository --remove ppa:ubuntu-toolchain-r/test
+        sudo apt-get update
+        sudo apt-get install g++-multilib
+      if: matrix.build == 'linux32'
+    - run: cargo test ${{ matrix.no_run }}
+    - run: cargo test ${{ matrix.no_run }} --features parallel
+    - run: cargo test ${{ matrix.no_run }} --manifest-path cc-test/Cargo.toml --target ${{ matrix.target }}
+    - run: cargo test ${{ matrix.no_run }} --manifest-path cc-test/Cargo.toml --target ${{ matrix.target }} --features parallel
+    - run: cargo test ${{ matrix.no_run }} --manifest-path cc-test/Cargo.toml --target ${{ matrix.target }} --release
+
+  cuda:
+    name: Test CUDA support
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v3
+    - name: Install cuda-minimal-build-11-8
+      shell: bash
+      run: |
+        # https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=20.04&target_type=deb_network
+        wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-keyring_1.0-1_all.deb
+        sudo dpkg -i cuda-keyring_1.0-1_all.deb
+        sudo apt-get update
+        sudo apt-get -y install cuda-minimal-build-11-8
+    - name: Test 'cudart' feature
+      shell: bash
+      run: |
+        PATH="/usr/local/cuda/bin:$PATH" cargo test --manifest-path cc-test/Cargo.toml --features test_cuda
+
+  msrv:
+    name: MSRV
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+    - uses: actions/checkout@v3
+    - name: Install Rust
+      run: |
+        rustup toolchain install 1.46.0 --no-self-update --profile minimal
+        rustup default 1.46.0
+      shell: bash
+    - run: cargo check --lib
+
+  rustfmt:
+    name: Rustfmt
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Install Rust
+      run: |
+        rustup toolchain install stable --no-self-update --profile minimal --component rustfmt
+        rustup default stable
+      shell: bash
+    - run: cargo fmt -- --check

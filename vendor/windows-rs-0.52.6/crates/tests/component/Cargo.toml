@@ -1,0 +1,25 @@
+[package]
+name = "test_component"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+doc = false
+doctest = false
+
+[dependencies.windows-core]
+path = "../../libs/core"
+
+[dependencies.windows]
+path = "../../libs/windows"
+features = [
+    "implement",
+    "Foundation",
+    "Win32_Foundation",
+    "Win32_System_WinRT",
+]
+
+[build-dependencies.windows-bindgen]
+path = "../../libs/bindgen"

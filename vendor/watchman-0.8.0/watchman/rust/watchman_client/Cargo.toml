@@ -1,0 +1,48 @@
+[package]
+name = "watchman_client"
+version = "0.8.0"
+authors = [ "Wez Furlong",]
+edition = "2021"
+description = "a client for the Watchman file watching service"
+documentation = "https://docs.rs/watchman_client"
+repository = "https://github.com/facebook/watchman/"
+license = "Apache-2.0"
+exclude = [ "examples/*",]
+
+[dev-dependencies]
+
+[dependencies.anyhow]
+version = "1.0"
+
+[dependencies.bytes]
+version = "1.0"
+features = [ "serde",]
+
+[dependencies.futures]
+version = "0.3.13"
+features = [ "async-await",]
+
+[dependencies.maplit]
+version = "1.0"
+
+[dependencies.serde]
+version = "1.0.126"
+features = [ "derive", "rc",]
+
+[dependencies.serde_bser]
+version = "0.3"
+
+[dependencies.thiserror]
+version = "1.0"
+
+[dependencies.tokio]
+version = "1.7.1"
+features = [ "full", "test-util",]
+
+[dependencies.tokio-util]
+version = "0.7"
+features = [ "full",]
+
+[target.'cfg(windows)'.dependencies.winapi]
+version = "0.3"
+features = [ "handleapi", "winuser",]

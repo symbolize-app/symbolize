@@ -102,8 +102,8 @@ includes:
   svc-gateway-guest-run:
     taskfile: svc-gateway-guest-run
 
-  tmpfs:
-    taskfile: dev-task/tmpfs.yml
+  build-dir:
+    taskfile: dev-task/build-dir.yml
 
   watchman:
     taskfile: dev-task/watchman.yml
@@ -286,7 +286,6 @@ tasks:
       - i
     deps:
       - cabal:install
-      - cargo:install
       - font:install
 
   lint:check:

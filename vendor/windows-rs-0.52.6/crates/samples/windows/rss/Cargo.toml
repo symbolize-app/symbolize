@@ -1,0 +1,12 @@
+[package]
+name = "sample_rss"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[dependencies.windows]
+path = "../../../libs/windows"
+features = [
+    "Foundation_Collections",
+    "Web_Syndication",
+]
