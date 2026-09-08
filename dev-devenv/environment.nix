@@ -6,7 +6,9 @@
     EASYRSA_NO_PASS = "1";
 
     NODE_OPTIONS_PRODUCTION = "--unhandled-rejections strict";
-    NODE_OPTIONS = "--experimental-json-modules --unhandled-rejections strict";
+    NODE_OPTIONS = "--experimental-json-modules --unhandled-rejections strict --import ${config.devenv.root}/dev-node-loader/register.mjs";
+    ESBUILD_BINARY_PATH = "${config.devenv.root}/build/vendor/esbuild/esbuild";
+    BETTER_SQLITE3_BINDING = "${config.devenv.root}/build/vendor/better-sqlite3/better_sqlite3.node";
     SYMBOLIZE_CHROMIUM_EXECUTABLE = "${pkgs.chromium}/bin/chromium";
 
     DATABASE_URL = "sqlite:svc-gateway-host-store/build/manifest.sqlite3";

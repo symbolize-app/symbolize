@@ -3,12 +3,19 @@ import {
   Option$Some,
 } from '../gleam_stdlib/gleam/option.mjs'
 import { Result$Error, Result$Ok, toBitArray } from './gleam.mjs'
-import DatabaseConstructor from '../../../../../vendor/better-sqlite3-11.1.2/symbolize.mjs'
+import DatabaseConstructor from 'better-sqlite3'
+import { resolve as pathResolve } from 'node:path'
+
+const repoRoot = process.env.DEVENV_ROOT ?? '.'
+const nativeBinding =
+  process.env.BETTER_SQLITE3_BINDING ??
+  pathResolve(repoRoot, 'build/vendor/better-sqlite3/better_sqlite3.node')
 
 export function open(path, readonly) {
   return new DatabaseConstructor(path, {
     fileMustExist: path !== ':memory:',
     readonly,
+    nativeBinding,
   })
 }
 

@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": 1,
+  "imports": {
+    "esbuild": "build/vendor/esbuild/main.js",
+    "better-sqlite3": "vendor/better-sqlite3-11.1.2/lib/index.js",
+    "puppeteer": "vendor/puppeteer-25.9.0/packages/puppeteer/src/puppeteer.ts",
+    "puppeteer-core": "vendor/puppeteer-25.9.0/packages/puppeteer-core/src/puppeteer-core.ts",
+    "@puppeteer/browsers": "vendor/puppeteer-25.9.0/packages/browsers/src/main.ts",
+    "chromium-bidi": "vendor/chromium-bidi-17.0.2/src/index.ts",
+    "devtools-protocol": "vendor/devtools-protocol-0.0.1666840/types/protocol.d.ts",
+    "webdriver-bidi-protocol": "vendor/webdriver-bidi-protocol-0.4.2/out/index.js",
+    "ws": "vendor/ws-8.21.3/wrapper.mjs",
+    "zod": "vendor/zod-3.25.76/packages/zod/src/index.ts",
+    "mitt": "vendor/mitt-3.0.1/src/index.ts",
+    "lilconfig": "vendor/lilconfig-3.1.3/src/index.js",
+    "rxjs": "vendor/rxjs-7.8.2/src/index.ts",
+    "rxjs/operators": "vendor/rxjs-7.8.2/src/operators/index.ts",
+    "urlpattern-polyfill": "vendor/urlpattern-polyfill-10.0.0/src/url-pattern.ts",
+    "parsel-js": "vendor/parsel-js-1.2.3/parsel.ts"
+  }
+}

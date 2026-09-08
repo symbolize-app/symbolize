@@ -1,0 +1,31 @@
+name: CI (ts@latest)
+
+on:
+  pull_request:
+    types: ['opened', 'reopened', 'synchronize']
+    # Legacy v7 is incompatible with latest TS
+    branches-ignore: ['7.x']
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: ['18']
+
+    name: ts@latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node }}
+      - name: build
+        run: |
+          npm install -g npm@latest
+          npm ci
+          npm install --legacy-peer-deps --no-save typescript@latest tslib@latest @types/node@latest
+          npm run compile
