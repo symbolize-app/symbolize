@@ -13,16 +13,19 @@ Each immediate child directory represents one upstream repository:
 vendor/
 └── <name>-<version-or-commit-date>/
     ├── .vendor.toml
-    ├── <upstream repository files>
-    └── optional runtime or build adapters
+    └── <upstream repository files>
 ```
 
 ## Dependency closure
 
 `vendor/` must contain every non-Devenv upstream dependency needed by the
-vendored roots, recursively. A dependency must not rely on an undeclared
-package-manager installation or on a dependency that exists only elsewhere in
-the developer environment.
+vendored roots, recursively, as direct immediate child directories. Transitive
+dependencies (for example, libraries required by TypeScript sources such as
+`rxjs`, `urlpattern-polyfill`, and `parsel-js`) must not be bundled into
+consumers or stubbed with hand-maintained adapter packages; each must exist as
+its own distinct, versioned child directory under `vendor/`. A dependency must
+not rely on an undeclared package-manager installation or on a dependency that
+exists only elsewhere in the developer environment.
 
 Dependencies supplied by Devenv are excluded from the closure. For example,
 ESLint and Prettier belong to Devenv and should not be duplicated here. Node
@@ -125,6 +128,47 @@ library sources remain in this directory. `task vendor:check` validates the
 Git metadata, package mappings, root patch table, local Cargo paths, and
 lockfile closure.
 
+## Node and TypeScript snapshots
+
+Node and TypeScript library dependencies follow the same direct-path snapshot
+principles without package managers, root `package.json`, or `node_modules`.
+Every upstream JavaScript/TypeScript library is kept as a pure Git checkout in
+an immediate child directory of `vendor/`.
+
+`vendor/node.json` serves as the single source of truth for bare module
+specifier remapping across the repository, acting as the exact equivalent of
+Cargo's `[patch.crates-io]` table:
+
+```json
+{
+  "version": 1,
+  "imports": {
+    "puppeteer": "vendor/puppeteer-25.9.0/packages/puppeteer/src/puppeteer.ts",
+    "rxjs": "vendor/rxjs-7.8.2/src/index.ts",
+    "urlpattern-polyfill": "vendor/urlpattern-polyfill-10.0.0/src/url-pattern.ts",
+    "parsel-js": "vendor/parsel-js-1.2.3/parsel.ts",
+    "better-sqlite3": "vendor/better-sqlite3-11.1.2/lib/index.js",
+    "esbuild": "build/vendor/esbuild/main.js"
+  }
+}
+```
+
+Execution and bundling consume this table directly:
+- **Node runtime execution**: Node 22 executes tests and scripts directly via
+  `dev-node-loader` (registered via `NODE_OPTIONS`), which intercepts bare
+  specifiers using `node.json`, transpiles TypeScript files on the fly, and
+  resolves extensionless TypeScript imports across vendored packages.
+- **Frontend bundling**: `dev-esbuild` reads `vendor/node.json` directly to
+  populate esbuild aliases during bundling.
+- **No wrapper packages**: Owned glue packages and handwritten `index.js` shim
+  directories (such as `dev-vendor/`) are strictly prohibited. Upstream libraries
+  are consumed directly from their source entrypoints or legitimate build
+  artifacts.
+- **Native build artifacts**: Platform-specific native outputs (such as
+  `better_sqlite3.node` compiled via `node-gyp` or the `esbuild` Go binary)
+  belong strictly in `build/vendor/` and are built by tasks in
+  `dev-task/vendor.yml`.
+
 ## Duplicate dependency ledger
 
 Duplicate snapshot directories in `vendor/` are strictly prohibited unless
@@ -206,12 +250,11 @@ with an empty ledger.
   circumstances require major rework to normalize; any retained duplicates must
   be justified in `dup.toml`.
 - Do not put package-manager installations or Devenv state in this directory.
-- A generated artifact is allowed only when it is a deliberate, documented
-  part of the direct-path adapter. For example,
-  `puppeteer-25.9.0/runtime/puppeteer.mjs` is the tested Node runtime bundle
-  for Puppeteer; its `.vendor.toml` records the exact upstream source release.
-  Build output for native or platform-specific tools belongs in `build/`, not
-  in `vendor/`.
+- No generated artifacts, ad-hoc wrappers, or monolithic runtime bundles are
+  permitted in `vendor/`. All snapshots must be pure upstream Git checkouts. Build
+  output for native or platform-specific tools belongs strictly in `build/vendor/`.
+  First-party glue adapter packages and owned `index.js` shim files are strictly
+  prohibited.
 - Vendored subdirectories must not contain automatic-agent instruction files,
   including `AGENTS.md`, `CLAUDE.md`, or equivalent files with other names.
 
@@ -226,11 +269,11 @@ write its full commit SHA and upstream URL to `.vendor.toml`. Recalculate the
 root's transitive dependency closure and regenerate the root
 `[patch.crates-io]` table; do not rewrite upstream Cargo manifests merely to
 point at neighboring snapshots. Add every newly required upstream repository
-unless it is supplied by Devenv. Update direct adapters and build tasks as
-needed, then run `task vendor:check` and the full repository check.
+unless it is supplied by Devenv. Update module mappings in `vendor/node.json`
+and build tasks as needed, then run `task vendor:check` and the full repository check.
 
 Native outputs are rebuilt for the current platform from the exact snapshots:
 esbuild is compiled with Go, and better-sqlite3 is compiled with node-gyp.
-Puppeteer uses the committed runtime bundle and the Chromium executable
-provided by Devenv; it does not download a browser or resolve a package from
-`node_modules`.
+Puppeteer executes directly from TypeScript source via `dev-node-loader` and the
+Chromium executable provided by Devenv; it does not download a browser or resolve
+a package from `node_modules`.

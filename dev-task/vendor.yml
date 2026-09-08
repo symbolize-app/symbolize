@@ -15,9 +15,21 @@ tasks:
     deps:
       - esbuild:build
       - better-sqlite3:build
+      - puppeteer:build
 
   clean:
     cmd: rm -rf build/vendor
+
+  puppeteer:build:
+    deps:
+      - esbuild:build
+    sources:
+      - 'vendor/puppeteer-25.9.0/packages/puppeteer-core/src/injected/**'
+      - 'vendor/puppeteer-25.9.0/packages/puppeteer-core/src/templates/**'
+    generates:
+      - build/vendor/puppeteer/injected.js
+    cmds:
+      - ./dev-task/build-puppeteer-injected.sh
 
   esbuild:build:
     sources:

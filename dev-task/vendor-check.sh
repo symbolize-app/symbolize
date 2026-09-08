@@ -21,10 +21,13 @@ expected_dirs=(
   lilconfig-3.1.3
   mitt-3.0.1
   modern-tar-0.8.4
+  parsel-js-1.2.3
   puppeteer-25.9.0
+  rxjs-7.8.2
   sqlite3-3.46.0
   string-width-8.2.2
   strip-ansi-7.2.0
+  urlpattern-polyfill-10.0.0
   webdriver-bidi-protocol-0.4.2
   wrap-ansi-9.0.2
   ws-8.21.3
@@ -377,7 +380,36 @@ if test -n "$(find "$vendor_root" \( -name AGENTS.md -o -name CLAUDE.md -o -name
   exit 1
 fi
 
-test -f "$vendor_root/puppeteer-25.9.0/runtime/puppeteer.mjs"
+test -f "$vendor_root/node.json"
+python3 - "$vendor_root" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+vendor_root = Path(sys.argv[1]).resolve()
+repo_root = vendor_root.parent
+node_json_path = vendor_root / "node.json"
+
+if not node_json_path.is_file():
+    raise SystemExit("vendor/node.json must exist")
+
+data = json.loads(node_json_path.read_text(encoding="utf-8"))
+imports = data.get("imports")
+if not isinstance(imports, dict) or not imports:
+    raise SystemExit("vendor/node.json must contain a non-empty 'imports' object")
+
+for spec, path_str in imports.items():
+    target = (repo_root / path_str).resolve()
+    if not target.exists():
+        raise SystemExit(f"vendor/node.json mapping '{spec}' -> '{path_str}' does not exist on disk")
+
+for bad_file in vendor_root.rglob("symbolize.mjs"):
+    raise SystemExit(f"Found forbidden ad-hoc adapter in vendor: {bad_file}")
+
+runtime_dir = vendor_root / "puppeteer-25.9.0" / "runtime"
+if runtime_dir.exists():
+    raise SystemExit(f"Found forbidden runtime bundle directory in vendor: {runtime_dir}")
+PY
 test -f "$vendor_root/gleam_stdlib-1.0.5/gleam.toml"
 test -f "$vendor_root/gleam_stdlib-1.0.5/src/gleam/io.gleam"
 test -f "$vendor_root/gleam_stdlib-1.0.5/src/gleam_stdlib.mjs"

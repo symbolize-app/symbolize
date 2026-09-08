@@ -13,12 +13,7 @@ import {
   Option$Some,
 } from '../gleam_stdlib/gleam/option.mjs'
 
-const { default: puppeteer } = await import(
-  new URL(
-    '../../../../../vendor/puppeteer-25.9.0/runtime/puppeteer.mjs',
-    import.meta.url,
-  )
-)
+import puppeteer from 'puppeteer'
 
 function launch_options(args = []) {
   const executablePath = process.env.SYMBOLIZE_CHROMIUM_EXECUTABLE

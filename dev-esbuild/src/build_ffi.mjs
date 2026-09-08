@@ -1,15 +1,34 @@
-const { build: esbuildBuild } = await import(
-  new URL(
-    '../../../../../vendor/esbuild-0.19.5/symbolize.mjs',
-    import.meta.url,
-  )
-)
+import { build as esbuildBuild } from 'esbuild'
+import { readFileSync, existsSync } from 'node:fs'
+import { resolve as pathResolve } from 'node:path'
 import { List, Result$Error, Result$Ok, toBitArray } from './gleam.mjs'
 
 const resolveBase = Symbol('resolveBase')
 
+function getVendorAliases() {
+  try {
+    const root =
+      process.env.DEVENV_ROOT ?? pathResolve(process.cwd(), '..')
+    const nodeJsonPath = pathResolve(root, 'vendor/node.json')
+    if (existsSync(nodeJsonPath)) {
+      const { imports } = JSON.parse(readFileSync(nodeJsonPath, 'utf8'))
+      const aliases = {}
+      for (const [k, v] of Object.entries(imports)) {
+        aliases[k] = pathResolve(root, v)
+      }
+      return aliases
+    }
+  } catch {}
+  return {}
+}
+
 export function new_options() {
-  return { define: {}, loader: {}, outExtension: {} }
+  return {
+    define: {},
+    loader: {},
+    outExtension: {},
+    alias: getVendorAliases(),
+  }
 }
 
 export function set_bundle(options, value) {

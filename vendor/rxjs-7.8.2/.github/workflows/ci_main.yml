@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  pull_request:
+    types: ['opened', 'reopened', 'synchronize']
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: ['14', '16', '18']
+
+    name: Node ${{ matrix.node }} build
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node }}
+      - name: install
+        run: |
+          npm --version
+          npm ci
+      - name: lint
+        run: npm run lint
+      - name: build
+        run: npm run build:package
+      - name: test
+        run: |
+          npm test
+          npm run test:side-effects
+      - name: dtslint
+        run: npm run dtslint
+      - name: import
+        if: ${{ matrix.node == '14' }}
+        run: npm run test:import
+      - name: import
+        if: ${{ matrix.node == '14' || matrix.node == '15' }}
+        run: npm run test:esm
+      - name: docs
+        run: |
+          cd docs_app
+          npm run setup
+          npm run build
