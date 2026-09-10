@@ -1,0 +1,19 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "futures-macro",
+    crate = "futures_macro",
+    crate_root = "src/lib.rs",
+    edition = "2018",
+    srcs = glob(["src/**/*.rs"]),
+    env = {
+        "CARGO_PKG_NAME": "futures-macro",
+        "CARGO_PKG_VERSION": "0.3.31",
+    },
+    proc_macro = True,
+    deps = [
+        "//proc-macro2-1.0.94:proc-macro2",
+        "//quote-1.0.35:quote",
+        "//syn-2.0.100:syn",
+    ],
+)

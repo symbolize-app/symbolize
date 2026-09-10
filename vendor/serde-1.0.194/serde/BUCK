@@ -1,0 +1,24 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "serde",
+    crate = "serde",
+    crate_root = "src/lib.rs",
+    edition = "2018",
+    srcs = glob(["src/**/*.rs"]),
+    env = {
+        "CARGO_PKG_NAME": "serde",
+        "CARGO_PKG_VERSION": "1.0.194",
+    },
+    features = [
+        "alloc",
+        "default",
+        "derive",
+        "rc",
+        "serde_derive",
+        "std",
+    ],
+    deps = [
+        "//serde-1.0.194/serde_derive:serde_derive",
+    ],
+)

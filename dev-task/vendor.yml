@@ -9,7 +9,15 @@ vars:
 
 tasks:
   check:
-    cmd: ./dev-task/vendor-check.sh
+    cmd: cabal run dev-gen -- --check-vendor
+
+  license:check:
+    desc: Audit all third-party code in vendor/ against approved open-source licenses
+    cmd: cabal run dev-gen -- --check-licenses
+
+  rust:gen:
+    desc: Regenerate Buck2 build files and target aliases for all vendored Rust crates
+    cmd: task gen
 
   build:
     deps:
@@ -65,9 +73,11 @@ tasks:
     cmds:
       - mkdir -p build/vendor/better-sqlite3
       - >-
+        sqlite_out=$(buck2 build --show-output -m release vendor//sqlite3-3.46.0:amalgamation | awk '{print $2}') &&
         temp_dir=$(mktemp -d) &&
         cp -a {{.BETTER_SQLITE3_VENDOR_DIR}}/. "$temp_dir/" &&
-        cp -a "$PWD/{{.SQLITE_VENDOR_DIR}}" "$temp_dir/deps/sqlite3" &&
+        mkdir -p "$temp_dir/deps/sqlite3" &&
+        cp -a "$sqlite_out"/* "$temp_dir/deps/sqlite3/" &&
         node-gyp --directory "$temp_dir" rebuild --release &&
         cp "$temp_dir/build/Release/better_sqlite3.node"
         build/vendor/better-sqlite3/better_sqlite3.node

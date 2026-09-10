@@ -17,14 +17,12 @@
     DBMATE_MIGRATIONS_TABLE = "migration";
 
     CARGO_HOME = "${config.devenv.root}/.cargo";
-    CARGO_BUILD_TARGET_DIR = "build/target";
     RUST_BACKTRACE = "1";
 
     LC_ALL = "C.UTF-8";
 
     OVERMIND_SOCKET = "build/overmind.socket";
 
-    TASK_CARGO_BUILD_MODE = "release";
     TASK_GEN_MODE = "release";
     TASK_WATCHMAN_CLIENT_MODE = "release";
   };

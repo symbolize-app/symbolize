@@ -19,9 +19,6 @@ async fn test_no_sandbox_content_security_policy() {
     .unwrap();
   assert_eq!(
     content_security_policy.to_str().unwrap(),
-    include_str!(
-      "../../../svc-gateway-guest-run/contentSecurityPolicy.txt"
-    )
-    .trim_end()
+    include_str!("contentSecurityPolicy.txt").trim_end()
   );
 }

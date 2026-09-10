@@ -1,0 +1,25 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "object",
+    crate = "object",
+    crate_root = "src/lib.rs",
+    edition = "2018",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "object",
+        "CARGO_PKG_VERSION": "0.32.2",
+    },
+    features = [
+        "archive",
+        "coff",
+        "elf",
+        "macho",
+        "pe",
+        "read_core",
+        "unaligned",
+    ],
+    deps = [
+        "//memchr-2.7.1:memchr",
+    ],
+)

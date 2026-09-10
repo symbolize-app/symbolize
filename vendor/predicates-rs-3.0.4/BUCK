@@ -1,0 +1,18 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "predicates",
+    crate = "predicates",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "predicates",
+        "CARGO_PKG_VERSION": "3.0.4",
+    },
+    deps = [
+        "//anstyle-1.0.4/crates/anstyle:anstyle",
+        "//itertools-0.11.0:itertools",
+        "//predicates-rs-3.0.4/crates/core:predicates-core",
+    ],
+)

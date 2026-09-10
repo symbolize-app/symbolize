@@ -1,0 +1,23 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "wasm-bindgen-macro-support",
+    crate = "wasm_bindgen_macro_support",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs"]),
+    env = {
+        "CARGO_PKG_NAME": "wasm-bindgen-macro-support",
+        "CARGO_PKG_VERSION": "0.2.95",
+    },
+    features = [
+        "spans",
+    ],
+    deps = [
+        "//proc-macro2-1.0.94:proc-macro2",
+        "//quote-1.0.35:quote",
+        "//syn-2.0.100:syn",
+        "//wasm-bindgen-0.3.72/crates/backend:wasm-bindgen-backend",
+        "//wasm-bindgen-0.3.72/crates/shared:wasm-bindgen-shared",
+    ],
+)

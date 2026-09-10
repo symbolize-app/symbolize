@@ -1,0 +1,17 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "futures-io",
+    crate = "futures_io",
+    crate_root = "src/lib.rs",
+    edition = "2018",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "futures-io",
+        "CARGO_PKG_VERSION": "0.3.31",
+    },
+    features = [
+        "default",
+        "std",
+    ],
+)

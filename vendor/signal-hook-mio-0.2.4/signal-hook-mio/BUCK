@@ -1,0 +1,24 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "signal-hook-mio",
+    crate = "signal_hook_mio",
+    crate_root = "src/lib.rs",
+    edition = "2018",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "signal-hook-mio",
+        "CARGO_PKG_VERSION": "0.2.4",
+    },
+    features = [
+        "mio-1_0",
+        "support-v1_0",
+    ],
+    named_deps = {
+        "mio_1_0": "//mio-1.0.1:mio",
+    },
+    deps = [
+        "//libc-0.2.171:libc",
+        "//signal-hook-0.3.17:signal-hook",
+    ],
+)

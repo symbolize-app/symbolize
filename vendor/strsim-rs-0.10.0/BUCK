@@ -1,0 +1,13 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "strsim",
+    crate = "strsim",
+    crate_root = "src/lib.rs",
+    edition = "2015",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "strsim",
+        "CARGO_PKG_VERSION": "0.10.0",
+    },
+)

@@ -1,0 +1,16 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "bitflags",
+    crate = "bitflags",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "bitflags",
+        "CARGO_PKG_VERSION": "2.4.1",
+    },
+    features = [
+        "std",
+    ],
+)

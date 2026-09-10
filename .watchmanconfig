@@ -14,6 +14,9 @@
     ".task",
     "relude-hlint.yaml",
     "result",
-    "tmp"
+    "tmp",
+    "/buck-out",
+    "/.buckd",
+    "/dist-newstyle"
   ]
 }

@@ -1,0 +1,17 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "percent-encoding",
+    crate = "percent_encoding",
+    crate_root = "src/lib.rs",
+    edition = "2018",
+    srcs = glob(["src/**/*.rs"]),
+    env = {
+        "CARGO_PKG_NAME": "percent-encoding",
+        "CARGO_PKG_VERSION": "2.3.1",
+    },
+    features = [
+        "alloc",
+        "std",
+    ],
+)

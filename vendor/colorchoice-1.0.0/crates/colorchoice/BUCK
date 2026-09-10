@@ -1,0 +1,13 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "colorchoice",
+    crate = "colorchoice",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "colorchoice",
+        "CARGO_PKG_VERSION": "1.0.0",
+    },
+)

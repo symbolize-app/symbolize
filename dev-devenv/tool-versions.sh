@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 
+buck2 --version
 cabal --version | head -n 1
-echo "cargo-deny $(cargo-deny --version)"
 echo "chromium $(chromium --version)"
-cargo --version
 curl --version | head -n 1
 dbmate --version
 echo $(easyrsa --version | head -n 4)

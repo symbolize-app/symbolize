@@ -1,0 +1,16 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "allocator-api2",
+    crate = "allocator_api2",
+    crate_root = "src/lib.rs",
+    edition = "2018",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "allocator-api2",
+        "CARGO_PKG_VERSION": "0.2.16",
+    },
+    features = [
+        "alloc",
+    ],
+)

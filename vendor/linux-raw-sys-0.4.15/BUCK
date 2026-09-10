@@ -1,0 +1,20 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "linux-raw-sys",
+    crate = "linux_raw_sys",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "linux-raw-sys",
+        "CARGO_PKG_VERSION": "0.4.15",
+    },
+    features = [
+        "elf",
+        "errno",
+        "general",
+        "ioctl",
+        "no_std",
+    ],
+)

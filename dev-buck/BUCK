@@ -1,0 +1,57 @@
+load("@prelude//tests:test_toolchain.bzl", "noop_test_toolchain")
+load("@prelude//toolchains:cxx.bzl", "system_cxx_toolchain")
+load("@prelude//toolchains:genrule.bzl", "system_genrule_toolchain")
+load("@prelude//toolchains:python.bzl", "system_python_bootstrap_toolchain", "system_python_toolchain")
+load("@prelude//toolchains:remote_test_execution.bzl", "remote_test_execution_toolchain")
+load("@prelude//toolchains:rust.bzl", "system_rust_toolchain")
+
+# C/C++ compiler and linker using Nix-provided gcc and g++ from $PATH.
+system_cxx_toolchain(
+    name = "cxx",
+    compiler = "gcc",
+    cxx_compiler = "g++",
+    linker = "g++",
+    compiler_type = "gcc",
+    visibility = ["PUBLIC"],
+)
+
+# Rust compiler using Nix-provided rustc from $PATH.
+system_rust_toolchain(
+    name = "rust",
+    default_edition = "2021",
+    visibility = ["PUBLIC"],
+)
+
+# Host Python interpreter using Nix-provided python3 from $PATH.
+# Buck2's prelude requires this to execute internal build scripts (such as rustc_action.py
+# for parsing compiler JSON diagnostics) on the host machine during builds.
+system_python_bootstrap_toolchain(
+    name = "python_bootstrap",
+    visibility = ["PUBLIC"],
+)
+
+# Python toolchain using Nix-provided python3 from $PATH for Python targets.
+system_python_toolchain(
+    name = "python",
+    visibility = ["PUBLIC"],
+)
+
+# Local test runner implementation required by prelude test rules.
+noop_test_toolchain(
+    name = "test",
+    visibility = ["PUBLIC"],
+)
+
+# Toolchain stub required by prelude test rules, which implicitly depend on
+# toolchains//:remote_test_execution. With no remote execution profiles configured,
+# Buck2 disables remote execution and runs tests strictly as local subprocesses.
+remote_test_execution_toolchain(
+    name = "remote_test_execution",
+    visibility = ["PUBLIC"],
+)
+
+# Generic rule execution toolchain using system /bin/sh and bash for genrules.
+system_genrule_toolchain(
+    name = "genrule",
+    visibility = ["PUBLIC"],
+)

@@ -1,0 +1,17 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "anstyle",
+    crate = "anstyle",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "anstyle",
+        "CARGO_PKG_VERSION": "1.0.4",
+    },
+    features = [
+        "default",
+        "std",
+    ],
+)

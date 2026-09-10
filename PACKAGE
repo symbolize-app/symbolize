@@ -1,0 +1,11 @@
+load(
+    "@dev_buck//:cfg_constructor.bzl",
+    "stage0",
+    "stage1",
+)
+
+set_cfg_constructor(
+    stage0 = stage0,
+    stage1 = stage1,
+    key = "buck.cfg_modifiers",
+)

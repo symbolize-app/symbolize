@@ -1,0 +1,17 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "crossbeam-utils",
+    crate = "crossbeam_utils",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "crossbeam-utils",
+        "CARGO_PKG_VERSION": "0.8.19",
+    },
+    features = [
+        "default",
+        "std",
+    ],
+)

@@ -1,0 +1,19 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "zerocopy-derive",
+    crate = "zerocopy_derive",
+    crate_root = "src/lib.rs",
+    edition = "2018",
+    srcs = glob(["src/**/*.rs"]),
+    env = {
+        "CARGO_PKG_NAME": "zerocopy-derive",
+        "CARGO_PKG_VERSION": "0.7.32",
+    },
+    proc_macro = True,
+    deps = [
+        "//proc-macro2-1.0.94:proc-macro2",
+        "//quote-1.0.35:quote",
+        "//syn-2.0.100:syn",
+    ],
+)

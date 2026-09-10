@@ -1,0 +1,13 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "ryu",
+    crate = "ryu",
+    crate_root = "src/lib.rs",
+    edition = "2018",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "ryu",
+        "CARGO_PKG_VERSION": "1.0.16",
+    },
+)

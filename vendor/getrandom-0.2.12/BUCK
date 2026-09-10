@@ -1,0 +1,17 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "getrandom",
+    crate = "getrandom",
+    crate_root = "src/lib.rs",
+    edition = "2018",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "getrandom",
+        "CARGO_PKG_VERSION": "0.2.12",
+    },
+    deps = [
+        "//cfg-if-1.0.0:cfg-if",
+        "//libc-0.2.171:libc",
+    ],
+)

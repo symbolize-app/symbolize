@@ -1,0 +1,20 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "tracing",
+    crate = "tracing",
+    crate_root = "src/lib.rs",
+    edition = "2018",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "tracing",
+        "CARGO_PKG_VERSION": "0.1.40",
+    },
+    features = [
+        "std",
+    ],
+    deps = [
+        "//pin-project-lite-0.2.13:pin-project-lite",
+        "//tracing-0.1.40/tracing-core:tracing-core",
+    ],
+)

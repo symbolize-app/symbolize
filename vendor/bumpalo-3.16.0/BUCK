@@ -1,0 +1,16 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "bumpalo",
+    crate = "bumpalo",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "bumpalo",
+        "CARGO_PKG_VERSION": "3.16.0",
+    },
+    features = [
+        "default",
+    ],
+)

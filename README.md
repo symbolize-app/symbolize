@@ -73,7 +73,7 @@ task i
 ```
 
 `task i` installs the non-Node development tools managed by the repository.
-Cargo tools, including `cargo-deny`, are provided by Devenv; library
+Rust toolchains are provided by Devenv; library
 dependencies are vendored under `vendor/` and built from those snapshots.
 
 ## Visual Studio Code

@@ -1,0 +1,23 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "thingbuf",
+    crate = "thingbuf",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs", "README.md", "mpsc_perf_comparison.md"]),
+    env = {
+        "CARGO_PKG_NAME": "thingbuf",
+        "CARGO_PKG_VERSION": "0.1.6",
+    },
+    features = [
+        "alloc",
+        "default",
+        "parking_lot",
+        "std",
+    ],
+    deps = [
+        "//parking_lot-0.12.1:parking_lot",
+        "//pin-project-1.1.10:pin-project",
+    ],
+)

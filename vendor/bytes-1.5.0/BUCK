@@ -1,0 +1,21 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "bytes",
+    crate = "bytes",
+    crate_root = "src/lib.rs",
+    edition = "2018",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "bytes",
+        "CARGO_PKG_VERSION": "1.5.0",
+    },
+    features = [
+        "default",
+        "serde",
+        "std",
+    ],
+    deps = [
+        "//serde-1.0.194/serde:serde",
+    ],
+)

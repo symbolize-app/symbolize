@@ -1,0 +1,20 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "slab",
+    crate = "slab",
+    crate_root = "src/lib.rs",
+    edition = "2018",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "slab",
+        "CARGO_PKG_VERSION": "0.4.9",
+    },
+    features = [
+        "default",
+        "std",
+    ],
+    deps = [
+        "//autocfg-1.1.0:autocfg",
+    ],
+)

@@ -1,0 +1,16 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "spin",
+    crate = "spin",
+    crate_root = "src/lib.rs",
+    edition = "2015",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "spin",
+        "CARGO_PKG_VERSION": "0.9.8",
+    },
+    features = [
+        "once",
+    ],
+)

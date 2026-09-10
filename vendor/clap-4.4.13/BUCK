@@ -1,0 +1,27 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "clap",
+    crate = "clap",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs", "README.md", "examples/**/*.rs", "examples/**/*.md"]),
+    env = {
+        "CARGO_PKG_NAME": "clap",
+        "CARGO_PKG_VERSION": "4.4.13",
+    },
+    features = [
+        "color",
+        "default",
+        "derive",
+        "error-context",
+        "help",
+        "std",
+        "suggestions",
+        "usage",
+    ],
+    deps = [
+        "//clap-4.4.13/clap_builder:clap_builder",
+        "//clap-4.4.13/clap_derive:clap_derive",
+    ],
+)

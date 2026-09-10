@@ -1,0 +1,17 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "fnv",
+    crate = "fnv",
+    crate_root = "lib.rs",
+    edition = "2015",
+    srcs = glob(["**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "fnv",
+        "CARGO_PKG_VERSION": "1.0.7",
+    },
+    features = [
+        "default",
+        "std",
+    ],
+)

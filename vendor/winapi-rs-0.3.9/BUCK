@@ -1,0 +1,21 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "winapi",
+    crate = "winapi",
+    crate_root = "src/lib.rs",
+    edition = "2015",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "winapi",
+        "CARGO_PKG_VERSION": "0.3.9",
+    },
+    features = [
+        "consoleapi",
+        "handleapi",
+        "processenv",
+        "winbase",
+        "winerror",
+        "winuser",
+    ],
+)

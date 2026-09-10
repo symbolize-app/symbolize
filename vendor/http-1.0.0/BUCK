@@ -1,0 +1,22 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "http",
+    crate = "http",
+    crate_root = "src/lib.rs",
+    edition = "2018",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "http",
+        "CARGO_PKG_VERSION": "1.0.0",
+    },
+    features = [
+        "default",
+        "std",
+    ],
+    deps = [
+        "//bytes-1.5.0:bytes",
+        "//itoa-1.0.10:itoa",
+        "//rust-fnv-1.0.7:fnv",
+    ],
+)

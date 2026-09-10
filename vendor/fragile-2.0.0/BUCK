@@ -1,0 +1,13 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "fragile",
+    crate = "fragile",
+    crate_root = "src/lib.rs",
+    edition = "2018",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "fragile",
+        "CARGO_PKG_VERSION": "2.0.0",
+    },
+)

@@ -59,9 +59,9 @@
     "--hint",
     "dev-hlint/base.yaml"
   ],
+  "rust-analyzer.checkOnSave": false,
   "rust-analyzer.imports.granularity.group": "item",
   "rust-analyzer.imports.group.enable": false,
-  "rust-analyzer.check.command": "clippy",
   "task": {
     "checkForUpdates": false
   },

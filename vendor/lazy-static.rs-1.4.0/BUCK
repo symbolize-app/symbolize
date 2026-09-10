@@ -1,0 +1,13 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "lazy_static",
+    crate = "lazy_static",
+    crate_root = "src/lib.rs",
+    edition = "2015",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "lazy_static",
+        "CARGO_PKG_VERSION": "1.4.0",
+    },
+)

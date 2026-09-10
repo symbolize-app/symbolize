@@ -1,0 +1,17 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "base64",
+    crate = "base64",
+    crate_root = "src/lib.rs",
+    edition = "2018",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "base64",
+        "CARGO_PKG_VERSION": "0.21.7",
+    },
+    features = [
+        "alloc",
+        "std",
+    ],
+)

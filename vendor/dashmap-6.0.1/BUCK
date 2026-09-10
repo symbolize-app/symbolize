@@ -1,0 +1,21 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "dashmap",
+    crate = "dashmap",
+    crate_root = "src/lib.rs",
+    edition = "2018",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "dashmap",
+        "CARGO_PKG_VERSION": "6.0.1",
+    },
+    deps = [
+        "//cfg-if-1.0.0:cfg-if",
+        "//crossbeam-0.8.4/crossbeam-utils:crossbeam-utils",
+        "//hashbrown-0.14.3:hashbrown",
+        "//once_cell-1.19.0:once_cell",
+        "//parking_lot-0.12.1/core:parking_lot_core",
+        "//parking_lot-0.12.1/lock_api:lock_api",
+    ],
+)

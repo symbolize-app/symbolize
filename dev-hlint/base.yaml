@@ -2,6 +2,10 @@
 - group: { name: future, enabled: true }
 - group: { name: teaching, enabled: true }
 - group: { name: dollar, enabled: true }
+- ignore: { name: "Use 'filterM' from Relude" }
+- ignore: { name: "Use 'isPrefixOf' from Relude" }
+- ignore: { name: "Use 'sort' from Relude" }
+- ignore: { name: "Use 'sortOn' from Relude" }
 - modules:
     - { name: '**', within: [] }
     - name:
@@ -9,8 +13,10 @@
         - Control.Monad
         - Control.Monad.IO.Unlift
         - Data.ByteString.Lazy
+        - Data.Char
         - Data.Foldable
         - Data.Traversable
+        - Data.Tuple
         - Data.Typeable
         - Dev.Gen
         - Dev.Gen.FilePath
@@ -38,7 +44,10 @@
         - UnliftIO.IO
       importStyle: explicit
     - { name: Data.Aeson, as: Aeson }
+    - { name: Data.Aeson.KeyMap, as: KeyMap }
+    - { name: Data.List, as: List }
     - { name: Data.Map.Strict, as: Map }
+    - { name: Data.Set, as: Set }
     - { name: Data.Text, as: Text }
     - { name: Data.Vector, only: [Vector] }
     - { name: Data.Yaml, as: Yaml }
@@ -50,7 +59,11 @@
     - { name: Dev.Gen.InterpretSpec, as: InterpretSpec }
     - { name: Dev.Gen.Package, as: Package }
     - { name: Dev.Gen.PackageSpec, as: PackageSpec }
+    - { name: Dev.Gen.Vendor.Check, as: VendorCheck }
+    - { name: Dev.Gen.Vendor.License, as: VendorLicense }
+    - { name: Dev.Gen.Vendor.Target, as: Target }
     - { name: Options.Applicative, as: Options }
+    - { name: System.Directory, as: Dir }
     - { name: System.FilePath, as: FilePath }
     - { name: System.Process.Typed, as: Process }
     - { name: Toml, as: Toml }

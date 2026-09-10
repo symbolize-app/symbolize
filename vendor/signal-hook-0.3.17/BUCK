@@ -1,0 +1,22 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "signal-hook",
+    crate = "signal_hook",
+    crate_root = "src/lib.rs",
+    edition = "2018",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "signal-hook",
+        "CARGO_PKG_VERSION": "0.3.17",
+    },
+    features = [
+        "channel",
+        "default",
+        "iterator",
+    ],
+    deps = [
+        "//libc-0.2.171:libc",
+        "//signal-hook-0.3.17/signal-hook-registry:signal-hook-registry",
+    ],
+)

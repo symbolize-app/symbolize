@@ -1,0 +1,13 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "equivalent",
+    crate = "equivalent",
+    crate_root = "src/lib.rs",
+    edition = "2015",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "equivalent",
+        "CARGO_PKG_VERSION": "1.0.1",
+    },
+)

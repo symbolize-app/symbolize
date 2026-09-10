@@ -1,0 +1,24 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "proc-macro2",
+    crate = "proc_macro2",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "proc-macro2",
+        "CARGO_PKG_VERSION": "1.0.94",
+    },
+    rustc_flags = [
+        "--cfg",
+        "wrap_proc_macro",
+    ],
+    features = [
+        "default",
+        "proc-macro",
+    ],
+    deps = [
+        "//unicode-ident-1.0.12:unicode-ident",
+    ],
+)

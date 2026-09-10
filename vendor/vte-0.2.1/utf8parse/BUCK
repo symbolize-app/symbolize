@@ -1,0 +1,16 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "utf8parse",
+    crate = "utf8parse",
+    crate_root = "src/lib.rs",
+    edition = "2018",
+    srcs = glob(["src/**/*.rs"]),
+    env = {
+        "CARGO_PKG_NAME": "utf8parse",
+        "CARGO_PKG_VERSION": "0.2.1",
+    },
+    features = [
+        "default",
+    ],
+)

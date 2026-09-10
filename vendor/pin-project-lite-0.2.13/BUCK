@@ -1,0 +1,13 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "pin-project-lite",
+    crate = "pin_project_lite",
+    crate_root = "src/lib.rs",
+    edition = "2018",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "pin-project-lite",
+        "CARGO_PKG_VERSION": "0.2.13",
+    },
+)

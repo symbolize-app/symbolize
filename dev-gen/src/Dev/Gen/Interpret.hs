@@ -4,31 +4,35 @@ module Dev.Gen.Interpret
   )
 where
 
+import Control.Monad (forM)
 import Control.Monad.IO.Unlift (MonadUnliftIO)
 import Data.Aeson qualified as Aeson
 import Data.ByteString.Lazy (hPut)
+import Data.List qualified as List
+import Data.Text qualified as Text
 import Data.Vector (Vector)
 import Data.Yaml qualified as Yaml
 import Dev.Gen.Command qualified as Command
 import Dev.Gen.Exec qualified as Exec
 import Dev.Gen.FilePath (FilePath (FilePath))
 import Relude.Applicative (pure)
-import Relude.Base (Eq, Type, (==))
-import Relude.Bool (Bool (True))
+import Relude.Base (Eq, Type, (/=), (==))
+import Relude.Bool (Bool (False, True), otherwise, (&&))
 import Relude.Container (fromList)
 import Relude.File (readFileLBS)
-import Relude.Foldable (toList)
+import Relude.Foldable (concat, length, toList)
 import Relude.Function (const, ($), (.))
 import Relude.Functor (bimap, first, (<$>))
-import Relude.Monad (Either (Left, Right), Maybe (Just, Nothing), either, fail, liftIO, (<=<))
+import Relude.Monad (Either (Left, Right), Maybe (Just, Nothing), either, fail, liftIO, (<=<), (>>=))
 import Relude.Monoid (Sum, mempty, (<>))
-import Relude.Numeric (Integer)
+import Relude.Numeric (Integer, (+))
 import Relude.Print (putText)
 import Relude.String
   ( LByteString,
     String,
     Text,
     decodeUtf8Strict,
+    decodeUtf8With,
     encodeUtf8,
     fromString,
     lines,
@@ -39,6 +43,8 @@ import Relude.String
     toText,
     unlines,
   )
+import System.Directory qualified as Dir
+import System.FilePath ((</>))
 import System.FilePath qualified as FilePath
 import System.IO (openTempFile)
 import System.Process.Typed qualified as Process
@@ -102,6 +108,8 @@ interpret (Exec.Command (Command.WriteLines filePath value)) mode =
     (\handle bytes -> liftIO $ hPut handle bytes)
 interpret (Exec.Command (Command.ReadTOML filePath)) _ =
   (0,) <$> _loadFromFile filePath _tomlEitherDecode
+interpret (Exec.Command Command.ReadVendorTargets) _ =
+  (0,) <$> _readVendorTargets
 
 _yamlEitherDecode :: (Aeson.FromJSON a) => LByteString -> Either String a
 _yamlEitherDecode = first show . Yaml.decodeEither' . toStrict
@@ -196,3 +204,54 @@ _formatWithPrettier filePath handle bytes =
     . Process.setStdin (Process.byteStringInput bytes)
     . Process.setStdout (Process.useHandleClose handle)
     $ Process.proc "prettier" ["--stdin-filepath", toString filePath]
+
+_readVendorTargets :: (MonadUnliftIO m) => m (Vector (Text, Text))
+_readVendorTargets = liftIO $ do
+  let vendorRoot = "vendor"
+  buckFiles <- findBuckFiles vendorRoot
+  targets <- forM buckFiles $ \buckPath -> do
+    mContent <- (Just <$> readFileLBS buckPath) `catchAny` const (pure Nothing)
+    case mContent >>= (rightToMaybe . decodeUtf8Strict . toStrict) of
+      Nothing -> pure []
+      Just txt -> do
+        let relDir = List.drop (length (vendorRoot :: String) + 1) (FilePath.takeDirectory buckPath)
+            relText = Text.replace "\\" "/" (toText relDir)
+            names = extractRustLibraryNames txt
+        pure [(name, if Text.null relText then ":" <> name else "//" <> relText <> ":" <> name) | name <- names]
+  pure (fromList (concat targets))
+  where
+    rightToMaybe (Right x) = Just x
+    rightToMaybe (Left _) = Nothing
+
+    findBuckFiles dir = do
+      entries <- Dir.listDirectory dir `catchAny` const (pure [])
+      let ignored :: [FilePath.FilePath]
+          ignored = [".git", ".tmp", "build", "node_modules", "dist-newstyle", "buck-out"]
+      fpaths <- forM entries $ \e -> do
+        let full = dir </> e
+        isDir <- Dir.doesDirectoryExist full `catchAny` const (pure False)
+        if isDir
+          then if e `List.elem` ignored then pure [] else findBuckFiles full
+          else
+            if e == "BUCK" && dir /= "vendor"
+              then pure [full]
+              else pure []
+      pure (concat fpaths)
+
+    extractRustLibraryNames txt =
+      go False (lines txt)
+      where
+        go _ [] = []
+        go inLib (l : rest)
+          | "rust_library(" `Text.isInfixOf` l = go True rest
+          | inLib && "name =" `Text.isInfixOf` l =
+              case extractQuoted l of
+                Just n -> n : go False rest
+                Nothing -> go inLib rest
+          | inLib && ")" `Text.isPrefixOf` Text.stripStart l = go False rest
+          | otherwise = go inLib rest
+
+        extractQuoted l =
+          case Text.splitOn "\"" l of
+            (_ : val : _) -> Just val
+            _ -> Nothing

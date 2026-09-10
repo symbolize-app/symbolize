@@ -1,0 +1,25 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "gloo-timers",
+    crate = "gloo_timers",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "gloo-timers",
+        "CARGO_PKG_VERSION": "0.3.0",
+    },
+    features = [
+        "default",
+        "futures",
+        "futures-channel",
+        "futures-core",
+    ],
+    deps = [
+        "//futures-rs-0.3.31/futures-channel:futures-channel",
+        "//futures-rs-0.3.31/futures-core:futures-core",
+        "//wasm-bindgen-0.3.72/crates/js-sys:js-sys",
+        "//wasm-bindgen-0.3.72:wasm-bindgen",
+    ],
+)

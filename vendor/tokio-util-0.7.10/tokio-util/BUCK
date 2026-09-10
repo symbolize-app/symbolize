@@ -1,0 +1,40 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "tokio-util",
+    crate = "tokio_util",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "tokio-util",
+        "CARGO_PKG_VERSION": "0.7.10",
+    },
+    features = [
+        "codec",
+        "compat",
+        "default",
+        "full",
+        "futures-io",
+        "futures-util",
+        "hashbrown",
+        "io",
+        "io-util",
+        "net",
+        "rt",
+        "slab",
+        "time",
+        "tracing",
+    ],
+    deps = [
+        "//bytes-1.5.0:bytes",
+        "//futures-rs-0.3.31/futures-core:futures-core",
+        "//futures-rs-0.3.31/futures-io:futures-io",
+        "//futures-rs-0.3.31/futures-sink:futures-sink",
+        "//futures-rs-0.3.31/futures-util:futures-util",
+        "//pin-project-lite-0.2.13:pin-project-lite",
+        "//slab-0.4.9:slab",
+        "//tokio-1.39.2/tokio:tokio",
+        "//tracing-0.1.40/tracing:tracing",
+    ],
+)

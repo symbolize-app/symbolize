@@ -1,10 +1,8 @@
 includes:
+  build-dir:
+    taskfile: dev-task/build-dir.yml
   cabal:
     taskfile: dev-task/cabal.yml
-  cargo:
-    taskfile: dev-task/cargo.yml
-  dev-cargo-build:
-    taskfile: dev-cargo-build
   dev-browser-test:
     taskfile: dev-browser-test
   dev-esbuild:
@@ -33,10 +31,10 @@ includes:
     taskfile: lib-dataflow
   lib-error:
     taskfile: lib-error
-  lib-hex-rs:
-    taskfile: lib-hex-rs
   lib-hex:
     taskfile: lib-hex
+  lib-hex-rs:
+    taskfile: lib-hex-rs
   lib-markup:
     taskfile: lib-markup
   lib-payload:
@@ -55,12 +53,12 @@ includes:
     taskfile: lib-time
   nix:
     taskfile: dev-task/nix.yml
-  overmind:
-    taskfile: dev-task/overmind.yml
   node:
     taskfile: dev-task/node.yml
-  vendor:
-    taskfile: dev-task/vendor.yml
+  overmind:
+    taskfile: dev-task/overmind.yml
+  rust:
+    taskfile: dev-task/rust.yml
   sqlite:
     taskfile: dev-task/sqlite.yml
   svc-auth-guest-read:
@@ -75,8 +73,8 @@ includes:
     taskfile: svc-gateway-host-store
   svc-search-host-read:
     taskfile: svc-search-host-read
-  build-dir:
-    taskfile: dev-task/build-dir.yml
+  vendor:
+    taskfile: dev-task/vendor.yml
   watchman:
     taskfile: dev-task/watchman.yml
 run: when_changed
@@ -87,36 +85,15 @@ tasks:
       - b
     deps:
       - cabal:build:debug
-      - cargo:build:debug
+      - rust:build:debug
       - node:build:debug
   build:release:
     aliases:
       - br
     deps:
       - cabal:build:release
-      - cargo:build:release
+      - rust:build:release
       - node:build:release
-  cargo:test:debug:
-    aliases:
-      - cargo:test
-      - cargo:t
-    deps:
-      - dev-cargo-build:test:debug
-      - dev-sim:test:debug
-      - dev-watchman-client:test:debug
-      - lib-hex-rs:test:debug
-      - svc-gateway-host-run:test:debug
-      - svc-search-host-read:test:debug
-  cargo:test:release:
-    aliases:
-      - cargo:tr
-    deps:
-      - dev-cargo-build:test:release
-      - dev-sim:test:release
-      - dev-watchman-client:test:release
-      - lib-hex-rs:test:release
-      - svc-gateway-host-run:test:release
-      - svc-search-host-read:test:release
   check:
     aliases:
       - c
@@ -129,11 +106,10 @@ tasks:
       - test:release
       - format:check
       - lint:check
-      - lock:check
   clean:
     deps:
       - cabal:clean
-      - cargo:clean
+      - rust:clean
       - node:clean
       - vendor:clean
   dev:
@@ -148,7 +124,7 @@ tasks:
       - fc
     deps:
       - cabal:format:check
-      - cargo:format:check
+      - rust:format:check
       - node:format:check
   format:fix:
     aliases:
@@ -156,7 +132,7 @@ tasks:
       - f
     deps:
       - cabal:format:fix
-      - cargo:format:fix
+      - rust:format:fix
       - node:format:fix
   gen:
     aliases:
@@ -259,7 +235,7 @@ tasks:
       - l
     deps:
       - cabal:lint
-      - cargo:lint:check
+      - rust:lint:check
       - node:lint:check
       - sqlite:lint:check
   lint:fix:
@@ -267,12 +243,9 @@ tasks:
       - lf
     deps:
       - cabal:lint
-      - cargo:lint:fix
+      - rust:lint:fix
       - node:lint:fix
       - sqlite:lint:fix
-  lock:check:
-    deps:
-      - cargo:lock:check
   node:link-build-dirs:
     deps:
       - dev-browser-test:link-build-dir
@@ -286,16 +259,35 @@ tasks:
       - lib-styling:link-build-dir
       - lib-test:link-build-dir
       - lib-test-runner:link-build-dir
+  rust:test:debug:
+    aliases:
+      - rust:test
+      - rust:t
+    deps:
+      - dev-sim:test:debug
+      - dev-watchman-client:test:debug
+      - lib-hex-rs:test:debug
+      - svc-gateway-host-run:test:debug
+      - svc-search-host-read:test:debug
+  rust:test:release:
+    aliases:
+      - rust:tr
+    deps:
+      - dev-sim:test:release
+      - dev-watchman-client:test:release
+      - lib-hex-rs:test:release
+      - svc-gateway-host-run:test:release
+      - svc-search-host-read:test:release
   security:
     aliases:
       - s
     deps:
-      - cargo:security
+      - rust:security
   test:release:
     aliases:
       - tr
     deps:
       - cabal:test:release
-      - cargo:test:release
+      - rust:test:release
       - node:test
-version: '3'
+version: "3"

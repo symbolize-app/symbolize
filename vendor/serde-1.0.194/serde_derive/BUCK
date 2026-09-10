@@ -1,0 +1,22 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "serde_derive",
+    crate = "serde_derive",
+    crate_root = "src/lib.rs",
+    edition = "2015",
+    srcs = glob(["src/**/*.rs"]),
+    env = {
+        "CARGO_PKG_NAME": "serde_derive",
+        "CARGO_PKG_VERSION": "1.0.194",
+    },
+    proc_macro = True,
+    features = [
+        "default",
+    ],
+    deps = [
+        "//proc-macro2-1.0.94:proc-macro2",
+        "//quote-1.0.35:quote",
+        "//syn-2.0.100:syn",
+    ],
+)

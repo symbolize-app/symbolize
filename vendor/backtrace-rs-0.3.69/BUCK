@@ -1,0 +1,22 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "backtrace",
+    crate = "backtrace",
+    crate_root = "src/lib.rs",
+    edition = "2018",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "backtrace",
+        "CARGO_PKG_VERSION": "0.3.69",
+    },
+    features = [
+        "default",
+        "std",
+    ],
+    deps = [
+        "//cc-rs-1.0.83:cc",
+        "//cfg-if-1.0.0:cfg-if",
+        "//rustc-demangle-0.1.23:rustc-demangle",
+    ],
+)

@@ -5,10 +5,12 @@ final: prev:
     name = "symbolize-rust";
     paths = [
       final.openssl
-      (final.rust-bin.nightly."2025-04-28".default.override {
+      (final.rust-bin.nightly."2025-04-28".minimal.override {
         extensions = [
           "rust-src"
           "rust-analyzer"
+          "rustfmt"
+          "clippy"
         ];
       })
     ];

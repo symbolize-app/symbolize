@@ -18,13 +18,15 @@ spec = context "Gen" $ do
     specify "emits the Gleam and JavaScript build graph" $
       InterpretSpec.interpret
         gen
-        [ ExecSpec.readTOML
-            "Cargo.toml"
-            ( FileFormat.CargoWorkspace
-                { workspace =
-                    FileFormat.CargoWorkspaceWorkspace
-                      { members = []
-                      }
+        [ ExecSpec.readLines
+            ".buckconfig.in"
+            [ "[cells]",
+              "  root = ."
+            ],
+          ExecSpec.readTOML
+            "workspace.bzl"
+            ( FileFormat.Workspace
+                { members = []
                 }
             ),
           ExecSpec.readLines
@@ -60,6 +62,19 @@ spec = context "Gen" $ do
                     ]
                 }
             ),
+          ExecSpec.readVendorTargets
+            [("foo-bar", "//foo-bar-1.0.0:foo-bar")],
+          ExecSpec.writeLines
+            ".buckconfig"
+            [ "[cells]",
+              "  root = .",
+              "",
+              "[project]",
+              "  ignore = \\",
+              "    .git, \\",
+              "    build, \\",
+              "    tmp"
+            ],
           ExecSpec.writeLines
             "Procfile"
             ["y: task y"],
@@ -79,17 +94,17 @@ spec = context "Gen" $ do
                       ],
                   vars = Just [("v1", "v2")],
                   tasks =
-                    [ ( "cargo:test:debug",
+                    [ ( "rust:test:debug",
                         FileFormat.TaskfileTask
-                          { aliases = Just ["cargo:test", "cargo:t"],
+                          { aliases = Just ["rust:test", "rust:t"],
                             deps = Just [],
                             cmd = Nothing,
                             cmds = Nothing
                           }
                       ),
-                      ( "cargo:test:release",
+                      ( "rust:test:release",
                         FileFormat.TaskfileTask
-                          { aliases = Just ["cargo:tr"],
+                          { aliases = Just ["rust:tr"],
                             deps = Just [],
                             cmd = Nothing,
                             cmds = Nothing
@@ -108,7 +123,21 @@ spec = context "Gen" $ do
             ),
           ExecSpec.writeLines
             ".sqlfluffignore"
-            ["build", "tmp"],
+            ["build", "tmp", "vendor"],
+          ExecSpec.writeLines
+            "vendor/BUCK"
+            [ "load(\"//:rules.bzl\", \"alias\")",
+              "",
+              "alias(",
+              "    name = \"foo-bar\",",
+              "    actual = \"//foo-bar-1.0.0:foo-bar\",",
+              ")",
+              "",
+              "alias(",
+              "    name = \"foo_bar\",",
+              "    actual = \"//foo-bar-1.0.0:foo-bar\",",
+              ")"
+            ],
           ExecSpec.writeJSON
             ".watchmanconfig"
             ( FileFormat.WatchmanConfig

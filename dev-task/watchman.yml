@@ -29,4 +29,7 @@ tasks:
 
   client:prep:
     internal: true
-    cmd: cargo build --locked {{if eq .TASK_WATCHMAN_CLIENT_MODE "release"}}--release{{end}} --package symbolize-dev-watchman-client
+    cmd: >-
+      mkdir -p build/target/{{.TASK_WATCHMAN_CLIENT_MODE}} &&
+      bin=$(buck2 build --show-output -m {{.TASK_WATCHMAN_CLIENT_MODE}} //dev-watchman-client:symbolize-dev-watchman-client | awk '{print $2}') &&
+      ln -sf $(realpath "$bin") build/target/{{.TASK_WATCHMAN_CLIENT_MODE}}/symbolize-dev-watchman-client

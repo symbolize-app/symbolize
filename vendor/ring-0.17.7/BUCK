@@ -1,0 +1,182 @@
+load("//:rules.bzl", "cxx_library", "genrule", "rust_library")
+
+genrule(
+    name = "aesni-gcm-x86_64-elf.S",
+    out = "aesni-gcm-x86_64-elf.S",
+    srcs = glob(["crypto/**/*.pl"]),
+    cmd = "perl crypto/fipsmodule/modes/asm/aesni-gcm-x86_64.pl elf $OUT",
+)
+
+genrule(
+    name = "aesni-x86_64-elf.S",
+    out = "aesni-x86_64-elf.S",
+    srcs = glob(["crypto/**/*.pl"]),
+    cmd = "perl crypto/fipsmodule/aes/asm/aesni-x86_64.pl elf $OUT",
+)
+
+genrule(
+    name = "chacha-x86_64-elf.S",
+    out = "chacha-x86_64-elf.S",
+    srcs = glob(["crypto/**/*.pl"]),
+    cmd = "perl crypto/chacha/asm/chacha-x86_64.pl elf $OUT",
+)
+
+genrule(
+    name = "chacha20_poly1305_x86_64-elf.S",
+    out = "chacha20_poly1305_x86_64-elf.S",
+    srcs = glob(["crypto/**/*.pl"]),
+    cmd = "perl crypto/cipher_extra/asm/chacha20_poly1305_x86_64.pl elf $OUT",
+)
+
+genrule(
+    name = "ghash-x86_64-elf.S",
+    out = "ghash-x86_64-elf.S",
+    srcs = glob(["crypto/**/*.pl"]),
+    cmd = "perl crypto/fipsmodule/modes/asm/ghash-x86_64.pl elf $OUT",
+)
+
+genrule(
+    name = "p256-x86_64-asm-elf.S",
+    out = "p256-x86_64-asm-elf.S",
+    srcs = glob(["crypto/**/*.pl"]),
+    cmd = "perl crypto/fipsmodule/ec/asm/p256-x86_64-asm.pl elf $OUT",
+)
+
+genrule(
+    name = "sha256-x86_64-elf.S",
+    out = "sha256-x86_64-elf.S",
+    srcs = glob(["crypto/**/*.pl"]),
+    cmd = "perl crypto/fipsmodule/sha/asm/sha512-x86_64.pl elf $OUT",
+)
+
+genrule(
+    name = "sha512-x86_64-elf.S",
+    out = "sha512-x86_64-elf.S",
+    srcs = glob(["crypto/**/*.pl"]),
+    cmd = "perl crypto/fipsmodule/sha/asm/sha512-x86_64.pl elf $OUT",
+)
+
+genrule(
+    name = "vpaes-x86_64-elf.S",
+    out = "vpaes-x86_64-elf.S",
+    srcs = glob(["crypto/**/*.pl"]),
+    cmd = "perl crypto/fipsmodule/aes/asm/vpaes-x86_64.pl elf $OUT",
+)
+
+genrule(
+    name = "x86_64-mont-elf.S",
+    out = "x86_64-mont-elf.S",
+    srcs = glob(["crypto/**/*.pl"]),
+    cmd = "perl crypto/fipsmodule/bn/asm/x86_64-mont.pl elf $OUT",
+)
+
+genrule(
+    name = "x86_64-mont5-elf.S",
+    out = "x86_64-mont5-elf.S",
+    srcs = glob(["crypto/**/*.pl"]),
+    cmd = "perl crypto/fipsmodule/bn/asm/x86_64-mont5.pl elf $OUT",
+)
+
+
+GEN_HEADERS_CMD = """python3 -c '
+import re, sys, os
+with open(sys.argv[1]) as f: c = f.read()
+renames = re.findall(r"\\(\\"([^\\"]+)\\",\\s*\\"([^\\"]+)\\"\\)", re.search(r"SYMBOLS_TO_RENAME:.*?=\\s*&\\[(.*?)\\];", c, re.DOTALL).group(1))
+prefixes = re.findall(r"\\"([^\\"]+)\\"", re.search(r"SYMBOLS_TO_PREFIX:.*?=\\s*&\\[(.*?)\\];", c, re.DOTALL).group(1))
+p = "ring_core_0_17_7_"
+out = sys.argv[2]
+os.makedirs(f"{out}/ring_core_generated", exist_ok=True)
+with open(f"{out}/ring_core_generated/prefix_symbols.h", "w") as f:
+    f.write("#ifndef ring_core_generated_PREFIX_SYMBOLS_H\\n#define ring_core_generated_PREFIX_SYMBOLS_H\\n\\n")
+    for o, r in renames: f.write(f"#define {o} {r}\\n")
+    for s in prefixes: f.write(f"#define {s} {p}{s}\\n")
+    f.write("\\n#endif\\n")
+with open(f"{out}/ring_core_generated/prefix_symbols_asm.h", "w") as f:
+    f.write("#ifndef ring_core_generated_PREFIX_SYMBOLS_ASM_H\\n#define ring_core_generated_PREFIX_SYMBOLS_ASM_H\\n\\n#if defined(__APPLE__)\\n")
+    for o, r in renames: f.write(f"#define _{o} _{r}\\n")
+    for s in prefixes: f.write(f"#define _{s} _{p}{s}\\n")
+    f.write("\\n#else\\n")
+    for o, r in renames: f.write(f"#define {o} {r}\\n")
+    for s in prefixes: f.write(f"#define {s} {p}{s}\\n")
+    f.write("\\n#endif\\n\\n#endif\\n")
+' build.rs $OUT"""
+
+genrule(
+    name = "ring-headers",
+    out = "include",
+    srcs = ["build.rs"],
+    cmd = GEN_HEADERS_CMD,
+)
+
+cxx_library(
+    name = "ring-core",
+    srcs = [
+        "crypto/cpu_intel.c",
+        "crypto/crypto.c",
+        "crypto/curve25519/curve25519.c",
+        "crypto/curve25519/curve25519_64_adx.c",
+        "crypto/fipsmodule/aes/aes_nohw.c",
+        "crypto/fipsmodule/bn/montgomery.c",
+        "crypto/fipsmodule/bn/montgomery_inv.c",
+        "crypto/fipsmodule/ec/ecp_nistz.c",
+        "crypto/fipsmodule/ec/gfp_p256.c",
+        "crypto/fipsmodule/ec/gfp_p384.c",
+        "crypto/fipsmodule/ec/p256.c",
+        "crypto/fipsmodule/ec/p256-nistz.c",
+        "crypto/limbs/limbs.c",
+        "crypto/mem.c",
+        "crypto/poly1305/poly1305.c",
+        "crypto/poly1305/poly1305_vec.c",
+        "third_party/fiat/asm/fiat_curve25519_adx_mul.S",
+        "third_party/fiat/asm/fiat_curve25519_adx_square.S",
+        ":aesni-gcm-x86_64-elf.S",
+        ":aesni-x86_64-elf.S",
+        ":chacha-x86_64-elf.S",
+        ":chacha20_poly1305_x86_64-elf.S",
+        ":ghash-x86_64-elf.S",
+        ":p256-x86_64-asm-elf.S",
+        ":sha256-x86_64-elf.S",
+        ":sha512-x86_64-elf.S",
+        ":vpaes-x86_64-elf.S",
+        ":x86_64-mont-elf.S",
+        ":x86_64-mont5-elf.S",
+    ],
+    headers = glob([
+        "include/**/*.h",
+        "crypto/**/*.h",
+        "crypto/**/*.inl",
+        "third_party/fiat/**/*.h",
+    ]),
+    compiler_flags = [
+        "-std=c1x",
+        "-fvisibility=hidden",
+        "-Ivendor/ring-0.17.7/include",
+        "-I$(location :ring-headers)",
+    ],
+)
+
+
+rust_library(
+    name = "ring",
+    crate = "ring",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs", "src/**/*.der", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "ring",
+        "CARGO_PKG_VERSION": "0.17.7",
+        "RING_CORE_PREFIX": "ring_core_0_17_7_",
+    },
+    features = [
+        "alloc",
+        "default",
+        "dev_urandom_fallback",
+    ],
+    deps = [
+        ":ring-core",
+        "//cfg-if-1.0.0:cfg-if",
+        "//getrandom-0.2.12:getrandom",
+        "//spin-rs-0.9.8:spin",
+        "//untrusted-0.9.0:untrusted",
+    ],
+)

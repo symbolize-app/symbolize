@@ -1,0 +1,23 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "clap_derive",
+    crate = "clap_derive",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "clap_derive",
+        "CARGO_PKG_VERSION": "4.4.7",
+    },
+    proc_macro = True,
+    features = [
+        "default",
+    ],
+    deps = [
+        "//heck-0.4.1:heck",
+        "//proc-macro2-1.0.94:proc-macro2",
+        "//quote-1.0.35:quote",
+        "//syn-2.0.100:syn",
+    ],
+)

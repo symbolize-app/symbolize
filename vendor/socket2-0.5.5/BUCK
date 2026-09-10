@@ -1,0 +1,19 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "socket2",
+    crate = "socket2",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "socket2",
+        "CARGO_PKG_VERSION": "0.5.5",
+    },
+    features = [
+        "all",
+    ],
+    deps = [
+        "//libc-0.2.171:libc",
+    ],
+)

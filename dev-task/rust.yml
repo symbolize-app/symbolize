@@ -1,0 +1,256 @@
+version: '3'
+
+run: when_changed
+
+vars:
+  # Note: some options still needed as args (https://github.com/rust-lang/rust-clippy/issues/7290)
+  CLIPPY_ARGS: >-
+    --
+    -A clippy::single_component_path_imports
+    -D warnings
+
+tasks:
+  build:debug:
+    aliases:
+      - build
+      - b
+    cmd:
+      task: execute-build
+      vars:
+        WATCH: false
+        MODE: debug
+        CLIPPY: false
+
+  build:clippy:debug:watch:
+    aliases:
+      - build:clippy:watch
+      - bcw
+    cmd:
+      task: execute-build
+      vars:
+        WATCH: true
+        MODE: debug
+        CLIPPY: true
+
+  build:release:
+    aliases:
+      - br
+    cmd:
+      task: execute-build
+      vars:
+        WATCH: false
+        MODE: release
+        CLIPPY: false
+
+  clean:
+    cmd: buck2 clean
+
+  clippy:lint:check:
+    cmd: buck2 bxl -m debug dev_buck//clippy.bxl:check
+
+  clippy:lint:fix:
+    cmd: buck2 bxl -m debug dev_buck//clippy.bxl:check
+
+  deny:lint:
+    cmd: task vendor:license:check
+
+  execute-build:
+    internal: true
+    requires:
+      vars:
+        - WATCH
+        - MODE
+        - CLIPPY
+    deps:
+      - execute-build:prep
+    cmd:
+      task: :watchman:client
+      vars:
+        WATCH: '{{.WATCH}}'
+        RESTART: false
+        MODE: rust
+        COMMAND: >-
+          mkdir -p build/target/{{.MODE}} &&
+          for target in dev-sim dev-watchman-client svc-gateway-host-run svc-search-host-read; do
+            bin=$(buck2 build --show-output -m {{.MODE}} //${target} | awk '{print $2}')
+            ln -sf $(realpath "$bin") build/target/{{.MODE}}/symbolize-${target}
+          done
+          {{if eq (toString .CLIPPY) "true"}}&& buck2 bxl -m {{.MODE}} dev_buck//clippy.bxl:check{{end}}
+
+  execute-build:prep:
+    internal: true
+    cmd: "true"
+
+  execute-package:
+    internal: true
+    requires:
+      vars:
+        - WATCH
+        - RESTART
+        - MODE
+        - TEST
+        - NAME
+        - ARGS
+    cmds:
+      # HACK: Reference all variables here, so Task doesn't think they're unused
+      - cmd: 'true # /{{.WATCH}}/{{.RESTART}}/{{.MODE}}/{{.TEST}}/{{.NAME}}/{{.ARGS}}/'
+        silent: true
+      - task: :watchman:client
+        vars:
+          WATCH: '{{.WATCH}}'
+          RESTART: '{{.RESTART}}'
+          MODE: '{{if eq (toString .TEST) "true"}}rust{{else}}executable{{end}}'
+          COMMAND: >-
+            {{if eq (toString .TEST) "true" -}}
+              buck2 test -m {{.MODE}} //{{.NAME}}:test
+            {{- else -}}
+              build/target/{{.MODE}}/symbolize-{{.NAME | trimSuffix "-rs"}} {{.ARGS}} {{.CLI_ARGS}}
+            {{- end}}
+
+  execute-package:run:debug:
+    internal: true
+    requires:
+      vars:
+        - NAME
+    deps:
+      - build:debug
+    cmds:
+      # HACK: Reference all variables here, so Task doesn't think they're unused
+      - cmd: 'true # /{{.NAME}}/{{.ARGS}}/'
+        silent: true
+      - task: execute-package
+        vars:
+          WATCH: false
+          RESTART: true
+          MODE: debug
+          TEST: false
+          NAME: '{{.NAME}}'
+          ARGS: '{{.ARGS}}'
+
+  execute-package:run:debug:watch:
+    internal: true
+    requires:
+      vars:
+        - NAME
+    deps:
+      - build:debug
+    cmds:
+      # HACK: Reference all variables here, so Task doesn't think they're unused
+      - cmd: 'true # /{{.NAME}}/{{.ARGS}}/'
+        silent: true
+      - task: execute-package
+        vars:
+          WATCH: true
+          RESTART: true
+          MODE: debug
+          TEST: false
+          NAME: '{{.NAME}}'
+          ARGS: '{{.ARGS}}'
+
+  execute-package:run:release:
+    internal: true
+    requires:
+      vars:
+        - NAME
+    deps:
+      - build:release
+    cmds:
+      # HACK: Reference all variables here, so Task doesn't think they're unused
+      - cmd: 'true # /{{.NAME}}/{{.ARGS}}/'
+        silent: true
+      - task: execute-package
+        vars:
+          WATCH: false
+          RESTART: false
+          MODE: release
+          TEST: false
+          NAME: '{{.NAME}}'
+          ARGS: '{{.ARGS}}'
+
+  execute-package:test:debug:
+    internal: true
+    requires:
+      vars:
+        - NAME
+    deps:
+      - build:debug
+    cmds:
+      # HACK: Reference all variables here, so Task doesn't think they're unused
+      - cmd: 'true # /{{.NAME}}/{{.ARGS}}/'
+        silent: true
+      - task: execute-package
+        vars:
+          WATCH: false
+          RESTART: false
+          MODE: debug
+          TEST: true
+          NAME: '{{.NAME}}'
+          ARGS: '{{.ARGS}}'
+
+  execute-package:test:debug:watch:
+    internal: true
+    requires:
+      vars:
+        - NAME
+    deps:
+      - build:debug
+    cmds:
+      # HACK: Reference all variables here, so Task doesn't think they're unused
+      - cmd: 'true # /{{.NAME}}/{{.ARGS}}/'
+        silent: true
+      - task: execute-package
+        vars:
+          WATCH: true
+          RESTART: false
+          MODE: debug
+          TEST: true
+          NAME: '{{.NAME}}'
+          ARGS: '{{.ARGS}}'
+
+  execute-package:test:release:
+    internal: true
+    requires:
+      vars:
+        - NAME
+    deps:
+      - build:release
+    cmds:
+      # HACK: Reference all variables here, so Task doesn't think they're unused
+      - cmd: 'true # /{{.NAME}}/{{.ARGS}}/'
+        silent: true
+      - task: execute-package
+        vars:
+          WATCH: false
+          RESTART: false
+          MODE: release
+          TEST: true
+          NAME: '{{.NAME}}'
+          ARGS: '{{.ARGS}}'
+
+  format:check:
+    aliases:
+      - fc
+    cmd: buck2 bxl -m debug dev_buck//format.bxl:check
+
+  format:fix:
+    aliases:
+      - format
+      - f
+    cmd: ./dev-buck/format-fix.sh
+
+  lint:check:
+    aliases:
+      - lint
+      - l
+    deps:
+      - clippy:lint:check
+
+  lint:fix:
+    aliases:
+      - lf
+    deps:
+      - clippy:lint:fix
+
+  security:
+    deps:
+      - deny:lint

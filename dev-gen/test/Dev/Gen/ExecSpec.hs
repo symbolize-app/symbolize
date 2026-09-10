@@ -3,6 +3,7 @@ module Dev.Gen.ExecSpec
     readJSON,
     readLines,
     readTOML,
+    readVendorTargets,
     readYAML,
     writeJSON,
     writeLines,
@@ -68,6 +69,12 @@ readTOML ::
   a ->
   Result
 readTOML = _result1 Command.ReadTOML
+
+readVendorTargets :: Vector (Text, Text) -> Result
+readVendorTargets = _result0 Command.ReadVendorTargets
+
+_result0 :: (Typeable a, Eq a, Show a) => Command.Command a -> a -> Result
+_result0 = Result
 
 _result1 ::
   (Typeable b, Eq b, Show b) =>

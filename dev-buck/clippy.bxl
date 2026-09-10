@@ -1,0 +1,25 @@
+load("@root//:workspace.bzl", "members")
+
+def _check_impl(ctx: bxl.Context):
+    target = ctx.cli_args.target
+    if target:
+        utargets = ctx.uquery().eval(target)
+        targets = ctx.configured_targets(utargets, modifiers = ctx.modifiers)
+    else:
+        clippy_targets = [f"root//{pkg}:clippy" for pkg in members]
+        targets = ctx.configured_targets(clippy_targets, modifiers = ctx.modifiers)
+    results = ctx.build(targets)
+    failed = False
+    for target, res in results.items():
+        if len(res.failures()) > 0:
+            failed = True
+
+    if failed:
+        fail("Clippy check failed.")
+
+check = bxl_main(
+    impl = _check_impl,
+    cli_args = {
+        "target": cli_args.option(cli_args.string()),
+    },
+)

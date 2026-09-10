@@ -1,0 +1,13 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "windows_aarch64_gnullvm",
+    crate = "windows_aarch64_gnullvm",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs"]),
+    env = {
+        "CARGO_PKG_NAME": "windows_aarch64_gnullvm",
+        "CARGO_PKG_VERSION": "0.52.6",
+    },
+)

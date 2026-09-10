@@ -3,9 +3,9 @@
 This directory contains the transitive closure of checked-out snapshots of
 upstream Git repositories that Symbolize depends on but that are not provided
 by Devenv. Gleam dependencies and build adapters consume direct paths into
-these snapshots. Cargo dependencies retain their upstream manifests and are
-redirected by the root workspace's `[patch.crates-io]` table; nothing is
-installed by a package manager or linked through a vendor workspace.
+these snapshots. Rust dependencies define local Buck2 targets and are exposed
+through unversioned aliases in `vendor/BUCK`; nothing is installed by a package
+manager or linked through a vendor workspace.
 
 Each immediate child directory represents one upstream repository:
 
@@ -35,11 +35,51 @@ Every snapshot in the closure follows the same naming, metadata, and
 automatic-agent-file rules, whether it is a direct dependency or a deeper
 transitive dependency.
 
-An upstream project that distributes a generated source unit may be represented
-by that exact source unit instead of a second copy inside each consumer. The
-SQLite amalgamation is kept this way in `sqlite3-3.46.0`; consumers stage or
-reference those shared files from their own build adapters. Its upstream Git
-ref and SQLite source identifier are recorded in `.vendor.toml`.
+All third-party projects are kept as pure Git checkouts.
+
+### Revendoring nested dependencies and single sources of truth
+
+When an upstream dependency vendors or bundles its own copy of an underlying
+third-party library (for example, `libsqlite3-sys` bundling SQLite amalgamations
+and SQLCipher, or Node packages bundling C/C++ libraries in internal directories),
+**never keep their nested copy**.
+
+Instead:
+1. **Revendor at root**: Revendor the underlying dependency directly at the top
+   level of `vendor/` as its own distinct, versioned upstream Git checkout
+   (e.g., `vendor/sqlite3-3.46.0/`).
+2. **Prune nested duplicates**: Purge the nested vendor directories and bundled
+   amalgamations from the consumer's snapshot.
+3. **Wire to the canonical target**: Point the consumer's build configuration
+   directly to the top-level vendored target (e.g., `deps = ["//sqlite3-3.46.0:sqlite3"]`
+   in Buck2, or staging the build artifact dynamically in Taskfile tasks).
+
+This practice establishes a strict single source of truth across all language
+ecosystems in the monorepo (e.g., Rust's `rusqlite` and Node's `better-sqlite3` both
+consume the exact same SQLite 3.46.0 source), prevents version drift, eliminates
+hundreds of thousands of lines of duplicate code from git history, and guarantees
+uniform license auditing.
+
+### Dynamic synthesis: leveraging Devenv + Buck2 for special build steps
+
+Vendored dependencies must not contain committed build artifacts, pre-computed
+amalgamations, generated assembly routines, or pre-built binaries. When an upstream
+project requires code generation, macro expansions, or pre-compilation steps,
+leverage **Devenv** and **Buck2** in tandem:
+
+- **Devenv supplies ambient toolchains**: Devenv provides the necessary hermetic
+  compilers, interpreters, and build tools (such as `gcc`, `clang`, `rustc`, `go`,
+  `tclsh`, `perl`, `python`, `node-gyp`) in the ambient developer environment. Buck2
+  rules rely on this ambient PATH rather than hardcoding Nix store hashes or
+  downloading external binaries.
+- **Buck2 orchestrates dynamic synthesis**: Buck2 `genrule` targets execute the
+  upstream generation scripts (for example, generating SQLite's `sqlite3.c`
+  amalgamation using upstream `Makefile.linux-gcc` + `tclsh`, or running upstream
+  Perl scripts to synthesize `ring`'s architecture-specific assembly).
+- **Hermetic build consumption**: Generated source files and compiled libraries
+  (`cxx_library`, `rust_library`) are tracked as rule outputs in `buck-out/` and
+  consumed directly by downstream build targets or staged into build directories
+  when required by native addons.
 
 ## Directory names
 
@@ -101,11 +141,11 @@ repository's vendor check rejects registry dependencies and locked manifest
 entries whose source is not `local`. The shared `gleam_stdlib` dependency is
 vendored as `gleam_stdlib-1.0.5`.
 
-## Cargo snapshots
+## Rust and Buck2 snapshots
 
 Rust library dependencies use the same snapshot layout, but their source of
 truth is the upstream Git repository and the full commit recorded in
-`.vendor.toml`, not the crates.io archive or Cargo's local cache. `.vendor.toml`
+`.vendor.toml`, not the crates.io archive or a package registry cache. `.vendor.toml`
 strictly permits only `url` and `ref`:
 
 ```toml
@@ -113,20 +153,18 @@ url = "https://github.com/example/project"
 ref = "0123456789abcdef0123456789abcdef01234567"
 ```
 
-The root workspace keeps its normal Cargo version constraints, and the root
-`[patch.crates-io]` table maps every active `(package name, version)` identity
-to a local path in these snapshots. Vendored Cargo manifests retain their
-upstream registry dependency declarations; Cargo applies the root patches
-when resolving the active graph. Multiple versions use unique patch aliases
-with `package = "..."`. The Cargo lockfile contains no registry or Git package
-sources. The outer workspace excludes `vendor/` because a monorepo snapshot
-may contain several package roots and multiple retained versions of a package.
+Each vendored Rust package defines its build rule in a local `BUCK` file using
+the `vendor_rust_library` or `rust_library` rules from `vendor/rules.bzl` or
+`//:rules.bzl`. `dev-gen` scans these vendored `BUCK` files to synthesize
+unversioned target aliases in `vendor/BUCK` (e.g. `alias(name = "tokio", actual = "//vendor/tokio-1.39.2/tokio:tokio")`),
+allowing first-party crates to depend on unversioned targets like `vendor//:tokio`
+and `vendor//:serde`. When multiple snapshot versions of a package are retained,
+they are explicitly tracked in `vendor/dup.toml` with consumer lists and justifications.
 
-Cargo package-manager installations and fetch tasks are intentionally absent.
-Development binaries such as `cargo-deny` are supplied by Devenv, while
-library sources remain in this directory. `task vendor:check` validates the
-Git metadata, package mappings, root patch table, local Cargo paths, and
-lockfile closure.
+Cargo package-manager installations, root manifests, and lockfiles are intentionally absent.
+All compilation, testing, and formatting run through Buck2. `task vendor:check` validates
+Git metadata, directory naming conventions, duplicate justifications, and closure integrity,
+while `task vendor:license:check` executes a pure Haskell SPDX license auditor across all snapshots.
 
 ## Node and TypeScript snapshots
 
@@ -136,8 +174,7 @@ Every upstream JavaScript/TypeScript library is kept as a pure Git checkout in
 an immediate child directory of `vendor/`.
 
 `vendor/node.json` serves as the single source of truth for bare module
-specifier remapping across the repository, acting as the exact equivalent of
-Cargo's `[patch.crates-io]` table:
+specifier remapping across the repository:
 
 ```json
 {
@@ -168,6 +205,108 @@ Execution and bundling consume this table directly:
   `better_sqlite3.node` compiled via `node-gyp` or the `esbuild` Go binary)
   belong strictly in `build/vendor/` and are built by tasks in
   `dev-task/vendor.yml`.
+
+## Buck2 target resolution
+
+Buck2 projects consume vendored dependencies through the `vendor//` cell,
+providing direct, hermetic compilation without shadow lockfiles, translation
+layers, or package-manager caches.
+
+`vendor/BUCK` serves as the single source of truth for unversioned target
+aliases across the repository, acting as the exact equivalent of
+`vendor/node.json` for Node module specifiers:
+
+```python
+alias(
+    name = "anyhow",
+    actual = "//anyhow-1.0.79:anyhow",
+    visibility = ["PUBLIC"],
+)
+
+alias(
+    name = "tokio",
+    actual = "//tokio-1.38.0:tokio",
+    visibility = ["PUBLIC"],
+)
+```
+
+Consumers throughout the repository depend directly on these canonical,
+unversioned aliases:
+
+```python
+rust_library(
+    name = "symbolize-lib-hex",
+    ...
+    deps = [
+        "vendor//:anyhow",
+    ],
+)
+```
+
+This establishes a clear dependency architecture:
+- **Zero version coupling**: First-party packages never hardcode snapshot
+  version numbers in their dependencies. Upgrading an upstream crate only
+  requires repointing its single alias in `vendor/BUCK`.
+- **Intra-vendor functional rules**: Vendored crates load `load("//:rules.bzl", "rust_library")`
+  directly from the `vendor//` cell root. This encapsulates baseline compilation
+  flags (`--cap-lints=allow`) and defaults visibility to `PUBLIC` without
+  introducing ambient directory inheritance or `PACKAGE` files.
+- **Explicit feature declaration**: Vendored crates declare their active feature
+  set explicitly using the native `features = [...]` attribute, reflecting the
+  monorepo-unified feature requirements of the codebase.
+
+## Rust crate ingestion and update workflow
+
+In Symbolize's Buck2 monorepo architecture, all third-party Rust dependencies are vendored directly in `vendor/` and built natively through the `vendor//` cell. Builds do not access the network, do not invoke Cargo, and do not consult or require lockfiles at build time; Git history provides the immutable, bit-for-bit cryptographic lock on all dependencies.
+
+### Step-by-Step Ingestion & Update Procedure
+
+When adding a new third-party crate or updating an existing one:
+
+1. **Import the Upstream Repository Snapshot**:
+   - Check out the upstream repository at the desired release tag or commit.
+   - Place the snapshot in an immediate child directory named `vendor/<package-name>-<version-or-date>/`.
+   - Remove upstream `.git`, `.gitattributes`, and automatic-agent instruction files (`AGENTS.md`, `CLAUDE.md`, etc.).
+   - Create `.vendor.toml` at the snapshot root specifying `url` and `ref` (full commit SHA).
+
+2. **Automate BUCK Alias Registration**:
+   - Run:
+     ```bash
+     task gen
+     ```
+     (or `task vendor:rust:gen`).
+   - This executes `dev-gen` (Haskell generator), which:
+     - Scans vendored crates and libraries in `vendor/**/BUCK`.
+     - Generates canonical, unversioned aliases in [`vendor/BUCK`](file:///home/geecko/code/symbolize/vendor/BUCK) (e.g. `alias(name = "tokio", actual = "//tokio-1.40.0:tokio")`).
+     - Automatically normalizes hyphenated crate names to both hyphenated and underscored aliases (e.g. `serde-json` and `serde_json`).
+
+3. **Audit Third-Party Licenses**:
+   - Run:
+     ```bash
+     task vendor:license:check
+     ```
+     (or `task security`).
+   - The Haskell license auditor in `dev-gen` inspects every package under `vendor/` across all languages and frameworks, evaluating full SPDX expressions against the approved open-source license list (MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC, CC0-1.0, Unicode-3.0, Zlib, etc.).
+
+4. **Handle C, Assembly, or Code Generation Special Cases**:
+   - Dependencies with native C, assembly, or code-generation steps (such as `ring` or `libsqlite3-sys`) must not rely on committed generated files or arbitrary Cargo `build.rs` execution.
+   - Revendor any nested third-party dependencies (such as SQLite) at the top level of `vendor/` and prune the nested copies.
+   - Leverage Devenv to provide any required ambient toolchains (`perl`, `tclsh`, etc.).
+   - Define Buck2 `genrule` targets to dynamically synthesize required sources (such as assembly files or amalgamations) and build native libraries using `cxx_library`.
+   - Wire consumer libraries directly to these dynamically synthesized targets.
+
+5. **Consume Canonical Aliases**:
+   - In first-party `BUCK` files, add `vendor//:<crate-name>` to `deps`.
+   - Never reference versioned snapshot directories directly from first-party crates.
+
+6. **Validate Hermetic Compilation**:
+   - Verify that all builds, tests, clippy checks, and formatting pass with an explicit mode modifier (e.g. `-m debug` or `-m release`):
+     ```bash
+     buck2 build -m debug //...
+     buck2 test -m debug //...
+     buck2 bxl -m debug dev_buck//clippy.bxl:check
+     buck2 bxl -m debug dev_buck//format.bxl:check
+     ```
 
 ## Duplicate dependency ledger
 
@@ -255,6 +394,13 @@ with an empty ledger.
   output for native or platform-specific tools belongs strictly in `build/vendor/`.
   First-party glue adapter packages and owned `index.js` shim files are strictly
   prohibited.
+- Revendor any third-party dependencies bundled inside an upstream snapshot as
+  independent top-level snapshots in `vendor/`, and delete the nested copies.
+- Do not commit generated build artifacts, amalgamations, or assembly to `vendor/`.
+  Leverage Devenv for ambient toolchains and Buck2 for dynamic build-time synthesis.
+- Expose every active vendored crate as an unversioned alias in `vendor/BUCK`.
+  First-party packages must depend on canonical `vendor//:<name>` targets rather
+  than coupling to versioned snapshot directory names.
 - Vendored subdirectories must not contain automatic-agent instruction files,
   including `AGENTS.md`, `CLAUDE.md`, or equivalent files with other names.
 
@@ -266,11 +412,11 @@ Devenv configuration and dependencies remain in `devenv.*` and
 To update a vendored dependency, select the upstream Git commit, export that
 commit without its `.git` directory into a new versioned child directory, and
 write its full commit SHA and upstream URL to `.vendor.toml`. Recalculate the
-root's transitive dependency closure and regenerate the root
-`[patch.crates-io]` table; do not rewrite upstream Cargo manifests merely to
-point at neighboring snapshots. Add every newly required upstream repository
-unless it is supplied by Devenv. Update module mappings in `vendor/node.json`
-and build tasks as needed, then run `task vendor:check` and the full repository check.
+root's transitive dependency closure and add any missing upstream dependencies.
+Ensure `BUCK` build files are present in newly vendored crates, run `dev-gen` to
+regenerate `vendor/BUCK` aliases, and update `vendor/dup.toml` if retaining multiple
+versions of a package. Update module mappings in `vendor/node.json` as needed, then
+run `task vendor:check` and the full repository check `task c`.
 
 Native outputs are rebuilt for the current platform from the exact snapshots:
 esbuild is compiled with Go, and better-sqlite3 is compiled with node-gyp.

@@ -1,0 +1,16 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "hashlink",
+    crate = "hashlink",
+    crate_root = "src/lib.rs",
+    edition = "2018",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "hashlink",
+        "CARGO_PKG_VERSION": "0.8.4",
+    },
+    deps = [
+        "//hashbrown-0.14.3:hashbrown",
+    ],
+)

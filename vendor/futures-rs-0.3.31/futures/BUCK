@@ -1,0 +1,30 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "futures",
+    crate = "futures",
+    crate_root = "src/lib.rs",
+    edition = "2018",
+    srcs = glob(["src/**/*.rs"]),
+    env = {
+        "CARGO_PKG_NAME": "futures",
+        "CARGO_PKG_VERSION": "0.3.31",
+    },
+    features = [
+        "alloc",
+        "async-await",
+        "default",
+        "executor",
+        "futures-executor",
+        "std",
+    ],
+    deps = [
+        "//futures-rs-0.3.31/futures-channel:futures-channel",
+        "//futures-rs-0.3.31/futures-core:futures-core",
+        "//futures-rs-0.3.31/futures-executor:futures-executor",
+        "//futures-rs-0.3.31/futures-io:futures-io",
+        "//futures-rs-0.3.31/futures-sink:futures-sink",
+        "//futures-rs-0.3.31/futures-task:futures-task",
+        "//futures-rs-0.3.31/futures-util:futures-util",
+    ],
+)

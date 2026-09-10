@@ -1,0 +1,16 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "anstyle-wincon",
+    crate = "anstyle_wincon",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "anstyle-wincon",
+        "CARGO_PKG_VERSION": "3.0.6",
+    },
+    deps = [
+        "//anstyle-1.0.4/crates/anstyle:anstyle",
+    ],
+)

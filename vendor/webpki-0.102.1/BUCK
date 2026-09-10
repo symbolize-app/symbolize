@@ -1,0 +1,25 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "rustls-webpki",
+    crate = "webpki",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs", "README.md", "src/**/*.der"]),
+    env = {
+        "CARGO_PKG_NAME": "rustls-webpki",
+        "CARGO_PKG_VERSION": "0.102.1",
+    },
+    features = [
+        "alloc",
+        "ring",
+        "std",
+    ],
+    named_deps = {
+        "pki_types": "//pki-types-1.1.0:rustls-pki-types",
+    },
+    deps = [
+        "//ring-0.17.7:ring",
+        "//untrusted-0.9.0:untrusted",
+    ],
+)

@@ -1,0 +1,22 @@
+load("@dev_buck//:rules.bzl", "rust_binary")
+
+rust_binary(
+    name = "symbolize-dev-sim",
+    deps = [
+        "//lib-hex-rs:symbolize-lib-hex",
+        "vendor//:anyhow",
+        "vendor//:bytes",
+        "vendor//:futures",
+        "vendor//:http-body",
+        "vendor//:http-body-util",
+        "vendor//:hyper",
+        "vendor//:hyper-util",
+        "vendor//:pin-project-lite",
+        "vendor//:rustls",
+        "vendor//:rustls-pemfile",
+        "vendor//:rustyline-async",
+        "vendor//:tokio",
+        "vendor//:tokio-rustls",
+        "vendor//:tokio-util",
+    ],
+)

@@ -5,37 +5,44 @@ where
 
 import Control.Applicative ((*>))
 import Data.Foldable (foldMap')
+import Data.Text qualified as Text
 import Data.Vector (Vector)
 import Data.Vector qualified as Vector
 import Dev.Gen.Exec qualified as Exec
 import Dev.Gen.FileFormat qualified as FileFormat
 import Dev.Gen.FilePath (FilePath (FilePath))
 import Dev.Gen.Package qualified as Package
+import Dev.Gen.Vendor.Target qualified as Target
 import Relude.Applicative (pass, pure, (<*>))
-import Relude.Base (Type)
-import Relude.Bool (Bool (False, True))
+import Relude.Base (Type, (/=), (==))
+import Relude.Bool (Bool (False, True), not, (&&), (||))
 import Relude.Container (fromList, uncurry)
 import Relude.Foldable (Foldable, for_, toList)
 import Relude.Function (const, ($), (.))
 import Relude.Functor ((<$>))
-import Relude.Monad (Maybe (Just, Nothing), (=<<))
+import Relude.Monad (Maybe (Just, Nothing), fromMaybe, (=<<))
 import Relude.Monoid (maybeToMonoid, (<>))
+import Relude.Numeric ((-))
 import Relude.String (Text)
 
 type Input :: Type
 data Input = Input
-  { cargoWorkspace :: FileFormat.CargoWorkspace,
+  { buckConfigInput :: Vector Text,
+    workspace :: FileFormat.Workspace,
     gitIgnore :: Vector Text,
     procfileInput :: Vector Text,
-    rootTaskfileInput :: FileFormat.Taskfile
+    rootTaskfileInput :: FileFormat.Taskfile,
+    vendorTargets :: Vector (Text, Text)
   }
 
 type Output :: Type
 data Output = Output
-  { packageTaskfiles :: Vector (FilePath, FileFormat.Taskfile),
+  { buckConfig :: Vector Text,
+    packageTaskfiles :: Vector (FilePath, FileFormat.Taskfile),
     procfile :: Vector Text,
     rootTaskfile :: FileFormat.Taskfile,
     sqlFluffIgnore :: Vector Text,
+    vendorBuck :: Vector Text,
     watchmanConfig :: FileFormat.WatchmanConfig
   }
 
@@ -45,50 +52,56 @@ gen = Exec.await . writeFiles . genFiles =<< Exec.await asyncReadFiles
 asyncReadFiles :: Exec.ExecConcurrently Input
 asyncReadFiles =
   Input
-    <$> Exec.async (Exec.readTOML "Cargo.toml")
+    <$> Exec.async (Exec.readLines ".buckconfig.in")
+    <*> Exec.async (Exec.readTOML "workspace.bzl")
     <*> Exec.async (Exec.readLines ".gitignore")
     <*> Exec.async (Exec.readLines "Procfile.in")
     <*> Exec.async (Exec.readYAML "Taskfile.in.yml")
+    <*> Exec.async Exec.readVendorTargets
 
 genFiles :: Input -> Output
 genFiles i =
   Output
-    { packageTaskfiles = genPackageTaskfiles i.cargoWorkspace,
-      procfile = genProcfile i.cargoWorkspace i.procfileInput,
+    { buckConfig = genBuckConfig i.buckConfigInput i.gitIgnore,
+      packageTaskfiles = genPackageTaskfiles i.workspace,
+      procfile = genProcfile i.workspace i.procfileInput,
       rootTaskfile =
         genRootTaskfile
-          i.cargoWorkspace
+          i.workspace
           i.rootTaskfileInput,
-      sqlFluffIgnore = i.gitIgnore,
+      sqlFluffIgnore = genSqlFluffIgnore i.gitIgnore,
+      vendorBuck = Target.genVendorBuck i.vendorTargets,
       watchmanConfig = genWatchmanConfig i.gitIgnore
     }
 
 writeFiles :: Output -> Exec.ExecConcurrently ()
 writeFiles o =
   pass
+    *> Exec.async (Exec.writeLines ".buckconfig" o.buckConfig)
     *> asyncWriteAll Exec.writeYAML o.packageTaskfiles
     *> Exec.async (Exec.writeLines "Procfile" o.procfile)
     *> Exec.async (Exec.writeYAML "Taskfile.yml" o.rootTaskfile)
     *> Exec.async (Exec.writeLines ".sqlfluffignore" o.sqlFluffIgnore)
+    *> Exec.async (Exec.writeLines "vendor/BUCK" o.vendorBuck)
     *> Exec.async (Exec.writeJSON ".watchmanconfig" o.watchmanConfig)
 
 genPackageTaskfiles ::
-  FileFormat.CargoWorkspace ->
+  FileFormat.Workspace ->
   Vector (FilePath, FileFormat.Taskfile)
-genPackageTaskfiles cargoWorkspace =
-  genCargoPackageTaskfile <$> cargoWorkspace.workspace.members
+genPackageTaskfiles workspace =
+  genRustPackageTaskfile <$> workspace.members
 
-genCargoPackageTaskfile :: Text -> (FilePath, FileFormat.Taskfile)
-genCargoPackageTaskfile cargoPackageName =
-  ( FilePath (cargoPackageName <> "/Taskfile.yml"),
+genRustPackageTaskfile :: Text -> (FilePath, FileFormat.Taskfile)
+genRustPackageTaskfile rustPackageName =
+  ( FilePath (rustPackageName <> "/Taskfile.yml"),
     FileFormat.Taskfile
       { version = FileFormat.taskfileVersion,
         run = FileFormat.taskfileRun,
         includes = Nothing,
-        vars = Just [("NAME", cargoPackageName)],
+        vars = Just [("NAME", rustPackageName)],
         tasks =
           fromList . toList $
-            uncurry genCargoTask
+            uncurry genRustTask
               <$> Vector.catMaybes
                 [ whenService ("run:debug", ["run", "r"]),
                   whenService ("run:debug:watch", ["run:watch", "rw"]),
@@ -100,10 +113,10 @@ genCargoPackageTaskfile cargoPackageName =
       }
   )
   where
-    whenService = whenTrue $ Package.isCargoService cargoPackageName
+    whenService = whenTrue $ Package.isRustService rustPackageName
 
-genCargoTask :: Text -> Vector Text -> (Text, FileFormat.TaskfileTask)
-genCargoTask name aliases =
+genRustTask :: Text -> Vector Text -> (Text, FileFormat.TaskfileTask)
+genRustTask name aliases =
   ( name,
     FileFormat.TaskfileTask
       { aliases = Just aliases,
@@ -111,7 +124,7 @@ genCargoTask name aliases =
         cmd =
           Just
             ( FileFormat.TaskfileCommand
-                { task = ":cargo:execute-package:" <> name,
+                { task = ":rust:execute-package:" <> name,
                   vars = Just [("NAME", "{{.NAME}}")]
                 }
             ),
@@ -120,10 +133,10 @@ genCargoTask name aliases =
   )
 
 genProcfile ::
-  FileFormat.CargoWorkspace ->
+  FileFormat.Workspace ->
   Vector Text ->
   Vector Text
-genProcfile cargoWorkspace procfileInput =
+genProcfile workspace procfileInput =
   procfileInput
     <> foldMap'
       ( \member ->
@@ -131,18 +144,18 @@ genProcfile cargoWorkspace procfileInput =
             [ Just $
                 member <> "__test: task " <> member <> ":test:watch",
               whenTrue
-                (Package.isCargoService member)
+                (Package.isRustService member)
                 $ member <> "__run: task " <> member <> ":run:watch"
             ]
       )
-      cargoWorkspace.workspace.members
+      workspace.members
 
 genRootTaskfile ::
-  FileFormat.CargoWorkspace ->
+  FileFormat.Workspace ->
   FileFormat.Taskfile ->
   FileFormat.Taskfile
-genRootTaskfile cargoWorkspace rootTaskfileInput =
-  let cargoPackageNames = cargoWorkspace.workspace.members
+genRootTaskfile workspace rootTaskfileInput =
+  let rustPackageNames = workspace.members
       newIncludes =
         fromList
           . toList
@@ -154,25 +167,25 @@ genRootTaskfile cargoWorkspace rootTaskfileInput =
                     }
                 )
             )
-            <$> cargoPackageNames
+            <$> rustPackageNames
       newTasks =
-        [ ( "cargo:test:debug",
+        [ ( "rust:test:debug",
             FileFormat.TaskfileTask
-              { aliases = Just ["cargo:test", "cargo:t"],
+              { aliases = Just ["rust:test", "rust:t"],
                 deps =
                   Just
-                    ( (<> ":test:debug") <$> cargoPackageNames
+                    ( (<> ":test:debug") <$> rustPackageNames
                     ),
                 cmd = Nothing,
                 cmds = Nothing
               }
           ),
-          ( "cargo:test:release",
+          ( "rust:test:release",
             FileFormat.TaskfileTask
-              { aliases = Just ["cargo:tr"],
+              { aliases = Just ["rust:tr"],
                 deps =
                   Just
-                    ( (<> ":test:release") <$> cargoPackageNames
+                    ( (<> ":test:release") <$> rustPackageNames
                     ),
                 cmd = Nothing,
                 cmds = Nothing
@@ -187,6 +200,9 @@ genRootTaskfile cargoWorkspace rootTaskfileInput =
           vars = rootTaskfileInput.vars,
           tasks = rootTaskfileInput.tasks <> newTasks
         }
+
+genSqlFluffIgnore :: Vector Text -> Vector Text
+genSqlFluffIgnore gitIgnore = Vector.snoc gitIgnore "vendor"
 
 genWatchmanConfig :: Vector Text -> FileFormat.WatchmanConfig
 genWatchmanConfig gitIgnore =
@@ -209,3 +225,31 @@ asyncWriteAll write filePairs =
 whenTrue :: Bool -> a -> Maybe a
 whenTrue True = Just
 whenTrue False = const Nothing
+
+genBuckConfig :: Vector Text -> Vector Text -> Vector Text
+genBuckConfig buckConfigInput gitIgnore =
+  buckConfigInput
+    <> [ "",
+         "[project]",
+         "  ignore = \\"
+       ]
+    <> genIgnores
+  where
+    normalize t = fromMaybe t (Text.stripPrefix "/" t)
+    cleanGit =
+      Vector.cons
+        ".git"
+        ( Vector.map
+            normalize
+            ( Vector.filter
+                (\t -> not (Text.null t) && not (Text.isPrefixOf "#" t) && t /= ".git" && t /= "/.git")
+                gitIgnore
+            )
+        )
+    len = Vector.length cleanGit
+    genIgnores =
+      Vector.imap
+        ( \i item ->
+            "    " <> item <> if i == (len - 1) then "" else ", \\"
+        )
+        cleanGit

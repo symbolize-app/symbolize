@@ -1,0 +1,26 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "rustyline-async",
+    crate = "rustyline_async",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "rustyline-async",
+        "CARGO_PKG_VERSION": "0.4.5",
+    },
+    features = [
+        "default",
+        "emacs",
+    ],
+    deps = [
+        "//crossterm-0.28.1:crossterm",
+        "//futures-rs-0.3.31/futures-util:futures-util",
+        "//pin-project-1.1.10:pin-project",
+        "//thingbuf-0.1.6:thingbuf",
+        "//thiserror-1.0.56:thiserror",
+        "//unicode-segmentation-1.12.0:unicode-segmentation",
+        "//unicode-width-0.2.0:unicode-width",
+    ],
+)

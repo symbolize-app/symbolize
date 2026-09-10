@@ -1,0 +1,1161 @@
+load("//:rules.bzl", "alias")
+
+alias(
+    name = "addr2line",
+    actual = "//addr2line-0.21.0:addr2line",
+)
+
+alias(
+    name = "adler",
+    actual = "//adler-1.0.2:adler",
+)
+
+alias(
+    name = "ahash",
+    actual = "//ahash-0.8.7:ahash",
+)
+
+alias(
+    name = "allocator-api2",
+    actual = "//allocator-api2-0.2.16:allocator-api2",
+)
+
+alias(
+    name = "allocator_api2",
+    actual = "//allocator-api2-0.2.16:allocator-api2",
+)
+
+alias(
+    name = "anstream",
+    actual = "//anstream-0.6.18/crates/anstream:anstream",
+)
+
+alias(
+    name = "anstyle",
+    actual = "//anstyle-1.0.4/crates/anstyle:anstyle",
+)
+
+alias(
+    name = "anstyle-parse",
+    actual = "//anstyle-parse-0.2.3/crates/anstyle-parse:anstyle-parse",
+)
+
+alias(
+    name = "anstyle-query",
+    actual = "//anstyle-query-1.0.0/crates/anstyle-query:anstyle-query",
+)
+
+alias(
+    name = "anstyle-wincon",
+    actual = "//anstyle-wincon-3.0.6/crates/anstyle-wincon:anstyle-wincon",
+)
+
+alias(
+    name = "anstyle_parse",
+    actual = "//anstyle-parse-0.2.3/crates/anstyle-parse:anstyle-parse",
+)
+
+alias(
+    name = "anstyle_query",
+    actual = "//anstyle-query-1.0.0/crates/anstyle-query:anstyle-query",
+)
+
+alias(
+    name = "anstyle_wincon",
+    actual = "//anstyle-wincon-3.0.6/crates/anstyle-wincon:anstyle-wincon",
+)
+
+alias(
+    name = "anyhow",
+    actual = "//anyhow-1.0.79:anyhow",
+)
+
+alias(
+    name = "autocfg",
+    actual = "//autocfg-1.1.0:autocfg",
+)
+
+alias(
+    name = "backon",
+    actual = "//backon-1.2.0/backon:backon",
+)
+
+alias(
+    name = "backtrace",
+    actual = "//backtrace-rs-0.3.69:backtrace",
+)
+
+alias(
+    name = "base64",
+    actual = "//rust-base64-0.21.7:base64",
+)
+
+alias(
+    name = "bitflags",
+    actual = "//bitflags-2.4.1:bitflags",
+)
+
+alias(
+    name = "bumpalo",
+    actual = "//bumpalo-3.16.0:bumpalo",
+)
+
+alias(
+    name = "byteorder",
+    actual = "//byteorder-1.5.0:byteorder",
+)
+
+alias(
+    name = "bytes",
+    actual = "//bytes-1.5.0:bytes",
+)
+
+alias(
+    name = "cc",
+    actual = "//cc-rs-1.0.83:cc",
+)
+
+alias(
+    name = "cfg-if",
+    actual = "//cfg-if-1.0.0:cfg-if",
+)
+
+alias(
+    name = "cfg_if",
+    actual = "//cfg-if-1.0.0:cfg-if",
+)
+
+alias(
+    name = "clap",
+    actual = "//clap-4.4.13:clap",
+)
+
+alias(
+    name = "clap_builder",
+    actual = "//clap-4.4.13/clap_builder:clap_builder",
+)
+
+alias(
+    name = "clap_derive",
+    actual = "//clap-4.4.13/clap_derive:clap_derive",
+)
+
+alias(
+    name = "clap_lex",
+    actual = "//clap-4.4.13/clap_lex:clap_lex",
+)
+
+alias(
+    name = "colorchoice",
+    actual = "//colorchoice-1.0.0/crates/colorchoice:colorchoice",
+)
+
+alias(
+    name = "crossbeam",
+    actual = "//crossbeam-0.8.4:crossbeam",
+)
+
+alias(
+    name = "crossbeam-channel",
+    actual = "//crossbeam-0.8.4/crossbeam-channel:crossbeam-channel",
+)
+
+alias(
+    name = "crossbeam-deque",
+    actual = "//crossbeam-0.8.4/crossbeam-deque:crossbeam-deque",
+)
+
+alias(
+    name = "crossbeam-epoch",
+    actual = "//crossbeam-0.8.4/crossbeam-epoch:crossbeam-epoch",
+)
+
+alias(
+    name = "crossbeam-queue",
+    actual = "//crossbeam-0.8.4/crossbeam-queue:crossbeam-queue",
+)
+
+alias(
+    name = "crossbeam-utils",
+    actual = "//crossbeam-0.8.4/crossbeam-utils:crossbeam-utils",
+)
+
+alias(
+    name = "crossbeam_channel",
+    actual = "//crossbeam-0.8.4/crossbeam-channel:crossbeam-channel",
+)
+
+alias(
+    name = "crossbeam_deque",
+    actual = "//crossbeam-0.8.4/crossbeam-deque:crossbeam-deque",
+)
+
+alias(
+    name = "crossbeam_epoch",
+    actual = "//crossbeam-0.8.4/crossbeam-epoch:crossbeam-epoch",
+)
+
+alias(
+    name = "crossbeam_queue",
+    actual = "//crossbeam-0.8.4/crossbeam-queue:crossbeam-queue",
+)
+
+alias(
+    name = "crossbeam_utils",
+    actual = "//crossbeam-0.8.4/crossbeam-utils:crossbeam-utils",
+)
+
+alias(
+    name = "crossterm",
+    actual = "//crossterm-0.28.1:crossterm",
+)
+
+alias(
+    name = "crossterm_winapi",
+    actual = "//crossterm-winapi-0.9.1:crossterm_winapi",
+)
+
+alias(
+    name = "dashmap",
+    actual = "//dashmap-6.0.1:dashmap",
+)
+
+alias(
+    name = "downcast",
+    actual = "//downcast-rs-0.11.0:downcast",
+)
+
+alias(
+    name = "either",
+    actual = "//either-1.9.0:either",
+)
+
+alias(
+    name = "equivalent",
+    actual = "//equivalent-1.0.1:equivalent",
+)
+
+alias(
+    name = "errno",
+    actual = "//rust-errno-0.3.11:errno",
+)
+
+alias(
+    name = "fallible-iterator",
+    actual = "//rust-fallible-iterator-0.3.0:fallible-iterator",
+)
+
+alias(
+    name = "fallible-streaming-iterator",
+    actual = "//fallible-streaming-iterator-0.1.9:fallible-streaming-iterator",
+)
+
+alias(
+    name = "fallible_iterator",
+    actual = "//rust-fallible-iterator-0.3.0:fallible-iterator",
+)
+
+alias(
+    name = "fallible_streaming_iterator",
+    actual = "//fallible-streaming-iterator-0.1.9:fallible-streaming-iterator",
+)
+
+alias(
+    name = "fastrand",
+    actual = "//fastrand-2.2.0:fastrand",
+)
+
+alias(
+    name = "fnv",
+    actual = "//rust-fnv-1.0.7:fnv",
+)
+
+alias(
+    name = "form_urlencoded",
+    actual = "//rust-url-1.2.1/form_urlencoded:form_urlencoded",
+)
+
+alias(
+    name = "fragile",
+    actual = "//fragile-2.0.0:fragile",
+)
+
+alias(
+    name = "futures",
+    actual = "//futures-rs-0.3.31/futures:futures",
+)
+
+alias(
+    name = "futures-channel",
+    actual = "//futures-rs-0.3.31/futures-channel:futures-channel",
+)
+
+alias(
+    name = "futures-core",
+    actual = "//futures-rs-0.3.31/futures-core:futures-core",
+)
+
+alias(
+    name = "futures-executor",
+    actual = "//futures-rs-0.3.31/futures-executor:futures-executor",
+)
+
+alias(
+    name = "futures-io",
+    actual = "//futures-rs-0.3.31/futures-io:futures-io",
+)
+
+alias(
+    name = "futures-macro",
+    actual = "//futures-rs-0.3.31/futures-macro:futures-macro",
+)
+
+alias(
+    name = "futures-sink",
+    actual = "//futures-rs-0.3.31/futures-sink:futures-sink",
+)
+
+alias(
+    name = "futures-task",
+    actual = "//futures-rs-0.3.31/futures-task:futures-task",
+)
+
+alias(
+    name = "futures-util",
+    actual = "//futures-rs-0.3.31/futures-util:futures-util",
+)
+
+alias(
+    name = "futures_channel",
+    actual = "//futures-rs-0.3.31/futures-channel:futures-channel",
+)
+
+alias(
+    name = "futures_core",
+    actual = "//futures-rs-0.3.31/futures-core:futures-core",
+)
+
+alias(
+    name = "futures_executor",
+    actual = "//futures-rs-0.3.31/futures-executor:futures-executor",
+)
+
+alias(
+    name = "futures_io",
+    actual = "//futures-rs-0.3.31/futures-io:futures-io",
+)
+
+alias(
+    name = "futures_macro",
+    actual = "//futures-rs-0.3.31/futures-macro:futures-macro",
+)
+
+alias(
+    name = "futures_sink",
+    actual = "//futures-rs-0.3.31/futures-sink:futures-sink",
+)
+
+alias(
+    name = "futures_task",
+    actual = "//futures-rs-0.3.31/futures-task:futures-task",
+)
+
+alias(
+    name = "futures_util",
+    actual = "//futures-rs-0.3.31/futures-util:futures-util",
+)
+
+alias(
+    name = "getrandom",
+    actual = "//getrandom-0.2.12:getrandom",
+)
+
+alias(
+    name = "gimli",
+    actual = "//gimli-0.28.1:gimli",
+)
+
+alias(
+    name = "gloo-timers",
+    actual = "//gloo-0.3.0/crates/timers:gloo-timers",
+)
+
+alias(
+    name = "gloo_timers",
+    actual = "//gloo-0.3.0/crates/timers:gloo-timers",
+)
+
+alias(
+    name = "h2",
+    actual = "//h2-0.4.4:h2",
+)
+
+alias(
+    name = "hashbrown",
+    actual = "//hashbrown-0.14.3:hashbrown",
+)
+
+alias(
+    name = "hashlink",
+    actual = "//hashlink-0.8.4:hashlink",
+)
+
+alias(
+    name = "heck",
+    actual = "//heck-0.4.1:heck",
+)
+
+alias(
+    name = "http",
+    actual = "//http-1.0.0:http",
+)
+
+alias(
+    name = "http-body",
+    actual = "//http-body-1.0.0/http-body:http-body",
+)
+
+alias(
+    name = "http-body-util",
+    actual = "//http-body-1.0.0/http-body-util:http-body-util",
+)
+
+alias(
+    name = "http_body",
+    actual = "//http-body-1.0.0/http-body:http-body",
+)
+
+alias(
+    name = "http_body_util",
+    actual = "//http-body-1.0.0/http-body-util:http-body-util",
+)
+
+alias(
+    name = "httpdate",
+    actual = "//httpdate-1.0.3:httpdate",
+)
+
+alias(
+    name = "hyper",
+    actual = "//hyper-1.1.0:hyper",
+)
+
+alias(
+    name = "hyper-util",
+    actual = "//hyper-util-0.1.2:hyper-util",
+)
+
+alias(
+    name = "hyper_util",
+    actual = "//hyper-util-0.1.2:hyper-util",
+)
+
+alias(
+    name = "indexmap",
+    actual = "//indexmap-2.1.0:indexmap",
+)
+
+alias(
+    name = "is_terminal_polyfill",
+    actual = "//is_terminal_polyfill-1.70.1:is_terminal_polyfill",
+)
+
+alias(
+    name = "itertools",
+    actual = "//itertools-0.11.0:itertools",
+)
+
+alias(
+    name = "itoa",
+    actual = "//itoa-1.0.10:itoa",
+)
+
+alias(
+    name = "js-sys",
+    actual = "//wasm-bindgen-0.3.72/crates/js-sys:js-sys",
+)
+
+alias(
+    name = "js_sys",
+    actual = "//wasm-bindgen-0.3.72/crates/js-sys:js-sys",
+)
+
+alias(
+    name = "lazy_static",
+    actual = "//lazy-static.rs-1.4.0:lazy_static",
+)
+
+alias(
+    name = "libc",
+    actual = "//libc-0.2.171:libc",
+)
+
+alias(
+    name = "libsqlite3-sys",
+    actual = "//rusqlite-0.27.0/libsqlite3-sys:libsqlite3-sys",
+)
+
+alias(
+    name = "libsqlite3_sys",
+    actual = "//rusqlite-0.27.0/libsqlite3-sys:libsqlite3-sys",
+)
+
+alias(
+    name = "linux-raw-sys",
+    actual = "//linux-raw-sys-0.4.15:linux-raw-sys",
+)
+
+alias(
+    name = "linux_raw_sys",
+    actual = "//linux-raw-sys-0.4.15:linux-raw-sys",
+)
+
+alias(
+    name = "lock_api",
+    actual = "//parking_lot-0.12.1/lock_api:lock_api",
+)
+
+alias(
+    name = "log",
+    actual = "//log-0.4.20:log",
+)
+
+alias(
+    name = "maplit",
+    actual = "//maplit-1.0.2:maplit",
+)
+
+alias(
+    name = "memchr",
+    actual = "//memchr-2.7.1:memchr",
+)
+
+alias(
+    name = "mime",
+    actual = "//mime-0.3.17:mime",
+)
+
+alias(
+    name = "miniz_oxide",
+    actual = "//miniz_oxide-0.7.1/miniz_oxide:miniz_oxide",
+)
+
+alias(
+    name = "mio",
+    actual = "//mio-1.0.1:mio",
+)
+
+alias(
+    name = "mockall",
+    actual = "//mockall-0.12.1/mockall:mockall",
+)
+
+alias(
+    name = "mockall_derive",
+    actual = "//mockall-0.12.1/mockall_derive:mockall_derive",
+)
+
+alias(
+    name = "nix",
+    actual = "//nix-0.27.1:nix",
+)
+
+alias(
+    name = "object",
+    actual = "//object-0.32.2:object",
+)
+
+alias(
+    name = "once_cell",
+    actual = "//once_cell-1.19.0:once_cell",
+)
+
+alias(
+    name = "parking_lot",
+    actual = "//parking_lot-0.12.1:parking_lot",
+)
+
+alias(
+    name = "parking_lot_core",
+    actual = "//parking_lot-0.12.1/core:parking_lot_core",
+)
+
+alias(
+    name = "percent-encoding",
+    actual = "//rust-url-1.2.1/percent_encoding:percent-encoding",
+)
+
+alias(
+    name = "percent_encoding",
+    actual = "//rust-url-1.2.1/percent_encoding:percent-encoding",
+)
+
+alias(
+    name = "pin-project",
+    actual = "//pin-project-1.1.10:pin-project",
+)
+
+alias(
+    name = "pin-project-internal",
+    actual = "//pin-project-1.1.10/pin-project-internal:pin-project-internal",
+)
+
+alias(
+    name = "pin-project-lite",
+    actual = "//pin-project-lite-0.2.13:pin-project-lite",
+)
+
+alias(
+    name = "pin-utils",
+    actual = "//pin-utils-0.1.0:pin-utils",
+)
+
+alias(
+    name = "pin_project",
+    actual = "//pin-project-1.1.10:pin-project",
+)
+
+alias(
+    name = "pin_project_internal",
+    actual = "//pin-project-1.1.10/pin-project-internal:pin-project-internal",
+)
+
+alias(
+    name = "pin_project_lite",
+    actual = "//pin-project-lite-0.2.13:pin-project-lite",
+)
+
+alias(
+    name = "pin_utils",
+    actual = "//pin-utils-0.1.0:pin-utils",
+)
+
+alias(
+    name = "pkg-config",
+    actual = "//pkg-config-rs-0.3.28:pkg-config",
+)
+
+alias(
+    name = "pkg_config",
+    actual = "//pkg-config-rs-0.3.28:pkg-config",
+)
+
+alias(
+    name = "predicates",
+    actual = "//predicates-rs-3.0.4:predicates",
+)
+
+alias(
+    name = "predicates-core",
+    actual = "//predicates-rs-3.0.4/crates/core:predicates-core",
+)
+
+alias(
+    name = "predicates-tree",
+    actual = "//predicates-rs-3.0.4/crates/tree:predicates-tree",
+)
+
+alias(
+    name = "predicates_core",
+    actual = "//predicates-rs-3.0.4/crates/core:predicates-core",
+)
+
+alias(
+    name = "predicates_tree",
+    actual = "//predicates-rs-3.0.4/crates/tree:predicates-tree",
+)
+
+alias(
+    name = "proc-macro2",
+    actual = "//proc-macro2-1.0.94:proc-macro2",
+)
+
+alias(
+    name = "proc_macro2",
+    actual = "//proc-macro2-1.0.94:proc-macro2",
+)
+
+alias(
+    name = "quote",
+    actual = "//quote-1.0.35:quote",
+)
+
+alias(
+    name = "ring",
+    actual = "//ring-0.17.7:ring",
+)
+
+alias(
+    name = "rusqlite",
+    actual = "//rusqlite-0.27.0:rusqlite",
+)
+
+alias(
+    name = "rustc-demangle",
+    actual = "//rustc-demangle-0.1.23:rustc-demangle",
+)
+
+alias(
+    name = "rustc_demangle",
+    actual = "//rustc-demangle-0.1.23:rustc-demangle",
+)
+
+alias(
+    name = "rustix",
+    actual = "//rustix-0.38.44:rustix",
+)
+
+alias(
+    name = "rustls",
+    actual = "//rustls-0.22.4/rustls:rustls",
+)
+
+alias(
+    name = "rustls-pemfile",
+    actual = "//pemfile-2.0.0:rustls-pemfile",
+)
+
+alias(
+    name = "rustls-pki-types",
+    actual = "//pki-types-1.1.0:rustls-pki-types",
+)
+
+alias(
+    name = "rustls-webpki",
+    actual = "//webpki-0.102.1:rustls-webpki",
+)
+
+alias(
+    name = "rustls_pemfile",
+    actual = "//pemfile-2.0.0:rustls-pemfile",
+)
+
+alias(
+    name = "rustls_pki_types",
+    actual = "//pki-types-1.1.0:rustls-pki-types",
+)
+
+alias(
+    name = "rustls_webpki",
+    actual = "//webpki-0.102.1:rustls-webpki",
+)
+
+alias(
+    name = "rustyline-async",
+    actual = "//rustyline-async-0.4.5:rustyline-async",
+)
+
+alias(
+    name = "rustyline_async",
+    actual = "//rustyline-async-0.4.5:rustyline-async",
+)
+
+alias(
+    name = "ryu",
+    actual = "//ryu-1.0.16:ryu",
+)
+
+alias(
+    name = "scopeguard",
+    actual = "//scopeguard-1.2.0:scopeguard",
+)
+
+alias(
+    name = "serde",
+    actual = "//serde-1.0.194/serde:serde",
+)
+
+alias(
+    name = "serde_bser",
+    actual = "//watchman-0.8.0/watchman/rust/serde_bser:serde_bser",
+)
+
+alias(
+    name = "serde_derive",
+    actual = "//serde-1.0.194/serde_derive:serde_derive",
+)
+
+alias(
+    name = "serde_json",
+    actual = "//json-1.0.111:serde_json",
+)
+
+alias(
+    name = "signal-hook",
+    actual = "//signal-hook-0.3.17:signal-hook",
+)
+
+alias(
+    name = "signal-hook-mio",
+    actual = "//signal-hook-mio-0.2.4/signal-hook-mio:signal-hook-mio",
+)
+
+alias(
+    name = "signal-hook-registry",
+    actual = "//signal-hook-0.3.17/signal-hook-registry:signal-hook-registry",
+)
+
+alias(
+    name = "signal_hook",
+    actual = "//signal-hook-0.3.17:signal-hook",
+)
+
+alias(
+    name = "signal_hook_mio",
+    actual = "//signal-hook-mio-0.2.4/signal-hook-mio:signal-hook-mio",
+)
+
+alias(
+    name = "signal_hook_registry",
+    actual = "//signal-hook-0.3.17/signal-hook-registry:signal-hook-registry",
+)
+
+alias(
+    name = "slab",
+    actual = "//slab-0.4.9:slab",
+)
+
+alias(
+    name = "smallvec",
+    actual = "//rust-smallvec-1.11.2:smallvec",
+)
+
+alias(
+    name = "socket2",
+    actual = "//socket2-0.5.5:socket2",
+)
+
+alias(
+    name = "spin",
+    actual = "//spin-rs-0.9.8:spin",
+)
+
+alias(
+    name = "strsim",
+    actual = "//strsim-rs-0.10.0:strsim",
+)
+
+alias(
+    name = "subtle",
+    actual = "//subtle-2.5.0:subtle",
+)
+
+alias(
+    name = "syn",
+    actual = "//syn-2.0.100:syn",
+)
+
+alias(
+    name = "termtree",
+    actual = "//termtree-0.4.1:termtree",
+)
+
+alias(
+    name = "thingbuf",
+    actual = "//thingbuf-0.1.6:thingbuf",
+)
+
+alias(
+    name = "thiserror",
+    actual = "//thiserror-1.0.56:thiserror",
+)
+
+alias(
+    name = "thiserror-impl",
+    actual = "//thiserror-1.0.56/impl:thiserror-impl",
+)
+
+alias(
+    name = "thiserror_impl",
+    actual = "//thiserror-1.0.56/impl:thiserror-impl",
+)
+
+alias(
+    name = "tokio",
+    actual = "//tokio-1.39.2/tokio:tokio",
+)
+
+alias(
+    name = "tokio-macros",
+    actual = "//tokio-1.39.2/tokio-macros:tokio-macros",
+)
+
+alias(
+    name = "tokio-rustls",
+    actual = "//tokio-rustls-0.25.0:tokio-rustls",
+)
+
+alias(
+    name = "tokio-stream",
+    actual = "//tokio-stream-0.1.14/tokio-stream:tokio-stream",
+)
+
+alias(
+    name = "tokio-util",
+    actual = "//tokio-util-0.7.10/tokio-util:tokio-util",
+)
+
+alias(
+    name = "tokio_macros",
+    actual = "//tokio-1.39.2/tokio-macros:tokio-macros",
+)
+
+alias(
+    name = "tokio_rustls",
+    actual = "//tokio-rustls-0.25.0:tokio-rustls",
+)
+
+alias(
+    name = "tokio_stream",
+    actual = "//tokio-stream-0.1.14/tokio-stream:tokio-stream",
+)
+
+alias(
+    name = "tokio_util",
+    actual = "//tokio-util-0.7.10/tokio-util:tokio-util",
+)
+
+alias(
+    name = "tracing",
+    actual = "//tracing-0.1.40/tracing:tracing",
+)
+
+alias(
+    name = "tracing-core",
+    actual = "//tracing-0.1.40/tracing-core:tracing-core",
+)
+
+alias(
+    name = "tracing_core",
+    actual = "//tracing-0.1.40/tracing-core:tracing-core",
+)
+
+alias(
+    name = "try-lock",
+    actual = "//try-lock-0.2.5:try-lock",
+)
+
+alias(
+    name = "try_lock",
+    actual = "//try-lock-0.2.5:try-lock",
+)
+
+alias(
+    name = "unicode-ident",
+    actual = "//unicode-ident-1.0.12:unicode-ident",
+)
+
+alias(
+    name = "unicode-segmentation",
+    actual = "//unicode-segmentation-1.12.0:unicode-segmentation",
+)
+
+alias(
+    name = "unicode-width",
+    actual = "//unicode-width-0.2.0:unicode-width",
+)
+
+alias(
+    name = "unicode_ident",
+    actual = "//unicode-ident-1.0.12:unicode-ident",
+)
+
+alias(
+    name = "unicode_segmentation",
+    actual = "//unicode-segmentation-1.12.0:unicode-segmentation",
+)
+
+alias(
+    name = "unicode_width",
+    actual = "//unicode-width-0.2.0:unicode-width",
+)
+
+alias(
+    name = "untrusted",
+    actual = "//untrusted-0.9.0:untrusted",
+)
+
+alias(
+    name = "utf8parse",
+    actual = "//vte-0.2.1/utf8parse:utf8parse",
+)
+
+alias(
+    name = "vcpkg",
+    actual = "//vcpkg-rs-0.2.15:vcpkg",
+)
+
+alias(
+    name = "version_check",
+    actual = "//version_check-0.9.4:version_check",
+)
+
+alias(
+    name = "want",
+    actual = "//want-0.3.1:want",
+)
+
+alias(
+    name = "wasi",
+    actual = "//wasi-0.11.0+wasi-snapshot-preview1:wasi",
+)
+
+alias(
+    name = "wasm-bindgen",
+    actual = "//wasm-bindgen-0.3.72:wasm-bindgen",
+)
+
+alias(
+    name = "wasm-bindgen-backend",
+    actual = "//wasm-bindgen-0.3.72/crates/backend:wasm-bindgen-backend",
+)
+
+alias(
+    name = "wasm-bindgen-macro",
+    actual = "//wasm-bindgen-0.3.72/crates/macro:wasm-bindgen-macro",
+)
+
+alias(
+    name = "wasm-bindgen-macro-support",
+    actual = "//wasm-bindgen-0.3.72/crates/macro-support:wasm-bindgen-macro-support",
+)
+
+alias(
+    name = "wasm-bindgen-shared",
+    actual = "//wasm-bindgen-0.3.72/crates/shared:wasm-bindgen-shared",
+)
+
+alias(
+    name = "wasm_bindgen",
+    actual = "//wasm-bindgen-0.3.72:wasm-bindgen",
+)
+
+alias(
+    name = "wasm_bindgen_backend",
+    actual = "//wasm-bindgen-0.3.72/crates/backend:wasm-bindgen-backend",
+)
+
+alias(
+    name = "wasm_bindgen_macro",
+    actual = "//wasm-bindgen-0.3.72/crates/macro:wasm-bindgen-macro",
+)
+
+alias(
+    name = "wasm_bindgen_macro_support",
+    actual = "//wasm-bindgen-0.3.72/crates/macro-support:wasm-bindgen-macro-support",
+)
+
+alias(
+    name = "wasm_bindgen_shared",
+    actual = "//wasm-bindgen-0.3.72/crates/shared:wasm-bindgen-shared",
+)
+
+alias(
+    name = "watchman_client",
+    actual = "//watchman-0.8.0/watchman/rust/watchman_client:watchman_client",
+)
+
+alias(
+    name = "winapi",
+    actual = "//winapi-rs-0.3.9:winapi",
+)
+
+alias(
+    name = "winapi-i686-pc-windows-gnu",
+    actual = "//winapi-rs-0.3.9/i686:winapi-i686-pc-windows-gnu",
+)
+
+alias(
+    name = "winapi-x86_64-pc-windows-gnu",
+    actual = "//winapi-rs-0.3.9/x86_64:winapi-x86_64-pc-windows-gnu",
+)
+
+alias(
+    name = "winapi_i686_pc_windows_gnu",
+    actual = "//winapi-rs-0.3.9/i686:winapi-i686-pc-windows-gnu",
+)
+
+alias(
+    name = "winapi_x86_64_pc_windows_gnu",
+    actual = "//winapi-rs-0.3.9/x86_64:winapi-x86_64-pc-windows-gnu",
+)
+
+alias(
+    name = "windows-sys",
+    actual = "//windows-rs-0.52.6/crates/libs/sys:windows-sys",
+)
+
+alias(
+    name = "windows-targets",
+    actual = "//windows-rs-0.52.6/crates/libs/targets:windows-targets",
+)
+
+alias(
+    name = "windows_aarch64_gnullvm",
+    actual = "//windows-rs-0.52.6/crates/targets/aarch64_gnullvm:windows_aarch64_gnullvm",
+)
+
+alias(
+    name = "windows_aarch64_msvc",
+    actual = "//windows-rs-0.52.6/crates/targets/aarch64_msvc:windows_aarch64_msvc",
+)
+
+alias(
+    name = "windows_i686_gnu",
+    actual = "//windows-rs-0.52.6/crates/targets/i686_gnu:windows_i686_gnu",
+)
+
+alias(
+    name = "windows_i686_gnullvm",
+    actual = "//windows-rs-0.52.6/crates/targets/i686_gnullvm:windows_i686_gnullvm",
+)
+
+alias(
+    name = "windows_i686_msvc",
+    actual = "//windows-rs-0.52.6/crates/targets/i686_msvc:windows_i686_msvc",
+)
+
+alias(
+    name = "windows_sys",
+    actual = "//windows-rs-0.52.6/crates/libs/sys:windows-sys",
+)
+
+alias(
+    name = "windows_targets",
+    actual = "//windows-rs-0.52.6/crates/libs/targets:windows-targets",
+)
+
+alias(
+    name = "windows_x86_64_gnu",
+    actual = "//windows-rs-0.52.6/crates/targets/x86_64_gnu:windows_x86_64_gnu",
+)
+
+alias(
+    name = "windows_x86_64_gnullvm",
+    actual = "//windows-rs-0.52.6/crates/targets/x86_64_gnullvm:windows_x86_64_gnullvm",
+)
+
+alias(
+    name = "windows_x86_64_msvc",
+    actual = "//windows-rs-0.52.6/crates/targets/x86_64_msvc:windows_x86_64_msvc",
+)
+
+alias(
+    name = "zerocopy",
+    actual = "//zerocopy-0.7.32:zerocopy",
+)
+
+alias(
+    name = "zerocopy-derive",
+    actual = "//zerocopy-0.7.32/zerocopy-derive:zerocopy-derive",
+)
+
+alias(
+    name = "zerocopy_derive",
+    actual = "//zerocopy-0.7.32/zerocopy-derive:zerocopy-derive",
+)
+
+alias(
+    name = "zeroize",
+    actual = "//utils-1.7.0/zeroize:zeroize",
+)

@@ -202,11 +202,11 @@ fn build_expr(cli: &Cli) -> Result<Expr> {
     Mode::Rust => vec![
       Expr::Suffix(vec!["rs".into(), "sql".into()]),
       Expr::Name(NameTerm {
-        paths: vec!["Cargo.lock".into(), "Cargo.toml".into()],
+        paths: vec!["BUCK".into(), "workspace.bzl".into()],
         wholename: false,
       }),
       Expr::Name(NameTerm {
-        paths: vec!["dev-task/cargo.yml".into()],
+        paths: vec!["dev-task/rust.yml".into()],
         wholename: true,
       }),
     ],

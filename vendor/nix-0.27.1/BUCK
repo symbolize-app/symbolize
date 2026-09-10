@@ -1,0 +1,23 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "nix",
+    crate = "nix",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "nix",
+        "CARGO_PKG_VERSION": "0.27.1",
+    },
+    features = [
+        "default",
+        "process",
+        "signal",
+    ],
+    deps = [
+        "//bitflags-2.4.1:bitflags",
+        "//cfg-if-1.0.0:cfg-if",
+        "//libc-0.2.171:libc",
+    ],
+)
