@@ -12,7 +12,6 @@
     gnumake
     go
     git
-    nodePackages.node-gyp
     perl
     pkg-config
     python3
