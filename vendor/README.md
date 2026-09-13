@@ -69,7 +69,7 @@ leverage **Devenv** and **Buck2** in tandem:
 
 - **Devenv supplies ambient toolchains**: Devenv provides the necessary hermetic
   compilers, interpreters, and build tools (such as `gcc`, `clang`, `rustc`, `go`,
-  `tclsh`, `perl`, `python`, `node-gyp`) in the ambient developer environment. Buck2
+  `tclsh`, `perl`, `python`) in the ambient developer environment. Buck2
   rules rely on this ambient PATH rather than hardcoding Nix store hashes or
   downloading external binaries.
 - **Buck2 orchestrates dynamic synthesis**: Buck2 `genrule` targets execute the
@@ -202,9 +202,9 @@ Execution and bundling consume this table directly:
   are consumed directly from their source entrypoints or legitimate build
   artifacts.
 - **Native build artifacts**: Platform-specific native outputs (such as
-  `better_sqlite3.node` compiled via `node-gyp` or the `esbuild` Go binary)
+  `better_sqlite3.node`, `puppeteer`'s injected script, or the `esbuild` binary and JS bundle, compiled via Buck2)
   belong strictly in `build/vendor/` and are built by tasks in
-  `dev-task/vendor.yml`.
+  `dev-task/node.yml`.
 
 ## Buck2 target resolution
 
@@ -419,7 +419,7 @@ versions of a package. Update module mappings in `vendor/node.json` as needed, t
 run `task vendor:check` and the full repository check `task c`.
 
 Native outputs are rebuilt for the current platform from the exact snapshots:
-esbuild is compiled with Go, and better-sqlite3 is compiled with node-gyp.
+esbuild and better-sqlite3 are compiled with Buck2.
 Puppeteer executes directly from TypeScript source via `dev-node-loader` and the
 Chromium executable provided by Devenv; it does not download a browser or resolve
 a package from `node_modules`.

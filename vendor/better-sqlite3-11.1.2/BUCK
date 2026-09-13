@@ -1,0 +1,51 @@
+load("//:rules.bzl", "alias", "genrule")
+
+genrule(
+    name = "better_sqlite3",
+    out = "better_sqlite3.node",
+    srcs = glob([
+        "src/**",
+    ]) + [
+        "//sqlite3-3.46.0:amalgamation",
+        "//sqlite3-3.46.0:sqlite3[static-pic]",
+    ],
+    cmd = """
+    sqlite_dir="$(location //sqlite3-3.46.0:amalgamation)"
+    sqlite_a="$(location //sqlite3-3.46.0:sqlite3[static-pic])"
+
+    node_bin=`command -v node`
+    node_dir=`dirname "$node_bin"`
+    node_prefix=`dirname "$node_dir"`
+    node_inc="$node_prefix/include/node"
+    if [ ! -d "$node_inc" ]; then
+      node_prefix=`node -e 'console.log(require("path").dirname(require("path").dirname(process.execPath)))'`
+      node_inc="$node_prefix/include/node"
+    fi
+
+    g++ -std=c++17 -O3 -fPIC -shared \
+      -DNODE_GYP_MODULE_NAME=better_sqlite3 \
+      -DUSING_UV_SHARED=1 \
+      -DUSING_V8_SHARED=1 \
+      -DV8_DEPRECATION_WARNINGS=1 \
+      -D_GLIBCXX_USE_CXX11_ABI=1 \
+      -D_LARGEFILE_SOURCE \
+      -D_FILE_OFFSET_BITS=64 \
+      -D__STDC_FORMAT_MACROS \
+      -DBUILDING_NODE_EXTENSION \
+      -DNDEBUG \
+      -I"$node_inc" \
+      -I"$sqlite_dir" \
+      -Isrc \
+      -Wl,-Bsymbolic \
+      -Wl,--whole-archive "$sqlite_a" -Wl,--no-whole-archive \
+      -Wl,--exclude-libs,ALL \
+      -Wl,-soname,better_sqlite3.node \
+      -o $OUT \
+      src/better_sqlite3.cpp
+    """,
+)
+
+alias(
+    name = "better-sqlite3",
+    actual = ":better_sqlite3",
+)

@@ -52,7 +52,7 @@ tasks:
     cmd: buck2 bxl -m debug dev_buck//clippy.bxl:check
 
   deny:lint:
-    cmd: task vendor:license:check
+    cmd: task license:check
 
   execute-build:
     internal: true

@@ -71,8 +71,6 @@ includes:
     taskfile: svc-gateway-host-store
   svc-search-host-read:
     taskfile: svc-search-host-read
-  vendor:
-    taskfile: dev-task/vendor.yml
   watchman:
     taskfile: dev-task/watchman.yml
 run: when_changed
@@ -109,7 +107,6 @@ tasks:
       - cabal:clean
       - rust:clean
       - node:clean
-      - vendor:clean
   dev:
     aliases:
       - d
@@ -221,6 +218,14 @@ tasks:
       - task svc-gateway-guest-run:test:browser:service-worker
       - task svc-auth-guest-read:test:browser
       - task svc-auth-guest-view:test:browser
+  license:check:
+    aliases:
+      - vendor:license:check
+    cmd:
+      task: cabal:execute-target:run:{{.TASK_GEN_MODE}}
+      vars:
+        ARGS: --check-licenses
+        NAME: dev-gen
   lint:check:
     aliases:
       - lint
@@ -282,4 +287,10 @@ tasks:
       - cabal:test:release
       - rust:test:release
       - node:test
+  vendor:check:
+    cmd:
+      task: cabal:execute-target:run:{{.TASK_GEN_MODE}}
+      vars:
+        ARGS: --check-vendor
+        NAME: dev-gen
 version: "3"

@@ -1,0 +1,35 @@
+load("//:rules.bzl", "genrule")
+
+genrule(
+    name = "injected",
+    out = "injected.js",
+    srcs = glob([
+        "packages/puppeteer-core/src/injected/**",
+        "packages/puppeteer-core/src/templates/**",
+    ]),
+    cmd = """
+    python3 - "$SRCDIR" "$OUT" <<'PY'
+import sys, subprocess, json
+from pathlib import Path
+
+srcdir = Path(sys.argv[1]).resolve()
+out_path = Path(sys.argv[2]).resolve()
+esbuild_bin = Path("$(exe //esbuild-0.19.5:esbuild)").resolve()
+injected_ts = srcdir / "packages/puppeteer-core/src/injected/injected.ts"
+tmpl_path = srcdir / "packages/puppeteer-core/src/templates/injected.ts.tmpl"
+
+code = subprocess.check_output([
+    str(esbuild_bin),
+    str(injected_ts),
+    "--bundle",
+    "--format=cjs",
+    "--target=chrome125,firefox125",
+    "--minify",
+    "--legal-comments=none",
+]).decode("utf-8")
+
+tmpl = tmpl_path.read_text(encoding="utf-8")
+out_path.write_text(tmpl.replace("SOURCE_CODE", json.dumps(code)), encoding="utf-8")
+PY
+    """,
+)

@@ -239,7 +239,6 @@ fn build_expr(cli: &Cli) -> Result<Expr> {
         paths: vec![
           "dev-eslint/index.json".into(),
           "dev-task/node.yml".into(),
-          "dev-task/vendor.yml".into(),
         ],
         wholename: true,
       }),
