@@ -48,21 +48,10 @@ tasks:
     cmds:
       - mkdir -p build/vendor/esbuild
       - >-
-        cd {{.ESBUILD_VENDOR_DIR}} &&
-        go build -trimpath -ldflags '-s -w'
-        -o ../../build/vendor/esbuild/esbuild
-        ./cmd/esbuild
-      - >-
-        build/vendor/esbuild/esbuild
-        {{.ESBUILD_VENDOR_DIR}}/lib/npm/node.ts
-        --outfile=build/vendor/esbuild/main.js
-        --bundle
-        --target=node12
-        --define:WASM=false
-        --define:ESBUILD_VERSION='"0.19.5"'
-        --external:esbuild
-        --platform=node
-        --log-level=warning
+        esbuild_bin=$(buck2 build --show-output -m release vendor//esbuild-0.19.5:esbuild | awk '{print $2}') &&
+        esbuild_js=$(buck2 build --show-output -m release vendor//esbuild-0.19.5:main.js | awk '{print $2}') &&
+        cp "$esbuild_bin" build/vendor/esbuild/esbuild &&
+        cp "$esbuild_js" build/vendor/esbuild/main.js
 
   better-sqlite3:build:
     sources:
@@ -73,11 +62,5 @@ tasks:
     cmds:
       - mkdir -p build/vendor/better-sqlite3
       - >-
-        sqlite_out=$(buck2 build --show-output -m release vendor//sqlite3-3.46.0:amalgamation | awk '{print $2}') &&
-        temp_dir=$(mktemp -d) &&
-        cp -a {{.BETTER_SQLITE3_VENDOR_DIR}}/. "$temp_dir/" &&
-        mkdir -p "$temp_dir/deps/sqlite3" &&
-        cp -a "$sqlite_out"/* "$temp_dir/deps/sqlite3/" &&
-        node-gyp --directory "$temp_dir" rebuild --release &&
-        cp "$temp_dir/build/Release/better_sqlite3.node"
-        build/vendor/better-sqlite3/better_sqlite3.node
+        better_sqlite3_node=$(buck2 build --show-output -m release vendor//better-sqlite3-11.1.2:better-sqlite3 | awk '{print $2}') &&
+        cp "$better_sqlite3_node" build/vendor/better-sqlite3/better_sqlite3.node
