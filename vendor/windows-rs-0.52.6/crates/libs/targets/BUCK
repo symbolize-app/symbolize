@@ -1,0 +1,13 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "windows-targets",
+    crate = "windows_targets",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs"]),
+    env = {
+        "CARGO_PKG_NAME": "windows-targets",
+        "CARGO_PKG_VERSION": "0.52.6",
+    },
+)

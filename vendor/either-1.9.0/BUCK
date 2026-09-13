@@ -1,0 +1,16 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "either",
+    crate = "either",
+    crate_root = "src/lib.rs",
+    edition = "2018",
+    srcs = glob(["src/**/*.rs"]),
+    env = {
+        "CARGO_PKG_NAME": "either",
+        "CARGO_PKG_VERSION": "1.9.0",
+    },
+    features = [
+        "use_std",
+    ],
+)

@@ -1,0 +1,16 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "addr2line",
+    crate = "addr2line",
+    crate_root = "src/lib.rs",
+    edition = "2018",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "addr2line",
+        "CARGO_PKG_VERSION": "0.21.0",
+    },
+    deps = [
+        "//gimli-0.28.1:gimli",
+    ],
+)

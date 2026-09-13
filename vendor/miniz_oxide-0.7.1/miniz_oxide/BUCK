@@ -1,0 +1,16 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "miniz_oxide",
+    crate = "miniz_oxide",
+    crate_root = "src/lib.rs",
+    edition = "2018",
+    srcs = glob(["src/**/*.rs"]),
+    env = {
+        "CARGO_PKG_NAME": "miniz_oxide",
+        "CARGO_PKG_VERSION": "0.7.1",
+    },
+    deps = [
+        "//adler-1.0.2:adler",
+    ],
+)

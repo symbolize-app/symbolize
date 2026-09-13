@@ -1,0 +1,16 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "want",
+    crate = "want",
+    crate_root = "src/lib.rs",
+    edition = "2018",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "want",
+        "CARGO_PKG_VERSION": "0.3.1",
+    },
+    deps = [
+        "//try-lock-0.2.5:try-lock",
+    ],
+)

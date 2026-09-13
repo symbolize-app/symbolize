@@ -1,0 +1,33 @@
+constraint_setting(
+    name = "mode",
+    visibility = ["PUBLIC"],
+)
+
+constraint_value(
+    name = "debug",
+    constraint_setting = ":mode",
+    visibility = ["PUBLIC"],
+)
+
+constraint_value(
+    name = "release",
+    constraint_setting = ":mode",
+    visibility = ["PUBLIC"],
+)
+
+config_setting(
+    name = "is_release",
+    constraint_values = [
+        ":release",
+    ],
+    visibility = ["PUBLIC"],
+)
+
+config_setting(
+    name = "is_debug",
+    constraint_values = [
+        ":debug",
+    ],
+    visibility = ["PUBLIC"],
+)
+

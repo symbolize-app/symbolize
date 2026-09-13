@@ -1,0 +1,17 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "byteorder",
+    crate = "byteorder",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "byteorder",
+        "CARGO_PKG_VERSION": "1.5.0",
+    },
+    features = [
+        "default",
+        "std",
+    ],
+)

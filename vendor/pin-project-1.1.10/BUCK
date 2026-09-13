@@ -1,0 +1,16 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "pin-project",
+    crate = "pin_project",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "pin-project",
+        "CARGO_PKG_VERSION": "1.1.10",
+    },
+    deps = [
+        "//pin-project-1.1.10/pin-project-internal:pin-project-internal",
+    ],
+)

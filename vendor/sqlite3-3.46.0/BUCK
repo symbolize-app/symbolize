@@ -1,0 +1,68 @@
+load("//:rules.bzl", "cxx_library", "genrule")
+
+genrule(
+    name = "amalgamation",
+    out = "amalgamation",
+    srcs = glob([
+        "src/**",
+        "tool/**",
+        "ext/**",
+        "Makefile.linux-gcc",
+        "main.mk",
+        "VERSION",
+        "manifest",
+        "manifest.uuid",
+    ]),
+    cmd = "make -f Makefile.linux-gcc TOP=. sqlite3.c && mkdir -p $OUT && cp sqlite3.c sqlite3.h sqlite3ext.h $OUT",
+)
+
+genrule(
+    name = "sqlite3.c",
+    out = "sqlite3.c",
+    srcs = [":amalgamation"],
+    cmd = "cp $(location :amalgamation)/sqlite3.c $OUT",
+)
+
+genrule(
+    name = "sqlite3.h",
+    out = "sqlite3.h",
+    srcs = [":amalgamation"],
+    cmd = "cp $(location :amalgamation)/sqlite3.h $OUT",
+)
+
+genrule(
+    name = "sqlite3ext.h",
+    out = "sqlite3ext.h",
+    srcs = [":amalgamation"],
+    cmd = "cp $(location :amalgamation)/sqlite3ext.h $OUT",
+)
+
+cxx_library(
+    name = "sqlite3",
+    srcs = [":sqlite3.c"],
+    exported_headers = [
+        ":sqlite3.h",
+        ":sqlite3ext.h",
+    ],
+    compiler_flags = [
+        "-DSQLITE_CORE",
+        "-DSQLITE_DEFAULT_FOREIGN_KEYS=1",
+        "-DSQLITE_ENABLE_API_ARMOR",
+        "-DSQLITE_ENABLE_COLUMN_METADATA",
+        "-DSQLITE_ENABLE_DBSTAT_VTAB",
+        "-DSQLITE_ENABLE_FTS3",
+        "-DSQLITE_ENABLE_FTS3_PARENTHESIS",
+        "-DSQLITE_ENABLE_FTS5",
+        "-DSQLITE_ENABLE_JSON1",
+        "-DSQLITE_ENABLE_LOAD_EXTENSION=1",
+        "-DSQLITE_ENABLE_MEMORY_MANAGEMENT",
+        "-DSQLITE_ENABLE_RTREE",
+        "-DSQLITE_ENABLE_STAT2",
+        "-DSQLITE_ENABLE_STAT4",
+        "-DSQLITE_ENABLE_UNLOCK_NOTIFY",
+        "-DSQLITE_SOUNDEX",
+        "-DSQLITE_THREADSAFE=1",
+        "-DSQLITE_HAVE_ISNAN",
+        "-DHAVE_USLEEP=1",
+    ],
+)

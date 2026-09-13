@@ -1,0 +1,23 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "backon",
+    crate = "backon",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs", "src/**/*.md"]),
+    env = {
+        "CARGO_PKG_NAME": "backon",
+        "CARGO_PKG_VERSION": "1.2.0",
+    },
+    features = [
+        "default",
+        "gloo-timers-sleep",
+        "std-blocking-sleep",
+        "tokio-sleep",
+    ],
+    deps = [
+        "//fastrand-2.2.0:fastrand",
+        "//tokio-1.39.2/tokio:tokio",
+    ],
+)

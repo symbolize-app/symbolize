@@ -1,0 +1,22 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "mockall",
+    crate = "mockall",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs"]),
+    env = {
+        "CARGO_PKG_NAME": "mockall",
+        "CARGO_PKG_VERSION": "0.12.1",
+    },
+    deps = [
+        "//cfg-if-1.0.0:cfg-if",
+        "//downcast-rs-0.11.0:downcast",
+        "//fragile-2.0.0:fragile",
+        "//lazy-static.rs-1.4.0:lazy_static",
+        "//mockall-0.12.1/mockall_derive:mockall_derive",
+        "//predicates-rs-3.0.4/crates/tree:predicates-tree",
+        "//predicates-rs-3.0.4:predicates",
+    ],
+)

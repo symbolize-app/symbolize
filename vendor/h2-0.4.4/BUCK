@@ -1,0 +1,26 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "h2",
+    crate = "h2",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "h2",
+        "CARGO_PKG_VERSION": "0.4.4",
+    },
+    deps = [
+        "//bytes-1.5.0:bytes",
+        "//futures-rs-0.3.31/futures-core:futures-core",
+        "//futures-rs-0.3.31/futures-sink:futures-sink",
+        "//futures-rs-0.3.31/futures-util:futures-util",
+        "//http-1.0.0:http",
+        "//indexmap-2.1.0:indexmap",
+        "//rust-fnv-1.0.7:fnv",
+        "//slab-0.4.9:slab",
+        "//tokio-1.39.2/tokio:tokio",
+        "//tokio-util-0.7.10/tokio-util:tokio-util",
+        "//tracing-0.1.40/tracing:tracing",
+    ],
+)

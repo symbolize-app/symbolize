@@ -1,0 +1,17 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "zeroize",
+    crate = "zeroize",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "zeroize",
+        "CARGO_PKG_VERSION": "1.7.0",
+    },
+    features = [
+        "alloc",
+        "default",
+    ],
+)

@@ -1,0 +1,20 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "http-body-util",
+    crate = "http_body_util",
+    crate_root = "src/lib.rs",
+    edition = "2018",
+    srcs = glob(["src/**/*.rs"]),
+    env = {
+        "CARGO_PKG_NAME": "http-body-util",
+        "CARGO_PKG_VERSION": "0.1.2",
+    },
+    deps = [
+        "//bytes-1.5.0:bytes",
+        "//futures-rs-0.3.31/futures-util:futures-util",
+        "//http-1.0.0:http",
+        "//http-body-1.0.0/http-body:http-body",
+        "//pin-project-lite-0.2.13:pin-project-lite",
+    ],
+)

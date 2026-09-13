@@ -1,0 +1,27 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "clap_builder",
+    crate = "clap_builder",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs", "README.md", "Cargo.toml"]),
+    env = {
+        "CARGO_PKG_NAME": "clap_builder",
+        "CARGO_PKG_VERSION": "4.4.12",
+    },
+    features = [
+        "color",
+        "error-context",
+        "help",
+        "std",
+        "suggestions",
+        "usage",
+    ],
+    deps = [
+        "//anstream-0.6.18/crates/anstream:anstream",
+        "//anstyle-1.0.4/crates/anstyle:anstyle",
+        "//clap-4.4.13/clap_lex:clap_lex",
+        "//strsim-rs-0.10.0:strsim",
+    ],
+)

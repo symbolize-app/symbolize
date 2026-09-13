@@ -1,0 +1,21 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "itertools",
+    crate = "itertools",
+    crate_root = "src/lib.rs",
+    edition = "2018",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "itertools",
+        "CARGO_PKG_VERSION": "0.11.0",
+    },
+    features = [
+        "default",
+        "use_alloc",
+        "use_std",
+    ],
+    deps = [
+        "//either-1.9.0:either",
+    ],
+)

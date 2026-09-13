@@ -1,0 +1,26 @@
+load("//:rules.bzl", "rust_library")
+
+
+rust_library(
+    name = "libsqlite3-sys",
+    crate = "libsqlite3_sys",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs"]),
+    env = {
+        "CARGO_PKG_NAME": "libsqlite3-sys",
+        "CARGO_PKG_VERSION": "0.27.0",
+        "OUT_DIR": "src",
+    },
+    features = [
+        "bundled",
+        "bundled_bindings",
+        "default",
+        "min_sqlite_version_3_14_0",
+        "pkg-config",
+        "vcpkg",
+    ],
+    deps = [
+        "//sqlite3-3.46.0:sqlite3",
+    ],
+)

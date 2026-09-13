@@ -1,0 +1,26 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "tokio-rustls",
+    crate = "tokio_rustls",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "tokio-rustls",
+        "CARGO_PKG_VERSION": "0.25.0",
+    },
+    features = [
+        "default",
+        "logging",
+        "ring",
+        "tls12",
+    ],
+    named_deps = {
+        "pki_types": "//pki-types-1.1.0:rustls-pki-types",
+    },
+    deps = [
+        "//rustls-0.22.4/rustls:rustls",
+        "//tokio-1.39.2/tokio:tokio",
+    ],
+)

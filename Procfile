@@ -1,12 +1,11 @@
 watchman__server: task watchman:server
-cargo__build__clippy: task cargo:build:clippy:watch
+rust__build__clippy: task rust:build:clippy:watch
 node__esbuild__build: task node:esbuild:build:watch
 node__test: task node:test:watch
 node__eslint__lint__check: task node:eslint:lint:check:watch
 cabal__build: task cabal:build:watch
 cabal__lint: task cabal:lint:watch
 dev-gen__test: task dev-gen:test:watch
-dev-cargo-build__test: task dev-cargo-build:test:watch
 dev-sim__test: task dev-sim:test:watch
 dev-watchman-client__test: task dev-watchman-client:test:watch
 lib-hex-rs__test: task lib-hex-rs:test:watch

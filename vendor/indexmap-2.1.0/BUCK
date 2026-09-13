@@ -1,0 +1,21 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "indexmap",
+    crate = "indexmap",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "indexmap",
+        "CARGO_PKG_VERSION": "2.1.0",
+    },
+    features = [
+        "default",
+        "std",
+    ],
+    deps = [
+        "//equivalent-1.0.1:equivalent",
+        "//hashbrown-0.14.3:hashbrown",
+    ],
+)

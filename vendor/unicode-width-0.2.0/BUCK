@@ -1,0 +1,17 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "unicode-width",
+    crate = "unicode_width",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "unicode-width",
+        "CARGO_PKG_VERSION": "0.2.0",
+    },
+    features = [
+        "cjk",
+        "default",
+    ],
+)

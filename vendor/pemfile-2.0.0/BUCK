@@ -1,0 +1,23 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "rustls-pemfile",
+    crate = "rustls_pemfile",
+    crate_root = "src/lib.rs",
+    edition = "2018",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "rustls-pemfile",
+        "CARGO_PKG_VERSION": "2.0.0",
+    },
+    features = [
+        "default",
+        "std",
+    ],
+    named_deps = {
+        "pki_types": "//pki-types-1.1.0:rustls-pki-types",
+    },
+    deps = [
+        "//rust-base64-0.21.7:base64",
+    ],
+)

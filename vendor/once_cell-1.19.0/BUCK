@@ -1,0 +1,19 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "once_cell",
+    crate = "once_cell",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "once_cell",
+        "CARGO_PKG_VERSION": "1.19.0",
+    },
+    features = [
+        "alloc",
+        "default",
+        "race",
+        "std",
+    ],
+)

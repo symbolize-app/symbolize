@@ -1,0 +1,19 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "thiserror-impl",
+    crate = "thiserror_impl",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs"]),
+    env = {
+        "CARGO_PKG_NAME": "thiserror-impl",
+        "CARGO_PKG_VERSION": "1.0.56",
+    },
+    proc_macro = True,
+    deps = [
+        "//proc-macro2-1.0.94:proc-macro2",
+        "//quote-1.0.35:quote",
+        "//syn-2.0.100:syn",
+    ],
+)

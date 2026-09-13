@@ -13,3 +13,7 @@ node_modules
 relude-hlint.yaml
 result
 tmp
+/buck-out
+/.buckd
+/dist-newstyle
+vendor

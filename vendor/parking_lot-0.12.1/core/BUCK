@@ -1,0 +1,18 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "parking_lot_core",
+    crate = "parking_lot_core",
+    crate_root = "src/lib.rs",
+    edition = "2018",
+    srcs = glob(["src/**/*.rs"]),
+    env = {
+        "CARGO_PKG_NAME": "parking_lot_core",
+        "CARGO_PKG_VERSION": "0.9.9",
+    },
+    deps = [
+        "//cfg-if-1.0.0:cfg-if",
+        "//libc-0.2.171:libc",
+        "//rust-smallvec-1.11.2:smallvec",
+    ],
+)

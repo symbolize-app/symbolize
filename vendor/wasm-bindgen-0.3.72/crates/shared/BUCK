@@ -1,0 +1,13 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "wasm-bindgen-shared",
+    crate = "wasm_bindgen_shared",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs"]),
+    env = {
+        "CARGO_PKG_NAME": "wasm-bindgen-shared",
+        "CARGO_PKG_VERSION": "0.2.95",
+    },
+)

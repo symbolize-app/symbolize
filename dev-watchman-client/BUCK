@@ -1,0 +1,13 @@
+load("@dev_buck//:rules.bzl", "rust_binary")
+
+rust_binary(
+    name = "symbolize-dev-watchman-client",
+    deps = [
+        "vendor//:anyhow",
+        "vendor//:backon",
+        "vendor//:clap",
+        "vendor//:nix",
+        "vendor//:tokio",
+        "vendor//:watchman_client",
+    ],
+)

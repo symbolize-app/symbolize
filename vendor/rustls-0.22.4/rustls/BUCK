@@ -1,0 +1,30 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "rustls",
+    crate = "rustls",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs"]),
+    env = {
+        "CARGO_PKG_NAME": "rustls",
+        "CARGO_PKG_VERSION": "0.22.4",
+    },
+    features = [
+        "default",
+        "log",
+        "logging",
+        "ring",
+        "tls12",
+    ],
+    named_deps = {
+        "pki_types": "//pki-types-1.1.0:rustls-pki-types",
+        "webpki": "//webpki-0.102.1:rustls-webpki",
+    },
+    deps = [
+        "//log-0.4.20:log",
+        "//ring-0.17.7:ring",
+        "//subtle-2.5.0:subtle",
+        "//utils-1.7.0/zeroize:zeroize",
+    ],
+)

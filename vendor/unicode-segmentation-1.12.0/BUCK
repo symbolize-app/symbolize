@@ -1,0 +1,13 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "unicode-segmentation",
+    crate = "unicode_segmentation",
+    crate_root = "src/lib.rs",
+    edition = "2018",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "unicode-segmentation",
+        "CARGO_PKG_VERSION": "1.12.0",
+    },
+)

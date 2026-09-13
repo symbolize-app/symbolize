@@ -1,0 +1,20 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "parking_lot",
+    crate = "parking_lot",
+    crate_root = "src/lib.rs",
+    edition = "2018",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "parking_lot",
+        "CARGO_PKG_VERSION": "0.12.1",
+    },
+    features = [
+        "default",
+    ],
+    deps = [
+        "//parking_lot-0.12.1/core:parking_lot_core",
+        "//parking_lot-0.12.1/lock_api:lock_api",
+    ],
+)

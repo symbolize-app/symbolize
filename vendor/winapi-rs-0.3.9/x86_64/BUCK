@@ -1,0 +1,13 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "winapi-x86_64-pc-windows-gnu",
+    crate = "winapi_x86_64_pc_windows_gnu",
+    crate_root = "src/lib.rs",
+    edition = "2015",
+    srcs = glob(["src/**/*.rs"]),
+    env = {
+        "CARGO_PKG_NAME": "winapi-x86_64-pc-windows-gnu",
+        "CARGO_PKG_VERSION": "0.4.0",
+    },
+)

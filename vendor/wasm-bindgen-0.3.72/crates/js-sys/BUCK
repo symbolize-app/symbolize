@@ -1,0 +1,16 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "js-sys",
+    crate = "js_sys",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "js-sys",
+        "CARGO_PKG_VERSION": "0.3.72",
+    },
+    deps = [
+        "//wasm-bindgen-0.3.72:wasm-bindgen",
+    ],
+)

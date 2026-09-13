@@ -1,0 +1,29 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "crossterm",
+    crate = "crossterm",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "crossterm",
+        "CARGO_PKG_VERSION": "0.28.1",
+    },
+    features = [
+        "bracketed-paste",
+        "default",
+        "event-stream",
+        "events",
+        "windows",
+    ],
+    deps = [
+        "//bitflags-2.4.1:bitflags",
+        "//futures-rs-0.3.31/futures-core:futures-core",
+        "//mio-1.0.1:mio",
+        "//parking_lot-0.12.1:parking_lot",
+        "//rustix-0.38.44:rustix",
+        "//signal-hook-0.3.17:signal-hook",
+        "//signal-hook-mio-0.2.4/signal-hook-mio:signal-hook-mio",
+    ],
+)

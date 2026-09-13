@@ -1,0 +1,29 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "crossbeam",
+    crate = "crossbeam",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "crossbeam",
+        "CARGO_PKG_VERSION": "0.8.4",
+    },
+    features = [
+        "alloc",
+        "crossbeam-channel",
+        "crossbeam-deque",
+        "crossbeam-epoch",
+        "crossbeam-queue",
+        "default",
+        "std",
+    ],
+    deps = [
+        "//crossbeam-0.8.4/crossbeam-channel:crossbeam-channel",
+        "//crossbeam-0.8.4/crossbeam-deque:crossbeam-deque",
+        "//crossbeam-0.8.4/crossbeam-epoch:crossbeam-epoch",
+        "//crossbeam-0.8.4/crossbeam-queue:crossbeam-queue",
+        "//crossbeam-0.8.4/crossbeam-utils:crossbeam-utils",
+    ],
+)

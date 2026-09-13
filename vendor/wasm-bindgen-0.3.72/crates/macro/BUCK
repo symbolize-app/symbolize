@@ -1,0 +1,21 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "wasm-bindgen-macro",
+    crate = "wasm_bindgen_macro",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "wasm-bindgen-macro",
+        "CARGO_PKG_VERSION": "0.2.95",
+    },
+    proc_macro = True,
+    features = [
+        "spans",
+    ],
+    deps = [
+        "//quote-1.0.35:quote",
+        "//wasm-bindgen-0.3.72/crates/macro-support:wasm-bindgen-macro-support",
+    ],
+)

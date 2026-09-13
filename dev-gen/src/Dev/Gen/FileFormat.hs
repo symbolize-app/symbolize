@@ -1,11 +1,10 @@
 module Dev.Gen.FileFormat
-  ( CargoWorkspace (..),
-    CargoWorkspaceWorkspace (..),
-    Taskfile (..),
+  ( Taskfile (..),
     TaskfileCommand (..),
     TaskfileInclude (..),
     TaskfileTask (..),
     WatchmanConfig (..),
+    Workspace (..),
     taskfileRun,
     taskfileVersion,
   )
@@ -22,23 +21,14 @@ import Relude.Monad (Maybe)
 import Relude.String (Text)
 import Toml.FromValue qualified as Toml
 
-type CargoWorkspace :: Type
-newtype CargoWorkspace = CargoWorkspace
-  { workspace :: CargoWorkspaceWorkspace
-  }
-  deriving stock (Show, Eq)
-
-instance Toml.FromValue CargoWorkspace where
-  fromValue = Toml.parseTableFromValue (CargoWorkspace <$> Toml.reqKey "workspace")
-
-type CargoWorkspaceWorkspace :: Type
-newtype CargoWorkspaceWorkspace = CargoWorkspaceWorkspace
+type Workspace :: Type
+newtype Workspace = Workspace
   { members :: Vector Text
   }
   deriving stock (Show, Eq)
 
-instance Toml.FromValue CargoWorkspaceWorkspace where
-  fromValue = Toml.parseTableFromValue (CargoWorkspaceWorkspace . fromList <$> Toml.reqKey "members")
+instance Toml.FromValue Workspace where
+  fromValue = Toml.parseTableFromValue (Workspace . fromList <$> Toml.reqKey "members")
 
 taskfileOptions :: Aeson.Options
 taskfileOptions =

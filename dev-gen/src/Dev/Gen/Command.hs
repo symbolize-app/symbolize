@@ -9,7 +9,7 @@ import Data.Typeable (cast)
 import Data.Vector (Vector)
 import Dev.Gen.FilePath (FilePath)
 import Relude.Base (Eq ((==)), Show, Type, Typeable)
-import Relude.Bool (Bool (False))
+import Relude.Bool (Bool (False, True))
 import Relude.Monad (maybe)
 import Relude.String (Text)
 import Toml.FromValue qualified as Toml
@@ -33,6 +33,7 @@ data Command a where
     Command a
   ReadLines :: FilePath -> Command (Vector Text)
   WriteLines :: FilePath -> Vector Text -> Command ()
+  ReadVendorTargets :: Command (Vector (Text, Text))
 
 instance Eq (Command a) where
   (==) :: Command a -> Command a -> Bool
@@ -54,6 +55,7 @@ instance Eq (Command a) where
     (filePathX, valueX) == (filePathY, valueY)
   (ReadTOML filePathX) == (ReadTOML filePathY) =
     filePathX == filePathY
+  ReadVendorTargets == ReadVendorTargets = True
   _ == _ = False
 
 deriving stock instance Show (Command a)

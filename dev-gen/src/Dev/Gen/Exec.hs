@@ -7,6 +7,7 @@ module Dev.Gen.Exec
     readJSON,
     readLines,
     readTOML,
+    readVendorTargets,
     readYAML,
     writeJSON,
     writeLines,
@@ -91,6 +92,9 @@ readTOML ::
   FilePath ->
   Exec a
 readTOML = _command1 Command.ReadTOML
+
+readVendorTargets :: Exec (Vector (Text, Text))
+readVendorTargets = Command Command.ReadVendorTargets
 
 _command1 :: (Typeable a) => (t1 -> Command.Command a) -> t1 -> Exec a
 _command1 command b = Command (command b)

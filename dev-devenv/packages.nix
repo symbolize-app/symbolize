@@ -2,8 +2,8 @@
 
 {
   packages = with pkgs; [
+    buck2
     curl
-    inputs.nixpkgs-gleam.legacyPackages.${pkgs.system}.cargo-deny
     chromium
     dbmate
     easyrsa
@@ -13,8 +13,10 @@
     go
     git
     nodePackages.node-gyp
+    perl
     pkg-config
     python3
+    tcl
     symbolize-haskell
     symbolize-node
     overmind

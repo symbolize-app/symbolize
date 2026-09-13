@@ -1,0 +1,26 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "anstream",
+    crate = "anstream",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "anstream",
+        "CARGO_PKG_VERSION": "0.6.18",
+    },
+    features = [
+        "auto",
+        "default",
+        "wincon",
+    ],
+    deps = [
+        "//anstyle-1.0.4/crates/anstyle:anstyle",
+        "//anstyle-parse-0.2.3/crates/anstyle-parse:anstyle-parse",
+        "//anstyle-query-1.0.0/crates/anstyle-query:anstyle-query",
+        "//colorchoice-1.0.0/crates/colorchoice:colorchoice",
+        "//is_terminal_polyfill-1.70.1:is_terminal_polyfill",
+        "//vte-0.2.1/utf8parse:utf8parse",
+    ],
+)

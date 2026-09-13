@@ -1,0 +1,18 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "memchr",
+    crate = "memchr",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "memchr",
+        "CARGO_PKG_VERSION": "2.7.1",
+    },
+    features = [
+        "alloc",
+        "default",
+        "std",
+    ],
+)

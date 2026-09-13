@@ -1,0 +1,16 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "signal-hook-registry",
+    crate = "signal_hook_registry",
+    crate_root = "src/lib.rs",
+    edition = "2015",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "signal-hook-registry",
+        "CARGO_PKG_VERSION": "1.4.1",
+    },
+    deps = [
+        "//libc-0.2.171:libc",
+    ],
+)

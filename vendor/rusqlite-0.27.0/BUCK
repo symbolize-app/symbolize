@@ -1,0 +1,25 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "rusqlite",
+    crate = "rusqlite",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "rusqlite",
+        "CARGO_PKG_VERSION": "0.30.0",
+    },
+    features = [
+        "bundled",
+        "modern_sqlite",
+    ],
+    deps = [
+        "//bitflags-2.4.1:bitflags",
+        "//fallible-streaming-iterator-0.1.9:fallible-streaming-iterator",
+        "//hashlink-0.8.4:hashlink",
+        "//rusqlite-0.27.0/libsqlite3-sys:libsqlite3-sys",
+        "//rust-fallible-iterator-0.3.0:fallible-iterator",
+        "//rust-smallvec-1.11.2:smallvec",
+    ],
+)

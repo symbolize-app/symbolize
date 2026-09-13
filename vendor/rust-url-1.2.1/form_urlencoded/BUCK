@@ -1,0 +1,21 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "form_urlencoded",
+    crate = "form_urlencoded",
+    crate_root = "src/lib.rs",
+    edition = "2018",
+    srcs = glob(["src/**/*.rs"]),
+    env = {
+        "CARGO_PKG_NAME": "form_urlencoded",
+        "CARGO_PKG_VERSION": "1.2.1",
+    },
+    features = [
+        "alloc",
+        "default",
+        "std",
+    ],
+    deps = [
+        "//rust-url-1.2.1/percent_encoding:percent-encoding",
+    ],
+)

@@ -1,0 +1,38 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "rustix",
+    crate = "rustix",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "rustix",
+        "CARGO_PKG_VERSION": "0.38.44",
+    },
+    rustc_flags = [
+        "--cfg",
+        "static_assertions",
+        "--cfg",
+        "linux_raw",
+        "--cfg",
+        "linux_like",
+        "--cfg",
+        "linux_kernel",
+    ],
+    features = [
+        "alloc",
+        "libc-extra-traits",
+        "std",
+        "stdio",
+        "termios",
+    ],
+    named_deps = {
+        "libc_errno": "//rust-errno-0.3.11:errno",
+    },
+    deps = [
+        "//bitflags-2.4.1:bitflags",
+        "//libc-0.2.171:libc",
+        "//linux-raw-sys-0.4.15:linux-raw-sys",
+    ],
+)

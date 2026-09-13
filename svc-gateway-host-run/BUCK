@@ -1,0 +1,33 @@
+load("@dev_buck//:rules.bzl", "rust_binary")
+
+rust_binary(
+    name = "symbolize-svc-gateway-host-run",
+    crate_root = "src/mod.rs",
+    deps = [
+        "//lib-hex-rs:symbolize-lib-hex",
+        "vendor//:anyhow",
+        "vendor//:bytes",
+        "vendor//:crossbeam",
+        "vendor//:dashmap",
+        "vendor//:form_urlencoded",
+        "vendor//:futures",
+        "vendor//:http",
+        "vendor//:http-body",
+        "vendor//:http-body-util",
+        "vendor//:hyper",
+        "vendor//:hyper-util",
+        "vendor//:mime",
+        "vendor//:ring",
+        "vendor//:rusqlite",
+        "vendor//:rustls",
+        "vendor//:rustls-pemfile",
+        "vendor//:thiserror",
+        "vendor//:tokio",
+        "vendor//:tokio-rustls",
+        "vendor//:tokio-stream",
+        "vendor//:tokio-util",
+    ],
+    test_deps = [
+        "vendor//:mockall",
+    ],
+)

@@ -1,0 +1,20 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "anstyle-parse",
+    crate = "anstyle_parse",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "anstyle-parse",
+        "CARGO_PKG_VERSION": "0.2.3",
+    },
+    features = [
+        "default",
+        "utf8",
+    ],
+    deps = [
+        "//vte-0.2.1/utf8parse:utf8parse",
+    ],
+)

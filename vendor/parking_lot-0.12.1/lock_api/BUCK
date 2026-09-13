@@ -1,0 +1,21 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "lock_api",
+    crate = "lock_api",
+    crate_root = "src/lib.rs",
+    edition = "2018",
+    srcs = glob(["src/**/*.rs"]),
+    env = {
+        "CARGO_PKG_NAME": "lock_api",
+        "CARGO_PKG_VERSION": "0.4.11",
+    },
+    features = [
+        "atomic_usize",
+        "default",
+    ],
+    deps = [
+        "//autocfg-1.1.0:autocfg",
+        "//scopeguard-1.2.0:scopeguard",
+    ],
+)

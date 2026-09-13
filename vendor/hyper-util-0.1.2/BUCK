@@ -1,0 +1,29 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "hyper-util",
+    crate = "hyper_util",
+    crate_root = "src/lib.rs",
+    edition = "2018",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "hyper-util",
+        "CARGO_PKG_VERSION": "0.1.2",
+    },
+    features = [
+        "default",
+        "tokio",
+    ],
+    deps = [
+        "//bytes-1.5.0:bytes",
+        "//futures-rs-0.3.31/futures-channel:futures-channel",
+        "//futures-rs-0.3.31/futures-util:futures-util",
+        "//http-1.0.0:http",
+        "//http-body-1.0.0/http-body:http-body",
+        "//hyper-1.1.0:hyper",
+        "//pin-project-lite-0.2.13:pin-project-lite",
+        "//socket2-0.5.5:socket2",
+        "//tokio-1.39.2/tokio:tokio",
+        "//tracing-0.1.40/tracing:tracing",
+    ],
+)

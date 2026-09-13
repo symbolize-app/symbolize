@@ -1,0 +1,20 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "mockall_derive",
+    crate = "mockall_derive",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "mockall_derive",
+        "CARGO_PKG_VERSION": "0.12.1",
+    },
+    proc_macro = True,
+    deps = [
+        "//cfg-if-1.0.0:cfg-if",
+        "//proc-macro2-1.0.94:proc-macro2",
+        "//quote-1.0.35:quote",
+        "//syn-2.0.100:syn",
+    ],
+)

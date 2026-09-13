@@ -1,0 +1,18 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "rustls-pki-types",
+    crate = "rustls_pki_types",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "rustls-pki-types",
+        "CARGO_PKG_VERSION": "1.1.0",
+    },
+    features = [
+        "alloc",
+        "default",
+        "std",
+    ],
+)

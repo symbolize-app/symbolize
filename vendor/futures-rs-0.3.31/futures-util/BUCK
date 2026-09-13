@@ -1,0 +1,41 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "futures-util",
+    crate = "futures_util",
+    crate_root = "src/lib.rs",
+    edition = "2018",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "futures-util",
+        "CARGO_PKG_VERSION": "0.3.31",
+    },
+    features = [
+        "alloc",
+        "async-await",
+        "async-await-macro",
+        "channel",
+        "default",
+        "futures-channel",
+        "futures-io",
+        "futures-macro",
+        "futures-sink",
+        "io",
+        "memchr",
+        "sink",
+        "slab",
+        "std",
+    ],
+    deps = [
+        "//futures-rs-0.3.31/futures-channel:futures-channel",
+        "//futures-rs-0.3.31/futures-core:futures-core",
+        "//futures-rs-0.3.31/futures-io:futures-io",
+        "//futures-rs-0.3.31/futures-macro:futures-macro",
+        "//futures-rs-0.3.31/futures-sink:futures-sink",
+        "//futures-rs-0.3.31/futures-task:futures-task",
+        "//memchr-2.7.1:memchr",
+        "//pin-project-lite-0.2.13:pin-project-lite",
+        "//pin-utils-0.1.0:pin-utils",
+        "//slab-0.4.9:slab",
+    ],
+)

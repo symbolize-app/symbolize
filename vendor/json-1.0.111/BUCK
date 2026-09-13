@@ -1,0 +1,22 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "serde_json",
+    crate = "serde_json",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "serde_json",
+        "CARGO_PKG_VERSION": "1.0.111",
+    },
+    features = [
+        "default",
+        "std",
+    ],
+    deps = [
+        "//itoa-1.0.10:itoa",
+        "//ryu-1.0.16:ryu",
+        "//serde-1.0.194/serde:serde",
+    ],
+)

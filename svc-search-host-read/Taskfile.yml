@@ -5,47 +5,47 @@ tasks:
       - run
       - r
     cmd:
-      task: :cargo:execute-package:run:debug
+      task: :rust:execute-package:run:debug
       vars:
-        NAME: '{{.NAME}}'
+        NAME: "{{.NAME}}"
   run:debug:watch:
     aliases:
       - run:watch
       - rw
     cmd:
-      task: :cargo:execute-package:run:debug:watch
+      task: :rust:execute-package:run:debug:watch
       vars:
-        NAME: '{{.NAME}}'
+        NAME: "{{.NAME}}"
   run:release:
     aliases:
       - rr
     cmd:
-      task: :cargo:execute-package:run:release
+      task: :rust:execute-package:run:release
       vars:
-        NAME: '{{.NAME}}'
+        NAME: "{{.NAME}}"
   test:debug:
     aliases:
       - test
       - t
     cmd:
-      task: :cargo:execute-package:test:debug
+      task: :rust:execute-package:test:debug
       vars:
-        NAME: '{{.NAME}}'
+        NAME: "{{.NAME}}"
   test:debug:watch:
     aliases:
       - test:watch
       - tw
     cmd:
-      task: :cargo:execute-package:test:debug:watch
+      task: :rust:execute-package:test:debug:watch
       vars:
-        NAME: '{{.NAME}}'
+        NAME: "{{.NAME}}"
   test:release:
     aliases:
       - tr
     cmd:
-      task: :cargo:execute-package:test:release
+      task: :rust:execute-package:test:release
       vars:
-        NAME: '{{.NAME}}'
+        NAME: "{{.NAME}}"
 vars:
   NAME: svc-search-host-read
-version: '3'
+version: "3"

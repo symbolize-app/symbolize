@@ -1,0 +1,23 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "tokio-stream",
+    crate = "tokio_stream",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs"]),
+    env = {
+        "CARGO_PKG_NAME": "tokio-stream",
+        "CARGO_PKG_VERSION": "0.1.14",
+    },
+    features = [
+        "default",
+        "net",
+        "time",
+    ],
+    deps = [
+        "//futures-rs-0.3.31/futures-core:futures-core",
+        "//pin-project-lite-0.2.13:pin-project-lite",
+        "//tokio-1.39.2/tokio:tokio",
+    ],
+)

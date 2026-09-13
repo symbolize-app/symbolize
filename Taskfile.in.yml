@@ -6,8 +6,8 @@ includes:
   cabal:
     taskfile: dev-task/cabal.yml
 
-  cargo:
-    taskfile: dev-task/cargo.yml
+  rust:
+    taskfile: dev-task/rust.yml
 
   dev-browser-test:
     taskfile: dev-browser-test
@@ -115,7 +115,7 @@ tasks:
       - b
     deps:
       - cabal:build:debug
-      - cargo:build:debug
+      - rust:build:debug
       - node:build:debug
 
   build:release:
@@ -123,7 +123,7 @@ tasks:
       - br
     deps:
       - cabal:build:release
-      - cargo:build:release
+      - rust:build:release
       - node:build:release
 
   check:
@@ -136,14 +136,13 @@ tasks:
       - test:release
       - format:check
       - lint:check
-      - lock:check
     cmds:
       - echo "✅"
 
   clean:
     deps:
       - cabal:clean
-      - cargo:clean
+      - rust:clean
       - node:clean
       - vendor:clean
 
@@ -160,7 +159,7 @@ tasks:
       - fc
     deps:
       - cabal:format:check
-      - cargo:format:check
+      - rust:format:check
       - node:format:check
 
   format:fix:
@@ -169,7 +168,7 @@ tasks:
       - f
     deps:
       - cabal:format:fix
-      - cargo:format:fix
+      - rust:format:fix
       - node:format:fix
 
   gleam:check:
@@ -294,7 +293,7 @@ tasks:
       - l
     deps:
       - cabal:lint
-      - cargo:lint:check
+      - rust:lint:check
       - node:lint:check
       - sqlite:lint:check
 
@@ -303,24 +302,20 @@ tasks:
       - lf
     deps:
       - cabal:lint
-      - cargo:lint:fix
+      - rust:lint:fix
       - node:lint:fix
       - sqlite:lint:fix
-
-  lock:check:
-    deps:
-      - cargo:lock:check
 
   security:
     aliases:
       - s
     deps:
-      - cargo:security
+      - rust:security
 
   test:release:
     aliases:
       - tr
     deps:
       - cabal:test:release
-      - cargo:test:release
+      - rust:test:release
       - node:test

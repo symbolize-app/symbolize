@@ -1,0 +1,8 @@
+load("@dev_buck//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "symbolize-lib-hex",
+    deps = [
+        "vendor//:anyhow",
+    ],
+)

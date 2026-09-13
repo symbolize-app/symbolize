@@ -1,0 +1,25 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "wasm-bindgen-backend",
+    crate = "wasm_bindgen_backend",
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    srcs = glob(["src/**/*.rs"]),
+    env = {
+        "CARGO_PKG_NAME": "wasm-bindgen-backend",
+        "CARGO_PKG_VERSION": "0.2.95",
+    },
+    features = [
+        "spans",
+    ],
+    deps = [
+        "//bumpalo-3.16.0:bumpalo",
+        "//log-0.4.20:log",
+        "//once_cell-1.19.0:once_cell",
+        "//proc-macro2-1.0.94:proc-macro2",
+        "//quote-1.0.35:quote",
+        "//syn-2.0.100:syn",
+        "//wasm-bindgen-0.3.72/crates/shared:wasm-bindgen-shared",
+    ],
+)

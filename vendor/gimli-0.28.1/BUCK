@@ -1,0 +1,17 @@
+load("//:rules.bzl", "rust_library")
+
+rust_library(
+    name = "gimli",
+    crate = "gimli",
+    crate_root = "src/lib.rs",
+    edition = "2018",
+    srcs = glob(["src/**/*.rs", "README.md"]),
+    env = {
+        "CARGO_PKG_NAME": "gimli",
+        "CARGO_PKG_VERSION": "0.28.1",
+    },
+    features = [
+        "read",
+        "read-core",
+    ],
+)
