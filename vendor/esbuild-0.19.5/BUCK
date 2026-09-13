@@ -1,0 +1,39 @@
+load("//:rules.bzl", "alias", "genrule")
+
+genrule(
+    name = "esbuild-bin",
+    out = "esbuild",
+    executable = True,
+    srcs = glob([
+        "cmd/**",
+        "internal/**",
+        "pkg/**",
+        "go.mod",
+        "go.sum",
+    ]),
+    cmd = "cd $SRCDIR && go build -trimpath -ldflags '-s -w' -o $OUT ./cmd/esbuild",
+)
+
+alias(
+    name = "esbuild",
+    actual = ":esbuild-bin",
+)
+
+genrule(
+    name = "main.js",
+    out = "main.js",
+    srcs = glob([
+        "lib/**",
+    ]),
+    cmd = """
+    $(exe :esbuild-bin) $SRCDIR/lib/npm/node.ts \
+      --outfile=$OUT \
+      --bundle \
+      --target=node12 \
+      --define:WASM=false \
+      --define:ESBUILD_VERSION='"0.19.5"' \
+      --external:esbuild \
+      --platform=node \
+      --log-level=warning
+    """,
+)

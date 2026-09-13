@@ -202,7 +202,7 @@ Execution and bundling consume this table directly:
   are consumed directly from their source entrypoints or legitimate build
   artifacts.
 - **Native build artifacts**: Platform-specific native outputs (such as
-  `better_sqlite3.node` compiled via Buck2 or the `esbuild` Go binary)
+  `better_sqlite3.node` or the `esbuild` binary and JS bundle, compiled via Buck2)
   belong strictly in `build/vendor/` and are built by tasks in
   `dev-task/vendor.yml`.
 
@@ -419,7 +419,7 @@ versions of a package. Update module mappings in `vendor/node.json` as needed, t
 run `task vendor:check` and the full repository check `task c`.
 
 Native outputs are rebuilt for the current platform from the exact snapshots:
-esbuild is compiled with Go, and better-sqlite3 is compiled with Buck2.
+esbuild and better-sqlite3 are compiled with Buck2.
 Puppeteer executes directly from TypeScript source via `dev-node-loader` and the
 Chromium executable provided by Devenv; it does not download a browser or resolve
 a package from `node_modules`.

@@ -48,21 +48,10 @@ tasks:
     cmds:
       - mkdir -p build/vendor/esbuild
       - >-
-        cd {{.ESBUILD_VENDOR_DIR}} &&
-        go build -trimpath -ldflags '-s -w'
-        -o ../../build/vendor/esbuild/esbuild
-        ./cmd/esbuild
-      - >-
-        build/vendor/esbuild/esbuild
-        {{.ESBUILD_VENDOR_DIR}}/lib/npm/node.ts
-        --outfile=build/vendor/esbuild/main.js
-        --bundle
-        --target=node12
-        --define:WASM=false
-        --define:ESBUILD_VERSION='"0.19.5"'
-        --external:esbuild
-        --platform=node
-        --log-level=warning
+        esbuild_bin=$(buck2 build --show-output -m release vendor//esbuild-0.19.5:esbuild | awk '{print $2}') &&
+        esbuild_js=$(buck2 build --show-output -m release vendor//esbuild-0.19.5:main.js | awk '{print $2}') &&
+        cp "$esbuild_bin" build/vendor/esbuild/esbuild &&
+        cp "$esbuild_js" build/vendor/esbuild/main.js
 
   better-sqlite3:build:
     sources:
