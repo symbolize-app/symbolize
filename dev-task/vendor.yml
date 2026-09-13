@@ -73,11 +73,5 @@ tasks:
     cmds:
       - mkdir -p build/vendor/better-sqlite3
       - >-
-        sqlite_out=$(buck2 build --show-output -m release vendor//sqlite3-3.46.0:amalgamation | awk '{print $2}') &&
-        temp_dir=$(mktemp -d) &&
-        cp -a {{.BETTER_SQLITE3_VENDOR_DIR}}/. "$temp_dir/" &&
-        mkdir -p "$temp_dir/deps/sqlite3" &&
-        cp -a "$sqlite_out"/* "$temp_dir/deps/sqlite3/" &&
-        node-gyp --directory "$temp_dir" rebuild --release &&
-        cp "$temp_dir/build/Release/better_sqlite3.node"
-        build/vendor/better-sqlite3/better_sqlite3.node
+        better_sqlite3_node=$(buck2 build --show-output -m release vendor//better-sqlite3-11.1.2:better-sqlite3 | awk '{print $2}') &&
+        cp "$better_sqlite3_node" build/vendor/better-sqlite3/better_sqlite3.node
