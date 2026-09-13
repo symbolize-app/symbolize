@@ -66,16 +66,6 @@ Chrome & Firefox:
 
 - Navigate settings UI to manually import `.pki/ca.crt`
 
-### Manual install
-
-```
-task i
-```
-
-`task i` installs the non-Node development tools managed by the repository.
-Rust toolchains are provided by Devenv; library
-dependencies are vendored under `vendor/` and built from those snapshots.
-
 ## Visual Studio Code
 
 1. Install [Visual Studio Code](https://code.visualstudio.com/docs/setup/setup-overview)

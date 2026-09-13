@@ -161,13 +161,6 @@ tasks:
       - f
     cmd: ormolu --mode inplace {{.FIND_FILES}}
 
-  install:
-    vars:
-      VERSION:
-        sh: grep 'any\.relude' cabal.project.freeze | sed -ne 's/.*==\([^,]*\).*/\1/p'
-    cmds:
-      - curl --fail --silent --show-error "https://raw.githubusercontent.com/kowainik/relude/v{{.VERSION}}/.hlint.yaml" -o dev-hlint/relude-hlint.yaml
-
   lint:
     aliases:
       - l
