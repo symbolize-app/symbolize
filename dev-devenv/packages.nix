@@ -19,6 +19,9 @@
     tcl
     symbolize-haskell
     symbolize-node
+    symbolize-relude-hlint-path
+    symbolize-font-literata-path
+    symbolize-font-path
     overmind
     symbolize-rust
     sqlfluff

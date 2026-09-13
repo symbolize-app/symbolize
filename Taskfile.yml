@@ -21,8 +21,6 @@ includes:
     taskfile: dev-watchman-client
   easyrsa:
     taskfile: dev-task/easyrsa.yml
-  font:
-    taskfile: dev-task/font.yml
   lib-collection:
     taskfile: lib-collection
   lib-concurrency:
@@ -223,12 +221,6 @@ tasks:
       - task svc-gateway-guest-run:test:browser:service-worker
       - task svc-auth-guest-read:test:browser
       - task svc-auth-guest-view:test:browser
-  install:
-    aliases:
-      - i
-    deps:
-      - cabal:install
-      - font:install
   lint:check:
     aliases:
       - lint

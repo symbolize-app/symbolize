@@ -33,9 +33,6 @@ includes:
   easyrsa:
     taskfile: dev-task/easyrsa.yml
 
-  font:
-    taskfile: dev-task/font.yml
-
   nix:
     taskfile: dev-task/nix.yml
 
@@ -279,13 +276,6 @@ tasks:
       vars:
         NAME: dev-gen
         ARGS: '--check'
-
-  install:
-    aliases:
-      - i
-    deps:
-      - cabal:install
-      - font:install
 
   lint:check:
     aliases:

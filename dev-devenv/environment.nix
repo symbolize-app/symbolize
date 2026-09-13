@@ -41,6 +41,17 @@
       set +a
     fi
 
+    mkdir -p "$DEVENV_ROOT/build"
+
+    mkdir -p "$DEVENV_ROOT/dev-hlint"
+    ln -sf "$(${pkgs.symbolize-relude-hlint-path}/bin/symbolize-relude-hlint-path)" "$DEVENV_ROOT/dev-hlint/relude-hlint.yaml"
+
+    mkdir -p "$DEVENV_ROOT/svc-gateway-guest-run/.font"
+    symbolize_font_dir="$(${pkgs.symbolize-font-literata-path}/bin/symbolize-font-literata-path)"
+    for f in "$symbolize_font_dir"/*; do
+      ln -sf "$f" "$DEVENV_ROOT/svc-gateway-guest-run/.font/$(basename "$f")"
+    done
+
     symbolize_clean_path=""
     old_ifs="$IFS"
     IFS=:
