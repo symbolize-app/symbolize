@@ -42,9 +42,6 @@ includes:
   node:
     taskfile: dev-task/node.yml
 
-  vendor:
-    taskfile: dev-task/vendor.yml
-
   sqlite:
     taskfile: dev-task/sqlite.yml
 
@@ -141,7 +138,6 @@ tasks:
       - cabal:clean
       - rust:clean
       - node:clean
-      - vendor:clean
 
   dev:
     aliases:
@@ -276,6 +272,22 @@ tasks:
       vars:
         NAME: dev-gen
         ARGS: '--check'
+
+  vendor:check:
+    cmd:
+      task: cabal:execute-target:run:{{.TASK_GEN_MODE}}
+      vars:
+        NAME: dev-gen
+        ARGS: '--check-vendor'
+
+  license:check:
+    aliases:
+      - vendor:license:check
+    cmd:
+      task: cabal:execute-target:run:{{.TASK_GEN_MODE}}
+      vars:
+        NAME: dev-gen
+        ARGS: '--check-licenses'
 
   lint:check:
     aliases:
