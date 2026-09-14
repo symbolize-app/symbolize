@@ -4,6 +4,7 @@ module Dev.Gen.ExecSpec
     readLines,
     readTOML,
     readVendorTargets,
+    readGleamPackages,
     readYAML,
     writeJSON,
     writeLines,
@@ -14,6 +15,7 @@ where
 import Data.Aeson qualified as Aeson
 import Data.Vector (Vector)
 import Dev.Gen.Command qualified as Command
+import Dev.Gen.FileFormat qualified as FileFormat
 import Dev.Gen.FilePath (FilePath)
 import Relude.Base (Eq, Show, Type, Typeable)
 import Relude.String (Text)
@@ -72,6 +74,9 @@ readTOML = _result1 Command.ReadTOML
 
 readVendorTargets :: Vector (Text, Text) -> Result
 readVendorTargets = _result0 Command.ReadVendorTargets
+
+readGleamPackages :: Vector FileFormat.GleamPackage -> Result
+readGleamPackages = _result0 Command.ReadGleamPackages
 
 _result0 :: (Typeable a, Eq a, Show a) => Command.Command a -> a -> Result
 _result0 = Result

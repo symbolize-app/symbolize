@@ -1,0 +1,16 @@
+load("@prelude//rules.bzl", "export_file")
+
+export_file(
+    name = "schema.sql",
+    src = "schema.sql",
+    visibility = ["PUBLIC"],
+)
+
+[
+    export_file(
+        name = f,
+        src = f,
+        visibility = ["PUBLIC"],
+    )
+    for f in native.glob(["migrate/*.sql"])
+]

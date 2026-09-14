@@ -1,0 +1,12 @@
+load("@dev_buck//:gleam.bzl", "gleam_package")
+
+gleam_package(
+    name = "lib-test-runner",
+    package_name = "symbolize_lib_test_runner",
+    deps = [
+        "//lib-test:lib-test",
+        "//lib-time:lib-time",
+        "vendor//:gleam_stdlib",
+    ],
+)
+

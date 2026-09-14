@@ -12,10 +12,11 @@ const nativeBinding =
   pathResolve(repoRoot, 'build/vendor/better-sqlite3/better_sqlite3.node')
 
 export function open(path, readonly) {
+  const binding = process.env.BETTER_SQLITE3_BINDING ?? nativeBinding
   return new DatabaseConstructor(path, {
     fileMustExist: path !== ':memory:',
     readonly,
-    nativeBinding,
+    nativeBinding: binding,
   })
 }
 

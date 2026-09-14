@@ -7,11 +7,26 @@ import dev_esbuild_output as output
 import gleam/float
 import gleam/int
 import gleam/io
+import gleam/option.{type Option, None, Some}
 import gleam/string
 import lib_time
 
 pub type Arguments {
-  Arguments(clean: Bool, mode: dev_context.Mode)
+  Arguments(
+    mode: dev_context.Mode,
+    database: String,
+    schema: String,
+    migrations: String,
+    query: String,
+    outbase: String,
+    guest_dir: String,
+    esbuild_bin: String,
+    better_sqlite3_binding: String,
+    copy_entries: List(String),
+    classic_entries: List(String),
+    module_entries: List(String),
+    packages: List(#(String, String)),
+  )
 }
 
 pub fn main() {
@@ -22,71 +37,80 @@ pub fn main() {
 }
 
 fn run(arguments: Arguments) -> Nil {
-  let Arguments(clean, mode) = arguments
-  let outdir = node.resolve("../build/guest/" <> mode_name(mode))
-  case clean {
-    True -> node.remove(outdir)(fn(result) { report_result(result) })
-    False -> {
-      db.init()(fn(result) {
-        case result {
-          Error(reason) -> fail(reason)
-          Ok(database) -> {
-            let time = lib_time.new_context(lib_time.time())
-            let context =
-              dev_context.context(dev_context.dev(mode, outdir), database, time)
-            node.mkdir(outdir)(fn(result) {
-              case result {
-                Error(reason) -> fail(reason)
-                Ok(Nil) -> build(context)
-              }
-            })
-          }
+  let Arguments(
+    mode,
+    database,
+    schema,
+    migrations,
+    query,
+    outbase,
+    guest_dir,
+    esbuild_bin,
+    better_sqlite3_binding,
+    copy_entries,
+    classic_entries,
+    module_entries,
+    packages,
+  ) = arguments
+
+  let manifest_path = node.resolve(database)
+  let schema_path = node.resolve(schema)
+  let migrations_path = node.resolve(migrations)
+  let query_path = node.resolve(query)
+  let resolved_outbase = node.resolve(outbase)
+  let outdir = node.resolve(database <> ".guest")
+
+  build.set_guest_dir(node.resolve(guest_dir))
+  build.set_esbuild_bin(node.resolve(esbuild_bin))
+  build.set_better_sqlite3_binding(node.resolve(better_sqlite3_binding))
+
+  list_each(packages, fn(pair) {
+    let #(name, path) = pair
+    build.set_package_path(name, node.resolve(path))
+  })
+
+  db.init_with_paths(manifest_path, schema_path, migrations_path, query_path)(
+    fn(result) {
+      case result {
+        Error(reason) -> fail(reason)
+        Ok(database_instance) -> {
+          let time = lib_time.new_context(lib_time.time())
+          let context =
+            dev_context.context(
+              dev_context.dev(mode, outdir),
+              database_instance,
+              time,
+            )
+          build_files_configured(
+            context,
+            resolved_outbase,
+            copy_entries,
+            classic_entries,
+            module_entries,
+          )
         }
-      })
-    }
-  }
+      }
+    },
+  )
 }
 
-fn build(context: dev_context.Context) -> Nil {
+fn build_files_configured(
+  context: dev_context.Context,
+  outbase: String,
+  copy_entries: List(String),
+  classic_entries: List(String),
+  module_entries: List(String),
+) -> Nil {
   let mode = dev_context.mode(dev_context.dev_context(context))
   let production = case mode {
     dev_context.Development -> False
     dev_context.Production -> True
   }
-  let outbase = node.resolve("..")
-  let copy_entry_points =
-    list_map(
-      [
-        "../svc-gateway-guest-run/.font/literata-italic.woff2",
-        "../svc-gateway-guest-run/.font/literata.woff2",
-        "../svc-gateway-guest-run/init.html",
-      ],
-      node.resolve,
-    )
-  let classic_entry_points =
-    list_map(
-      [
-        "../svc-gateway-guest-run/build/dev/javascript/symbolize_svc_gateway_guest_run/svc_gateway_guest_run_service_worker_main.mjs",
-      ],
-      node.resolve,
-    )
-  let module_entry_points =
-    list_map(
-      case production {
-        True -> [
-          "../svc-gateway-guest-run/build/dev/javascript/symbolize_svc_gateway_guest_run/svc_gateway_guest_run_dedicated_worker_main.mjs",
-          "../svc-gateway-guest-run/build/dev/javascript/symbolize_svc_gateway_guest_run/svc_gateway_guest_run_main.mjs",
-          "../svc-gateway-guest-run/build/dev/javascript/symbolize_svc_gateway_guest_run/svc_gateway_guest_run_register.mjs",
-        ]
-        False -> [
-          "../svc-gateway-guest-run/build/dev/javascript/symbolize_svc_gateway_guest_run/svc_gateway_guest_run_dedicated_worker_main.mjs",
-          "../svc-gateway-guest-run/build/dev/javascript/symbolize_svc_gateway_guest_run/svc_gateway_guest_run_main.mjs",
-          "../svc-gateway-guest-run/build/dev/javascript/symbolize_svc_gateway_guest_run/svc_gateway_guest_run_register.mjs",
-          "../svc-gateway-guest-run/build/dev/javascript/symbolize_svc_gateway_guest_run/svc_gateway_guest_run_development.mjs",
-        ]
-      },
-      node.resolve,
-    )
+
+  let copy_entry_points = list_map(copy_entries, node.resolve)
+  let classic_entry_points = list_map(classic_entries, node.resolve)
+  let module_entry_points = list_map(module_entries, node.resolve)
+
   let start = lib_time.performance_now(dev_context.time(context))
   let version_id = node.now_milliseconds()
   build_files(
@@ -170,49 +194,363 @@ fn finish_build(
   )
 }
 
-fn report_result(result: Result(Nil, String)) -> Nil {
-  case result {
-    Ok(Nil) -> Nil
-    Error(reason) -> {
-      fail(reason)
-    }
-  }
-}
-
 fn parse_arguments(arguments: List(String)) -> Result(Arguments, String) {
-  parse_arguments_loop(arguments, False, dev_context.Development, False)
+  parse_arguments_loop(
+    arguments,
+    dev_context.Development,
+    None,
+    None,
+    None,
+    None,
+    None,
+    None,
+    None,
+    None,
+    [],
+    [],
+    [],
+    [],
+  )
 }
 
 fn parse_arguments_loop(
   arguments: List(String),
-  clean: Bool,
   mode: dev_context.Mode,
-  mode_seen: Bool,
+  database: Option(String),
+  schema: Option(String),
+  migrations: Option(String),
+  query: Option(String),
+  outbase: Option(String),
+  guest_dir: Option(String),
+  esbuild_bin: Option(String),
+  better_sqlite3_binding: Option(String),
+  copy_entries: List(String),
+  classic_entries: List(String),
+  module_entries: List(String),
+  packages: List(#(String, String)),
 ) -> Result(Arguments, String) {
   case arguments {
-    [] -> Ok(Arguments(clean, mode))
-    ["--clean", ..rest] -> parse_arguments_loop(rest, True, mode, mode_seen)
-    ["--mode", value, ..rest] ->
-      case mode_seen {
-        True -> Error("Option '--mode' was specified more than once")
-        False ->
-          case string.starts_with(value, "-") {
-            True ->
-              Error(
-                "Option '--mode' argument is ambiguous. Did you forget to "
-                <> "specify the option argument for '--mode'?",
-              )
-            False ->
-              case parse_mode(value) {
-                Error(reason) -> Error(reason)
-                Ok(mode) -> parse_arguments_loop(rest, clean, mode, True)
-              }
+    [] ->
+      case
+        mode,
+        database,
+        schema,
+        migrations,
+        query,
+        guest_dir,
+        esbuild_bin,
+        better_sqlite3_binding
+      {
+        _, None, _, _, _, _, _, _ ->
+          Error("Missing required option '--database <path>'")
+        _, _, None, _, _, _, _, _ ->
+          Error("Missing required option '--schema <path>'")
+        _, _, _, None, _, _, _, _ ->
+          Error("Missing required option '--migrations <path>'")
+        _, _, _, _, None, _, _, _ ->
+          Error("Missing required option '--query <path>'")
+        _, _, _, _, _, None, _, _ ->
+          Error("Missing required option '--guest-dir <path>'")
+        _, _, _, _, _, _, None, _ ->
+          Error("Missing required option '--esbuild-bin <path>'")
+        _, _, _, _, _, _, _, None ->
+          Error("Missing required option '--better-sqlite3-binding <path>'")
+        parsed_mode,
+          Some(db_path),
+          Some(schema_file),
+          Some(migrations_dir),
+          Some(query_dir),
+          Some(guest_directory),
+          Some(bin),
+          Some(binding)
+        -> {
+          let outbase_path = case outbase {
+            Some(p) -> p
+            None -> "."
           }
+          Ok(Arguments(
+            parsed_mode,
+            db_path,
+            schema_file,
+            migrations_dir,
+            query_dir,
+            outbase_path,
+            guest_directory,
+            bin,
+            binding,
+            copy_entries,
+            classic_entries,
+            module_entries,
+            packages,
+          ))
+        }
+      }
+    ["--mode", value, ..rest] ->
+      case parse_mode(value) {
+        Error(reason) -> Error(reason)
+        Ok(parsed_mode) ->
+          parse_arguments_loop(
+            rest,
+            parsed_mode,
+            database,
+            schema,
+            migrations,
+            query,
+            outbase,
+            guest_dir,
+            esbuild_bin,
+            better_sqlite3_binding,
+            copy_entries,
+            classic_entries,
+            module_entries,
+            packages,
+          )
       }
     ["--mode"] -> Error("Option '--mode <value>' argument missing")
+    ["--database", value, ..rest] ->
+      parse_arguments_loop(
+        rest,
+        mode,
+        Some(value),
+        schema,
+        migrations,
+        query,
+        outbase,
+        guest_dir,
+        esbuild_bin,
+        better_sqlite3_binding,
+        copy_entries,
+        classic_entries,
+        module_entries,
+        packages,
+      )
+    ["--database"] -> Error("Option '--database <value>' argument missing")
+    ["--schema", value, ..rest] ->
+      parse_arguments_loop(
+        rest,
+        mode,
+        database,
+        Some(value),
+        migrations,
+        query,
+        outbase,
+        guest_dir,
+        esbuild_bin,
+        better_sqlite3_binding,
+        copy_entries,
+        classic_entries,
+        module_entries,
+        packages,
+      )
+    ["--schema"] -> Error("Option '--schema <value>' argument missing")
+    ["--migrations", value, ..rest] ->
+      parse_arguments_loop(
+        rest,
+        mode,
+        database,
+        schema,
+        Some(value),
+        query,
+        outbase,
+        guest_dir,
+        esbuild_bin,
+        better_sqlite3_binding,
+        copy_entries,
+        classic_entries,
+        module_entries,
+        packages,
+      )
+    ["--migrations"] -> Error("Option '--migrations <value>' argument missing")
+    ["--query", value, ..rest] ->
+      parse_arguments_loop(
+        rest,
+        mode,
+        database,
+        schema,
+        migrations,
+        Some(value),
+        outbase,
+        guest_dir,
+        esbuild_bin,
+        better_sqlite3_binding,
+        copy_entries,
+        classic_entries,
+        module_entries,
+        packages,
+      )
+    ["--query"] -> Error("Option '--query <value>' argument missing")
+    ["--outbase", value, ..rest] ->
+      parse_arguments_loop(
+        rest,
+        mode,
+        database,
+        schema,
+        migrations,
+        query,
+        Some(value),
+        guest_dir,
+        esbuild_bin,
+        better_sqlite3_binding,
+        copy_entries,
+        classic_entries,
+        module_entries,
+        packages,
+      )
+    ["--outbase"] -> Error("Option '--outbase <value>' argument missing")
+    ["--guest-dir", value, ..rest] ->
+      parse_arguments_loop(
+        rest,
+        mode,
+        database,
+        schema,
+        migrations,
+        query,
+        outbase,
+        Some(value),
+        esbuild_bin,
+        better_sqlite3_binding,
+        copy_entries,
+        classic_entries,
+        module_entries,
+        packages,
+      )
+    ["--guest-dir"] -> Error("Option '--guest-dir <value>' argument missing")
+    ["--esbuild-bin", value, ..rest] ->
+      parse_arguments_loop(
+        rest,
+        mode,
+        database,
+        schema,
+        migrations,
+        query,
+        outbase,
+        guest_dir,
+        Some(value),
+        better_sqlite3_binding,
+        copy_entries,
+        classic_entries,
+        module_entries,
+        packages,
+      )
+    ["--esbuild-bin"] ->
+      Error("Option '--esbuild-bin <value>' argument missing")
+    ["--better-sqlite3-binding", value, ..rest] ->
+      parse_arguments_loop(
+        rest,
+        mode,
+        database,
+        schema,
+        migrations,
+        query,
+        outbase,
+        guest_dir,
+        esbuild_bin,
+        Some(value),
+        copy_entries,
+        classic_entries,
+        module_entries,
+        packages,
+      )
+    ["--better-sqlite3-binding"] ->
+      Error("Option '--better-sqlite3-binding <value>' argument missing")
+    ["--copy-entry", value, ..rest] ->
+      parse_arguments_loop(
+        rest,
+        mode,
+        database,
+        schema,
+        migrations,
+        query,
+        outbase,
+        guest_dir,
+        esbuild_bin,
+        better_sqlite3_binding,
+        append(copy_entries, [value]),
+        classic_entries,
+        module_entries,
+        packages,
+      )
+    ["--copy-entry"] -> Error("Option '--copy-entry <value>' argument missing")
+    ["--classic-entry", value, ..rest] ->
+      parse_arguments_loop(
+        rest,
+        mode,
+        database,
+        schema,
+        migrations,
+        query,
+        outbase,
+        guest_dir,
+        esbuild_bin,
+        better_sqlite3_binding,
+        copy_entries,
+        append(classic_entries, [value]),
+        module_entries,
+        packages,
+      )
+    ["--classic-entry"] ->
+      Error("Option '--classic-entry <value>' argument missing")
+    ["--module-entry", value, ..rest] ->
+      parse_arguments_loop(
+        rest,
+        mode,
+        database,
+        schema,
+        migrations,
+        query,
+        outbase,
+        guest_dir,
+        esbuild_bin,
+        better_sqlite3_binding,
+        copy_entries,
+        classic_entries,
+        append(module_entries, [value]),
+        packages,
+      )
+    ["--module-entry"] ->
+      Error("Option '--module-entry <value>' argument missing")
+    ["--package", value, ..rest] ->
+      case string.split_once(value, on: "=") {
+        Error(Nil) ->
+          Error("Option '--package <name=path>' must contain '=' separator")
+        Ok(#(name, path)) ->
+          parse_arguments_loop(
+            rest,
+            mode,
+            database,
+            schema,
+            migrations,
+            query,
+            outbase,
+            guest_dir,
+            esbuild_bin,
+            better_sqlite3_binding,
+            copy_entries,
+            classic_entries,
+            module_entries,
+            append(packages, [#(name, path)]),
+          )
+      }
+    ["--package"] -> Error("Option '--package <name=path>' argument missing")
     ["--", ..rest] ->
       case rest {
-        [] -> Ok(Arguments(clean, mode))
+        [] ->
+          parse_arguments_loop(
+            [],
+            mode,
+            database,
+            schema,
+            migrations,
+            query,
+            outbase,
+            guest_dir,
+            esbuild_bin,
+            better_sqlite3_binding,
+            copy_entries,
+            classic_entries,
+            module_entries,
+            packages,
+          )
         [first, ..] ->
           Error(
             "Unexpected argument '"
@@ -220,31 +558,15 @@ fn parse_arguments_loop(
             <> "'. This command does not take positional arguments",
           )
       }
-    [argument, ..rest] ->
-      case string.starts_with(argument, "--mode=") {
-        True ->
-          case mode_seen {
-            True -> Error("Option '--mode' was specified more than once")
-            False ->
-              case parse_mode(string.drop_start(argument, 7)) {
-                Error(reason) -> Error(reason)
-                Ok(mode) -> parse_arguments_loop(rest, clean, mode, True)
-              }
-          }
+    [argument, ..] ->
+      case string.starts_with(argument, "-") {
+        True -> Error("Unknown option '" <> argument <> "'")
         False ->
-          case string.starts_with(argument, "--clean=") {
-            True -> Error("Option '--clean' does not take an argument")
-            False ->
-              case string.starts_with(argument, "-") {
-                True -> Error("Unknown option '" <> argument <> "'")
-                False ->
-                  Error(
-                    "Unexpected argument '"
-                    <> argument
-                    <> "'. This command does not take positional arguments",
-                  )
-              }
-          }
+          Error(
+            "Unexpected argument '"
+            <> argument
+            <> "'. This command does not take positional arguments",
+          )
       }
   }
 }
@@ -255,16 +577,8 @@ fn parse_mode(value: String) -> Result(dev_context.Mode, String) {
     "production" -> Ok(dev_context.Production)
     _ ->
       Error(
-        "Invalid string option (not \"development\" | \"production\") "
-        <> "at (root)",
+        "Invalid string option (not \"development\" | \"production\") at (root)",
       )
-  }
-}
-
-fn mode_name(mode: dev_context.Mode) -> String {
-  case mode {
-    dev_context.Development -> "development"
-    dev_context.Production -> "production"
   }
 }
 
@@ -309,5 +623,15 @@ fn append(first: List(a), second: List(a)) -> List(a) {
   case first {
     [] -> second
     [head, ..tail] -> [head, ..append(tail, second)]
+  }
+}
+
+fn list_each(values: List(a), effect: fn(a) -> Nil) -> Nil {
+  case values {
+    [] -> Nil
+    [first, ..rest] -> {
+      effect(first)
+      list_each(rest, effect)
+    }
   }
 }

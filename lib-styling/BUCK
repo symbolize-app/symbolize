@@ -1,0 +1,11 @@
+load("@dev_buck//:gleam.bzl", "gleam_package")
+
+gleam_package(
+    name = "lib-styling",
+    package_name = "symbolize_lib_styling",
+    deps = [
+        "//lib-dataflow:lib-dataflow",
+        "vendor//:gleam_stdlib",
+    ],
+)
+

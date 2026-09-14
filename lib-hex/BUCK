@@ -1,0 +1,10 @@
+load("@dev_buck//:gleam.bzl", "gleam_package")
+
+gleam_package(
+    name = "lib-hex",
+    package_name = "symbolize_lib_hex",
+    deps = [
+        "vendor//:gleam_stdlib",
+    ],
+)
+

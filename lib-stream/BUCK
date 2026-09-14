@@ -1,0 +1,16 @@
+load("@dev_buck//:gleam.bzl", "gleam_package")
+
+gleam_package(
+    name = "lib-stream",
+    package_name = "symbolize_lib_stream",
+    deps = [
+        "//dev-browser-test:dev-browser-test",
+        "//lib-dataflow:lib-dataflow",
+        "//lib-error:lib-error",
+        "//lib-hex:lib-hex",
+        "//lib-random:lib-random",
+        "//lib-time:lib-time",
+        "vendor//:gleam_stdlib",
+    ],
+)
+

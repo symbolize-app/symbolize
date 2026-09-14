@@ -1,0 +1,27 @@
+load("@dev_buck//:gleam.bzl", "gleam_package")
+
+gleam_package(
+    name = "dev-esbuild",
+    package_name = "symbolize_dev_esbuild",
+    deps = [
+        "//dev-browser-test:dev-browser-test",
+        "//lib-collection:lib-collection",
+        "//lib-dataflow:lib-dataflow",
+        "//lib-error:lib-error",
+        "//lib-hex:lib-hex",
+        "//lib-time:lib-time",
+        "vendor//:gleam_stdlib",
+    ],
+)
+
+load("@prelude//rules.bzl", "export_file")
+
+[
+    export_file(
+        name = f,
+        src = f,
+        visibility = ["PUBLIC"],
+    )
+    for f in native.glob(["query/*.sql"])
+]
+

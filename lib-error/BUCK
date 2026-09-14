@@ -1,0 +1,14 @@
+load("@dev_buck//:gleam.bzl", "gleam_package")
+
+gleam_package(
+    name = "lib-error",
+    package_name = "symbolize_lib_error",
+    deps = [
+        "//dev-browser-test:dev-browser-test",
+        "//lib-dataflow:lib-dataflow",
+        "//lib-random:lib-random",
+        "//lib-time:lib-time",
+        "vendor//:gleam_stdlib",
+    ],
+)
+

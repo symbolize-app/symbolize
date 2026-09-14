@@ -1,0 +1,6 @@
+load("//:rules.bzl", "gleam_package")
+
+gleam_package(
+    name = "gleam_stdlib",
+    package_name = "gleam_stdlib",
+)

@@ -1,0 +1,13 @@
+load("@prelude//rules.bzl", "export_file")
+
+export_file(
+    name = "register.mjs",
+    src = "register.mjs",
+    visibility = ["PUBLIC"],
+)
+
+export_file(
+    name = "hooks.mjs",
+    src = "hooks.mjs",
+    visibility = ["PUBLIC"],
+)

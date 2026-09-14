@@ -1,0 +1,11 @@
+load("@dev_buck//:gleam.bzl", "gleam_package")
+
+gleam_package(
+    name = "lib-random",
+    package_name = "symbolize_lib_random",
+    deps = [
+        "//lib-hex:lib-hex",
+        "vendor//:gleam_stdlib",
+    ],
+)
+

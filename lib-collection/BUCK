@@ -1,0 +1,10 @@
+load("@dev_buck//:gleam.bzl", "gleam_package")
+
+gleam_package(
+    name = "lib-collection",
+    package_name = "symbolize_lib_collection",
+    deps = [
+        "vendor//:gleam_stdlib",
+    ],
+)
+

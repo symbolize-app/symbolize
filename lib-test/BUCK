@@ -1,0 +1,12 @@
+load("@dev_buck//:gleam.bzl", "gleam_package")
+
+gleam_package(
+    name = "lib-test",
+    package_name = "symbolize_lib_test",
+    deps = [
+        "//lib-dataflow:lib-dataflow",
+        "//lib-error:lib-error",
+        "vendor//:gleam_stdlib",
+    ],
+)
+

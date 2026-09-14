@@ -7,6 +7,7 @@ where
 import Data.Aeson qualified as Aeson
 import Data.Typeable (cast)
 import Data.Vector (Vector)
+import Dev.Gen.FileFormat qualified as FileFormat
 import Dev.Gen.FilePath (FilePath)
 import Relude.Base (Eq ((==)), Show, Type, Typeable)
 import Relude.Bool (Bool (False, True))
@@ -34,6 +35,7 @@ data Command a where
   ReadLines :: FilePath -> Command (Vector Text)
   WriteLines :: FilePath -> Vector Text -> Command ()
   ReadVendorTargets :: Command (Vector (Text, Text))
+  ReadGleamPackages :: Command (Vector FileFormat.GleamPackage)
 
 instance Eq (Command a) where
   (==) :: Command a -> Command a -> Bool
@@ -56,6 +58,7 @@ instance Eq (Command a) where
   (ReadTOML filePathX) == (ReadTOML filePathY) =
     filePathX == filePathY
   ReadVendorTargets == ReadVendorTargets = True
+  ReadGleamPackages == ReadGleamPackages = True
   _ == _ = False
 
 deriving stock instance Show (Command a)

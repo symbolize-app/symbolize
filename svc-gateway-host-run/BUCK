@@ -30,4 +30,7 @@ rust_binary(
     test_deps = [
         "vendor//:mockall",
     ],
+    env = {
+        "MANIFEST_PATH": "$(location //svc-gateway-guest-run:manifest)",
+    },
 )

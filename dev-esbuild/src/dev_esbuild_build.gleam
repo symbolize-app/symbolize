@@ -84,6 +84,21 @@ fn set_plugins(options: BuildOptions, value: List(Plugin)) -> Nil
 @external(javascript, "./build_ffi.mjs", "new_entry_point")
 fn new_entry_point(input: String, output: String) -> EntryPoint
 
+@external(javascript, "./build_ffi.mjs", "new_classic_plugin")
+fn new_classic_plugin() -> Plugin
+
+@external(javascript, "./build_ffi.mjs", "set_package_path")
+pub fn set_package_path(name: String, path: String) -> Nil
+
+@external(javascript, "./build_ffi.mjs", "set_guest_dir")
+pub fn set_guest_dir(path: String) -> Nil
+
+@external(javascript, "./build_ffi.mjs", "set_esbuild_bin")
+pub fn set_esbuild_bin(path: String) -> Nil
+
+@external(javascript, "./build_ffi.mjs", "set_better_sqlite3_binding")
+pub fn set_better_sqlite3_binding(path: String) -> Nil
+
 @external(javascript, "./build_ffi.mjs", "new_modules_plugin")
 fn new_modules_plugin(
   rewrite: fn(NativeResolveArgs, NativeResolveResult) ->
@@ -311,6 +326,7 @@ fn classic_options(
 ) -> BuildOptions {
   let options = common_options(entry_points, outbase, outdir, production)
   set_format(options, "iife")
+  set_plugins(options, [new_classic_plugin()])
   options
 }
 

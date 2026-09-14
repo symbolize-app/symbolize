@@ -1,0 +1,16 @@
+load("@dev_buck//:gleam.bzl", "gleam_package")
+
+gleam_package(
+    name = "svc-auth-guest-view",
+    package_name = "symbolize_svc_auth_guest_view",
+    deps = [
+        "//dev-browser-test:dev-browser-test",
+        "//lib-dataflow:lib-dataflow",
+        "//lib-markup:lib-markup",
+        "//lib-stream:lib-stream",
+        "//lib-styling:lib-styling",
+        "//lib-time:lib-time",
+        "vendor//:gleam_stdlib",
+    ],
+)
+

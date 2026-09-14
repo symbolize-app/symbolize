@@ -376,6 +376,11 @@ alias(
 )
 
 alias(
+    name = "gleam_stdlib",
+    actual = "//gleam_stdlib-1.0.5:gleam_stdlib",
+)
+
+alias(
     name = "gloo-timers",
     actual = "//gloo-0.3.0/crates/timers:gloo-timers",
 )

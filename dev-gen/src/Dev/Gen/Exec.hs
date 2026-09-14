@@ -8,6 +8,7 @@ module Dev.Gen.Exec
     readLines,
     readTOML,
     readVendorTargets,
+    readGleamPackages,
     readYAML,
     writeJSON,
     writeLines,
@@ -19,6 +20,7 @@ import Control.Monad (MonadFail, ap, liftM, (>>))
 import Data.Aeson qualified as Aeson
 import Data.Vector (Vector)
 import Dev.Gen.Command qualified as Command
+import Dev.Gen.FileFormat qualified as FileFormat
 import Dev.Gen.FilePath (FilePath)
 import Relude.Applicative (Applicative, pass, pure, (<*>))
 import Relude.Base (Eq, Show, Type, Typeable)
@@ -95,6 +97,9 @@ readTOML = _command1 Command.ReadTOML
 
 readVendorTargets :: Exec (Vector (Text, Text))
 readVendorTargets = Command Command.ReadVendorTargets
+
+readGleamPackages :: Exec (Vector FileFormat.GleamPackage)
+readGleamPackages = Command Command.ReadGleamPackages
 
 _command1 :: (Typeable a) => (t1 -> Command.Command a) -> t1 -> Exec a
 _command1 command b = Command (command b)
