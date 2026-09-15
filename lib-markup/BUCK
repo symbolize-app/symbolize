@@ -1,0 +1,14 @@
+load("@dev_buck//:gleam.bzl", "gleam_package")
+
+gleam_package(
+    name = "lib-markup",
+    package_name = "symbolize_lib_markup",
+    deps = [
+        "//dev-browser-test:dev-browser-test",
+        "//lib-dataflow:lib-dataflow",
+        "//lib-error:lib-error",
+        "//lib-styling:lib-styling",
+        "vendor//:gleam_stdlib",
+    ],
+)
+

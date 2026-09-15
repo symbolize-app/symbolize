@@ -1,0 +1,14 @@
+load("@dev_buck//:gleam.bzl", "gleam_package")
+
+gleam_package(
+    name = "svc-auth-guest-read",
+    package_name = "symbolize_svc_auth_guest_read",
+    deps = [
+        "//dev-browser-test:dev-browser-test",
+        "//lib-dataflow:lib-dataflow",
+        "//lib-stream:lib-stream",
+        "//lib-time:lib-time",
+        "vendor//:gleam_stdlib",
+    ],
+)
+

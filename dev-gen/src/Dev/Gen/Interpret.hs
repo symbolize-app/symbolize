@@ -14,16 +14,17 @@ import Data.Vector (Vector)
 import Data.Yaml qualified as Yaml
 import Dev.Gen.Command qualified as Command
 import Dev.Gen.Exec qualified as Exec
+import Dev.Gen.FileFormat qualified as FileFormat
 import Dev.Gen.FilePath (FilePath (FilePath))
 import Relude.Applicative (pure)
 import Relude.Base (Eq, Type, (/=), (==))
-import Relude.Bool (Bool (False, True), otherwise, (&&))
+import Relude.Bool (Bool (False, True), not, otherwise, (&&), (||))
 import Relude.Container (fromList)
 import Relude.File (readFileLBS)
 import Relude.Foldable (concat, length, toList)
 import Relude.Function (const, ($), (.))
 import Relude.Functor (bimap, first, (<$>))
-import Relude.Monad (Either (Left, Right), Maybe (Just, Nothing), either, fail, liftIO, (<=<), (>>=))
+import Relude.Monad (Either (Left, Right), Maybe (Just, Nothing), catMaybes, either, fail, liftIO, (<=<), (>>=))
 import Relude.Monoid (Sum, mempty, (<>))
 import Relude.Numeric (Integer, (+))
 import Relude.Print (putText)
@@ -110,6 +111,8 @@ interpret (Exec.Command (Command.ReadTOML filePath)) _ =
   (0,) <$> _loadFromFile filePath _tomlEitherDecode
 interpret (Exec.Command Command.ReadVendorTargets) _ =
   (0,) <$> _readVendorTargets
+interpret (Exec.Command Command.ReadGleamPackages) _ =
+  (0,) <$> _readGleamPackages
 
 _yamlEitherDecode :: (Aeson.FromJSON a) => LByteString -> Either String a
 _yamlEitherDecode = first show . Yaml.decodeEither' . toStrict
@@ -243,15 +246,70 @@ _readVendorTargets = liftIO $ do
       where
         go _ [] = []
         go inLib (l : rest)
-          | "rust_library(" `Text.isInfixOf` l = go True rest
+          | "rust_library(" `Text.isInfixOf` l || "gleam_package(" `Text.isInfixOf` l = go True rest
           | inLib && "name =" `Text.isInfixOf` l =
-              case extractQuoted l of
+              case _extractQuoted l of
                 Just n -> n : go False rest
                 Nothing -> go inLib rest
           | inLib && ")" `Text.isPrefixOf` Text.stripStart l = go False rest
           | otherwise = go inLib rest
 
-        extractQuoted l =
-          case Text.splitOn "\"" l of
-            (_ : val : _) -> Just val
+_extractQuoted :: Text -> Maybe Text
+_extractQuoted l =
+  case Text.splitOn "\"" l of
+    (_ : val : _) -> Just val
+    _ -> Nothing
+
+_readGleamPackages :: (MonadUnliftIO m) => m (Vector FileFormat.GleamPackage)
+_readGleamPackages = liftIO $ do
+  mWorkspace <- (Just <$> readFileLBS "workspace.bzl") `catchAny` const (pure Nothing)
+  case mWorkspace >>= (rightToMaybe . decodeUtf8Strict . toStrict) of
+    Nothing -> pure []
+    Just txt -> do
+      let gleamDirs = extractGleamMembers (lines txt)
+      pkgs <- forM gleamDirs $ \dText -> do
+        let d = toString dText
+            tomlPath = d </> "gleam.toml"
+        mContent <- (Just <$> readFileLBS tomlPath) `catchAny` const (pure Nothing)
+        case mContent >>= (rightToMaybe . decodeUtf8Strict . toStrict) of
+          Nothing -> pure Nothing
+          Just tomlTxt -> do
+            let ls = lines tomlTxt
+                pkgName = parsePackageName ls
+                deps = parseDependencies ls
+            pure (Just (FileFormat.GleamPackage dText pkgName (fromList deps)))
+      pure (fromList (catMaybes pkgs))
+  where
+    rightToMaybe (Right x) = Just x
+    rightToMaybe (Left _) = Nothing
+
+    extractGleamMembers ls =
+      let inMembers = List.dropWhile (not . ("gleam_members =" `Text.isInfixOf`)) ls
+          memberLines = List.takeWhile (not . ("]" `Text.isPrefixOf`) . Text.stripStart) (List.drop 1 inMembers)
+       in [n | l <- memberLines, Just n <- [_extractQuoted l]]
+
+    parsePackageName [] = ""
+    parsePackageName (l : rest)
+      | "name =" `Text.isInfixOf` l =
+          case _extractQuoted l of
+            Just n -> n
+            Nothing -> parsePackageName rest
+      | otherwise = parsePackageName rest
+
+    parseDependencies ls =
+      let inDeps = List.dropWhile (not . ("dependencies" `Text.isInfixOf`)) ls
+          depLines = List.takeWhile (not . ("[" `Text.isPrefixOf`) . Text.stripStart) (List.drop 1 inDeps)
+       in List.sort [d | l <- depLines, Just d <- [parseDepLine l]]
+
+    parseDepLine l
+      | "=" `Text.isInfixOf` l && "path =" `Text.isInfixOf` l =
+          case (Text.splitOn "=" l, Text.splitOn "\"" l) of
+            (k : _, _ : p : _) ->
+              let depName = Text.strip k
+               in if "vendor/" `Text.isInfixOf` p
+                    then Just ("vendor//:" <> depName)
+                    else
+                      let depDir = Text.replace "../" "" p
+                       in Just ("//" <> depDir <> ":" <> depDir)
             _ -> Nothing
+      | otherwise = Nothing

@@ -103,13 +103,78 @@ export function new_entry_point(input, output) {
   return { in: input, out: output }
 }
 
+const packageMap = new Map()
+let guestDir = null
+
+export function set_package_path(name, path) {
+  packageMap.set(name, path)
+}
+
+export function set_guest_dir(path) {
+  guestDir = path
+}
+
+export function set_esbuild_bin(path) {
+  process.env.ESBUILD_BINARY_PATH = path
+}
+
+export function set_better_sqlite3_binding(path) {
+  process.env.BETTER_SQLITE3_BINDING = path
+}
+
+function resolveWithPackageMap(importPath) {
+  if (importPath.startsWith('../../../../') && guestDir) {
+    const assetName = importPath.slice('../../../../'.length)
+    return pathResolve(guestDir, assetName)
+  }
+  if (importPath.startsWith('../')) {
+    const slashIdx = importPath.indexOf('/', 3)
+    if (slashIdx !== -1) {
+      const pkg = importPath.slice(3, slashIdx)
+      const subpath = importPath.slice(slashIdx + 1)
+      if (packageMap.has(pkg)) {
+        return pathResolve(packageMap.get(pkg), subpath)
+      }
+    } else if (importPath === '../prelude.mjs') {
+      if (packageMap.has('prelude')) {
+        return packageMap.get('prelude')
+      }
+    }
+  }
+  return importPath
+}
+
+export function new_classic_plugin() {
+  const plugin = {
+    name: 'buildClassic',
+    setup(buildApi) {
+      buildApi.onResolve({ filter: /.*/ }, async (args) => {
+        if (args.pluginData === resolveBase) return undefined
+        const mappedPath = resolveWithPackageMap(args.path)
+        if (mappedPath !== args.path) {
+          return buildApi.resolve(mappedPath, {
+            importer: args.importer,
+            kind: args.kind,
+            namespace: args.namespace,
+            pluginData: resolveBase,
+            resolveDir: args.resolveDir,
+          })
+        }
+        return undefined
+      })
+    },
+  }
+  return plugin
+}
+
 export function new_modules_plugin(rewrite) {
   const plugin = {
     name: 'buildModules',
     setup(buildApi) {
       buildApi.onResolve({ filter: /.*/ }, async (args) => {
         if (args.pluginData === resolveBase) return undefined
-        const resolveResult = await buildApi.resolve(args.path, {
+        const mappedPath = resolveWithPackageMap(args.path)
+        const resolveResult = await buildApi.resolve(mappedPath, {
           importer: args.importer,
           kind: args.kind,
           namespace: args.namespace,

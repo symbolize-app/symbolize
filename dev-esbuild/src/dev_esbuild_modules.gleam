@@ -100,15 +100,27 @@ pub fn convert_to_out_path(
   input_path: String,
 ) -> Result(#(Context, String), String) {
   let relative = relative_path(context.outbase, input_path)
-  case generated_gateway_entry(relative) {
+  case generated_gateway_entry(input_path) {
     Some(output_path) -> Ok(#(context, output_path))
     None ->
-      case generated_development_entry(relative) {
+      case generated_development_entry(input_path) {
         Some(output_path) -> Ok(#(context, output_path))
         None ->
-          case generated_module_output_path(relative) {
+          case generated_module_output_path(input_path) {
             Some(output_path) -> Ok(#(context, output_path))
-            None -> convert_regular_out_path(context, relative)
+            None ->
+              case generated_gateway_entry(relative) {
+                Some(output_path) -> Ok(#(context, output_path))
+                None ->
+                  case generated_development_entry(relative) {
+                    Some(output_path) -> Ok(#(context, output_path))
+                    None ->
+                      case generated_module_output_path(relative) {
+                        Some(output_path) -> Ok(#(context, output_path))
+                        None -> convert_regular_out_path(context, relative)
+                      }
+                  }
+              }
           }
       }
   }
@@ -160,13 +172,20 @@ fn generated_development_entry(path: String) -> Option(String) {
 // Keep the compiler output as the esbuild input, but give each generated module
 // a stable logical output path before imports are rewritten.
 fn generated_module_output_path(path: String) -> Option(String) {
-  case string.split(path, on: "/") {
-    ["build", _, "javascript", "prelude.mjs"] -> Some(".gleam/prelude")
-    ["build", _, "javascript", package, ..module_parts] ->
-      generated_package_output_path(package, module_parts)
-    [_, "build", _, "javascript", package, ..module_parts] ->
-      generated_package_output_path(package, module_parts)
-    _ -> None
+  case string.ends_with(path, "/prelude.mjs") || path == "prelude.mjs" {
+    True -> Some(".gleam/prelude")
+    False -> extract_package_and_module(string.split(path, on: "/"))
+  }
+}
+
+fn extract_package_and_module(parts: List(String)) -> Option(String) {
+  case parts {
+    [] -> None
+    [head, ..tail] ->
+      case generated_package_prefix(head) {
+        Some(_) -> generated_package_output_path(head, tail)
+        None -> extract_package_and_module(tail)
+      }
   }
 }
 

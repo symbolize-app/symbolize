@@ -75,27 +75,31 @@ tasks:
       - esbuild:build
       - esbuild:b
     deps:
-      - :dev-esbuild:build
-    cmd: ./dev-esbuild/bin/dev-esbuild --mode development
+      - :svc-gateway-host-store:link-build-dir
+    cmd: >-
+      out=$(buck2 build --show-output //svc-gateway-guest-run:manifest | awk '{print $2}') &&
+      ln -sf $(realpath "$out") svc-gateway-host-store/build/manifest.sqlite3
 
   esbuild:build:debug:watch:
     aliases:
       - esbuild:build:watch
       - esbuild:bw
     deps:
-      - :dev-esbuild:build
+      - :svc-gateway-host-store:link-build-dir
     cmd:
       task: :watchman:client
       vars:
         WATCH: true
         RESTART: false
         MODE: javascript
-        COMMAND: ./dev-esbuild/bin/dev-esbuild --mode development
+        COMMAND: task node:esbuild:build:debug
 
   esbuild:build:release:
     deps:
-      - :dev-esbuild:build
-    cmd: ./dev-esbuild/bin/dev-esbuild --mode production
+      - :svc-gateway-host-store:link-build-dir
+    cmd: >-
+      out=$(buck2 build --show-output //svc-gateway-guest-run:manifest-release | awk '{print $2}') &&
+      ln -sf $(realpath "$out") svc-gateway-host-store/build/manifest.sqlite3
 
   esbuild:test:browser:built:
     cmds:
@@ -104,14 +108,10 @@ tasks:
       - task: :dev-esbuild:test:browser:built
 
   esbuild:clean:debug:
-    deps:
-      - :dev-esbuild:build
-    cmd: ./dev-esbuild/bin/dev-esbuild --mode development --clean
+    cmd: rm -f svc-gateway-host-store/build/manifest.sqlite3
 
   esbuild:clean:release:
-    deps:
-      - :dev-esbuild:build
-    cmd: ./dev-esbuild/bin/dev-esbuild --mode production --clean
+    cmd: rm -f svc-gateway-host-store/build/manifest.sqlite3
 
   eslint:clean:
     cmd: rm build/eslint-cache

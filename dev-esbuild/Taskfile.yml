@@ -31,9 +31,7 @@ tasks:
       - :svc-gateway-guest-run:build
     dir: '{{.TASKFILE_DIR}}'
     cmd: gleam build
-  cli:debug:
-    dir: '{{.TASKFILE_DIR}}'
-    cmd: ./bin/dev-esbuild --mode development
+
   link-build-dir:
     cmd:
       task: :build-dir:link-package-build-dir

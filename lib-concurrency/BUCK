@@ -1,0 +1,12 @@
+load("@dev_buck//:gleam.bzl", "gleam_package")
+
+gleam_package(
+    name = "lib-concurrency",
+    package_name = "symbolize_lib_concurrency",
+    deps = [
+        "//dev-browser-test:dev-browser-test",
+        "//lib-dataflow:lib-dataflow",
+        "vendor//:gleam_stdlib",
+    ],
+)
+

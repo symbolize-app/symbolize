@@ -225,18 +225,26 @@ fn build_expr(cli: &Cli) -> Result<Expr> {
       Expr::Suffix(vec![
         "cjs".into(),
         "css".into(),
+        "gleam".into(),
         "html".into(),
         "js".into(),
         "mjs".into(),
         "sql".into(),
+        "toml".into(),
         "txt".into(),
       ]),
       Expr::Name(NameTerm {
-        paths: vec![".eslintrc.json".into(), "vendor/README.md".into()],
+        paths: vec![
+          ".eslintrc.json".into(),
+          "BUCK".into(),
+          "vendor/README.md".into(),
+        ],
         wholename: false,
       }),
       Expr::Name(NameTerm {
         paths: vec![
+          "dev-buck/esbuild.bzl".into(),
+          "dev-buck/gleam.bzl".into(),
           "dev-eslint/index.json".into(),
           "dev-task/node.yml".into(),
         ],

@@ -1,0 +1,10 @@
+load("@dev_buck//:gleam.bzl", "gleam_package")
+
+gleam_package(
+    name = "lib-time",
+    package_name = "symbolize_lib_time",
+    deps = [
+        "vendor//:gleam_stdlib",
+    ],
+)
+

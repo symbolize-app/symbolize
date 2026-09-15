@@ -1,5 +1,6 @@
 module Dev.Gen.FileFormat
-  ( Taskfile (..),
+  ( GleamPackage (..),
+    Taskfile (..),
     TaskfileCommand (..),
     TaskfileInclude (..),
     TaskfileTask (..),
@@ -12,23 +13,37 @@ where
 
 import Data.Aeson qualified as Aeson
 import Data.Vector (Vector)
+import Relude.Applicative (pure)
 import Relude.Base (Eq, Generic, Show, Type)
 import Relude.Bool (Bool (True))
 import Relude.Container (Map, fromList)
-import Relude.Function ((.))
-import Relude.Functor ((<$>))
-import Relude.Monad (Maybe)
+import Relude.Function (($), (.))
+import Relude.Functor (fmap, (<$>))
+import Relude.Monad (Maybe, maybe)
+import Relude.Monoid (mempty)
 import Relude.String (Text)
 import Toml.FromValue qualified as Toml
 
 type Workspace :: Type
-newtype Workspace = Workspace
-  { members :: Vector Text
+data Workspace = Workspace
+  { rustMembers :: Vector Text,
+    gleamMembers :: Vector Text
   }
   deriving stock (Show, Eq)
 
 instance Toml.FromValue Workspace where
-  fromValue = Toml.parseTableFromValue (Workspace . fromList <$> Toml.reqKey "members")
+  fromValue = Toml.parseTableFromValue $ do
+    rm <- fromList <$> Toml.reqKey "rust_members"
+    gm <- maybe mempty fromList <$> Toml.optKey "gleam_members"
+    pure Workspace {rustMembers = rm, gleamMembers = gm}
+
+type GleamPackage :: Type
+data GleamPackage = GleamPackage
+  { dir :: Text,
+    name :: Text,
+    deps :: Vector Text
+  }
+  deriving stock (Show, Eq, Generic)
 
 taskfileOptions :: Aeson.Options
 taskfileOptions =

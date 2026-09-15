@@ -1,5 +1,5 @@
 load("@prelude//rules.bzl", "export_file", "test_suite")
-load("//:workspace.bzl", "members")
+load("//:workspace.bzl", "rust_members")
 
 export_file(
     name = "rustfmt.toml",
@@ -9,7 +9,7 @@ export_file(
 
 test_suite(
     name = "test",
-    tests = [f"//{pkg}:test" for pkg in members],
+    tests = [f"//{pkg}:test" for pkg in rust_members],
     visibility = ["PUBLIC"],
 )
 

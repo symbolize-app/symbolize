@@ -1,0 +1,35 @@
+load("@dev_buck//:gleam.bzl", "gleam_package")
+
+gleam_package(
+    name = "svc-gateway-guest-run",
+    package_name = "symbolize_svc_gateway_guest_run",
+    deps = [
+        "//dev-browser-test:dev-browser-test",
+        "//lib-collection:lib-collection",
+        "//lib-dataflow:lib-dataflow",
+        "//lib-error:lib-error",
+        "//lib-hex:lib-hex",
+        "//lib-markup:lib-markup",
+        "//lib-payload:lib-payload",
+        "//lib-random:lib-random",
+        "//lib-stream:lib-stream",
+        "//lib-styling:lib-styling",
+        "//lib-time:lib-time",
+        "//svc-auth-guest-read:svc-auth-guest-read",
+        "//svc-auth-guest-view:svc-auth-guest-view",
+        "vendor//:gleam_stdlib",
+    ],
+)
+
+load("@dev_buck//:esbuild.bzl", "esbuild_manifest")
+
+esbuild_manifest(
+    name = "manifest",
+    mode = "development",
+)
+
+esbuild_manifest(
+    name = "manifest-release",
+    mode = "production",
+)
+

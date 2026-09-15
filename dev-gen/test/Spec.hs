@@ -26,7 +26,8 @@ spec = context "Gen" $ do
           ExecSpec.readTOML
             "workspace.bzl"
             ( FileFormat.Workspace
-                { members = []
+                { rustMembers = [],
+                  gleamMembers = []
                 }
             ),
           ExecSpec.readLines
@@ -64,6 +65,8 @@ spec = context "Gen" $ do
             ),
           ExecSpec.readVendorTargets
             [("foo-bar", "//foo-bar-1.0.0:foo-bar")],
+          ExecSpec.readGleamPackages
+            [],
           ExecSpec.writeLines
             ".buckconfig"
             [ "[cells]",

@@ -1,0 +1,11 @@
+load("@dev_buck//:gleam.bzl", "gleam_package")
+
+gleam_package(
+    name = "dev-browser-test",
+    package_name = "symbolize_dev_browser_test",
+    deps = [
+        "//lib-dataflow:lib-dataflow",
+        "vendor//:gleam_stdlib",
+    ],
+)
+

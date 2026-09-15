@@ -105,8 +105,14 @@ impl DbImpl {
   }
 
   fn open_db_connection() -> Result<rusqlite::Connection> {
+    let path = std::env::var("MANIFEST_PATH")
+      .ok()
+      .or_else(|| option_env!("MANIFEST_PATH").map(String::from))
+      .unwrap_or_else(|| {
+        "svc-gateway-host-store/build/manifest.sqlite3".to_string()
+      });
     Ok(rusqlite::Connection::open_with_flags(
-      "svc-gateway-host-store/build/manifest.sqlite3",
+      path,
       rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY
         | rusqlite::OpenFlags::SQLITE_OPEN_NO_MUTEX,
     )?)
@@ -302,5 +308,16 @@ impl Db for DbImpl {
         )
       })
       .await
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[tokio::test]
+  async fn test_open_db_connection() {
+    let conn = DbImpl::open_db_connection();
+    assert!(conn.is_ok(), "Failed to open DB: {:?}", conn.err());
   }
 }

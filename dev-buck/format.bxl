@@ -1,4 +1,4 @@
-load("@root//:workspace.bzl", "members")
+load("@root//:workspace.bzl", "rust_members")
 
 def _diff_impl(ctx: bxl.Context):
     target = ctx.cli_args.target
@@ -6,7 +6,7 @@ def _diff_impl(ctx: bxl.Context):
         utargets = ctx.uquery().eval(target)
         targets = ctx.configured_targets(utargets, modifiers = ctx.modifiers)
     else:
-        diff_targets = [f"root//{pkg}:format-diff" for pkg in members]
+        diff_targets = [f"root//{pkg}:format-diff" for pkg in rust_members]
         targets = ctx.configured_targets(diff_targets, modifiers = ctx.modifiers)
     seen = {}
     build_results = ctx.build(targets)
@@ -33,7 +33,7 @@ def _check_impl(ctx: bxl.Context):
         utargets = ctx.uquery().eval(target)
         targets = ctx.configured_targets(utargets, modifiers = ctx.modifiers)
     else:
-        check_targets = [f"root//{pkg}:format-check" for pkg in members]
+        check_targets = [f"root//{pkg}:format-check" for pkg in rust_members]
         targets = ctx.configured_targets(check_targets, modifiers = ctx.modifiers)
 
     results = ctx.build(targets)

@@ -23,12 +23,6 @@ type Statement
 
 type Parameters
 
-const manifest_path = "../svc-gateway-host-store/build/manifest.sqlite3"
-
-const migrations_path = "../svc-gateway-host-store/migrate"
-
-const schema_path = "../svc-gateway-host-store/schema.sql"
-
 const query_path = "query"
 
 @external(javascript, "./database_ffi.mjs", "open")
@@ -93,8 +87,8 @@ fn get_blob_by_blob(
 @external(javascript, "./database_ffi.mjs", "call_and_catch")
 fn call_and_catch(action: fn() -> a) -> Result(a, String)
 
-pub fn open(path: String) -> Database {
-  configure(open_ffi(path, False), query_path)
+pub fn open_with_query(path: String, query_directory: String) -> Database {
+  configure(open_ffi(path, False), query_directory)
 }
 
 pub fn open_readonly(path: String) -> Database {
@@ -107,21 +101,30 @@ pub fn open_memory(schema: String) -> Database {
   configure(database, query_path)
 }
 
-pub fn migrate() -> lib_error.Async(Nil, String) {
+pub fn migrate_with_paths(
+  database_path: String,
+  schema_path: String,
+  migrations_path: String,
+) -> lib_error.Async(Nil, String) {
   fn(done) {
     node.exec_file("dbmate", ["--no-dump-schema", "up"], [
-      #("DATABASE_URL", "sqlite:" <> manifest_path),
+      #("DATABASE_URL", "sqlite:" <> database_path),
       #("DBMATE_MIGRATIONS_DIR", migrations_path),
       #("DBMATE_SCHEMA_FILE", schema_path),
     ])(done)
   }
 }
 
-pub fn init() -> lib_error.Async(Database, String) {
+pub fn init_with_paths(
+  database_path: String,
+  schema_path: String,
+  migrations_path: String,
+  query_directory: String,
+) -> lib_error.Async(Database, String) {
   fn(done) {
-    migrate()(fn(result) {
+    migrate_with_paths(database_path, schema_path, migrations_path)(fn(result) {
       case result {
-        Ok(Nil) -> done(Ok(open(manifest_path)))
+        Ok(Nil) -> done(Ok(open_with_query(database_path, query_directory)))
         Error(reason) -> done(Error(reason))
       }
     })

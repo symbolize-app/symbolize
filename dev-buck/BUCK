@@ -55,3 +55,10 @@ system_genrule_toolchain(
     name = "genrule",
     visibility = ["PUBLIC"],
 )
+
+load(":gleam.bzl", "gleam_prelude")
+
+gleam_prelude(
+    name = "prelude",
+    visibility = ["PUBLIC"],
+)

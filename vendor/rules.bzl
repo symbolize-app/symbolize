@@ -36,3 +36,12 @@ def genrule(name, **kwargs):
         **kwargs,
     )
 
+load("@dev_buck//:gleam.bzl", _gleam_package = "gleam_package")
+
+def gleam_package(name, **kwargs):
+    _gleam_package(
+        name = name,
+        visibility = ["PUBLIC"],
+        **kwargs,
+    )
+

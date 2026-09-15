@@ -15,9 +15,9 @@ import Dev.Gen.Package qualified as Package
 import Dev.Gen.Vendor.Target qualified as Target
 import Relude.Applicative (pass, pure, (<*>))
 import Relude.Base (Type, (/=), (==))
-import Relude.Bool (Bool (False, True), not, (&&), (||))
+import Relude.Bool (Bool (False, True), not, otherwise, (&&), (||))
 import Relude.Container (fromList, uncurry)
-import Relude.Foldable (Foldable, for_, toList)
+import Relude.Foldable (Foldable, for_, null, toList)
 import Relude.Function (const, ($), (.))
 import Relude.Functor ((<$>))
 import Relude.Monad (Maybe (Just, Nothing), fromMaybe, (=<<))
@@ -32,13 +32,15 @@ data Input = Input
     gitIgnore :: Vector Text,
     procfileInput :: Vector Text,
     rootTaskfileInput :: FileFormat.Taskfile,
-    vendorTargets :: Vector (Text, Text)
+    vendorTargets :: Vector (Text, Text),
+    gleamPackages :: Vector FileFormat.GleamPackage
   }
 
 type Output :: Type
 data Output = Output
   { buckConfig :: Vector Text,
     packageTaskfiles :: Vector (FilePath, FileFormat.Taskfile),
+    gleamBuckFiles :: Vector (FilePath, Vector Text),
     procfile :: Vector Text,
     rootTaskfile :: FileFormat.Taskfile,
     sqlFluffIgnore :: Vector Text,
@@ -58,12 +60,14 @@ asyncReadFiles =
     <*> Exec.async (Exec.readLines "Procfile.in")
     <*> Exec.async (Exec.readYAML "Taskfile.in.yml")
     <*> Exec.async Exec.readVendorTargets
+    <*> Exec.async Exec.readGleamPackages
 
 genFiles :: Input -> Output
 genFiles i =
   Output
     { buckConfig = genBuckConfig i.buckConfigInput i.gitIgnore,
       packageTaskfiles = genPackageTaskfiles i.workspace,
+      gleamBuckFiles = genGleamBuckFiles i.gleamPackages,
       procfile = genProcfile i.workspace i.procfileInput,
       rootTaskfile =
         genRootTaskfile
@@ -79,17 +83,81 @@ writeFiles o =
   pass
     *> Exec.async (Exec.writeLines ".buckconfig" o.buckConfig)
     *> asyncWriteAll Exec.writeYAML o.packageTaskfiles
+    *> asyncWriteAll Exec.writeLines o.gleamBuckFiles
     *> Exec.async (Exec.writeLines "Procfile" o.procfile)
     *> Exec.async (Exec.writeYAML "Taskfile.yml" o.rootTaskfile)
     *> Exec.async (Exec.writeLines ".sqlfluffignore" o.sqlFluffIgnore)
     *> Exec.async (Exec.writeLines "vendor/BUCK" o.vendorBuck)
     *> Exec.async (Exec.writeJSON ".watchmanconfig" o.watchmanConfig)
 
+genGleamBuckFiles ::
+  Vector FileFormat.GleamPackage ->
+  Vector (FilePath, Vector Text)
+genGleamBuckFiles pkgs =
+  genGleamBuckFile <$> pkgs
+
+genGleamBuckFile :: FileFormat.GleamPackage -> (FilePath, Vector Text)
+genGleamBuckFile pkg =
+  ( FilePath (pkg.dir <> "/BUCK"),
+    genGleamBuck pkg
+  )
+
+genGleamBuck :: FileFormat.GleamPackage -> Vector Text
+genGleamBuck pkg =
+  let header =
+        [ "load(\"@dev_buck//:gleam.bzl\", \"gleam_package\")",
+          "",
+          "gleam_package(",
+          "    name = \"" <> pkg.dir <> "\",",
+          "    package_name = \"" <> pkg.name <> "\","
+        ]
+      depsSection =
+        if null pkg.deps
+          then []
+          else
+            ["    deps = ["]
+              <> ["        \"" <> d <> "\"," | d <- toList pkg.deps]
+              <> ["    ],"]
+      footer =
+        [ ")",
+          ""
+        ]
+      extra
+        | pkg.dir == "svc-gateway-guest-run" =
+            [ "load(\"@dev_buck//:esbuild.bzl\", \"esbuild_manifest\")",
+              "",
+              "esbuild_manifest(",
+              "    name = \"manifest\",",
+              "    mode = \"development\",",
+              ")",
+              "",
+              "esbuild_manifest(",
+              "    name = \"manifest-release\",",
+              "    mode = \"production\",",
+              ")",
+              ""
+            ]
+        | pkg.dir == "dev-esbuild" =
+            [ "load(\"@prelude//rules.bzl\", \"export_file\")",
+              "",
+              "[",
+              "    export_file(",
+              "        name = f,",
+              "        src = f,",
+              "        visibility = [\"PUBLIC\"],",
+              "    )",
+              "    for f in native.glob([\"query/*.sql\"])",
+              "]",
+              ""
+            ]
+        | otherwise = []
+   in fromList (header <> depsSection <> footer <> extra)
+
 genPackageTaskfiles ::
   FileFormat.Workspace ->
   Vector (FilePath, FileFormat.Taskfile)
 genPackageTaskfiles workspace =
-  genRustPackageTaskfile <$> workspace.members
+  genRustPackageTaskfile <$> workspace.rustMembers
 
 genRustPackageTaskfile :: Text -> (FilePath, FileFormat.Taskfile)
 genRustPackageTaskfile rustPackageName =
@@ -148,14 +216,14 @@ genProcfile workspace procfileInput =
                 $ member <> "__run: task " <> member <> ":run:watch"
             ]
       )
-      workspace.members
+      workspace.rustMembers
 
 genRootTaskfile ::
   FileFormat.Workspace ->
   FileFormat.Taskfile ->
   FileFormat.Taskfile
 genRootTaskfile workspace rootTaskfileInput =
-  let rustPackageNames = workspace.members
+  let rustPackageNames = workspace.rustMembers
       newIncludes =
         fromList
           . toList
