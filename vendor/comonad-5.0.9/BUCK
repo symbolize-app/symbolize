@@ -1,0 +1,19 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "comonad",
+    package_name = "comonad",
+    package_version = "5.0.9",
+    default_language = "Haskell2010",
+    srcs = ['src/Control/Comonad.hs', 'src/Control/Comonad/Env.hs', 'src/Control/Comonad/Env/Class.hs', 'src/Control/Comonad/Hoist/Class.hs', 'src/Control/Comonad/Identity.hs', 'src/Control/Comonad/Store.hs', 'src/Control/Comonad/Store/Class.hs', 'src/Control/Comonad/Traced.hs', 'src/Control/Comonad/Traced/Class.hs', 'src/Control/Comonad/Trans/Class.hs', 'src/Control/Comonad/Trans/Env.hs', 'src/Control/Comonad/Trans/Identity.hs', 'src/Control/Comonad/Trans/Store.hs', 'src/Control/Comonad/Trans/Traced.hs', 'src/Data/Functor/Composition.hs'],
+    src_dirs = ['src'],
+    deps = [
+        "//:base",
+        "//:containers",
+        "//:distributive",
+        "//:indexed-traversable",
+        "//:tagged",
+        "//:transformers",
+        "//:transformers-compat",
+    ],
+)

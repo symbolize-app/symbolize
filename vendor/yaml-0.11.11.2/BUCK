@@ -1,0 +1,29 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "yaml",
+    package_name = "yaml",
+    package_version = "0.11.11.2",
+    default_language = "Haskell2010",
+    srcs = ['src/Data/Yaml.hs', 'src/Data/Yaml/Aeson.hs', 'src/Data/Yaml/Builder.hs', 'src/Data/Yaml/Config.hs', 'src/Data/Yaml/Include.hs', 'src/Data/Yaml/Internal.hs', 'src/Data/Yaml/Parser.hs', 'src/Data/Yaml/Pretty.hs', 'src/Data/Yaml/TH.hs'],
+    src_dirs = ['src'],
+    deps = [
+        "//:aeson",
+        "//:attoparsec",
+        "//:base",
+        "//:bytestring",
+        "//:conduit",
+        "//:containers",
+        "//:directory",
+        "//:filepath",
+        "//:libyaml",
+        "//:mtl",
+        "//:resourcet",
+        "//:scientific",
+        "//:template-haskell",
+        "//:text",
+        "//:transformers",
+        "//:unordered-containers",
+        "//:vector",
+    ],
+)

@@ -1,6 +1,41 @@
 load("//:rules.bzl", "alias")
 
 alias(
+    name = "Cabal",
+    actual = "@dev_buck//boot:Cabal",
+)
+
+alias(
+    name = "Cabal-syntax",
+    actual = "@dev_buck//boot:Cabal-syntax",
+)
+
+alias(
+    name = "Cabal_syntax",
+    actual = "@dev_buck//boot:Cabal-syntax",
+)
+
+alias(
+    name = "HUnit",
+    actual = "//HUnit-1.6.2.0:HUnit",
+)
+
+alias(
+    name = "OneTuple",
+    actual = "//OneTuple-0.4.2:OneTuple",
+)
+
+alias(
+    name = "QuickCheck",
+    actual = "//QuickCheck-2.15.0.1:QuickCheck",
+)
+
+alias(
+    name = "StateVar",
+    actual = "//StateVar-1.2.2:StateVar",
+)
+
+alias(
     name = "addr2line",
     actual = "//addr2line-0.21.0:addr2line",
 )
@@ -11,8 +46,18 @@ alias(
 )
 
 alias(
+    name = "aeson",
+    actual = "//aeson-2.2.3.0:aeson",
+)
+
+alias(
     name = "ahash",
     actual = "//ahash-0.8.7:ahash",
+)
+
+alias(
+    name = "alex",
+    actual = "//alex-3.5.3.0:alex",
 )
 
 alias(
@@ -23,6 +68,26 @@ alias(
 alias(
     name = "allocator_api2",
     actual = "//allocator-api2-0.2.16:allocator-api2",
+)
+
+alias(
+    name = "ansi-terminal",
+    actual = "//ansi-terminal-1.1.2:ansi-terminal",
+)
+
+alias(
+    name = "ansi-terminal-types",
+    actual = "//ansi-terminal-types-1.1:ansi-terminal-types",
+)
+
+alias(
+    name = "ansi_terminal",
+    actual = "//ansi-terminal-1.1.2:ansi-terminal",
+)
+
+alias(
+    name = "ansi_terminal_types",
+    actual = "//ansi-terminal-types-1.1:ansi-terminal-types",
 )
 
 alias(
@@ -71,6 +136,26 @@ alias(
 )
 
 alias(
+    name = "array",
+    actual = "@dev_buck//boot:array",
+)
+
+alias(
+    name = "assoc",
+    actual = "//assoc-1.1.1:assoc",
+)
+
+alias(
+    name = "async",
+    actual = "//async-2.2.5:async",
+)
+
+alias(
+    name = "attoparsec",
+    actual = "//attoparsec-0.14.4:attoparsec",
+)
+
+alias(
     name = "autocfg",
     actual = "//autocfg-1.1.0:autocfg",
 )
@@ -86,13 +171,43 @@ alias(
 )
 
 alias(
+    name = "base",
+    actual = "@dev_buck//boot:base",
+)
+
+alias(
+    name = "base-orphans",
+    actual = "//base-orphans-0.9.3:base-orphans",
+)
+
+alias(
     name = "base64",
     actual = "//rust-base64-0.21.7:base64",
 )
 
 alias(
+    name = "base_orphans",
+    actual = "//base-orphans-0.9.3:base-orphans",
+)
+
+alias(
+    name = "bifunctors",
+    actual = "//bifunctors-5.6.2:bifunctors",
+)
+
+alias(
+    name = "binary",
+    actual = "@dev_buck//boot:binary",
+)
+
+alias(
     name = "bitflags",
     actual = "//bitflags-2.4.1:bitflags",
+)
+
+alias(
+    name = "bitvec",
+    actual = "//bitvec-1.1.5.0:bitvec",
 )
 
 alias(
@@ -111,6 +226,21 @@ alias(
 )
 
 alias(
+    name = "bytestring",
+    actual = "@dev_buck//boot:bytestring",
+)
+
+alias(
+    name = "call-stack",
+    actual = "//call-stack-0.4.0:call-stack",
+)
+
+alias(
+    name = "call_stack",
+    actual = "//call-stack-0.4.0:call-stack",
+)
+
+alias(
     name = "cc",
     actual = "//cc-rs-1.0.83:cc",
 )
@@ -123,6 +253,16 @@ alias(
 alias(
     name = "cfg_if",
     actual = "//cfg-if-1.0.0:cfg-if",
+)
+
+alias(
+    name = "character-ps",
+    actual = "//character-ps-0.1:character-ps",
+)
+
+alias(
+    name = "character_ps",
+    actual = "//character-ps-0.1:character-ps",
 )
 
 alias(
@@ -148,6 +288,31 @@ alias(
 alias(
     name = "colorchoice",
     actual = "//colorchoice-1.0.0/crates/colorchoice:colorchoice",
+)
+
+alias(
+    name = "colour",
+    actual = "//colour-2.3.6:colour",
+)
+
+alias(
+    name = "comonad",
+    actual = "//comonad-5.0.9:comonad",
+)
+
+alias(
+    name = "conduit",
+    actual = "//conduit-1.3.6.1:conduit",
+)
+
+alias(
+    name = "containers",
+    actual = "@dev_buck//boot:containers",
+)
+
+alias(
+    name = "contravariant",
+    actual = "//contravariant-1.5.5:contravariant",
 )
 
 alias(
@@ -221,6 +386,36 @@ alias(
 )
 
 alias(
+    name = "data-fix",
+    actual = "//data-fix-0.3.4:data-fix",
+)
+
+alias(
+    name = "data_fix",
+    actual = "//data-fix-0.3.4:data-fix",
+)
+
+alias(
+    name = "deepseq",
+    actual = "@dev_buck//boot:deepseq",
+)
+
+alias(
+    name = "directory",
+    actual = "@dev_buck//boot:directory",
+)
+
+alias(
+    name = "distributive",
+    actual = "//distributive-0.6.2.1:distributive",
+)
+
+alias(
+    name = "dlist",
+    actual = "//dlist-1.0:dlist",
+)
+
+alias(
     name = "downcast",
     actual = "//downcast-rs-0.11.0:downcast",
 )
@@ -238,6 +433,11 @@ alias(
 alias(
     name = "errno",
     actual = "//rust-errno-0.3.11:errno",
+)
+
+alias(
+    name = "exceptions",
+    actual = "@dev_buck//boot:exceptions",
 )
 
 alias(
@@ -263,6 +463,11 @@ alias(
 alias(
     name = "fastrand",
     actual = "//fastrand-2.2.0:fastrand",
+)
+
+alias(
+    name = "filepath",
+    actual = "@dev_buck//boot:filepath",
 )
 
 alias(
@@ -366,8 +571,43 @@ alias(
 )
 
 alias(
+    name = "generically",
+    actual = "//generically-0.1.1:generically",
+)
+
+alias(
     name = "getrandom",
     actual = "//getrandom-0.2.12:getrandom",
+)
+
+alias(
+    name = "ghc-bignum",
+    actual = "@dev_buck//boot:ghc-bignum",
+)
+
+alias(
+    name = "ghc-boot-th",
+    actual = "@dev_buck//boot:ghc-boot-th",
+)
+
+alias(
+    name = "ghc-prim",
+    actual = "@dev_buck//boot:ghc-prim",
+)
+
+alias(
+    name = "ghc_bignum",
+    actual = "@dev_buck//boot:ghc-bignum",
+)
+
+alias(
+    name = "ghc_boot_th",
+    actual = "@dev_buck//boot:ghc-boot-th",
+)
+
+alias(
+    name = "ghc_prim",
+    actual = "@dev_buck//boot:ghc-prim",
 )
 
 alias(
@@ -396,6 +636,26 @@ alias(
 )
 
 alias(
+    name = "happy",
+    actual = "//happy-2.1.5:happy",
+)
+
+alias(
+    name = "happy-lib",
+    actual = "//happy-lib-2.1.5:happy-lib",
+)
+
+alias(
+    name = "happy_lib",
+    actual = "//happy-lib-2.1.5:happy-lib",
+)
+
+alias(
+    name = "hashable",
+    actual = "//hashable-1.5.0.0:hashable",
+)
+
+alias(
     name = "hashbrown",
     actual = "//hashbrown-0.14.3:hashbrown",
 )
@@ -406,8 +666,53 @@ alias(
 )
 
 alias(
+    name = "haskell-lexer",
+    actual = "//haskell-lexer-1.2.1:haskell-lexer",
+)
+
+alias(
+    name = "haskell_lexer",
+    actual = "//haskell-lexer-1.2.1:haskell-lexer",
+)
+
+alias(
     name = "heck",
     actual = "//heck-0.4.1:heck",
+)
+
+alias(
+    name = "hspec",
+    actual = "//hspec-2.11.12:hspec",
+)
+
+alias(
+    name = "hspec-core",
+    actual = "//hspec-core-2.11.12:hspec-core",
+)
+
+alias(
+    name = "hspec-discover",
+    actual = "//hspec-discover-2.11.12:hspec-discover",
+)
+
+alias(
+    name = "hspec-expectations",
+    actual = "//hspec-expectations-0.8.4:hspec-expectations",
+)
+
+alias(
+    name = "hspec_core",
+    actual = "//hspec-core-2.11.12:hspec-core",
+)
+
+alias(
+    name = "hspec_discover",
+    actual = "//hspec-discover-2.11.12:hspec-discover",
+)
+
+alias(
+    name = "hspec_expectations",
+    actual = "//hspec-expectations-0.8.4:hspec-expectations",
 )
 
 alias(
@@ -456,8 +761,58 @@ alias(
 )
 
 alias(
+    name = "indexed-traversable",
+    actual = "//indexed-traversable-0.1.4:indexed-traversable",
+)
+
+alias(
+    name = "indexed-traversable-instances",
+    actual = "//indexed-traversable-instances-0.1.2:indexed-traversable-instances",
+)
+
+alias(
+    name = "indexed_traversable",
+    actual = "//indexed-traversable-0.1.4:indexed-traversable",
+)
+
+alias(
+    name = "indexed_traversable_instances",
+    actual = "//indexed-traversable-instances-0.1.2:indexed-traversable-instances",
+)
+
+alias(
     name = "indexmap",
     actual = "//indexmap-2.1.0:indexmap",
+)
+
+alias(
+    name = "integer-conversion",
+    actual = "//integer-conversion-0.1.1:integer-conversion",
+)
+
+alias(
+    name = "integer-gmp",
+    actual = "@dev_buck//boot:integer-gmp",
+)
+
+alias(
+    name = "integer-logarithms",
+    actual = "//integer-logarithms-1.0.4:integer-logarithms",
+)
+
+alias(
+    name = "integer_conversion",
+    actual = "//integer-conversion-0.1.1:integer-conversion",
+)
+
+alias(
+    name = "integer_gmp",
+    actual = "@dev_buck//boot:integer-gmp",
+)
+
+alias(
+    name = "integer_logarithms",
+    actual = "//integer-logarithms-1.0.4:integer-logarithms",
 )
 
 alias(
@@ -503,6 +858,21 @@ alias(
 alias(
     name = "libsqlite3_sys",
     actual = "//rusqlite-0.27.0/libsqlite3-sys:libsqlite3-sys",
+)
+
+alias(
+    name = "libyaml",
+    actual = "//libyaml-0.1.4:libyaml",
+)
+
+alias(
+    name = "libyaml-clib",
+    actual = "//libyaml-clib-0.2.5:libyaml-clib",
+)
+
+alias(
+    name = "libyaml_clib",
+    actual = "//libyaml-clib-0.2.5:libyaml-clib",
 )
 
 alias(
@@ -561,6 +931,31 @@ alias(
 )
 
 alias(
+    name = "mono-traversable",
+    actual = "//mono-traversable-1.0.21.0:mono-traversable",
+)
+
+alias(
+    name = "mono_traversable",
+    actual = "//mono-traversable-1.0.21.0:mono-traversable",
+)
+
+alias(
+    name = "mtl",
+    actual = "@dev_buck//boot:mtl",
+)
+
+alias(
+    name = "network-uri",
+    actual = "//network-uri-2.6.4.2:network-uri",
+)
+
+alias(
+    name = "network_uri",
+    actual = "//network-uri-2.6.4.2:network-uri",
+)
+
+alias(
     name = "nix",
     actual = "//nix-0.27.1:nix",
 )
@@ -576,6 +971,26 @@ alias(
 )
 
 alias(
+    name = "optparse-applicative",
+    actual = "//optparse-applicative-0.18.1.0:optparse-applicative",
+)
+
+alias(
+    name = "optparse_applicative",
+    actual = "//optparse-applicative-0.18.1.0:optparse-applicative",
+)
+
+alias(
+    name = "os-string",
+    actual = "//os-string-2.0.7:os-string",
+)
+
+alias(
+    name = "os_string",
+    actual = "//os-string-2.0.7:os-string",
+)
+
+alias(
     name = "parking_lot",
     actual = "//parking_lot-0.12.1:parking_lot",
 )
@@ -583,6 +998,11 @@ alias(
 alias(
     name = "parking_lot_core",
     actual = "//parking_lot-0.12.1/core:parking_lot_core",
+)
+
+alias(
+    name = "parsec",
+    actual = "@dev_buck//boot:parsec",
 )
 
 alias(
@@ -671,6 +1091,31 @@ alias(
 )
 
 alias(
+    name = "pretty",
+    actual = "@dev_buck//boot:pretty",
+)
+
+alias(
+    name = "prettyprinter",
+    actual = "//prettyprinter-1.7.1:prettyprinter",
+)
+
+alias(
+    name = "prettyprinter-ansi-terminal",
+    actual = "//prettyprinter-ansi-terminal-1.1.3:prettyprinter-ansi-terminal",
+)
+
+alias(
+    name = "prettyprinter_ansi_terminal",
+    actual = "//prettyprinter-ansi-terminal-1.1.3:prettyprinter-ansi-terminal",
+)
+
+alias(
+    name = "primitive",
+    actual = "//primitive-0.9.1.0:primitive",
+)
+
+alias(
     name = "proc-macro2",
     actual = "//proc-macro2-1.0.94:proc-macro2",
 )
@@ -681,13 +1126,48 @@ alias(
 )
 
 alias(
+    name = "process",
+    actual = "@dev_buck//boot:process",
+)
+
+alias(
+    name = "quickcheck-io",
+    actual = "//quickcheck-io-0.2.0:quickcheck-io",
+)
+
+alias(
+    name = "quickcheck_io",
+    actual = "//quickcheck-io-0.2.0:quickcheck-io",
+)
+
+alias(
     name = "quote",
     actual = "//quote-1.0.35:quote",
 )
 
 alias(
+    name = "random",
+    actual = "//random-1.3.1:random",
+)
+
+alias(
+    name = "relude",
+    actual = "//relude-1.2.2.0:relude",
+)
+
+alias(
+    name = "resourcet",
+    actual = "//resourcet-1.3.0:resourcet",
+)
+
+alias(
     name = "ring",
     actual = "//ring-0.17.7:ring",
+)
+
+alias(
+    name = "rts",
+    actual = "@dev_buck//boot:rts",
 )
 
 alias(
@@ -761,8 +1241,33 @@ alias(
 )
 
 alias(
+    name = "safe-exceptions",
+    actual = "//safe-exceptions-0.1.7.4:safe-exceptions",
+)
+
+alias(
+    name = "safe_exceptions",
+    actual = "//safe-exceptions-0.1.7.4:safe-exceptions",
+)
+
+alias(
+    name = "scientific",
+    actual = "//scientific-0.3.8.0:scientific",
+)
+
+alias(
     name = "scopeguard",
     actual = "//scopeguard-1.2.0:scopeguard",
+)
+
+alias(
+    name = "semialign",
+    actual = "//semialign-1.3.1:semialign",
+)
+
+alias(
+    name = "semigroupoids",
+    actual = "//semigroupoids-6.0.1:semigroupoids",
 )
 
 alias(
@@ -836,6 +1341,26 @@ alias(
 )
 
 alias(
+    name = "split",
+    actual = "//split-0.2.5:split",
+)
+
+alias(
+    name = "splitmix",
+    actual = "//splitmix-0.1.1:splitmix",
+)
+
+alias(
+    name = "stm",
+    actual = "@dev_buck//boot:stm",
+)
+
+alias(
+    name = "strict",
+    actual = "//strict-0.5.1:strict",
+)
+
+alias(
     name = "strsim",
     actual = "//strsim-rs-0.10.0:strsim",
 )
@@ -851,8 +1376,88 @@ alias(
 )
 
 alias(
+    name = "tagged",
+    actual = "//tagged-0.8.9:tagged",
+)
+
+alias(
+    name = "tasty",
+    actual = "//tasty-1.5.3:tasty",
+)
+
+alias(
+    name = "template-haskell",
+    actual = "@dev_buck//boot:template-haskell",
+)
+
+alias(
+    name = "template_haskell",
+    actual = "@dev_buck//boot:template-haskell",
+)
+
+alias(
     name = "termtree",
     actual = "//termtree-0.4.1:termtree",
+)
+
+alias(
+    name = "text",
+    actual = "@dev_buck//boot:text",
+)
+
+alias(
+    name = "text-iso8601",
+    actual = "//text-iso8601-0.1.1:text-iso8601",
+)
+
+alias(
+    name = "text-short",
+    actual = "//text-short-0.1.6:text-short",
+)
+
+alias(
+    name = "text_iso8601",
+    actual = "//text-iso8601-0.1.1:text-iso8601",
+)
+
+alias(
+    name = "text_short",
+    actual = "//text-short-0.1.6:text-short",
+)
+
+alias(
+    name = "tf-random",
+    actual = "//tf-random-0.5:tf-random",
+)
+
+alias(
+    name = "tf_random",
+    actual = "//tf-random-0.5:tf-random",
+)
+
+alias(
+    name = "th-abstraction",
+    actual = "//th-abstraction-0.7.1.0:th-abstraction",
+)
+
+alias(
+    name = "th-compat",
+    actual = "//th-compat-0.1.6:th-compat",
+)
+
+alias(
+    name = "th_abstraction",
+    actual = "//th-abstraction-0.7.1.0:th-abstraction",
+)
+
+alias(
+    name = "th_compat",
+    actual = "//th-compat-0.1.6:th-compat",
+)
+
+alias(
+    name = "these",
+    actual = "//these-1.2.1:these",
 )
 
 alias(
@@ -873,6 +1478,21 @@ alias(
 alias(
     name = "thiserror_impl",
     actual = "//thiserror-1.0.56/impl:thiserror-impl",
+)
+
+alias(
+    name = "time",
+    actual = "@dev_buck//boot:time",
+)
+
+alias(
+    name = "time-compat",
+    actual = "//time-compat-1.9.8:time-compat",
+)
+
+alias(
+    name = "time_compat",
+    actual = "//time-compat-1.9.8:time-compat",
 )
 
 alias(
@@ -921,6 +1541,16 @@ alias(
 )
 
 alias(
+    name = "toml-parser",
+    actual = "//toml-parser-1.3.2.0:toml-parser",
+)
+
+alias(
+    name = "toml_parser",
+    actual = "//toml-parser-1.3.2.0:toml-parser",
+)
+
+alias(
     name = "tracing",
     actual = "//tracing-0.1.40/tracing:tracing",
 )
@@ -936,6 +1566,21 @@ alias(
 )
 
 alias(
+    name = "transformers",
+    actual = "@dev_buck//boot:transformers",
+)
+
+alias(
+    name = "transformers-compat",
+    actual = "//transformers-compat-0.7.2:transformers-compat",
+)
+
+alias(
+    name = "transformers_compat",
+    actual = "//transformers-compat-0.7.2:transformers-compat",
+)
+
+alias(
     name = "try-lock",
     actual = "//try-lock-0.2.5:try-lock",
 )
@@ -943,6 +1588,16 @@ alias(
 alias(
     name = "try_lock",
     actual = "//try-lock-0.2.5:try-lock",
+)
+
+alias(
+    name = "typed-process",
+    actual = "//typed-process-0.2.13.0:typed-process",
+)
+
+alias(
+    name = "typed_process",
+    actual = "//typed-process-0.2.13.0:typed-process",
 )
 
 alias(
@@ -976,6 +1631,36 @@ alias(
 )
 
 alias(
+    name = "unix",
+    actual = "@dev_buck//boot:unix",
+)
+
+alias(
+    name = "unliftio",
+    actual = "//unliftio-0.2.25.1:unliftio",
+)
+
+alias(
+    name = "unliftio-core",
+    actual = "//unliftio-core-0.2.1.0:unliftio-core",
+)
+
+alias(
+    name = "unliftio_core",
+    actual = "//unliftio-core-0.2.1.0:unliftio-core",
+)
+
+alias(
+    name = "unordered-containers",
+    actual = "//unordered-containers-0.2.20:unordered-containers",
+)
+
+alias(
+    name = "unordered_containers",
+    actual = "//unordered-containers-0.2.20:unordered-containers",
+)
+
+alias(
     name = "untrusted",
     actual = "//untrusted-0.9.0:untrusted",
 )
@@ -986,8 +1671,43 @@ alias(
 )
 
 alias(
+    name = "uuid-types",
+    actual = "//uuid-types-1.0.6:uuid-types",
+)
+
+alias(
+    name = "uuid_types",
+    actual = "//uuid-types-1.0.6:uuid-types",
+)
+
+alias(
     name = "vcpkg",
     actual = "//vcpkg-rs-0.2.15:vcpkg",
+)
+
+alias(
+    name = "vector",
+    actual = "//vector-0.13.2.0:vector",
+)
+
+alias(
+    name = "vector-algorithms",
+    actual = "//vector-algorithms-0.9.1.0:vector-algorithms",
+)
+
+alias(
+    name = "vector-stream",
+    actual = "//vector-stream-0.1.0.1:vector-stream",
+)
+
+alias(
+    name = "vector_algorithms",
+    actual = "//vector-algorithms-0.9.1.0:vector-algorithms",
+)
+
+alias(
+    name = "vector_stream",
+    actual = "//vector-stream-0.1.0.1:vector-stream",
 )
 
 alias(
@@ -1143,6 +1863,16 @@ alias(
 alias(
     name = "windows_x86_64_msvc",
     actual = "//windows-rs-0.52.6/crates/targets/x86_64_msvc:windows_x86_64_msvc",
+)
+
+alias(
+    name = "witherable",
+    actual = "//witherable-0.5:witherable",
+)
+
+alias(
+    name = "yaml",
+    actual = "//yaml-0.11.11.2:yaml",
 )
 
 alias(

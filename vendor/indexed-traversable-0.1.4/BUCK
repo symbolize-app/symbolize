@@ -1,0 +1,16 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "indexed-traversable",
+    package_name = "indexed-traversable",
+    package_version = "0.1.4",
+    default_language = "Haskell2010",
+    srcs = ['src/CoerceCompat.hs', 'src/Data/Foldable/WithIndex.hs', 'src/Data/Foldable1/WithIndex.hs', 'src/Data/Functor/WithIndex.hs', 'src/Data/Traversable/WithIndex.hs', 'src/GhcList.hs', 'src/WithIndex.hs'],
+    src_dirs = ['src'],
+    deps = [
+        "//:array",
+        "//:base",
+        "//:containers",
+        "//:transformers",
+    ],
+)

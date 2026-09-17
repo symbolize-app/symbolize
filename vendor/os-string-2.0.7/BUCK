@@ -1,0 +1,17 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "os-string",
+    package_name = "os-string",
+    package_version = "2.0.7",
+    default_language = "Haskell2010",
+    srcs = ['System/OsString.hs', 'System/OsString/Data/ByteString/Short.hs', 'System/OsString/Data/ByteString/Short/Internal.hs', 'System/OsString/Data/ByteString/Short/Word16.hs', 'System/OsString/Encoding.hs', 'System/OsString/Encoding/Internal.hs', 'System/OsString/Internal.hs', 'System/OsString/Internal/Exception.hs', 'System/OsString/Internal/Types.hs', 'System/OsString/Posix.hs', 'System/OsString/Windows.hs'],
+    src_dirs = ['.'],
+    deps = [
+        "//:base",
+        "//:bytestring",
+        "//:deepseq",
+        "//:exceptions",
+        "//:template-haskell",
+    ],
+)

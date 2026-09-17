@@ -1,0 +1,15 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "contravariant",
+    package_name = "contravariant",
+    package_version = "1.5.5",
+    default_language = "Haskell2010",
+    srcs = ['src/Data/Functor/Contravariant/Compose.hs', 'src/Data/Functor/Contravariant/Divisible.hs', 'src/Data/Functor/Contravariant/Generic.hs'],
+    src_dirs = ['src'],
+    deps = [
+        "//:StateVar",
+        "//:base",
+        "//:transformers",
+    ],
+)

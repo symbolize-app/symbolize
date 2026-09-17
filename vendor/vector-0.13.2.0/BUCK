@@ -1,0 +1,20 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "vector",
+    package_name = "vector",
+    package_version = "0.13.2.0",
+    default_language = "Haskell2010",
+    srcs = ['benchlib/Bench/Vector/Algo/AwShCC.hs', 'benchlib/Bench/Vector/Algo/FindIndexR.hs', 'benchlib/Bench/Vector/Algo/HybCC.hs', 'benchlib/Bench/Vector/Algo/Leaffix.hs', 'benchlib/Bench/Vector/Algo/ListRank.hs', 'benchlib/Bench/Vector/Algo/MutableSet.hs', 'benchlib/Bench/Vector/Algo/NextPermutation.hs', 'benchlib/Bench/Vector/Algo/Quickhull.hs', 'benchlib/Bench/Vector/Algo/Rootfix.hs', 'benchlib/Bench/Vector/Algo/Spectral.hs', 'benchlib/Bench/Vector/Algo/Tridiag.hs', 'benchlib/Bench/Vector/Tasty.hs', 'benchlib/Bench/Vector/TestData/Graph.hs', 'benchlib/Bench/Vector/TestData/ParenTree.hs', 'src/Data/Vector.hs', 'src/Data/Vector/Fusion/Bundle.hs', 'src/Data/Vector/Fusion/Bundle/Monadic.hs', 'src/Data/Vector/Fusion/Bundle/Size.hs', 'src/Data/Vector/Fusion/Stream/Monadic.hs', 'src/Data/Vector/Fusion/Util.hs', 'src/Data/Vector/Generic.hs', 'src/Data/Vector/Generic/Base.hs', 'src/Data/Vector/Generic/Mutable.hs', 'src/Data/Vector/Generic/Mutable/Base.hs', 'src/Data/Vector/Generic/New.hs', 'src/Data/Vector/Internal/Check.hs', 'src/Data/Vector/Mutable.hs', 'src/Data/Vector/Primitive.hs', 'src/Data/Vector/Primitive/Mutable.hs', 'src/Data/Vector/Storable.hs', 'src/Data/Vector/Storable/Internal.hs', 'src/Data/Vector/Storable/Mutable.hs', 'src/Data/Vector/Strict.hs', 'src/Data/Vector/Strict/Mutable.hs', 'src/Data/Vector/Unboxed.hs', 'src/Data/Vector/Unboxed/Base.hs', 'src/Data/Vector/Unboxed/Mutable.hs'],
+    src_dirs = ['src', 'benchlib'],
+    deps = [
+        "//:base",
+        "//:deepseq",
+        "//:primitive",
+        "//:random",
+        "//:tasty",
+        "//:vector-stream",
+    ],
+    include_dirs = ['include', 'internal'],
+    compiler_flags = ['-DVECTOR_BOUNDS_CHECKS'],
+)

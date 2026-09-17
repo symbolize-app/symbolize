@@ -1,0 +1,15 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "hspec-discover",
+    package_name = "hspec-discover",
+    package_version = "2.11.12",
+    default_language = "Haskell2010",
+    srcs = ['src/Test/Hspec/Discover/Config.hs', 'src/Test/Hspec/Discover/Run.hs', 'src/Test/Hspec/Discover/Sort.hs'],
+    src_dirs = ['src'],
+    deps = [
+        "//:base",
+        "//:directory",
+        "//:filepath",
+    ],
+)

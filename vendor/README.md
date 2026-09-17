@@ -3,7 +3,7 @@
 This directory contains the transitive closure of checked-out snapshots of
 upstream Git repositories that Symbolize depends on but that are not provided
 by Devenv. Gleam dependencies and build adapters consume direct paths into
-these snapshots. Rust dependencies define local Buck2 targets and are exposed
+these snapshots. Rust and Haskell dependencies define local Buck2 targets and are exposed
 through unversioned aliases in `vendor/BUCK`; nothing is installed by a package
 manager or linked through a vendor workspace.
 
@@ -206,6 +206,29 @@ Execution and bundling consume this table directly:
   belong strictly in `build/vendor/` and are built by tasks in
   `dev-task/node.yml`.
 
+## Haskell and Buck2 snapshots
+
+Haskell library dependencies follow the same direct-path snapshot principles as
+Rust and Node without package managers, global caches, or Cabal installations.
+Each third-party Hackage library is kept as a pure Git checkout or release snapshot
+in an immediate child directory of `vendor/` (e.g. `vendor/aeson-2.2.3.0/`).
+
+Every vendored Haskell package defines its build rule in a local `BUCK` file using
+the `haskell_library` rule from `vendor//:rules.bzl` or `dev_buck//:rules.bzl`.
+`vendor/BUCK` exposes canonical, unversioned aliases (e.g.
+`alias(name = "aeson", actual = "//aeson-2.2.3.0:aeson")`), allowing first-party
+packages such as `dev-gen` to depend on clean, unversioned targets like `vendor//:aeson`,
+`vendor//:relude`, and `vendor//:optparse-applicative`.
+
+GHC boot packages provided by the compiler toolchain (such as `base`, `bytestring`,
+`containers`, `text`, and `mtl`) are declared as `haskell_boot_package` targets and
+aliased directly in `vendor/BUCK` (e.g. `vendor//:base`).
+
+Cabal package-manager builds, root `cabal.project` configurations, and freeze files
+are eliminated from the build path. All compilation, module dependency scanning via
+`ghc -M` with dynamic execution DAGs, package database registration, and topological
+archive linking run entirely through Buck2.
+
 ## Buck2 target resolution
 
 Buck2 projects consume vendored dependencies through the `vendor//` cell,
@@ -266,7 +289,7 @@ When adding a new third-party crate or updating an existing one:
 1. **Import the Upstream Repository Snapshot**:
    - Check out the upstream repository at the desired release tag or commit.
    - Place the snapshot in an immediate child directory named `vendor/<package-name>-<version-or-date>/`.
-   - Remove upstream `.git`, `.gitattributes`, and automatic-agent instruction files (`AGENTS.md`, `CLAUDE.md`, etc.).
+   - Remove upstream `.git`, `.gitattributes`, `.gitmodules`, and automatic-agent instruction files (`AGENTS.md`, `CLAUDE.md`, etc.).
    - Create `.vendor.toml` at the snapshot root specifying `url` and `ref` (full commit SHA).
 
 2. **Automate BUCK Alias Registration**:
@@ -307,6 +330,57 @@ When adding a new third-party crate or updating an existing one:
      buck2 bxl -m debug dev_buck//clippy.bxl:check
      buck2 bxl -m debug dev_buck//format.bxl:check
      ```
+
+## Haskell package ingestion and update workflow
+
+In Symbolize's Buck2 architecture, all third-party Haskell dependencies are vendored
+directly in `vendor/` and compiled natively by Buck2 through the `vendor//` cell.
+
+### Step-by-Step Ingestion & Update Procedure
+
+When adding a new third-party Haskell package or updating an existing one:
+
+1. **Import the Upstream Package Snapshot**:
+   - Check out or unpack the upstream repository or Hackage release snapshot at the desired release tag.
+   - Place the snapshot in an immediate child directory named `vendor/<package-name>-<version>/`.
+   - Remove upstream `.git`, `.gitattributes`, `.gitmodules`, and automatic-agent instruction files (`AGENTS.md`, `CLAUDE.md`, etc.).
+   - Create `.vendor.toml` at the snapshot root specifying `url` and `ref` (full commit SHA or release tag).
+
+2. **Define the Package BUCK File**:
+   - Create a `BUCK` file in `vendor/<package-name>-<version>/` specifying:
+     ```python
+     load("//:rules.bzl", "haskell_library")
+
+     haskell_library(
+         name = "<package-name>",
+         package_name = "<package-name>",
+         package_version = "<version>",
+         srcs = glob(["src/**/*.hs"]),
+         src_dirs = ["src"],
+         default_language = "Haskell2010",
+         deps = [
+             "vendor//:base",
+             # ... other dependencies
+         ],
+     )
+     ```
+   - For packages with native C sources, headers, or compiler flags (such as `libyaml`, `bitvec`, or `primitive`), specify `c_srcs`, `includes`, `include_dirs`, and `compiler_flags` accordingly.
+
+3. **Register the Canonical Alias**:
+   - In `vendor/BUCK`, add the unversioned alias:
+     ```python
+     alias(
+         name = "<package-name>",
+         actual = "//<package-name>-<version>:<package-name>",
+         visibility = ["PUBLIC"],
+     )
+     ```
+   - If the package name contains hyphens, provide an underscored alias as well (e.g. `optparse_applicative`).
+
+4. **Audit and Verify**:
+   - Run `task vendor:check` to verify closure integrity, duplicate rules, and `.vendor.toml` manifests.
+   - Run `task vendor:license:check` to verify that the package's license conforms to approved SPDX licenses.
+   - Run `task c` to ensure all release builds and tests pass cleanly across the monorepo.
 
 ## Duplicate dependency ledger
 
@@ -383,6 +457,9 @@ with an empty ledger.
 - Keep `.vendor.toml` alongside the snapshot it describes.
 - Do not preserve upstream `.gitattributes` files; their rules would affect
   future additions and checkouts within the vendored subtree.
+- Do not preserve upstream `.gitmodules` files; submodules are prohibited in
+  vendor snapshots. If a submodule is needed for the build, vendor it directly
+  (e.g., as a peer snapshot in `vendor/`).
 - Keep tracked upstream files even when an upstream `.gitignore` hides them;
   the vendor check rejects any files left untracked below `vendor/`.
 - Duplicate snapshot directories are prohibited unless truly exceptional

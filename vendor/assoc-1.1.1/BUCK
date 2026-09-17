@@ -1,0 +1,13 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "assoc",
+    package_name = "assoc",
+    package_version = "1.1.1",
+    default_language = "Haskell2010",
+    srcs = ['src/Data/Bifunctor/Assoc.hs', 'src/Data/Bifunctor/Swap.hs'],
+    src_dirs = ['src'],
+    deps = [
+        "//:base",
+    ],
+)

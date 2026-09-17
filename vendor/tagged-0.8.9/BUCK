@@ -1,0 +1,16 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "tagged",
+    package_name = "tagged",
+    package_version = "0.8.9",
+    default_language = "Haskell98",
+    srcs = ['src/Data/Proxy/TH.hs', 'src/Data/Tagged.hs'],
+    src_dirs = ['src'],
+    deps = [
+        "//:base",
+        "//:deepseq",
+        "//:template-haskell",
+        "//:transformers",
+    ],
+)

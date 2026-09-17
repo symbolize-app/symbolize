@@ -1,0 +1,17 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "prettyprinter-ansi-terminal",
+    package_name = "prettyprinter-ansi-terminal",
+    package_version = "1.1.3",
+    default_language = "Haskell2010",
+    srcs = ['src/Data/Text/Prettyprint/Doc/Render/Terminal.hs', 'src/Data/Text/Prettyprint/Doc/Render/Terminal/Internal.hs', 'src/Prettyprinter/Render/Terminal.hs', 'src/Prettyprinter/Render/Terminal/Internal.hs'],
+    src_dirs = ['src'],
+    deps = [
+        "//:ansi-terminal",
+        "//:base",
+        "//:prettyprinter",
+        "//:text",
+    ],
+    include_dirs = ['misc'],
+)

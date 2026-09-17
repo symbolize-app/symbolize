@@ -1,0 +1,27 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "conduit",
+    package_name = "conduit",
+    package_version = "1.3.6.1",
+    default_language = "Haskell2010",
+    srcs = ['src/Conduit.hs', 'src/Data/Conduit.hs', 'src/Data/Conduit/Combinators.hs', 'src/Data/Conduit/Combinators/Stream.hs', 'src/Data/Conduit/Combinators/Unqualified.hs', 'src/Data/Conduit/Internal.hs', 'src/Data/Conduit/Internal/Conduit.hs', 'src/Data/Conduit/Internal/Fusion.hs', 'src/Data/Conduit/Internal/List/Stream.hs', 'src/Data/Conduit/Internal/Pipe.hs', 'src/Data/Conduit/Lift.hs', 'src/Data/Conduit/List.hs', 'src/Data/Streaming/FileRead.hs', 'src/Data/Streaming/Filesystem.hs'],
+    src_dirs = ['src'],
+    deps = [
+        "//:base",
+        "//:bytestring",
+        "//:directory",
+        "//:exceptions",
+        "//:filepath",
+        "//:mono-traversable",
+        "//:mtl",
+        "//:primitive",
+        "//:resourcet",
+        "//:text",
+        "//:transformers",
+        "//:unix",
+        "//:unliftio-core",
+        "//:vector",
+    ],
+    include_dirs = ['.'],
+)

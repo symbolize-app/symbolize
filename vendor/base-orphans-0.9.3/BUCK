@@ -1,0 +1,14 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "base-orphans",
+    package_name = "base-orphans",
+    package_version = "0.9.3",
+    default_language = "Haskell2010",
+    srcs = ['src/Data/Orphans.hs', 'src/Data/Orphans/Prelude.hs'],
+    src_dirs = ['src'],
+    deps = [
+        "//:base",
+        "//:ghc-prim",
+    ],
+)

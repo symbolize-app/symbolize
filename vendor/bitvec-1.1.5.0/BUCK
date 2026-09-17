@@ -1,0 +1,21 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "bitvec",
+    package_name = "bitvec",
+    package_version = "1.1.5.0",
+    default_language = "Haskell2010",
+    srcs = ['src/Data/Bit.hs', 'src/Data/Bit/F2Poly.hs', 'src/Data/Bit/F2PolyTS.hs', 'src/Data/Bit/Immutable.hs', 'src/Data/Bit/ImmutableTS.hs', 'src/Data/Bit/Internal.hs', 'src/Data/Bit/InternalTS.hs', 'src/Data/Bit/Mutable.hs', 'src/Data/Bit/MutableTS.hs', 'src/Data/Bit/PdepPext.hs', 'src/Data/Bit/SIMD.hs', 'src/Data/Bit/ThreadSafe.hs', 'src/Data/Bit/Utils.hs'],
+    src_dirs = ['src'],
+    deps = [
+        "//:base",
+        "//:bytestring",
+        "//:deepseq",
+        "//:ghc-bignum",
+        "//:primitive",
+        "//:vector",
+    ],
+    c_srcs = ['cbits/bitvec_simd.c'],
+    include_dirs = ['src'],
+    compiler_flags = ['-DUseSIMD'],
+)

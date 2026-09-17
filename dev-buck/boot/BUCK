@@ -1,0 +1,3 @@
+load("@dev_buck//:haskell.bzl", "declare_boot_packages")
+
+declare_boot_packages()

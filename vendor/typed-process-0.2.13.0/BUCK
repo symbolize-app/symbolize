@@ -1,0 +1,20 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "typed-process",
+    package_name = "typed-process",
+    package_version = "0.2.13.0",
+    default_language = "Haskell2010",
+    srcs = ['src/System/Process/Typed.hs', 'src/System/Process/Typed/Internal.hs'],
+    src_dirs = ['src'],
+    deps = [
+        "//:async",
+        "//:base",
+        "//:bytestring",
+        "//:process",
+        "//:stm",
+        "//:text",
+        "//:transformers",
+        "//:unliftio-core",
+    ],
+)

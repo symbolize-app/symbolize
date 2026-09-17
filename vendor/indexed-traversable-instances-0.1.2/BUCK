@@ -1,0 +1,18 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "indexed-traversable-instances",
+    package_name = "indexed-traversable-instances",
+    package_version = "0.1.2",
+    default_language = "Haskell2010",
+    srcs = ['src/Data/Functor/WithIndex/Instances.hs'],
+    src_dirs = ['src'],
+    deps = [
+        "//:OneTuple",
+        "//:base",
+        "//:indexed-traversable",
+        "//:tagged",
+        "//:unordered-containers",
+        "//:vector",
+    ],
+)

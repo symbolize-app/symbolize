@@ -1,0 +1,16 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "integer-conversion",
+    package_name = "integer-conversion",
+    package_version = "0.1.1",
+    default_language = "Haskell2010",
+    srcs = ['src/Data/Integer/Conversion.hs'],
+    src_dirs = ['src'],
+    deps = [
+        "//:base",
+        "//:bytestring",
+        "//:primitive",
+        "//:text",
+    ],
+)

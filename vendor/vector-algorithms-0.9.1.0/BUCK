@@ -1,0 +1,19 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "vector-algorithms",
+    package_name = "vector-algorithms",
+    package_version = "0.9.1.0",
+    default_language = "Haskell2010",
+    srcs = ['src/Data/Vector/Algorithms.hs', 'src/Data/Vector/Algorithms/AmericanFlag.hs', 'src/Data/Vector/Algorithms/Common.hs', 'src/Data/Vector/Algorithms/Heap.hs', 'src/Data/Vector/Algorithms/Insertion.hs', 'src/Data/Vector/Algorithms/Intro.hs', 'src/Data/Vector/Algorithms/Merge.hs', 'src/Data/Vector/Algorithms/Optimal.hs', 'src/Data/Vector/Algorithms/Radix.hs', 'src/Data/Vector/Algorithms/Search.hs', 'src/Data/Vector/Algorithms/Tim.hs'],
+    src_dirs = ['src'],
+    deps = [
+        "//:base",
+        "//:bitvec",
+        "//:bytestring",
+        "//:primitive",
+        "//:vector",
+    ],
+    include_dirs = ['include'],
+    compiler_flags = ['-DVECTOR_BOUNDS_CHECKS'],
+)

@@ -351,7 +351,7 @@ checkVendorHygiene repoRoot = do
     else pure $ Right ()
   where
     forbiddenNames :: [FilePath]
-    forbiddenNames = ["AGENTS.md", "CLAUDE.md", "CODEX.md", "SKILL.md", ".agents", ".claude", ".gitattributes", "symbolize.mjs"]
+    forbiddenNames = ["AGENTS.md", "CLAUDE.md", "CODEX.md", "SKILL.md", ".agents", ".claude", ".gitattributes", ".gitmodules"]
 
     forbiddenDirs :: [FilePath]
     forbiddenDirs = [".git", "node_modules"]

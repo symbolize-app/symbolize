@@ -1,0 +1,17 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "text-iso8601",
+    package_name = "text-iso8601",
+    package_version = "0.1.1",
+    default_language = "Haskell2010",
+    srcs = ['src/Data/Time/FromText.hs', 'src/Data/Time/ToText.hs'],
+    src_dirs = ['src'],
+    deps = [
+        "//:base",
+        "//:integer-conversion",
+        "//:text",
+        "//:time",
+        "//:time-compat",
+    ],
+)

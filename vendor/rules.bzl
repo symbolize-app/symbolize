@@ -45,3 +45,20 @@ def gleam_package(name, **kwargs):
         **kwargs,
     )
 
+load("@dev_buck//:haskell.bzl", _haskell_boot_package = "haskell_boot_package", _haskell_library = "haskell_library")
+
+def haskell_library(name, **kwargs):
+    _haskell_library(
+        name = name,
+        visibility = ["PUBLIC"],
+        **kwargs,
+    )
+
+def haskell_boot_package(name, **kwargs):
+    _haskell_boot_package(
+        name = name,
+        visibility = ["PUBLIC"],
+        **kwargs,
+    )
+
+

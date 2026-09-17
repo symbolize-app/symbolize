@@ -1,0 +1,22 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "strict",
+    package_name = "strict",
+    package_version = "0.5.1",
+    default_language = "Haskell2010",
+    srcs = ['src/Data/Strict.hs', 'src/Data/Strict/Classes.hs', 'src/Data/Strict/Either.hs', 'src/Data/Strict/Maybe.hs', 'src/Data/Strict/These.hs', 'src/Data/Strict/Tuple.hs', 'src/System/IO/Strict.hs'],
+    src_dirs = ['src'],
+    deps = [
+        "//:assoc",
+        "//:base",
+        "//:binary",
+        "//:bytestring",
+        "//:deepseq",
+        "//:ghc-prim",
+        "//:hashable",
+        "//:text",
+        "//:these",
+        "//:transformers",
+    ],
+)

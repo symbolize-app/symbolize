@@ -221,6 +221,12 @@ def rust_binary(
             visibility = ["PUBLIC"],
         )
 
+load(":haskell.bzl", _haskell_binary = "haskell_binary", _haskell_library = "haskell_library", _haskell_test = "haskell_test")
+
+haskell_binary = _haskell_binary
+haskell_library = _haskell_library
+haskell_test = _haskell_test
+
 
 
 

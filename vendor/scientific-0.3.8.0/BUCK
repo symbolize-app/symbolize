@@ -1,0 +1,22 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "scientific",
+    package_name = "scientific",
+    package_version = "0.3.8.0",
+    default_language = "Haskell2010",
+    srcs = ['src/Data/ByteString/Builder/Scientific.hs', 'src/Data/Scientific.hs', 'src/Data/Text/Lazy/Builder/Scientific.hs', 'src/GHC/Integer/Compat.hs', 'src/Utils.hs'],
+    src_dirs = ['src'],
+    deps = [
+        "//:base",
+        "//:binary",
+        "//:bytestring",
+        "//:containers",
+        "//:deepseq",
+        "//:hashable",
+        "//:integer-logarithms",
+        "//:primitive",
+        "//:template-haskell",
+        "//:text",
+    ],
+)

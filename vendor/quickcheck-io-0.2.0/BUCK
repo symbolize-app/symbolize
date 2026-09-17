@@ -1,0 +1,15 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "quickcheck-io",
+    package_name = "quickcheck-io",
+    package_version = "0.2.0",
+    default_language = "Haskell2010",
+    srcs = ['src/Test/QuickCheck/IO.hs'],
+    src_dirs = ['src'],
+    deps = [
+        "//:HUnit",
+        "//:QuickCheck",
+        "//:base",
+    ],
+)

@@ -1,0 +1,325 @@
+
+==================== Tidy Core ====================
+
+Result size of Tidy Core
+  = {terms: 681, types: 511, coercions: 85, joins: 0/7}
+
+integer0_r35V = IS 0#
+
+$trModule1_r41P = "integer-conversion-0.1.1"#
+
+$trModule2_r41Q = TrNameS $trModule1_r41P
+
+$trModule3_r41R = "Data.Integer.Conversion"#
+
+$trModule4_r41S = TrNameS $trModule3_r41R
+
+$trModule = Module $trModule2_r41Q $trModule4_r41S
+
+$dIP_r41T
+  = pushCallStack
+      (unpackCString# "index"#,
+       SrcLoc
+         (unpackCString# "integer-conversion-0.1.1"#)
+         (unpackCString# "Data.Integer.Conversion"#)
+         (unpackCString#
+            "vendor/integer-conversion-0.1.1/src/Data/Integer/Conversion.hs"#)
+         (I# 134#)
+         (I# 27#)
+         (I# 134#)
+         (I# 35#))
+      emptyCallStack
+
+Rec {
+algorithm_r35U
+  = \ @s_a3FA arr_a3CO len_a3CP base_a3CQ ->
+      case arr_a3CO of arr1_X0 { MutableArray ipv_s41f ->
+      case len_a3CP of len1_X1 { I# ipv1_s41h ->
+      case base_a3CQ of base1_X2 { __DEFAULT ->
+      letrec {
+        finish_a3CS
+          = \ acc_a3D1 i_a3D2 ->
+              case acc_a3D1 of acc1_X3 { __DEFAULT ->
+              case i_a3D2 of i1_X4 { I# ipv2_s41j ->
+              case < $fOrdInt i1_X4 len1_X1 of {
+                False -> return $fMonadST acc1_X3;
+                True ->
+                  >>=
+                    $fMonadST
+                    (readArray $fPrimMonadST0 (arr1_X0 `cast` <Co:5> :: ...) i1_X4)
+                    (\ a_a3D3 ->
+                       finish_a3CS
+                         (+ $fNumInteger (* $fNumInteger acc1_X3 base1_X2) a_a3D3)
+                         (+ $fNumInt i1_X4 (I# 1#)))
+              }
+              }
+              }; } in
+      letrec {
+        loop_a3CR
+          = \ i_a3CT o_a3CU ->
+              case i_a3CT of i1_X3 { I# ipv2_s41n ->
+              case o_a3CU of o1_X4 { I# ipv3_s41p ->
+              case < $fOrdInt i1_X3 len1_X1 of {
+                False ->
+                  case div $fIntegralInt (+ $fNumInt len1_X1 (I# 1#)) (I# 2#)
+                  of len'_a3D0
+                  { I# ipv4_s41r ->
+                  case * $fNumInteger base1_X2 base1_X2 of base'_a3CZ { __DEFAULT ->
+                  algorithm_r35U arr1_X0 len'_a3D0 base'_a3CZ
+                  }
+                  };
+                True ->
+                  >>=
+                    $fMonadST
+                    (readArray $fPrimMonadST0 (arr1_X0 `cast` <Co:5> :: ...) i1_X3)
+                    (\ a_a3CX ->
+                       >>=
+                         $fMonadST
+                         (readArray
+                            $fPrimMonadST0
+                            (arr1_X0 `cast` <Co:5> :: ...)
+                            (+ $fNumInt i1_X3 (I# 1#)))
+                         (\ b_a3CY ->
+                            >>
+                              $fMonadST
+                              (writeArray
+                                 $fPrimMonadST0 (arr1_X0 `cast` <Co:5> :: ...) i1_X3 integer0_r35V)
+                              (>>
+                                 $fMonadST
+                                 (writeArray
+                                    $fPrimMonadST0
+                                    (arr1_X0 `cast` <Co:5> :: ...)
+                                    (+ $fNumInt i1_X3 (I# 1#))
+                                    integer0_r35V)
+                                 (>>
+                                    $fMonadST
+                                    ($!
+                                       (writeArray
+                                          $fPrimMonadST0 (arr1_X0 `cast` <Co:5> :: ...) o1_X4)
+                                       (+ $fNumInteger (* $fNumInteger a_a3CX base1_X2) b_a3CY))
+                                    (loop_a3CR
+                                       (+ $fNumInt i1_X3 (I# 2#)) (+ $fNumInt o1_X4 (I# 1#)))))))
+              }
+              }
+              }; } in
+      case <= $fOrdInt len1_X1 (I# 40#) of {
+        False ->
+          case even $fIntegralInt len1_X1 of {
+            False -> loop_a3CR (I# 1#) (I# 1#);
+            True -> loop_a3CR (I# 0#) (I# 0#)
+          };
+        True -> finish_a3CS (IS 0#) (I# 0#)
+      }
+      }
+      }
+      }
+end Rec }
+
+simpleByteStringToInteger_r35M
+  = foldl'
+      (\ acc_a3rt w_a3ru ->
+         + $fNumInteger
+           (* $fNumInteger acc_a3rt (IS 10#))
+           (toInteger
+              $fIntegralInt
+              (- $fNumInt
+                 (fromIntegral $fIntegralWord8 $fNumInt w_a3ru)
+                 (I# 48#))))
+      (IS 0#)
+
+byteStringToInteger
+  = \ bs_a3rq ->
+      case length bs_a3rq of len_a3rr { I# ipv_s41t ->
+      case >= $fOrdInt len_a3rr (I# 40#) of {
+        False -> simpleByteStringToInteger_r35M bs_a3rq;
+        True ->
+          let {
+            len'_a3rx
+              = div $fIntegralInt (+ $fNumInt len_a3rr (I# 1#)) (I# 2#) } in
+          letrec {
+            loop_a3ry
+              = \ @s_a3Kx arr_a3rA i_a3rB o_a3rC ->
+                  case arr_a3rA of arr1_X0 { MutableArray ipv1_s41v ->
+                  case i_a3rB of i1_X2 { I# ipv2_s41x ->
+                  case o_a3rC of o1_X3 { I# ipv3_s41z ->
+                  case < $fOrdInt i1_X2 len_a3rr of {
+                    False -> algorithm_r35U arr1_X0 len'_a3rx (IS 100#);
+                    True ->
+                      >>
+                        $fMonadST
+                        ($!
+                           (writeArray $fPrimMonadST0 (arr1_X0 `cast` <Co:5> :: ...) o1_X3)
+                           (+ $fNumInteger
+                              (* $fNumInteger
+                                 (toInteger
+                                    $fIntegralInt
+                                    (- $fNumInt
+                                       (fromIntegral
+                                          $fIntegralWord8
+                                          $fNumInt
+                                          (index ($dIP_r41T `cast` <Co:4> :: ...) bs_a3rq i1_X2))
+                                       (I# 48#)))
+                                 (IS 10#))
+                              (toInteger
+                                 $fIntegralInt
+                                 (- $fNumInt
+                                    (fromIntegral
+                                       $fIntegralWord8
+                                       $fNumInt
+                                       (index
+                                          ($dIP_r41T `cast` <Co:4> :: ...)
+                                          bs_a3rq
+                                          (+ $fNumInt i1_X2 (I# 1#))))
+                                    (I# 48#)))))
+                        (loop_a3ry
+                           arr1_X0 (+ $fNumInt i1_X2 (I# 2#)) (+ $fNumInt o1_X3 (I# 1#)))
+                  }
+                  }
+                  }
+                  }; } in
+          $ runST
+            (\ @s_a3LH ->
+               >>=
+                 $fMonadST
+                 ((newArray $fPrimMonadST0 len'_a3rx (IS 0#)) `cast` <Co:6> :: ...)
+                 (\ arr_a3rE ->
+                    case even $fIntegralInt len_a3rr of {
+                      False ->
+                        >>
+                          $fMonadST
+                          ($!
+                             (writeArray $fPrimMonadST0 (arr_a3rE `cast` <Co:5> :: ...) (I# 0#))
+                             (toInteger
+                                $fIntegralInt
+                                (- $fNumInt
+                                   (fromIntegral
+                                      $fIntegralWord8
+                                      $fNumInt
+                                      (index ($dIP_r41T `cast` <Co:4> :: ...) bs_a3rq (I# 0#)))
+                                   (I# 48#))))
+                          (loop_a3ry arr_a3rE (I# 1#) (I# 1#));
+                      True -> loop_a3ry arr_a3rE (I# 0#) (I# 0#)
+                    }))
+      }
+      }
+
+simpleStringToInteger_r35S
+  = foldl'
+      $fFoldableList
+      (\ a_a3Cv b_a3Cw ->
+         + $fNumInteger
+           (* $fNumInteger a_a3Cv (IS 10#))
+           (toInteger $fIntegralInt (- $fNumInt (ord b_a3Cw) (I# 48#))))
+      (IS 0#)
+
+stringToIntegerWithLen
+  = \ str_a3Cs len_a3Ct ->
+      case >= $fOrdInt len_a3Ct (I# 40#) of {
+        False -> simpleStringToInteger_r35S str_a3Cs;
+        True ->
+          let {
+            len'_a3Cz
+              = div $fIntegralInt (+ $fNumInt len_a3Ct (I# 1#)) (I# 2#) } in
+          letrec {
+            loop_a3CA
+              = \ @s_a3OJ arr_a3CC ds_d40t o_a3CG ->
+                  case arr_a3CC of arr1_X0 { MutableArray ipv_s41B ->
+                  case ds_d40t of {
+                    [] -> algorithm_r35U arr1_X0 len'_a3Cz (IS 100#);
+                    : a_a3CD ds1_d40y ->
+                      case ds1_d40y of {
+                        [] -> algorithm_r35U arr1_X0 len'_a3Cz (IS 100#);
+                        : b_a3CE cs_a3CF ->
+                          case o_a3CG of o1_X4 { I# ipv1_s41F ->
+                          case < $fOrdInt o1_X4 len'_a3Cz of {
+                            False -> algorithm_r35U arr1_X0 len'_a3Cz (IS 100#);
+                            True ->
+                              >>
+                                $fMonadST
+                                ($!
+                                   (writeArray $fPrimMonadST0 (arr1_X0 `cast` <Co:5> :: ...) o1_X4)
+                                   (+ $fNumInteger
+                                      (* $fNumInteger
+                                         (toInteger
+                                            $fIntegralInt (- $fNumInt (ord a_a3CD) (I# 48#)))
+                                         (IS 10#))
+                                      (toInteger $fIntegralInt (- $fNumInt (ord b_a3CE) (I# 48#)))))
+                                (loop_a3CA arr1_X0 cs_a3CF (+ $fNumInt o1_X4 (I# 1#)))
+                          }
+                          }
+                      }
+                  }
+                  }; } in
+          $ runST
+            (\ @s_a3PH ->
+               >>=
+                 $fMonadST
+                 ((newArray $fPrimMonadST0 len'_a3Cz integer0_r35V)
+                  `cast` <Co:6> :: ...)
+                 (\ arr_a3CI ->
+                    case even $fIntegralInt len_a3Ct of {
+                      False ->
+                        case str_a3Cs of {
+                          [] -> return $fMonadST integer0_r35V;
+                          : a_a3CM bs_a3CN ->
+                            >>
+                              $fMonadST
+                              ($ (writeArray
+                                    $fPrimMonadST0 (arr_a3CI `cast` <Co:5> :: ...) (I# 0#))
+                                 (toInteger $fIntegralInt (- $fNumInt (ord a_a3CM) (I# 48#))))
+                              (loop_a3CA arr_a3CI bs_a3CN (I# 1#))
+                        };
+                      True -> loop_a3CA arr_a3CI str_a3Cs (I# 0#)
+                    }))
+      }
+
+stringToInteger
+  = \ str_a3sq ->
+      stringToIntegerWithLen str_a3sq (length $fFoldableList str_a3sq)
+
+simpleTextToInteger_r35I
+  = foldl'
+      (\ acc_a3kh c_a3ki ->
+         + $fNumInteger
+           (* $fNumInteger acc_a3kh (IS 10#))
+           (toInteger $fIntegralInt (- $fNumInt (ord c_a3ki) (I# 48#))))
+      (IS 0#)
+
+textToInteger
+  = \ t_a38C ->
+      case t_a38C of wild_X1 { Text bx_d417 bx1_d418 bx2_d419 ->
+      case >= $fOrdInt (I# bx2_d419) (I# 40#) of {
+        False -> simpleTextToInteger_r35I wild_X1;
+        True ->
+          letrec {
+            loop_a3lV
+              = \ @s_a3Ui arr_a3lX t1_a3lY o_a3lZ ->
+                  case arr_a3lX of arr1_X3 { MutableArray ipv_s41H ->
+                  case t1_a3lY of t2_X4 { Text ipv1_s41J ipv2_s41K ipv3_s41L ->
+                  case o_a3lZ of o1_X5 { I# ipv4_s41N ->
+                  case uncons t2_X4 of {
+                    Nothing -> algorithm_r35U arr1_X3 o1_X5 (IS 10#);
+                    Just ds_d40W ->
+                      case ds_d40W of { (c_a3m0, t'_a3m1) ->
+                      >>
+                        $fMonadST
+                        ($!
+                           (writeArray $fPrimMonadST0 (arr1_X3 `cast` <Co:5> :: ...) o1_X5)
+                           (toInteger $fIntegralInt (- $fNumInt (ord c_a3m0) (I# 48#))))
+                        (loop_a3lV arr1_X3 t'_a3m1 (+ $fNumInt o1_X5 (I# 1#)))
+                      }
+                  }
+                  }
+                  }
+                  }; } in
+          $ runST
+            (\ @s_a3V4 ->
+               >>=
+                 $fMonadST
+                 ((newArray $fPrimMonadST0 (I# bx2_d419) integer0_r35V)
+                  `cast` <Co:6> :: ...)
+                 (\ arr_a3mk -> loop_a3lV arr_a3mk wild_X1 (I# 0#)))
+      }
+      }
+
+

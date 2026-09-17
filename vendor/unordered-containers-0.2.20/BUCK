@@ -1,0 +1,16 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "unordered-containers",
+    package_name = "unordered-containers",
+    package_version = "0.2.20",
+    default_language = "Haskell2010",
+    srcs = ['Data/HashMap/Internal.hs', 'Data/HashMap/Internal/Array.hs', 'Data/HashMap/Internal/Debug.hs', 'Data/HashMap/Internal/List.hs', 'Data/HashMap/Internal/Strict.hs', 'Data/HashMap/Lazy.hs', 'Data/HashMap/Strict.hs', 'Data/HashSet.hs', 'Data/HashSet/Internal.hs'],
+    src_dirs = ['.'],
+    deps = [
+        "//:base",
+        "//:deepseq",
+        "//:hashable",
+        "//:template-haskell",
+    ],
+)

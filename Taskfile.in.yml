@@ -3,8 +3,8 @@ version: '3'
 run: when_changed
 
 includes:
-  cabal:
-    taskfile: dev-task/cabal.yml
+  haskell:
+    taskfile: dev-task/haskell.yml
 
   rust:
     taskfile: dev-task/rust.yml
@@ -108,7 +108,7 @@ tasks:
       - build
       - b
     deps:
-      - cabal:build:debug
+      - haskell:build:debug
       - rust:build:debug
       - node:build:debug
 
@@ -116,7 +116,7 @@ tasks:
     aliases:
       - br
     deps:
-      - cabal:build:release
+      - haskell:build:release
       - rust:build:release
       - node:build:release
 
@@ -135,7 +135,7 @@ tasks:
 
   clean:
     deps:
-      - cabal:clean
+      - haskell:clean
       - rust:clean
       - node:clean
 
@@ -151,7 +151,7 @@ tasks:
     aliases:
       - fc
     deps:
-      - cabal:format:check
+      - haskell:format:check
       - rust:format:check
       - node:format:check
 
@@ -160,7 +160,7 @@ tasks:
       - format
       - f
     deps:
-      - cabal:format:fix
+      - haskell:format:fix
       - rust:format:fix
       - node:format:fix
 
@@ -272,40 +272,29 @@ tasks:
   gen:
     aliases:
       - g
-    cmd:
-      task: cabal:execute-target:run:{{.TASK_GEN_MODE}}
-      vars:
-        NAME: dev-gen
+    cmds:
+      - buck2 run //dev-gen:symbolize-dev-gen-exe
 
   gen:check:
-    cmd:
-      task: cabal:execute-target:run:{{.TASK_GEN_MODE}}
-      vars:
-        NAME: dev-gen
-        ARGS: '--check'
+    cmds:
+      - buck2 run //dev-gen:symbolize-dev-gen-exe -- --check
 
   vendor:check:
-    cmd:
-      task: cabal:execute-target:run:{{.TASK_GEN_MODE}}
-      vars:
-        NAME: dev-gen
-        ARGS: '--check-vendor'
+    cmds:
+      - buck2 run //dev-gen:symbolize-dev-gen-exe -- --check-vendor
 
   license:check:
     aliases:
       - vendor:license:check
-    cmd:
-      task: cabal:execute-target:run:{{.TASK_GEN_MODE}}
-      vars:
-        NAME: dev-gen
-        ARGS: '--check-licenses'
+    cmds:
+      - buck2 run //dev-gen:symbolize-dev-gen-exe -- --check-licenses
 
   lint:check:
     aliases:
       - lint
       - l
     deps:
-      - cabal:lint
+      - haskell:lint
       - rust:lint:check
       - node:lint:check
       - sqlite:lint:check
@@ -314,7 +303,7 @@ tasks:
     aliases:
       - lf
     deps:
-      - cabal:lint
+      - haskell:lint
       - rust:lint:fix
       - node:lint:fix
       - sqlite:lint:fix
@@ -329,6 +318,6 @@ tasks:
     aliases:
       - tr
     deps:
-      - cabal:test:release
+      - haskell:test:release
       - rust:test:release
       - node:test

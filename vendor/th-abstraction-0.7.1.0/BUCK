@@ -1,0 +1,16 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "th-abstraction",
+    package_name = "th-abstraction",
+    package_version = "0.7.1.0",
+    default_language = "Haskell2010",
+    srcs = ['src/Language/Haskell/TH/Datatype.hs', 'src/Language/Haskell/TH/Datatype/Internal.hs', 'src/Language/Haskell/TH/Datatype/TyVarBndr.hs'],
+    src_dirs = ['src'],
+    deps = [
+        "//:base",
+        "//:containers",
+        "//:ghc-prim",
+        "//:template-haskell",
+    ],
+)

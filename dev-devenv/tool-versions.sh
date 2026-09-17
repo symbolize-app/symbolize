@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 buck2 --version
-cabal --version | head -n 1
 echo "chromium $(chromium --version)"
 curl --version | head -n 1
 dbmate --version

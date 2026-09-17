@@ -62,3 +62,12 @@ gleam_prelude(
     name = "prelude",
     visibility = ["PUBLIC"],
 )
+
+load("@prelude//rules.bzl", "export_file")
+
+export_file(
+    name = "ghc_dep_scan.py",
+    src = "ghc_dep_scan.py",
+    visibility = ["PUBLIC"],
+)
+
