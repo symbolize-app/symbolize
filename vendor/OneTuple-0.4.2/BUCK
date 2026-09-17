@@ -1,0 +1,15 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "OneTuple",
+    package_name = "OneTuple",
+    package_version = "0.4.2",
+    default_language = "Haskell98",
+    srcs = ['src/Data/Tuple/OneTuple.hs', 'src/Data/Tuple/Solo.hs', 'src/Data/Tuple/Solo/TH.hs'],
+    src_dirs = ['src'],
+    deps = [
+        "//:base",
+        "//:ghc-prim",
+        "//:template-haskell",
+    ],
+)

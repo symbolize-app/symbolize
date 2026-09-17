@@ -1,0 +1,17 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "hspec",
+    package_name = "hspec",
+    package_version = "2.11.12",
+    default_language = "Haskell2010",
+    srcs = ['src/Test/Hspec.hs', 'src/Test/Hspec/Discover.hs', 'src/Test/Hspec/Formatters.hs', 'src/Test/Hspec/QuickCheck.hs', 'src/Test/Hspec/Runner.hs'],
+    src_dirs = ['src'],
+    deps = [
+        "//:QuickCheck",
+        "//:base",
+        "//:hspec-core",
+        "//:hspec-discover",
+        "//:hspec-expectations",
+    ],
+)

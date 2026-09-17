@@ -1,0 +1,15 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "HUnit",
+    package_name = "HUnit",
+    package_version = "1.6.2.0",
+    default_language = "Haskell2010",
+    srcs = ['src/Test/HUnit.hs', 'src/Test/HUnit/Base.hs', 'src/Test/HUnit/Lang.hs', 'src/Test/HUnit/Terminal.hs', 'src/Test/HUnit/Text.hs'],
+    src_dirs = ['src'],
+    deps = [
+        "//:base",
+        "//:call-stack",
+        "//:deepseq",
+    ],
+)

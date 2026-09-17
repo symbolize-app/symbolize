@@ -1,0 +1,22 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "tasty",
+    package_name = "tasty",
+    package_version = "1.5.3",
+    default_language = "Haskell2010",
+    srcs = ['Control/Concurrent/Async.hs', 'Test/Tasty.hs', 'Test/Tasty/CmdLine.hs', 'Test/Tasty/Core.hs', 'Test/Tasty/Ingredients.hs', 'Test/Tasty/Ingredients/Basic.hs', 'Test/Tasty/Ingredients/ConsoleReporter.hs', 'Test/Tasty/Ingredients/IncludingOptions.hs', 'Test/Tasty/Ingredients/ListTests.hs', 'Test/Tasty/Options.hs', 'Test/Tasty/Options/Core.hs', 'Test/Tasty/Options/Env.hs', 'Test/Tasty/Parallel.hs', 'Test/Tasty/Patterns.hs', 'Test/Tasty/Patterns/Eval.hs', 'Test/Tasty/Patterns/Expr.hs', 'Test/Tasty/Patterns/Parser.hs', 'Test/Tasty/Patterns/Printer.hs', 'Test/Tasty/Patterns/Types.hs', 'Test/Tasty/Providers.hs', 'Test/Tasty/Providers/ConsoleFormat.hs', 'Test/Tasty/Run.hs', 'Test/Tasty/Runners.hs', 'Test/Tasty/Runners/Reducers.hs', 'Test/Tasty/Runners/Utils.hs'],
+    src_dirs = ['.'],
+    deps = [
+        "//:ansi-terminal",
+        "//:base",
+        "//:containers",
+        "//:optparse-applicative",
+        "//:stm",
+        "//:tagged",
+        "//:transformers",
+        "//:unix",
+    ],
+    default_extensions = ['CPP', 'ScopedTypeVariables', 'DeriveDataTypeable'],
+    compiler_flags = ['-DUSE_WCWIDTH'],
+)

@@ -1,0 +1,15 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "async",
+    package_name = "async",
+    package_version = "2.2.5",
+    default_language = "Haskell2010",
+    srcs = ['Control/Concurrent/Async.hs', 'Control/Concurrent/Async/Internal.hs'],
+    src_dirs = ['.'],
+    deps = [
+        "//:base",
+        "//:hashable",
+        "//:stm",
+    ],
+)

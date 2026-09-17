@@ -6,39 +6,28 @@ vars:
   NAME: dev-gen
 
 tasks:
-  repl:debug:
-    aliases:
-      - repl
-    cmd:
-      task: :cabal:repl-target:debug
-      vars:
-        NAME: '{{.NAME}}'
-
   test:debug:
     aliases:
       - test
       - t
-    cmd:
-      task: :cabal:execute-target:test:debug
-      vars:
-        NAME: '{{.NAME}}'
+    cmd: buck2 test //dev-gen:symbolize-dev-gen-test
 
   test:debug:watch:
     aliases:
       - test:watch
       - tw
     cmd:
-      task: :cabal:execute-target:test:debug:watch
+      task: :watchman:client
       vars:
-        NAME: '{{.NAME}}'
+        WATCH: true
+        RESTART: false
+        MODE: haskell
+        COMMAND: buck2 test //dev-gen:symbolize-dev-gen-test
 
   test:release:
     aliases:
       - tr
-    cmd:
-      task: :cabal:execute-target:test:release
-      vars:
-        NAME: '{{.NAME}}'
+    cmd: buck2 test //dev-gen:symbolize-dev-gen-test
 
   link-build-dir:
     cmd:

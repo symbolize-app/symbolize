@@ -1,0 +1,13 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "split",
+    package_name = "split",
+    package_version = "0.2.5",
+    default_language = "Haskell2010",
+    srcs = ['src/Data/List/Split.hs', 'src/Data/List/Split/Internals.hs'],
+    src_dirs = ['src'],
+    deps = [
+        "//:base",
+    ],
+)

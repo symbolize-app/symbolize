@@ -1,0 +1,17 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "happy-lib",
+    package_name = "happy-lib",
+    package_version = "2.1.5",
+    default_language = "Haskell98",
+    srcs = [],
+    deps = [
+        "//:array",
+        "//:base",
+        "//:containers",
+        "//:mtl",
+        "//:transformers",
+    ],
+    default_extensions = ['CPP', 'MagicHash', 'FlexibleContexts', 'NamedFieldPuns', 'PatternGuards'],
+)

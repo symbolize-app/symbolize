@@ -1,0 +1,20 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "toml-parser",
+    package_name = "toml-parser",
+    package_version = "1.3.2.0",
+    default_language = "Haskell2010",
+    srcs = ['src/Toml.hs', 'src/Toml/FromValue.hs', 'src/Toml/FromValue/Generic.hs', 'src/Toml/FromValue/Matcher.hs', 'src/Toml/FromValue/ParseTable.hs', 'src/Toml/Generic.hs', 'src/Toml/Lexer.hs', 'src/Toml/Lexer/Token.hs', 'src/Toml/Lexer/Utils.hs', 'src/Toml/Located.hs', 'src/Toml/Parser.hs', 'src/Toml/Parser/Types.hs', 'src/Toml/Parser/Utils.hs', 'src/Toml/Position.hs', 'src/Toml/Pretty.hs', 'src/Toml/Semantics.hs', 'src/Toml/Semantics/Ordered.hs', 'src/Toml/ToValue.hs', 'src/Toml/ToValue/Generic.hs', 'src/Toml/Value.hs'],
+    src_dirs = ['src'],
+    deps = [
+        "//:array",
+        "//:base",
+        "//:containers",
+        "//:prettyprinter",
+        "//:text",
+        "//:time",
+        "//:transformers",
+    ],
+    default_extensions = ['BlockArguments', 'DeriveDataTypeable', 'DeriveGeneric', 'DeriveTraversable', 'EmptyCase', 'FlexibleContexts', 'FlexibleInstances', 'GeneralizedNewtypeDeriving', 'ImportQualifiedPost', 'LambdaCase', 'ScopedTypeVariables', 'TypeOperators', 'TypeSynonymInstances', 'ViewPatterns'],
+)

@@ -1,0 +1,15 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "data-fix",
+    package_name = "data-fix",
+    package_version = "0.3.4",
+    default_language = "Haskell2010",
+    srcs = ['src/Data/Fix.hs'],
+    src_dirs = ['src'],
+    deps = [
+        "//:base",
+        "//:deepseq",
+        "//:hashable",
+    ],
+)

@@ -1,0 +1,20 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "bifunctors",
+    package_name = "bifunctors",
+    package_version = "5.6.2",
+    default_language = "Haskell2010",
+    srcs = ['src/Data/Biapplicative.hs', 'src/Data/Bifunctor/Biap.hs', 'src/Data/Bifunctor/Biff.hs', 'src/Data/Bifunctor/Clown.hs', 'src/Data/Bifunctor/Fix.hs', 'src/Data/Bifunctor/Flip.hs', 'src/Data/Bifunctor/Functor.hs', 'src/Data/Bifunctor/Join.hs', 'src/Data/Bifunctor/Joker.hs', 'src/Data/Bifunctor/Product.hs', 'src/Data/Bifunctor/Sum.hs', 'src/Data/Bifunctor/TH.hs', 'src/Data/Bifunctor/TH/Internal.hs', 'src/Data/Bifunctor/Tannen.hs', 'src/Data/Bifunctor/Wrapped.hs'],
+    src_dirs = ['src'],
+    deps = [
+        "//:assoc",
+        "//:base",
+        "//:comonad",
+        "//:containers",
+        "//:tagged",
+        "//:template-haskell",
+        "//:th-abstraction",
+        "//:transformers",
+    ],
+)

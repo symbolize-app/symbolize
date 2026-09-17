@@ -1,0 +1,16 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "ansi-terminal",
+    package_name = "ansi-terminal",
+    package_version = "1.1.2",
+    default_language = "Haskell2010",
+    srcs = ['src/System/Console/ANSI.hs', 'src/System/Console/ANSI/Codes.hs', 'unix/System/Console/ANSI/Internal.hs'],
+    src_dirs = ['src', 'unix'],
+    deps = [
+        "//:ansi-terminal-types",
+        "//:base",
+        "//:colour",
+    ],
+    default_extensions = ['CPP'],
+)

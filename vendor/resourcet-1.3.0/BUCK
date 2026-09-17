@@ -1,0 +1,19 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "resourcet",
+    package_name = "resourcet",
+    package_version = "1.3.0",
+    default_language = "Haskell2010",
+    srcs = ['Control/Monad/Trans/Resource.hs', 'Control/Monad/Trans/Resource/Internal.hs', 'Data/Acquire.hs', 'Data/Acquire/Internal.hs', 'UnliftIO/Resource.hs'],
+    src_dirs = ['.'],
+    deps = [
+        "//:base",
+        "//:containers",
+        "//:exceptions",
+        "//:mtl",
+        "//:primitive",
+        "//:transformers",
+        "//:unliftio-core",
+    ],
+)

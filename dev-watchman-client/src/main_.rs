@@ -182,19 +182,15 @@ fn build_expr(cli: &Cli) -> Result<Expr> {
       })]
     }
     Mode::Haskell => vec![
-      Expr::Suffix(vec!["hs".into(), "cabal".into()]),
+      Expr::Suffix(vec!["hs".into()]),
       Expr::Name(NameTerm {
-        paths: vec![
-          "package.yaml".into(),
-          "cabal.project".into(),
-          "cabal.project.freeze".into(),
-        ],
+        paths: vec!["BUCK".into()],
         wholename: false,
       }),
       Expr::Name(NameTerm {
         paths: vec![
           "dev-hlint/base.yaml".into(),
-          "dev-task/cabal.yml".into(),
+          "dev-task/haskell.yml".into(),
         ],
         wholename: true,
       }),

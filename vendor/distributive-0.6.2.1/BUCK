@@ -1,0 +1,16 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "distributive",
+    package_name = "distributive",
+    package_version = "0.6.2.1",
+    default_language = "Haskell2010",
+    srcs = ['src/Data/Distributive.hs', 'src/Data/Distributive/Generic.hs'],
+    src_dirs = ['src'],
+    deps = [
+        "//:base",
+        "//:base-orphans",
+        "//:tagged",
+        "//:transformers",
+    ],
+)

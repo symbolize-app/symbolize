@@ -1,0 +1,14 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "character-ps",
+    package_name = "character-ps",
+    package_version = "0.1",
+    default_language = "Haskell2010",
+    srcs = ['src/Data/Char/Patterns.hs', 'src/Data/Word16/Patterns.hs', 'src/Data/Word8/Patterns.hs'],
+    src_dirs = ['src'],
+    deps = [
+        "//:base",
+    ],
+    default_extensions = ['PatternSynonyms'],
+)

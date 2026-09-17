@@ -1,0 +1,21 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "text-short",
+    package_name = "text-short",
+    package_version = "0.1.6",
+    default_language = "Haskell2010",
+    srcs = ['src-ghc804/PrimOps.hs', 'src/Data/Text/Short.hs', 'src/Data/Text/Short/Internal.hs', 'src/Data/Text/Short/Partial.hs', 'src/Data/Text/Short/Unsafe.hs'],
+    src_dirs = ['src', 'src-ghc804'],
+    deps = [
+        "//:base",
+        "//:binary",
+        "//:bytestring",
+        "//:deepseq",
+        "//:ghc-prim",
+        "//:hashable",
+        "//:template-haskell",
+        "//:text",
+    ],
+    c_srcs = ['cbits/cbits.c'],
+)

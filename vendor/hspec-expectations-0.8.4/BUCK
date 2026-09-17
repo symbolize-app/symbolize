@@ -1,0 +1,15 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "hspec-expectations",
+    package_name = "hspec-expectations",
+    package_version = "0.8.4",
+    default_language = "Haskell2010",
+    srcs = ['src/Test/Hspec/Expectations.hs', 'src/Test/Hspec/Expectations/Contrib.hs', 'src/Test/Hspec/Expectations/Matcher.hs'],
+    src_dirs = ['src'],
+    deps = [
+        "//:HUnit",
+        "//:base",
+        "//:call-stack",
+    ],
+)

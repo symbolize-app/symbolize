@@ -1,0 +1,11 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "libyaml-clib",
+    package_name = "libyaml-clib",
+    package_version = "0.2.5",
+    default_language = "Haskell2010",
+    srcs = [],
+    c_srcs = ['cbits/writer.c', 'cbits/dumper.c', 'cbits/loader.c', 'cbits/api.c', 'cbits/scanner.c', 'cbits/emitter.c', 'cbits/parser.c', 'cbits/reader.c'],
+    include_dirs = ['cbits'],
+)

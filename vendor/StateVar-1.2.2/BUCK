@@ -1,0 +1,16 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "StateVar",
+    package_name = "StateVar",
+    package_version = "1.2.2",
+    default_language = "Haskell2010",
+    srcs = ['src/Data/StateVar.hs'],
+    src_dirs = ['src'],
+    deps = [
+        "//:base",
+        "//:stm",
+        "//:transformers",
+    ],
+    compiler_flags = ['-DUSE_DEFAULT_SIGNATURES=1'],
+)

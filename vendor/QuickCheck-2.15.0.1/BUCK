@@ -1,0 +1,19 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "QuickCheck",
+    package_name = "QuickCheck",
+    package_version = "2.15.0.1",
+    default_language = "Haskell2010",
+    srcs = ['src/Test/QuickCheck.hs', 'src/Test/QuickCheck/All.hs', 'src/Test/QuickCheck/Arbitrary.hs', 'src/Test/QuickCheck/Exception.hs', 'src/Test/QuickCheck/Features.hs', 'src/Test/QuickCheck/Function.hs', 'src/Test/QuickCheck/Gen.hs', 'src/Test/QuickCheck/Gen/Unsafe.hs', 'src/Test/QuickCheck/Modifiers.hs', 'src/Test/QuickCheck/Monadic.hs', 'src/Test/QuickCheck/Poly.hs', 'src/Test/QuickCheck/Property.hs', 'src/Test/QuickCheck/Random.hs', 'src/Test/QuickCheck/State.hs', 'src/Test/QuickCheck/Test.hs', 'src/Test/QuickCheck/Text.hs'],
+    src_dirs = ['src'],
+    deps = [
+        "//:base",
+        "//:containers",
+        "//:deepseq",
+        "//:random",
+        "//:splitmix",
+        "//:template-haskell",
+        "//:transformers",
+    ],
+)

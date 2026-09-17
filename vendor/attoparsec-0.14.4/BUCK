@@ -1,0 +1,21 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "attoparsec",
+    package_name = "attoparsec",
+    package_version = "0.14.4",
+    default_language = "Haskell2010",
+    srcs = ['Data/Attoparsec.hs', 'Data/Attoparsec/ByteString.hs', 'Data/Attoparsec/ByteString/Char8.hs', 'Data/Attoparsec/ByteString/Internal.hs', 'Data/Attoparsec/ByteString/Lazy.hs', 'Data/Attoparsec/Char8.hs', 'Data/Attoparsec/Combinator.hs', 'Data/Attoparsec/Internal.hs', 'Data/Attoparsec/Internal/Types.hs', 'Data/Attoparsec/Lazy.hs', 'Data/Attoparsec/Number.hs', 'Data/Attoparsec/Text.hs', 'Data/Attoparsec/Text/Internal.hs', 'Data/Attoparsec/Text/Lazy.hs', 'Data/Attoparsec/Types.hs', 'Data/Attoparsec/Zepto.hs', 'internal/Data/Attoparsec/ByteString/Buffer.hs', 'internal/Data/Attoparsec/ByteString/FastSet.hs', 'internal/Data/Attoparsec/Internal/Compat.hs', 'internal/Data/Attoparsec/Internal/Fhthagn.hs', 'internal/Data/Attoparsec/Text/Buffer.hs', 'internal/Data/Attoparsec/Text/FastSet.hs'],
+    src_dirs = ['.', 'internal'],
+    deps = [
+        "//:array",
+        "//:base",
+        "//:bytestring",
+        "//:containers",
+        "//:deepseq",
+        "//:ghc-prim",
+        "//:scientific",
+        "//:text",
+        "//:transformers",
+    ],
+)

@@ -1,0 +1,22 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "mono-traversable",
+    package_name = "mono-traversable",
+    package_version = "1.0.21.0",
+    default_language = "Haskell2010",
+    srcs = ['src/Data/Containers.hs', 'src/Data/MonoTraversable.hs', 'src/Data/MonoTraversable/Unprefixed.hs', 'src/Data/NonNull.hs', 'src/Data/Sequences.hs'],
+    src_dirs = ['src'],
+    deps = [
+        "//:base",
+        "//:bytestring",
+        "//:containers",
+        "//:hashable",
+        "//:split",
+        "//:text",
+        "//:transformers",
+        "//:unordered-containers",
+        "//:vector",
+        "//:vector-algorithms",
+    ],
+)

@@ -190,10 +190,15 @@ detectPackageLicense pkgPath = do
                   licFileRes <- detectFromLicenseFiles pkgPath
                   case licFileRes of
                     Just res -> pure (Just res)
-                    Nothing ->
-                      if "sqlite3" `Text.isInfixOf` pkgDirName
-                        then pure $ Just ("blessing", "SQLite3 blessing dedication")
-                        else pure Nothing
+                    Nothing -> do
+                      -- 5. Cabal file
+                      cabalRes <- detectFromCabal pkgPath
+                      case cabalRes of
+                        Just res -> pure (Just res)
+                        Nothing ->
+                          if "sqlite3" `Text.isInfixOf` pkgDirName
+                            then pure $ Just ("blessing", "SQLite3 blessing dedication")
+                            else pure Nothing
 
 newtype CargoPackage = CargoPackage
   { license :: Maybe Text
@@ -367,6 +372,33 @@ detectFromLicenseFiles dir = liftIO $ do
             Just lic -> pure $ Just (lic, "License file " <> toText f)
             Nothing -> checkFiles fs
         Nothing -> checkFiles fs
+
+detectFromCabal :: (MonadUnliftIO m) => FilePath -> m (Maybe (Text, Text))
+detectFromCabal dir = liftIO $ do
+  entries <- Dir.listDirectory dir `catchAny` const (pure [])
+  let cabalFiles = List.filter (\f -> ".cabal" `List.isSuffixOf` f) entries
+  case cabalFiles of
+    [] -> pure Nothing
+    (cf : _) -> do
+      mContent <- (Just <$> readFileLBS (dir </> cf)) `catchAny` const (pure Nothing)
+      case mContent >>= (rightToMaybe . decodeUtf8Strict . toStrict) of
+        Nothing -> pure Nothing
+        Just content ->
+          pure $ do
+            let lns = lines content
+                licLine = List.find (\l -> "license:" `Text.isPrefixOf` Text.toLower (Text.stripStart l)) lns
+            l <- licLine
+            let rawLic = Text.strip (Text.drop (Text.length ("license:" :: Text)) (Text.stripStart l))
+                normalized = case Text.toUpper rawLic of
+                  "BSD3" -> "BSD-3-Clause"
+                  "BSD-3" -> "BSD-3-Clause"
+                  "BSD2" -> "BSD-2-Clause"
+                  "BSD-2" -> "BSD-2-Clause"
+                  "MIT" -> "MIT"
+                  "ISC" -> "ISC"
+                  "APACHE-2.0" -> "Apache-2.0"
+                  _ -> rawLic
+            if Text.null normalized then Nothing else Just (normalized, "Cabal file " <> toText cf)
 
 listSubdirs :: (MonadUnliftIO m) => FilePath -> m [FilePath]
 listSubdirs dir = liftIO $ do

@@ -1,0 +1,25 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "semigroupoids",
+    package_name = "semigroupoids",
+    package_version = "6.0.1",
+    default_language = "Haskell2010",
+    srcs = ['src/Data/Bifunctor/Apply.hs', 'src/Data/Functor/Alt.hs', 'src/Data/Functor/Apply.hs', 'src/Data/Functor/Bind.hs', 'src/Data/Functor/Bind/Class.hs', 'src/Data/Functor/Bind/Trans.hs', 'src/Data/Functor/Contravariant/Conclude.hs', 'src/Data/Functor/Contravariant/Decide.hs', 'src/Data/Functor/Contravariant/Divise.hs', 'src/Data/Functor/Extend.hs', 'src/Data/Functor/Plus.hs', 'src/Data/Groupoid.hs', 'src/Data/Isomorphism.hs', 'src/Data/Semigroup/Bifoldable.hs', 'src/Data/Semigroup/Bitraversable.hs', 'src/Data/Semigroup/Foldable.hs', 'src/Data/Semigroup/Foldable/Class.hs', 'src/Data/Semigroup/Traversable.hs', 'src/Data/Semigroup/Traversable/Class.hs', 'src/Data/Semigroupoid.hs', 'src/Data/Semigroupoid/Categorical.hs', 'src/Data/Semigroupoid/Dual.hs', 'src/Data/Semigroupoid/Ob.hs', 'src/Data/Semigroupoid/Static.hs', 'src/Data/Traversable/Instances.hs', 'src/Semigroupoids/Do.hs', 'src/Semigroupoids/Internal.hs'],
+    src_dirs = ['src'],
+    deps = [
+        "//:base",
+        "//:base-orphans",
+        "//:bifunctors",
+        "//:comonad",
+        "//:containers",
+        "//:contravariant",
+        "//:distributive",
+        "//:hashable",
+        "//:tagged",
+        "//:template-haskell",
+        "//:transformers",
+        "//:transformers-compat",
+        "//:unordered-containers",
+    ],
+)

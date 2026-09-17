@@ -1,0 +1,16 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "transformers-compat",
+    package_name = "transformers-compat",
+    package_version = "0.7.2",
+    default_language = "Haskell2010",
+    srcs = ['generics/Data/Functor/Classes/Generic.hs', 'generics/Data/Functor/Classes/Generic/Internal.hs', 'src/Control/Monad/Trans/Instances.hs'],
+    src_dirs = ['src', 'generics'],
+    deps = [
+        "//:base",
+        "//:ghc-prim",
+        "//:transformers",
+    ],
+    compiler_flags = ['-DMTL'],
+)

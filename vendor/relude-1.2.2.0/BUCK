@@ -1,0 +1,24 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "relude",
+    package_name = "relude",
+    package_version = "1.2.2.0",
+    default_language = "Haskell2010",
+    srcs = ['src/Relude.hs', 'src/Relude/Applicative.hs', 'src/Relude/Base.hs', 'src/Relude/Bool.hs', 'src/Relude/Bool/Guard.hs', 'src/Relude/Bool/Reexport.hs', 'src/Relude/Container.hs', 'src/Relude/Container/One.hs', 'src/Relude/Container/Reexport.hs', 'src/Relude/Debug.hs', 'src/Relude/DeepSeq.hs', 'src/Relude/Enum.hs', 'src/Relude/Exception.hs', 'src/Relude/Extra.hs', 'src/Relude/Extra/Bifunctor.hs', 'src/Relude/Extra/CallStack.hs', 'src/Relude/Extra/Enum.hs', 'src/Relude/Extra/Foldable.hs', 'src/Relude/Extra/Foldable1.hs', 'src/Relude/Extra/Group.hs', 'src/Relude/Extra/Lens.hs', 'src/Relude/Extra/Map.hs', 'src/Relude/Extra/Newtype.hs', 'src/Relude/Extra/Tuple.hs', 'src/Relude/Extra/Type.hs', 'src/Relude/File.hs', 'src/Relude/Foldable.hs', 'src/Relude/Foldable/Fold.hs', 'src/Relude/Foldable/Reexport.hs', 'src/Relude/Function.hs', 'src/Relude/Functor.hs', 'src/Relude/Functor/Fmap.hs', 'src/Relude/Functor/Reexport.hs', 'src/Relude/Lifted.hs', 'src/Relude/Lifted/Concurrent.hs', 'src/Relude/Lifted/Env.hs', 'src/Relude/Lifted/Exit.hs', 'src/Relude/Lifted/File.hs', 'src/Relude/Lifted/Handle.hs', 'src/Relude/Lifted/IORef.hs', 'src/Relude/Lifted/Terminal.hs', 'src/Relude/List.hs', 'src/Relude/List/NonEmpty.hs', 'src/Relude/List/Reexport.hs', 'src/Relude/Monad.hs', 'src/Relude/Monad/Either.hs', 'src/Relude/Monad/Maybe.hs', 'src/Relude/Monad/Reexport.hs', 'src/Relude/Monad/Trans.hs', 'src/Relude/Monoid.hs', 'src/Relude/Nub.hs', 'src/Relude/Numeric.hs', 'src/Relude/Print.hs', 'src/Relude/String.hs', 'src/Relude/String/Conversion.hs', 'src/Relude/String/Reexport.hs', 'src/Relude/Unsafe.hs'],
+    src_dirs = ['src'],
+    deps = [
+        "//:base",
+        "//:bytestring",
+        "//:containers",
+        "//:deepseq",
+        "//:ghc-prim",
+        "//:hashable",
+        "//:mtl",
+        "//:stm",
+        "//:text",
+        "//:transformers",
+        "//:unordered-containers",
+    ],
+    default_extensions = ['InstanceSigs', 'NoImplicitPrelude', 'OverloadedStrings', 'ScopedTypeVariables', 'TypeApplications'],
+)

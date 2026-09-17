@@ -1,0 +1,21 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "witherable",
+    package_name = "witherable",
+    package_version = "0.5",
+    default_language = "Haskell2010",
+    srcs = ['src/Witherable.hs'],
+    src_dirs = ['src'],
+    deps = [
+        "//:base",
+        "//:base-orphans",
+        "//:containers",
+        "//:hashable",
+        "//:indexed-traversable",
+        "//:indexed-traversable-instances",
+        "//:transformers",
+        "//:unordered-containers",
+        "//:vector",
+    ],
+)

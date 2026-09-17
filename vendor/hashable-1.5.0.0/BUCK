@@ -1,0 +1,22 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "hashable",
+    package_name = "hashable",
+    package_version = "1.5.0.0",
+    default_language = "Haskell2010",
+    srcs = ['src/Data/Hashable.hs', 'src/Data/Hashable/Class.hs', 'src/Data/Hashable/FFI.hs', 'src/Data/Hashable/Generic.hs', 'src/Data/Hashable/Generic/Instances.hs', 'src/Data/Hashable/Imports.hs', 'src/Data/Hashable/Lifted.hs', 'src/Data/Hashable/LowLevel.hs', 'src/Data/Hashable/Mix.hs', 'src/Data/Hashable/XXH3.hs'],
+    src_dirs = ['src'],
+    deps = [
+        "//:base",
+        "//:bytestring",
+        "//:containers",
+        "//:deepseq",
+        "//:filepath",
+        "//:ghc-bignum",
+        "//:ghc-prim",
+        "//:os-string",
+        "//:text",
+    ],
+    include_dirs = ['include', 'xxHash-0.8.2'],
+)

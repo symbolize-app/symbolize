@@ -1,0 +1,31 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "hspec-core",
+    package_name = "hspec-core",
+    package_version = "2.11.12",
+    default_language = "Haskell2010",
+    srcs = ['src/GetOpt/Declarative.hs', 'src/GetOpt/Declarative/Environment.hs', 'src/GetOpt/Declarative/Interpret.hs', 'src/GetOpt/Declarative/Types.hs', 'src/GetOpt/Declarative/Util.hs', 'src/NonEmpty.hs', 'src/Test/Hspec/Core/Annotations.hs', 'src/Test/Hspec/Core/Clock.hs', 'src/Test/Hspec/Core/Compat.hs', 'src/Test/Hspec/Core/Config.hs', 'src/Test/Hspec/Core/Config/Definition.hs', 'src/Test/Hspec/Core/Config/Options.hs', 'src/Test/Hspec/Core/Example.hs', 'src/Test/Hspec/Core/Example/Location.hs', 'src/Test/Hspec/Core/Extension.hs', 'src/Test/Hspec/Core/Extension/Config.hs', 'src/Test/Hspec/Core/Extension/Config/Type.hs', 'src/Test/Hspec/Core/Extension/Item.hs', 'src/Test/Hspec/Core/Extension/Option.hs', 'src/Test/Hspec/Core/Extension/Spec.hs', 'src/Test/Hspec/Core/Extension/Tree.hs', 'src/Test/Hspec/Core/FailureReport.hs', 'src/Test/Hspec/Core/Format.hs', 'src/Test/Hspec/Core/Formatters.hs', 'src/Test/Hspec/Core/Formatters/Diff.hs', 'src/Test/Hspec/Core/Formatters/Internal.hs', 'src/Test/Hspec/Core/Formatters/Pretty.hs', 'src/Test/Hspec/Core/Formatters/Pretty/Parser.hs', 'src/Test/Hspec/Core/Formatters/Pretty/Parser/Parser.hs', 'src/Test/Hspec/Core/Formatters/Pretty/Unicode.hs', 'src/Test/Hspec/Core/Formatters/V1.hs', 'src/Test/Hspec/Core/Formatters/V1/Free.hs', 'src/Test/Hspec/Core/Formatters/V1/Internal.hs', 'src/Test/Hspec/Core/Formatters/V1/Monad.hs', 'src/Test/Hspec/Core/Formatters/V2.hs', 'src/Test/Hspec/Core/Hooks.hs', 'src/Test/Hspec/Core/QuickCheck.hs', 'src/Test/Hspec/Core/QuickCheck/Util.hs', 'src/Test/Hspec/Core/Runner.hs', 'src/Test/Hspec/Core/Runner/Eval.hs', 'src/Test/Hspec/Core/Runner/JobQueue.hs', 'src/Test/Hspec/Core/Runner/PrintSlowSpecItems.hs', 'src/Test/Hspec/Core/Runner/Result.hs', 'src/Test/Hspec/Core/Shuffle.hs', 'src/Test/Hspec/Core/Spec.hs', 'src/Test/Hspec/Core/Spec/Monad.hs', 'src/Test/Hspec/Core/Timer.hs', 'src/Test/Hspec/Core/Tree.hs', 'src/Test/Hspec/Core/Util.hs', 'vendor/Control/Concurrent/Async.hs', 'vendor/Data/Algorithm/Diff.hs'],
+    src_dirs = ['src', 'vendor'],
+    deps = [
+        "//:HUnit",
+        "//:QuickCheck",
+        "//:ansi-terminal",
+        "//:array",
+        "//:base",
+        "//:call-stack",
+        "//:containers",
+        "//:deepseq",
+        "//:directory",
+        "//:filepath",
+        "//:haskell-lexer",
+        "//:hspec-expectations",
+        "//:process",
+        "//:quickcheck-io",
+        "//:random",
+        "//:stm",
+        "//:tf-random",
+        "//:time",
+        "//:transformers",
+    ],
+)

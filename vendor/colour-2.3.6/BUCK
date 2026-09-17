@@ -1,0 +1,13 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "colour",
+    package_name = "colour",
+    package_version = "2.3.6",
+    default_language = "Haskell98",
+    srcs = ['Data/Colour.hs', 'Data/Colour/CIE.hs', 'Data/Colour/CIE/Chromaticity.hs', 'Data/Colour/CIE/Illuminant.hs', 'Data/Colour/Chan.hs', 'Data/Colour/Internal.hs', 'Data/Colour/Matrix.hs', 'Data/Colour/Names.hs', 'Data/Colour/RGB.hs', 'Data/Colour/RGBSpace.hs', 'Data/Colour/RGBSpace/HSL.hs', 'Data/Colour/RGBSpace/HSV.hs', 'Data/Colour/SRGB.hs', 'Data/Colour/SRGB/Linear.hs'],
+    src_dirs = ['.'],
+    deps = [
+        "//:base",
+    ],
+)

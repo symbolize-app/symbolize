@@ -1,0 +1,16 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "splitmix",
+    package_name = "splitmix",
+    package_version = "0.1.1",
+    default_language = "Haskell2010",
+    srcs = ['src-compat/Data/Bits/Compat.hs', 'src/System/Random/SplitMix.hs', 'src/System/Random/SplitMix/Init.hs', 'src/System/Random/SplitMix32.hs'],
+    src_dirs = ['src', 'src-compat'],
+    deps = [
+        "//:base",
+        "//:deepseq",
+    ],
+    c_srcs = ['cbits-unix/init.c'],
+    compiler_flags = ['-DSPLITMIX_INIT_C=1'],
+)

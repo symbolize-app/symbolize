@@ -1,0 +1,164 @@
+version: '3'
+
+run: when_changed
+
+vars:
+  PACKAGES: dev-gen
+  FIND_FILES: $(fd -g '*.hs' $(fd -d 1 -g '{app,src,test}' {{.PACKAGES}}))
+  ORMOLU_FLAGS: >-
+    -o -XGHC2021
+    -o -XExplicitNamespaces
+    -o -XTypeFamilies
+    -o -XDataKinds
+    -o -XNoImplicitPrelude
+    -o -XOverloadedStrings
+    -o -XOverloadedLabels
+    -o -XDerivingStrategies
+    -o -XDeriveGeneric
+    -o -XDuplicateRecordFields
+    -o -XNoFieldSelectors
+    -o -XNamedFieldPuns
+    -o -XOverloadedRecordDot
+    -o -XDisambiguateRecordFields
+    -o -XOverloadedLists
+    -p relude
+
+tasks:
+  build:debug:
+    aliases:
+      - build
+      - b
+    cmd: buck2 build //dev-gen:symbolize-dev-gen-exe //dev-gen:symbolize-dev-gen-test
+
+  build:debug:watch:
+    aliases:
+      - build:watch
+      - bw
+    cmd:
+      task: :watchman:client
+      vars:
+        WATCH: true
+        RESTART: false
+        MODE: haskell
+        COMMAND: buck2 build //dev-gen:symbolize-dev-gen-exe //dev-gen:symbolize-dev-gen-test
+
+  build:release:
+    aliases:
+      - br
+    cmd: buck2 build //dev-gen:symbolize-dev-gen-exe //dev-gen:symbolize-dev-gen-test
+
+  clean:
+    cmd: "true"
+
+  execute-target:
+    internal: true
+    requires:
+      vars:
+        - WATCH
+        - MODE
+        - NAME
+        - TARGET
+        - ARGS
+    cmds:
+      - cmd: 'true # /{{.WATCH}}/{{.MODE}}/{{.NAME}}/{{.TARGET}}/{{.ARGS}}/'
+        silent: true
+      - task: :watchman:client
+        vars:
+          WATCH: '{{.WATCH}}'
+          RESTART: false
+          MODE: executable
+          COMMAND: 'buck2 run //{{.NAME}}:symbolize-{{.NAME}}-exe -- {{.ARGS}} {{.CLI_ARGS}}'
+
+  execute-target:run:debug:
+    internal: true
+    requires:
+      vars:
+        - NAME
+    cmd: buck2 run //{{.NAME}}:symbolize-{{.NAME}}-exe -- {{.ARGS}} {{.CLI_ARGS}}
+
+  execute-target:run:release:
+    internal: true
+    requires:
+      vars:
+        - NAME
+    cmd: buck2 run //{{.NAME}}:symbolize-{{.NAME}}-exe -- {{.ARGS}} {{.CLI_ARGS}}
+
+  execute-target:test:debug:
+    internal: true
+    requires:
+      vars:
+        - NAME
+    cmd: buck2 test //{{.NAME}}:symbolize-{{.NAME}}-test
+
+  execute-target:test:debug:watch:
+    internal: true
+    requires:
+      vars:
+        - NAME
+    cmd:
+      task: :watchman:client
+      vars:
+        WATCH: true
+        RESTART: false
+        MODE: haskell
+        COMMAND: buck2 test //{{.NAME}}:symbolize-{{.NAME}}-test
+
+  execute-target:test:release:
+    internal: true
+    requires:
+      vars:
+        - NAME
+    cmd: buck2 test //{{.NAME}}:symbolize-{{.NAME}}-test
+
+  format:check:
+    aliases:
+      - fc
+    cmd: ormolu --mode check {{.ORMOLU_FLAGS}} {{.FIND_FILES}}
+
+  format:fix:
+    aliases:
+      - format
+      - f
+    cmd: ormolu --mode inplace {{.ORMOLU_FLAGS}} {{.FIND_FILES}}
+
+  lint:
+    aliases:
+      - l
+    cmd:
+      task: lint:exec
+      vars:
+        WATCH: false
+
+  lint:exec:
+    internal: true
+    requires:
+      vars:
+        - WATCH
+    cmd:
+      task: :watchman:client
+      vars:
+        WATCH: '{{.WATCH}}'
+        RESTART: false
+        MODE: haskell
+        COMMAND: hlint --hint dev-hlint/relude-hlint.yaml --hint dev-hlint/base.yaml --threads {{.FIND_FILES}}
+
+  lint:watch:
+    aliases:
+      - lw
+    cmd:
+      task: lint:exec
+      vars:
+        WATCH: true
+
+  test:debug:
+    aliases:
+      - test
+      - t
+    deps:
+      - :dev-gen:test:debug
+
+  test:release:
+    aliases:
+      - tr
+    deps:
+      - :dev-gen:test:release

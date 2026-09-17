@@ -1,0 +1,26 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "unliftio",
+    package_name = "unliftio",
+    package_version = "0.2.25.1",
+    default_language = "Haskell2010",
+    srcs = ['src/UnliftIO.hs', 'src/UnliftIO/Async.hs', 'src/UnliftIO/Chan.hs', 'src/UnliftIO/Concurrent.hs', 'src/UnliftIO/Directory.hs', 'src/UnliftIO/Environment.hs', 'src/UnliftIO/Exception.hs', 'src/UnliftIO/Exception/Lens.hs', 'src/UnliftIO/Foreign.hs', 'src/UnliftIO/IO.hs', 'src/UnliftIO/IO/File.hs', 'src/UnliftIO/IO/File/Posix.hs', 'src/UnliftIO/IORef.hs', 'src/UnliftIO/Internals/Async.hs', 'src/UnliftIO/MVar.hs', 'src/UnliftIO/Memoize.hs', 'src/UnliftIO/Process.hs', 'src/UnliftIO/QSem.hs', 'src/UnliftIO/QSemN.hs', 'src/UnliftIO/STM.hs', 'src/UnliftIO/Temporary.hs', 'src/UnliftIO/Timeout.hs'],
+    src_dirs = ['src'],
+    deps = [
+        "//:async",
+        "//:base",
+        "//:bytestring",
+        "//:deepseq",
+        "//:directory",
+        "//:filepath",
+        "//:process",
+        "//:safe-exceptions",
+        "//:stm",
+        "//:time",
+        "//:transformers",
+        "//:unix",
+        "//:unliftio-core",
+    ],
+    c_srcs = ['cbits/file-posix.c', 'cbits/time-posix.c'],
+)

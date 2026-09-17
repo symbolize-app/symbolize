@@ -1,0 +1,19 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "optparse-applicative",
+    package_name = "optparse-applicative",
+    package_version = "0.18.1.0",
+    default_language = "Haskell98",
+    srcs = ['src/Options/Applicative.hs', 'src/Options/Applicative/Arrows.hs', 'src/Options/Applicative/BashCompletion.hs', 'src/Options/Applicative/Builder.hs', 'src/Options/Applicative/Builder/Completer.hs', 'src/Options/Applicative/Builder/Internal.hs', 'src/Options/Applicative/Common.hs', 'src/Options/Applicative/Extra.hs', 'src/Options/Applicative/Help.hs', 'src/Options/Applicative/Help/Chunk.hs', 'src/Options/Applicative/Help/Core.hs', 'src/Options/Applicative/Help/Levenshtein.hs', 'src/Options/Applicative/Help/Pretty.hs', 'src/Options/Applicative/Help/Types.hs', 'src/Options/Applicative/Internal.hs', 'src/Options/Applicative/NonEmpty.hs', 'src/Options/Applicative/Types.hs'],
+    src_dirs = ['src'],
+    deps = [
+        "//:base",
+        "//:prettyprinter",
+        "//:prettyprinter-ansi-terminal",
+        "//:process",
+        "//:text",
+        "//:transformers",
+        "//:transformers-compat",
+    ],
+)

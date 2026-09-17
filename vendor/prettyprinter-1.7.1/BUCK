@@ -1,0 +1,15 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "prettyprinter",
+    package_name = "prettyprinter",
+    package_version = "1.7.1",
+    default_language = "Haskell2010",
+    srcs = ['src/Data/Text/Prettyprint/Doc.hs', 'src/Data/Text/Prettyprint/Doc/Internal.hs', 'src/Data/Text/Prettyprint/Doc/Internal/Debug.hs', 'src/Data/Text/Prettyprint/Doc/Internal/Type.hs', 'src/Data/Text/Prettyprint/Doc/Render/String.hs', 'src/Data/Text/Prettyprint/Doc/Render/Text.hs', 'src/Data/Text/Prettyprint/Doc/Render/Tutorials/StackMachineTutorial.hs', 'src/Data/Text/Prettyprint/Doc/Render/Tutorials/TreeRenderingTutorial.hs', 'src/Data/Text/Prettyprint/Doc/Render/Util/Panic.hs', 'src/Data/Text/Prettyprint/Doc/Render/Util/SimpleDocTree.hs', 'src/Data/Text/Prettyprint/Doc/Render/Util/StackMachine.hs', 'src/Data/Text/Prettyprint/Doc/Symbols/Ascii.hs', 'src/Data/Text/Prettyprint/Doc/Symbols/Unicode.hs', 'src/Data/Text/Prettyprint/Doc/Util.hs', 'src/Prettyprinter.hs', 'src/Prettyprinter/Internal.hs', 'src/Prettyprinter/Internal/Debug.hs', 'src/Prettyprinter/Internal/Type.hs', 'src/Prettyprinter/Render/String.hs', 'src/Prettyprinter/Render/Text.hs', 'src/Prettyprinter/Render/Tutorials/StackMachineTutorial.hs', 'src/Prettyprinter/Render/Tutorials/TreeRenderingTutorial.hs', 'src/Prettyprinter/Render/Util/Panic.hs', 'src/Prettyprinter/Render/Util/SimpleDocTree.hs', 'src/Prettyprinter/Render/Util/StackMachine.hs', 'src/Prettyprinter/Symbols/Ascii.hs', 'src/Prettyprinter/Symbols/Unicode.hs', 'src/Prettyprinter/Util.hs'],
+    src_dirs = ['src'],
+    deps = [
+        "//:base",
+        "//:text",
+    ],
+    include_dirs = ['misc'],
+)

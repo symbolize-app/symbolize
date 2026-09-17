@@ -1,0 +1,13 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "haskell-lexer",
+    package_name = "haskell-lexer",
+    package_version = "1.2.1",
+    default_language = "Haskell2010",
+    srcs = ['Language/Haskell/Lexer.hs', 'Language/Haskell/Lexer/Layout.hs', 'Language/Haskell/Lexer/Lex.hs', 'Language/Haskell/Lexer/Position.hs', 'Language/Haskell/Lexer/Tokens.hs', 'Language/Haskell/Lexer/Utils.hs'],
+    src_dirs = ['.'],
+    deps = [
+        "//:base",
+    ],
+)

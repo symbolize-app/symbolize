@@ -1,0 +1,19 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "time-compat",
+    package_name = "time-compat",
+    package_version = "1.9.8",
+    default_language = "Haskell2010",
+    srcs = ['src/Data/Format.hs', 'src/Data/Time/Calendar/Compat.hs', 'src/Data/Time/Calendar/Easter/Compat.hs', 'src/Data/Time/Calendar/Julian/Compat.hs', 'src/Data/Time/Calendar/Month/Compat.hs', 'src/Data/Time/Calendar/MonthDay/Compat.hs', 'src/Data/Time/Calendar/OrdinalDate/Compat.hs', 'src/Data/Time/Calendar/Private.hs', 'src/Data/Time/Calendar/Quarter/Compat.hs', 'src/Data/Time/Calendar/Types.hs', 'src/Data/Time/Calendar/WeekDate/Compat.hs', 'src/Data/Time/Clock/Compat.hs', 'src/Data/Time/Clock/POSIX/Compat.hs', 'src/Data/Time/Clock/System/Compat.hs', 'src/Data/Time/Clock/TAI/Compat.hs', 'src/Data/Time/Compat.hs', 'src/Data/Time/Format/Compat.hs', 'src/Data/Time/Format/ISO8601/Compat.hs', 'src/Data/Time/LocalTime/Compat.hs', 'src/Data/Time/Orphans.hs'],
+    src_dirs = ['src'],
+    deps = [
+        "//:base",
+        "//:base-orphans",
+        "//:deepseq",
+        "//:hashable",
+        "//:template-haskell",
+        "//:time",
+    ],
+    default_extensions = ['Trustworthy', 'BangPatterns', 'DeriveDataTypeable', 'DeriveGeneric', 'DeriveLift', 'PatternSynonyms', 'StandaloneDeriving', 'ViewPatterns'],
+)

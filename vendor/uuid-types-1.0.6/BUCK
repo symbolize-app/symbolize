@@ -1,0 +1,20 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "uuid-types",
+    package_name = "uuid-types",
+    package_version = "1.0.6",
+    default_language = "Haskell2010",
+    srcs = ['src/Data/UUID/Types.hs', 'src/Data/UUID/Types/Internal.hs', 'src/Data/UUID/Types/Internal/Builder.hs'],
+    src_dirs = ['src'],
+    deps = [
+        "//:base",
+        "//:binary",
+        "//:bytestring",
+        "//:deepseq",
+        "//:hashable",
+        "//:random",
+        "//:template-haskell",
+        "//:text",
+    ],
+)

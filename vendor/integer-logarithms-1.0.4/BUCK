@@ -1,0 +1,16 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "integer-logarithms",
+    package_name = "integer-logarithms",
+    package_version = "1.0.4",
+    default_language = "Haskell2010",
+    srcs = ['src/GHC/Integer/Logarithms/Compat.hs', 'src/Math/NumberTheory/Logarithms.hs', 'src/Math/NumberTheory/Powers/Integer.hs', 'src/Math/NumberTheory/Powers/Natural.hs'],
+    src_dirs = ['src'],
+    deps = [
+        "//:array",
+        "//:base",
+        "//:ghc-bignum",
+        "//:ghc-prim",
+    ],
+)

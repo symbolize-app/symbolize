@@ -1,0 +1,17 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "tf-random",
+    package_name = "tf-random",
+    package_version = "0.5",
+    default_language = "Haskell2010",
+    srcs = ['src/System/Random/TF.hs', 'src/System/Random/TF/Gen.hs', 'src/System/Random/TF/Init.hs', 'src/System/Random/TF/Instances.hs'],
+    src_dirs = ['src'],
+    deps = [
+        "//:base",
+        "//:primitive",
+        "//:random",
+        "//:time",
+    ],
+    c_srcs = ['cbits/threefish_block.c'],
+)

@@ -1,0 +1,13 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "generically",
+    package_name = "generically",
+    package_version = "0.1.1",
+    default_language = "Haskell2010",
+    srcs = ['src/GHC/Generics/Generically.hs'],
+    src_dirs = ['src'],
+    deps = [
+        "//:base",
+    ],
+)

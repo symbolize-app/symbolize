@@ -221,7 +221,35 @@ _readVendorTargets = liftIO $ do
             relText = Text.replace "\\" "/" (toText relDir)
             names = extractRustLibraryNames txt
         pure [(name, if Text.null relText then ":" <> name else "//" <> relText <> ":" <> name) | name <- names]
-  pure (fromList (concat targets))
+  let bootTargets =
+        [ ("Cabal", "@dev_buck//boot:Cabal"),
+          ("Cabal-syntax", "@dev_buck//boot:Cabal-syntax"),
+          ("array", "@dev_buck//boot:array"),
+          ("base", "@dev_buck//boot:base"),
+          ("binary", "@dev_buck//boot:binary"),
+          ("bytestring", "@dev_buck//boot:bytestring"),
+          ("containers", "@dev_buck//boot:containers"),
+          ("deepseq", "@dev_buck//boot:deepseq"),
+          ("directory", "@dev_buck//boot:directory"),
+          ("exceptions", "@dev_buck//boot:exceptions"),
+          ("filepath", "@dev_buck//boot:filepath"),
+          ("ghc-bignum", "@dev_buck//boot:ghc-bignum"),
+          ("ghc-boot-th", "@dev_buck//boot:ghc-boot-th"),
+          ("ghc-prim", "@dev_buck//boot:ghc-prim"),
+          ("integer-gmp", "@dev_buck//boot:integer-gmp"),
+          ("mtl", "@dev_buck//boot:mtl"),
+          ("parsec", "@dev_buck//boot:parsec"),
+          ("pretty", "@dev_buck//boot:pretty"),
+          ("process", "@dev_buck//boot:process"),
+          ("rts", "@dev_buck//boot:rts"),
+          ("stm", "@dev_buck//boot:stm"),
+          ("template-haskell", "@dev_buck//boot:template-haskell"),
+          ("text", "@dev_buck//boot:text"),
+          ("time", "@dev_buck//boot:time"),
+          ("transformers", "@dev_buck//boot:transformers"),
+          ("unix", "@dev_buck//boot:unix")
+        ]
+  pure (fromList (bootTargets <> concat targets))
   where
     rightToMaybe (Right x) = Just x
     rightToMaybe (Left _) = Nothing
@@ -246,7 +274,7 @@ _readVendorTargets = liftIO $ do
       where
         go _ [] = []
         go inLib (l : rest)
-          | "rust_library(" `Text.isInfixOf` l || "gleam_package(" `Text.isInfixOf` l = go True rest
+          | "rust_library(" `Text.isInfixOf` l || "gleam_package(" `Text.isInfixOf` l || "haskell_library(" `Text.isInfixOf` l = go True rest
           | inLib && "name =" `Text.isInfixOf` l =
               case _extractQuoted l of
                 Just n -> n : go False rest

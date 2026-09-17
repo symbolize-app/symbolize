@@ -1,0 +1,17 @@
+load("//:rules.bzl", "haskell_library")
+
+haskell_library(
+    name = "these",
+    package_name = "these",
+    package_version = "1.2.1",
+    default_language = "Haskell2010",
+    srcs = ['src/Data/Functor/These.hs', 'src/Data/These.hs', 'src/Data/These/Combinators.hs'],
+    src_dirs = ['src'],
+    deps = [
+        "//:assoc",
+        "//:base",
+        "//:binary",
+        "//:deepseq",
+        "//:hashable",
+    ],
+)
