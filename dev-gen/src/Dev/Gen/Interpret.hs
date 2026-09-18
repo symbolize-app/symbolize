@@ -33,7 +33,6 @@ import Relude.String
     String,
     Text,
     decodeUtf8Strict,
-    decodeUtf8With,
     encodeUtf8,
     fromString,
     lines,

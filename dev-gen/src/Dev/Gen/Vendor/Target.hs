@@ -8,7 +8,7 @@ import Data.List qualified as List
 import Data.Text qualified as Text
 import Data.Tuple (fst)
 import Data.Vector (Vector)
-import Relude.Base (Eq, (==))
+import Relude.Base ((==))
 import Relude.Container (fromList)
 import Relude.Foldable (foldMap', toList)
 import Relude.Function (($), (.))

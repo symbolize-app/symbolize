@@ -13,9 +13,9 @@ import Dev.Gen.FileFormat qualified as FileFormat
 import Dev.Gen.FilePath (FilePath (FilePath))
 import Dev.Gen.Package qualified as Package
 import Dev.Gen.Vendor.Target qualified as Target
-import Relude.Applicative (pass, pure, (<*>))
+import Relude.Applicative (pass, (<*>))
 import Relude.Base (Type, (/=), (==))
-import Relude.Bool (Bool (False, True), not, otherwise, (&&), (||))
+import Relude.Bool (Bool (False, True), not, otherwise, (&&))
 import Relude.Container (fromList, uncurry)
 import Relude.Foldable (Foldable, for_, null, toList)
 import Relude.Function (const, ($), (.))

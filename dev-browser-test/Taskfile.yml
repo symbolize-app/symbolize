@@ -1,14 +1,12 @@
 version: '3'
-
 run: when_changed
-
 tasks:
   check:
-    dir: '{{.TASKFILE_DIR}}'
-    cmd: gleam check
+    cmd: buck2 build //dev-browser-test:check
   format:check:
-    dir: '{{.TASKFILE_DIR}}'
-    cmd: gleam format --check src
+    aliases:
+    - fc
+    cmd: buck2 build //dev-browser-test:format-check
   build:
     dir: '{{.TASKFILE_DIR}}'
     cmd: gleam build
@@ -17,6 +15,9 @@ tasks:
       task: :build-dir:link-package-build-dir
       vars:
         NAME: '{{.NAME}}'
-
+  lint:
+    aliases:
+    - l
+    cmd: buck2 build //dev-browser-test:lint
 vars:
   NAME: dev-browser-test

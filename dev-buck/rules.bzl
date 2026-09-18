@@ -1,6 +1,7 @@
 load("@prelude//rules.bzl", _alias = "alias", _rust_binary = "rust_binary", _rust_library = "rust_library", _rust_test = "rust_test")
 load(":clippy.bzl", _rust_clippy_check = "rust_clippy_check")
-load(":format.bzl", _rust_format_check = "rust_format_check", _rust_format_diff = "rust_format_diff")
+load(":format.bzl", _format_check = "format_check", _gleam_format_diff = "gleam_format_diff", _haskell_format_diff = "haskell_format_diff", _rust_format_check = "rust_format_check", _rust_format_diff = "rust_format_diff")
+
 
 _DEFAULT_RUSTC_FLAGS = [
     "-A",
@@ -107,6 +108,20 @@ def rust_library(
         _rust_clippy_check(
             name = "clippy",
             targets = clippy_targets,
+            visibility = ["PUBLIC"],
+        )
+
+    if not native.rule_exists("lint"):
+        _alias(
+            name = "lint",
+            actual = ":clippy",
+            visibility = ["PUBLIC"],
+        )
+
+    if not native.rule_exists("check"):
+        _alias(
+            name = "check",
+            actual = ":" + name,
             visibility = ["PUBLIC"],
         )
 
@@ -221,11 +236,32 @@ def rust_binary(
             visibility = ["PUBLIC"],
         )
 
-load(":haskell.bzl", _haskell_binary = "haskell_binary", _haskell_library = "haskell_library", _haskell_test = "haskell_test")
+    if not native.rule_exists("lint"):
+        _alias(
+            name = "lint",
+            actual = ":clippy" if native.rule_exists("clippy") else ":" + name,
+            visibility = ["PUBLIC"],
+        )
 
+    if not native.rule_exists("check"):
+        _alias(
+            name = "check",
+            actual = ":" + name,
+            visibility = ["PUBLIC"],
+        )
+
+load(":haskell.bzl", _haskell_binary = "haskell_binary", _haskell_library = "haskell_library", _haskell_lint = "haskell_lint", _haskell_test = "haskell_test")
+
+alias = _alias
 haskell_binary = _haskell_binary
 haskell_library = _haskell_library
 haskell_test = _haskell_test
+haskell_lint = _haskell_lint
+haskell_format_diff = _haskell_format_diff
+gleam_format_diff = _gleam_format_diff
+format_check = _format_check
+rust_format_check = _rust_format_check
+rust_format_diff = _rust_format_diff
 
 
 

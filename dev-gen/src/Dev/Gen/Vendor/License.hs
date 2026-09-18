@@ -21,17 +21,16 @@ import Data.Set (Set)
 import Data.Set qualified as Set
 import Data.Text qualified as Text
 import Relude.Applicative (pure, (<*>))
-import Relude.Base (Char, Eq, Ord, Show, (/=), (<), (==))
+import Relude.Base (Eq, Show, (/=))
 import Relude.Bool (Bool (False, True), not, otherwise, (&&), (||))
-import Relude.Container (fromList)
 import Relude.File (readFileLBS)
-import Relude.Foldable (for_, length, null, toList)
+import Relude.Foldable (for_, length, null)
 import Relude.Function (const, flip, ($), (.))
 import Relude.Functor (fmap, (<$>))
-import Relude.Monad (Either (Left, Right), Maybe (Just, Nothing), either, maybe, (>>=))
+import Relude.Monad (Either (Left, Right), Maybe (Just, Nothing), (>>=))
 import Relude.Monoid ((<>))
 import Relude.Print (putTextLn)
-import Relude.String (String, Text, decodeUtf8Strict, lines, show, toStrict, toString, toText)
+import Relude.String (Text, decodeUtf8Strict, lines, show, toStrict, toString, toText)
 import System.Directory qualified as Dir
 import System.FilePath (FilePath, takeFileName, (</>))
 import Toml qualified
@@ -207,17 +206,12 @@ newtype CargoPackage = CargoPackage
 instance Toml.FromValue CargoPackage where
   fromValue = Toml.parseTableFromValue (CargoPackage <$> Toml.optKey "license")
 
-newtype CargoWorkspace = CargoWorkspace
-  { package :: Maybe CargoPackage
-  }
+newtype CargoWorkspace = CargoWorkspace (Maybe CargoPackage)
 
 instance Toml.FromValue CargoWorkspace where
   fromValue = Toml.parseTableFromValue (CargoWorkspace <$> Toml.optKey "package")
 
-data CargoManifest = CargoManifest
-  { package :: Maybe CargoPackage,
-    workspace :: Maybe CargoWorkspace
-  }
+data CargoManifest = CargoManifest (Maybe CargoPackage) (Maybe CargoWorkspace)
 
 instance Toml.FromValue CargoManifest where
   fromValue =
@@ -251,7 +245,9 @@ detectFromCargo dir = do
     extractCargoLic (CargoManifest mPkg mWs) =
       case mPkg >>= (.license) of
         Just lic -> Just lic
-        Nothing -> mWs >>= (.package) >>= (.license)
+        Nothing -> case mWs of
+          Just (CargoWorkspace (Just p)) -> p.license
+          _ -> Nothing
 
     checkSubcrates root = do
       subdirs <- listSubdirs root

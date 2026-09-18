@@ -12,5 +12,5 @@ for diff_file in $diff_paths; do
 done
 
 if [ "$applied" -gt 0 ]; then
-  echo "Applied format diffs to $applied crate(s)."
+  echo "Applied format diffs to $applied package(s)."
 fi

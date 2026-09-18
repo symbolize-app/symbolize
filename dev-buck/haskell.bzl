@@ -375,6 +375,7 @@ def _haskell_library_impl(ctx: AnalysisContext) -> list[Provider]:
         'hs-libraries: HS${pkg_id}\nEOF\n' +
         'if [ -n "$dep_ids" ]; then echo "depends: ${dep_ids}" >> "$out_pkg/${pkg_id}.conf"; fi; ' +
         'if [ -n "$extra_libs" ]; then echo "extra-libraries: ${extra_libs}" >> "$out_pkg/${pkg_id}.conf"; fi; ' +
+        'if [ "${#mod_dirs[@]}" -gt 0 ]; then find "${mod_dirs[@]}" -name "*.warnings" -exec cat {} + > "$out_pkg/warnings.log" 2>/dev/null || true; fi; touch "$out_pkg/warnings.log"; ' +
         'ghc-pkg register --package-db="$out_pkg/package.conf.d" --no-expand-pkgroot --force "$out_pkg/${pkg_id}.conf"'
     )
 
@@ -488,7 +489,10 @@ def _haskell_library_impl(ctx: AnalysisContext) -> list[Provider]:
                     "-e",
                     "-c",
                     'out_dir="$1"; shift; src="$1"; shift; rel_path="$1"; shift; dir_path="$1"; shift; ' +
-                    'src_dir="$(dirname "$src")"; mkdir -p "$out_dir/$dir_path" && ghc -c "$src" -I"$src_dir" -o "$out_dir/$rel_path.o" -ohi "$out_dir/$rel_path.hi" "$@"',
+                    'src_dir="$(dirname "$src")"; mkdir -p "$out_dir/$dir_path"; ' +
+                    'warn_file="$out_dir/$rel_path.warnings"; ' +
+                    'set +e; ghc -c "$src" -I"$src_dir" -o "$out_dir/$rel_path.o" -ohi "$out_dir/$rel_path.hi" "$@" 2> "$warn_file"; status=$?; ' +
+                    'if [ -s "$warn_file" ]; then cat "$warn_file" >&2; fi; exit $status',
                     "--",
                     mod_dirs[mod_key].as_output(),
                     mod.src,
@@ -542,8 +546,14 @@ def _haskell_library_impl(ctx: AnalysisContext) -> list[Provider]:
             f = dynamic_compile,
         )
 
+    warnings_art = out_pkg.project("warnings.log")
     return [
-        DefaultInfo(default_output = out_pkg),
+        DefaultInfo(
+            default_output = out_pkg,
+            sub_targets = {
+                "warnings": [DefaultInfo(default_output = warnings_art)],
+            },
+        ),
         HaskellLibraryInfo(
             package_name = pkg_name,
             package_id = pkg_id,
@@ -581,6 +591,7 @@ haskell_library = rule(
 
 def _haskell_binary_impl(ctx: AnalysisContext) -> list[Provider]:
     out_bin = ctx.actions.declare_output(ctx.attrs.name)
+    warnings_art = ctx.actions.declare_output(ctx.attrs.name + ".warnings.log")
     deps_json = ctx.actions.declare_output("__deps__.json")
 
     src_dirs = ctx.attrs.src_dirs or ["."]
@@ -682,7 +693,10 @@ def _haskell_binary_impl(ctx: AnalysisContext) -> list[Provider]:
                 "-e",
                 "-c",
                 'out_dir="$1"; shift; src="$1"; shift; rel_path="$1"; shift; dir_path="$1"; shift; ' +
-                'src_dir="$(dirname "$src")"; mkdir -p "$out_dir/$dir_path" && ghc -c "$src" -I"$src_dir" -o "$out_dir/$rel_path.o" -ohi "$out_dir/$rel_path.hi" "$@"',
+                'src_dir="$(dirname "$src")"; mkdir -p "$out_dir/$dir_path"; ' +
+                'warn_file="$out_dir/$rel_path.warnings"; ' +
+                'set +e; ghc -c "$src" -I"$src_dir" -o "$out_dir/$rel_path.o" -ohi "$out_dir/$rel_path.hi" "$@" 2> "$warn_file"; status=$?; ' +
+                'if [ -s "$warn_file" ]; then cat "$warn_file" >&2; fi; exit $status',
                 "--",
                 mod_dirs[mod_key].as_output(),
                 mod.src,
@@ -697,6 +711,21 @@ def _haskell_binary_impl(ctx: AnalysisContext) -> list[Provider]:
                 identifier = mod.info.dotted_name,
             )
             compiled_mod_dirs.append(mod_dirs[mod_key])
+
+        combine_warn_cmd = cmd_args(
+            "bash",
+            "-e",
+            "-c",
+            'out="$1"; shift; if [ "$#" -gt 0 ]; then find "$@" -name "*.warnings" -exec cat {} + > "$out" 2>/dev/null || true; fi; touch "$out"',
+            "--",
+            outputs[warnings_art].as_output(),
+            [mod_dirs[k] for k in mod_dirs],
+        )
+        ctx.actions.run(
+            combine_warn_cmd,
+            category = "haskell_warnings",
+            identifier = ctx.attrs.name,
+        )
 
         # Step 3: Link binary
         link_cmd = cmd_args(
@@ -723,12 +752,17 @@ def _haskell_binary_impl(ctx: AnalysisContext) -> list[Provider]:
     ctx.actions.dynamic_output(
         dynamic = [deps_json],
         inputs = [ctx.attrs.main] + ctx.attrs.srcs + dep_info.pkg_dirs + [cabal_macros],
-        outputs = [out_bin.as_output()],
+        outputs = [out_bin.as_output(), warnings_art.as_output()],
         f = dynamic_compile,
     )
 
     providers = [
-        DefaultInfo(default_output = out_bin),
+        DefaultInfo(
+            default_output = out_bin,
+            sub_targets = {
+                "warnings": [DefaultInfo(default_output = warnings_art)],
+            },
+        ),
         RunInfo(args = cmd_args(out_bin)),
     ]
     if getattr(ctx.attrs, "is_test", False):
@@ -772,3 +806,84 @@ haskell_test = rule(
         "_dep_scanner": attrs.source(default = "dev_buck//:ghc_dep_scan.py"),
     },
 )
+
+def _haskell_lint_impl(ctx: AnalysisContext) -> list[Provider]:
+    out = ctx.actions.declare_output("lint.ok")
+    script = ctx.actions.declare_output("run_hlint_and_warnings.sh")
+    script_lines = [
+        "#!/usr/bin/env bash",
+        "set -euo pipefail",
+        'OUT="$1"',
+        "shift",
+        'NUM_HINTS="$1"',
+        "shift",
+        "HINTS=()",
+        'for ((i=0; i<NUM_HINTS; i++)); do',
+        '  HINTS+=("--hint" "$1")',
+        "  shift",
+        "done",
+        'NUM_DIAGS="$1"',
+        "shift",
+        "DIAGS=()",
+        'for ((i=0; i<NUM_DIAGS; i++)); do',
+        '  DIAGS+=("$1")',
+        "  shift",
+        "done",
+        "failed=0",
+        'if ! hlint "${HINTS[@]}" --threads "$@"; then',
+        "  failed=1",
+        "fi",
+        'for diag in "${DIAGS[@]}"; do',
+        '  if [ -s "$diag" ]; then',
+        '    if grep -qi "warning:" "$diag"; then',
+        '      echo "GHC compiler warning(s) detected:" >&2',
+        '      cat "$diag" >&2',
+        "      failed=1",
+        "    fi",
+        "  fi",
+        "done",
+        'if [ "$failed" -ne 0 ]; then',
+        "  exit 1",
+        "fi",
+        'touch "$OUT"',
+    ]
+    ctx.actions.write(script, "\n".join(script_lines) + "\n", is_executable = True)
+
+    diag_artifacts = []
+    for t in ctx.attrs.targets:
+        if "warnings" in t[DefaultInfo].sub_targets:
+            diag_artifacts.extend(t[DefaultInfo].sub_targets["warnings"][DefaultInfo].default_outputs)
+
+    cmd = cmd_args([
+        script,
+        out.as_output(),
+        str(len(ctx.attrs.hints)),
+    ])
+    for h in ctx.attrs.hints:
+        cmd.add(h)
+    cmd.add(str(len(diag_artifacts)))
+    for d in diag_artifacts:
+        cmd.add(d)
+    for s in ctx.attrs.srcs:
+        cmd.add(s)
+
+    ctx.actions.run(
+        cmd,
+        category = "haskell_lint",
+    )
+
+    return [DefaultInfo(default_output = out)]
+
+haskell_lint = rule(
+    impl = _haskell_lint_impl,
+    attrs = {
+        "hints": attrs.list(attrs.source(), default = [
+            "root//dev-hlint:relude-hlint.yaml",
+            "root//dev-hlint:base.yaml",
+        ]),
+        "srcs": attrs.list(attrs.source()),
+        "targets": attrs.list(attrs.dep(), default = []),
+    },
+)
+
+

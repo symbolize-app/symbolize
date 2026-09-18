@@ -10,7 +10,7 @@ tasks:
     aliases:
       - test
       - t
-    cmd: buck2 test //dev-gen:symbolize-dev-gen-test
+    cmd: buck2 test -m debug //dev-gen:test
 
   test:debug:watch:
     aliases:
@@ -22,12 +22,31 @@ tasks:
         WATCH: true
         RESTART: false
         MODE: haskell
-        COMMAND: buck2 test //dev-gen:symbolize-dev-gen-test
+        COMMAND: buck2 test -m debug //dev-gen:test
 
   test:release:
     aliases:
       - tr
-    cmd: buck2 test //dev-gen:symbolize-dev-gen-test
+    cmd: buck2 test -m release //dev-gen:test
+
+  check:
+    cmd: buck2 build -m debug //dev-gen:check
+
+  format:check:
+    aliases:
+      - fc
+    cmd: buck2 build //dev-gen:format-check
+
+  format:fix:
+    aliases:
+      - format
+      - f
+    cmd: ./dev-buck/format-fix.sh
+
+  lint:
+    aliases:
+      - l
+    cmd: buck2 build //dev-gen:lint
 
   link-build-dir:
     cmd:

@@ -8,8 +8,8 @@ def _check_impl(ctx: bxl.Context):
         utargets = ctx.uquery().eval(target)
         targets = ctx.configured_targets(utargets, modifiers = ctx.modifiers)
     else:
-        clippy_targets = [f"root//{pkg}:clippy" for pkg in _all_members]
-        targets = ctx.configured_targets(clippy_targets, modifiers = ctx.modifiers)
+        lint_targets = [f"root//{pkg}:lint" for pkg in _all_members]
+        targets = ctx.configured_targets(lint_targets, modifiers = ctx.modifiers)
     results = ctx.build(targets)
     failed = False
     for target, res in results.items():
@@ -17,7 +17,7 @@ def _check_impl(ctx: bxl.Context):
             failed = True
 
     if failed:
-        fail("Clippy check failed.")
+        fail("Lint check failed.")
 
 check = bxl_main(
     impl = _check_impl,

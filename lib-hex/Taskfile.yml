@@ -1,19 +1,29 @@
 run: when_changed
 tasks:
   check:
-    dir: '{{.TASKFILE_DIR}}'
-    cmd: gleam check
+    cmd: buck2 build //lib-hex:check
   format:check:
-    dir: '{{.TASKFILE_DIR}}'
-    cmd: gleam format --check src
-  test:
-    dir: '{{.TASKFILE_DIR}}'
-    cmd: gleam run --module lib_hex_test_main
+    aliases:
+    - fc
+    cmd: buck2 build //lib-hex:format-check
   link-build-dir:
     cmd:
       task: :build-dir:link-package-build-dir
       vars:
         NAME: '{{.NAME}}'
+  lint:
+    aliases:
+    - l
+    cmd: buck2 build //lib-hex:lint
+  test:debug:
+    aliases:
+    - test
+    - t
+    cmd: buck2 test -m debug //lib-hex:test
+  test:release:
+    aliases:
+    - tr
+    cmd: buck2 test -m release //lib-hex:test
 vars:
   NAME: lib-hex
 version: '3'

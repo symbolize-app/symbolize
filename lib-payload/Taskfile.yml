@@ -1,19 +1,29 @@
 run: when_changed
 tasks:
   check:
-    dir: '{{.TASKFILE_DIR}}'
-    cmd: gleam check
+    cmd: buck2 build //lib-payload:check
   format:check:
-    dir: '{{.TASKFILE_DIR}}'
-    cmd: gleam format --check src
-  test:
-    dir: '{{.TASKFILE_DIR}}'
-    cmd: gleam run --module lib_payload_test_main
+    aliases:
+    - fc
+    cmd: buck2 build //lib-payload:format-check
   link-build-dir:
     cmd:
       task: :build-dir:link-package-build-dir
       vars:
         NAME: '{{.NAME}}'
+  lint:
+    aliases:
+    - l
+    cmd: buck2 build //lib-payload:lint
+  test:debug:
+    aliases:
+    - test
+    - t
+    cmd: buck2 test -m debug //lib-payload:test
+  test:release:
+    aliases:
+    - tr
+    cmd: buck2 test -m release //lib-payload:test
 vars:
   NAME: lib-payload
 version: '3'
