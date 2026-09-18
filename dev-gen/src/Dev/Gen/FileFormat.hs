@@ -17,8 +17,8 @@ import Relude.Applicative (pure)
 import Relude.Base (Eq, Generic, Show, Type)
 import Relude.Bool (Bool (True))
 import Relude.Container (Map, fromList)
-import Relude.Function (($), (.))
-import Relude.Functor (fmap, (<$>))
+import Relude.Function (($))
+import Relude.Functor ((<$>))
 import Relude.Monad (Maybe, maybe)
 import Relude.Monoid (mempty)
 import Relude.String (Text)
@@ -27,7 +27,8 @@ import Toml.FromValue qualified as Toml
 type Workspace :: Type
 data Workspace = Workspace
   { rustMembers :: Vector Text,
-    gleamMembers :: Vector Text
+    gleamMembers :: Vector Text,
+    haskellMembers :: Vector Text
   }
   deriving stock (Show, Eq)
 
@@ -35,7 +36,8 @@ instance Toml.FromValue Workspace where
   fromValue = Toml.parseTableFromValue $ do
     rm <- fromList <$> Toml.reqKey "rust_members"
     gm <- maybe mempty fromList <$> Toml.optKey "gleam_members"
-    pure Workspace {rustMembers = rm, gleamMembers = gm}
+    hm <- maybe mempty fromList <$> Toml.optKey "haskell_members"
+    pure Workspace {rustMembers = rm, gleamMembers = gm, haskellMembers = hm}
 
 type GleamPackage :: Type
 data GleamPackage = GleamPackage

@@ -27,7 +27,8 @@ spec = context "Gen" $ do
             "workspace.bzl"
             ( FileFormat.Workspace
                 { rustMembers = [],
-                  gleamMembers = []
+                  gleamMembers = [],
+                  haskellMembers = []
                 }
             ),
           ExecSpec.readLines

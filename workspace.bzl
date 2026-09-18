@@ -29,3 +29,9 @@ gleam_members = [
     "svc-auth-guest-view",
     "svc-gateway-guest-run",
 ]
+
+# Haskell packages
+haskell_members = [
+    "dev-gen",
+]
+

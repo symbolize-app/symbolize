@@ -1,42 +1,54 @@
 run: when_changed
 tasks:
   check:
-    dir: '{{.TASKFILE_DIR}}'
-    cmd: gleam check
+    cmd: buck2 build //dev-esbuild:check
   format:check:
-    dir: '{{.TASKFILE_DIR}}'
-    cmd: gleam format --check src
+    aliases:
+    - fc
+    cmd: buck2 build //dev-esbuild:format-check
   test:
     cmds:
-      - task: test:output
-      - task: test:build
+    - task: test:output
+    - task: test:build
   test:build:
     deps:
-      - build
+    - build
     dir: '{{.TASKFILE_DIR}}'
     cmd: gleam run --module dev_esbuild_build_test_main
   test:output:
     deps:
-      - build
+    - build
     dir: '{{.TASKFILE_DIR}}'
     cmd: gleam run --module dev_esbuild_output_test_main
   test:browser:built:
     dir: '{{.TASKFILE_DIR}}'
     cmds:
-      - gleam run --module dev_esbuild_built_service_worker_browser_driver_main
-      - gleam run --module dev_esbuild_development_graph_browser_driver_main
+    - gleam run --module dev_esbuild_built_service_worker_browser_driver_main
+    - gleam run --module dev_esbuild_development_graph_browser_driver_main
   build:
     deps:
-      - :node:vendor:build
-      - :svc-gateway-guest-run:build
+    - :node:vendor:build
+    - :svc-gateway-guest-run:build
     dir: '{{.TASKFILE_DIR}}'
     cmd: gleam build
-
   link-build-dir:
     cmd:
       task: :build-dir:link-package-build-dir
       vars:
         NAME: '{{.NAME}}'
+  lint:
+    aliases:
+    - l
+    cmd: buck2 build //dev-esbuild:lint
+  test:debug:
+    aliases:
+    - test
+    - t
+    cmd: buck2 test -m debug //dev-esbuild:test
+  test:release:
+    aliases:
+    - tr
+    cmd: buck2 test -m release //dev-esbuild:test
 vars:
   NAME: dev-esbuild
 version: '3'

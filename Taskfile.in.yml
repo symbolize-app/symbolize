@@ -208,6 +208,28 @@ tasks:
       - svc-gateway-guest-run:format:check
       - svc-auth-guest-view:format:check
 
+  gleam:lint:check:
+    deps:
+      - dev-browser-test:lint
+      - dev-esbuild:lint
+      - dev-node-test:lint
+      - lib-concurrency:lint
+      - lib-collection:lint
+      - lib-dataflow:lint
+      - lib-error:lint
+      - lib-hex:lint
+      - lib-markup:lint
+      - lib-payload:lint
+      - lib-random:lint
+      - lib-styling:lint
+      - lib-stream:lint
+      - lib-test:lint
+      - lib-test-runner:lint
+      - lib-time:lint
+      - svc-auth-guest-read:lint
+      - svc-gateway-guest-run:lint
+      - svc-auth-guest-view:lint
+
   gleam:test:
     deps:
       - dev-esbuild:test
@@ -294,6 +316,7 @@ tasks:
       - lint
       - l
     deps:
+      - gleam:lint:check
       - haskell:lint
       - rust:lint:check
       - node:lint:check
@@ -303,6 +326,7 @@ tasks:
     aliases:
       - lf
     deps:
+      - gleam:lint:check
       - haskell:lint
       - rust:lint:fix
       - node:lint:fix

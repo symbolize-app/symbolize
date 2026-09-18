@@ -6,8 +6,8 @@ import Dev.Gen.Vendor.License qualified as VendorLicense
 import Numeric (showFFloat)
 import Options.Applicative qualified as Options
 import Relude.Applicative ((<**>), (<*>))
-import Relude.Base (Type, (==), (>))
-import Relude.Bool (Bool, not, when, (&&), (||))
+import Relude.Base (Type, (==))
+import Relude.Bool (Bool, not, (&&))
 import Relude.Function (($))
 import Relude.Functor ((<$>))
 import Relude.Lifted (exitFailure)

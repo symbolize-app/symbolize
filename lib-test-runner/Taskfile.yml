@@ -1,16 +1,11 @@
 run: when_changed
 tasks:
   check:
-    dir: '{{.TASKFILE_DIR}}'
-    cmd: gleam check
+    cmd: buck2 build //lib-test-runner:check
   format:check:
-    dir: '{{.TASKFILE_DIR}}'
-    cmd: gleam format --check src
-  test:
-    deps:
-      - build
-    dir: '{{.TASKFILE_DIR}}'
-    cmd: gleam run --module lib_test_runner_test_main
+    aliases:
+    - fc
+    cmd: buck2 build //lib-test-runner:format-check
   build:
     dir: '{{.TASKFILE_DIR}}'
     cmd: gleam build
@@ -19,6 +14,19 @@ tasks:
       task: :build-dir:link-package-build-dir
       vars:
         NAME: '{{.NAME}}'
+  lint:
+    aliases:
+    - l
+    cmd: buck2 build //lib-test-runner:lint
+  test:debug:
+    aliases:
+    - test
+    - t
+    cmd: buck2 test -m debug //lib-test-runner:test
+  test:release:
+    aliases:
+    - tr
+    cmd: buck2 test -m release //lib-test-runner:test
 vars:
   NAME: lib-test-runner
 version: '3'

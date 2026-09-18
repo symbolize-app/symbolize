@@ -3,32 +3,14 @@ version: '3'
 run: when_changed
 
 vars:
-  PACKAGES: dev-gen
-  FIND_FILES: $(fd -g '*.hs' $(fd -d 1 -g '{app,src,test}' {{.PACKAGES}}))
-  ORMOLU_FLAGS: >-
-    -o -XGHC2021
-    -o -XExplicitNamespaces
-    -o -XTypeFamilies
-    -o -XDataKinds
-    -o -XNoImplicitPrelude
-    -o -XOverloadedStrings
-    -o -XOverloadedLabels
-    -o -XDerivingStrategies
-    -o -XDeriveGeneric
-    -o -XDuplicateRecordFields
-    -o -XNoFieldSelectors
-    -o -XNamedFieldPuns
-    -o -XOverloadedRecordDot
-    -o -XDisambiguateRecordFields
-    -o -XOverloadedLists
-    -p relude
+  NAME: dev-gen
 
 tasks:
   build:debug:
     aliases:
       - build
       - b
-    cmd: buck2 build //dev-gen:symbolize-dev-gen-exe //dev-gen:symbolize-dev-gen-test
+    cmd: buck2 build -m debug //dev-gen:symbolize-dev-gen-exe //dev-gen:symbolize-dev-gen-test
 
   build:debug:watch:
     aliases:
@@ -40,12 +22,12 @@ tasks:
         WATCH: true
         RESTART: false
         MODE: haskell
-        COMMAND: buck2 build //dev-gen:symbolize-dev-gen-exe //dev-gen:symbolize-dev-gen-test
+        COMMAND: buck2 build -m debug //dev-gen:symbolize-dev-gen-exe //dev-gen:symbolize-dev-gen-test
 
   build:release:
     aliases:
       - br
-    cmd: buck2 build //dev-gen:symbolize-dev-gen-exe //dev-gen:symbolize-dev-gen-test
+    cmd: buck2 build -m release //dev-gen:symbolize-dev-gen-exe //dev-gen:symbolize-dev-gen-test
 
   clean:
     cmd: "true"
@@ -67,28 +49,28 @@ tasks:
           WATCH: '{{.WATCH}}'
           RESTART: false
           MODE: executable
-          COMMAND: 'buck2 run //{{.NAME}}:symbolize-{{.NAME}}-exe -- {{.ARGS}} {{.CLI_ARGS}}'
+          COMMAND: 'buck2 run -m {{.MODE}} //{{.NAME}}:symbolize-{{.NAME}}-exe -- {{.ARGS}} {{.CLI_ARGS}}'
 
   execute-target:run:debug:
     internal: true
     requires:
       vars:
         - NAME
-    cmd: buck2 run //{{.NAME}}:symbolize-{{.NAME}}-exe -- {{.ARGS}} {{.CLI_ARGS}}
+    cmd: buck2 run -m debug //{{.NAME}}:symbolize-{{.NAME}}-exe -- {{.ARGS}} {{.CLI_ARGS}}
 
   execute-target:run:release:
     internal: true
     requires:
       vars:
         - NAME
-    cmd: buck2 run //{{.NAME}}:symbolize-{{.NAME}}-exe -- {{.ARGS}} {{.CLI_ARGS}}
+    cmd: buck2 run -m release //{{.NAME}}:symbolize-{{.NAME}}-exe -- {{.ARGS}} {{.CLI_ARGS}}
 
   execute-target:test:debug:
     internal: true
     requires:
       vars:
         - NAME
-    cmd: buck2 test //{{.NAME}}:symbolize-{{.NAME}}-test
+    cmd: buck2 test -m debug //{{.NAME}}:test
 
   execute-target:test:debug:watch:
     internal: true
@@ -101,25 +83,30 @@ tasks:
         WATCH: true
         RESTART: false
         MODE: haskell
-        COMMAND: buck2 test //{{.NAME}}:symbolize-{{.NAME}}-test
+        COMMAND: buck2 test -m debug //{{.NAME}}:test
 
   execute-target:test:release:
     internal: true
     requires:
       vars:
         - NAME
-    cmd: buck2 test //{{.NAME}}:symbolize-{{.NAME}}-test
+    cmd: buck2 test -m release //{{.NAME}}:test
+
+  check:
+    aliases:
+      - c
+    cmd: buck2 build -m debug //dev-gen:check
 
   format:check:
     aliases:
       - fc
-    cmd: ormolu --mode check {{.ORMOLU_FLAGS}} {{.FIND_FILES}}
+    cmd: buck2 build //dev-gen:format-check
 
   format:fix:
     aliases:
       - format
       - f
-    cmd: ormolu --mode inplace {{.ORMOLU_FLAGS}} {{.FIND_FILES}}
+    cmd: ./dev-buck/format-fix.sh
 
   lint:
     aliases:
@@ -140,7 +127,7 @@ tasks:
         WATCH: '{{.WATCH}}'
         RESTART: false
         MODE: haskell
-        COMMAND: hlint --hint dev-hlint/relude-hlint.yaml --hint dev-hlint/base.yaml --threads {{.FIND_FILES}}
+        COMMAND: buck2 build //dev-gen:lint
 
   lint:watch:
     aliases:

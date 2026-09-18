@@ -2,19 +2,14 @@ version: '3'
 run: when_changed
 tasks:
   check:
-    dir: '{{.TASKFILE_DIR}}'
-    cmd: gleam check
+    cmd: buck2 build //lib-markup:check
   format:check:
-    dir: '{{.TASKFILE_DIR}}'
-    cmd: gleam format --check src
-  test:
-    deps:
-      - build
-    dir: '{{.TASKFILE_DIR}}'
-    cmd: gleam run --module lib_markup_data_test_main
+    aliases:
+    - fc
+    cmd: buck2 build //lib-markup:format-check
   test:browser:
     deps:
-      - build
+    - build
     dir: '{{.TASKFILE_DIR}}'
     cmd: gleam run --module lib_markup_browser_driver_main
   build:
@@ -25,5 +20,18 @@ tasks:
       task: :build-dir:link-package-build-dir
       vars:
         NAME: '{{.NAME}}'
+  lint:
+    aliases:
+    - l
+    cmd: buck2 build //lib-markup:lint
+  test:debug:
+    aliases:
+    - test
+    - t
+    cmd: buck2 test -m debug //lib-markup:test
+  test:release:
+    aliases:
+    - tr
+    cmd: buck2 test -m release //lib-markup:test
 vars:
   NAME: lib-markup

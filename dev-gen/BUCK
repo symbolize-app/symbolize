@@ -1,4 +1,4 @@
-load("@dev_buck//:rules.bzl", "haskell_binary", "haskell_library", "haskell_test")
+load("@dev_buck//:rules.bzl", "alias", "format_check", "haskell_binary", "haskell_format_diff", "haskell_library", "haskell_lint", "haskell_test")
 
 haskell_library(
     name = "symbolize-dev-gen",
@@ -40,6 +40,7 @@ haskell_library(
         "vendor//:vector",
         "vendor//:yaml",
     ],
+    compiler_flags = ["-Wall"],
     visibility = ["PUBLIC"],
 )
 
@@ -66,6 +67,7 @@ haskell_binary(
         "OverloadedLists",
     ],
     compiler_flags = [
+        "-Wall",
         "-threaded",
         "-rtsopts",
         "-with-rtsopts=-N",
@@ -114,6 +116,7 @@ haskell_test(
         "OverloadedLists",
     ],
     compiler_flags = [
+        "-Wall",
         "-threaded",
         "-rtsopts",
         "-with-rtsopts=-N",
@@ -139,3 +142,51 @@ haskell_test(
     ],
     visibility = ["PUBLIC"],
 )
+
+alias(
+    name = "test",
+    actual = ":symbolize-dev-gen-test",
+    visibility = ["PUBLIC"],
+)
+
+alias(
+    name = "dev-gen",
+    actual = ":symbolize-dev-gen-exe",
+    visibility = ["PUBLIC"],
+)
+
+alias(
+    name = "check",
+    actual = ":symbolize-dev-gen-exe",
+    visibility = ["PUBLIC"],
+)
+
+haskell_format_diff(
+    name = "format-diff",
+    srcs = glob(["app/**/*.hs", "src/**/*.hs", "test/**/*.hs"]),
+    visibility = ["PUBLIC"],
+)
+
+format_check(
+    name = "format-check",
+    diff = ":format-diff",
+    visibility = ["PUBLIC"],
+)
+
+haskell_lint(
+    name = "lint",
+    srcs = glob(["app/**/*.hs", "src/**/*.hs", "test/**/*.hs"]),
+    targets = [
+        ":symbolize-dev-gen",
+        ":symbolize-dev-gen-exe",
+        ":symbolize-dev-gen-test",
+    ],
+    visibility = ["PUBLIC"],
+)
+
+alias(
+    name = "clippy",
+    actual = ":lint",
+    visibility = ["PUBLIC"],
+)
+

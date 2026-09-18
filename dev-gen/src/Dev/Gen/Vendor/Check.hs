@@ -17,20 +17,19 @@ import Data.Map.Strict (Map)
 import Data.Map.Strict qualified as Map
 import Data.Text qualified as Text
 import Relude.Applicative (pure, (<*>))
-import Relude.Base (Char, Eq, Ord, Show, (/=), (<), (==), (>), (>=))
+import Relude.Base (Eq, Show, (/=), (<), (==), (>))
 import Relude.Bool (Bool (False, True), not, otherwise, (&&), (||))
-import Relude.Container (fromList)
 import Relude.File (readFileLBS)
-import Relude.Foldable (any, concat, concatMap, elem, for_, length, notElem, null, toList)
+import Relude.Foldable (any, concat, concatMap, elem, for_, length, notElem, null)
 import Relude.Function (const, flip, ($), (.))
 import Relude.Functor (fmap, (<$>))
-import Relude.Monad (Either (Left, Right), Maybe (Just, Nothing), either, fromLeft, fromMaybe, fromRight, maybe, (>>=))
+import Relude.Monad (Either (Left, Right), Maybe (Just, Nothing), either, fromLeft, fromMaybe, fromRight, (>>=))
 import Relude.Monoid ((<>))
-import Relude.Numeric (Int, Integer, (+), (-))
+import Relude.Numeric (Int, Integer, (+))
 import Relude.Print (putTextLn)
 import Relude.String (String, Text, decodeUtf8Strict, show, toStrict, toString, toText)
 import System.Directory qualified as Dir
-import System.FilePath (FilePath, splitDirectories, takeFileName, (</>))
+import System.FilePath (FilePath, (</>))
 import Toml qualified
 import Toml.FromValue qualified as Toml
 import UnliftIO.Exception (catchAny)
