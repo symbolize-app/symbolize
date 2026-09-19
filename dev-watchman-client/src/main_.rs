@@ -5,8 +5,10 @@ use backon::Retryable as _;
 use clap;
 use clap::Parser as _;
 use nix::sys::signal::Signal;
+use std::ffi::OsString;
 use std::future::ready;
 use std::path::Path;
+use std::path::PathBuf;
 use std::process::ExitCode;
 use std::process::ExitStatus;
 use std::sync::Arc;
@@ -30,23 +32,88 @@ use watchman_client::pdu::SubscribeRequest;
 #[derive(Clone, Debug, clap::Parser)]
 #[command(version)]
 struct Cli {
-  #[arg(short, long)]
-  mode: Mode,
+  #[arg(
+    short,
+    long,
+    conflicts_with = "mode",
+    required_unless_present = "mode"
+  )]
+  target: Option<String>,
+
+  #[arg(
+    short,
+    long,
+    conflicts_with = "target",
+    required_unless_present = "target"
+  )]
+  mode: Option<Mode>,
+
+  #[arg(long, default_value = "debug")]
+  modifier: String,
 
   #[arg(short, long)]
   restart: bool,
 
-  #[arg(required = true, last = true)]
+  #[arg(last = true)]
   command: Vec<String>,
 }
 
-impl Cli {
-  fn program(&self) -> Result<&String> {
-    self.command.first().ok_or(anyhow!("empty command"))
-  }
+#[derive(Clone, Debug)]
+struct ResolvedTarget {
+  executable_path: PathBuf,
+  directory: PathBuf,
+  file_name: OsString,
+}
 
-  fn args(&self) -> &[String] {
-    self.command.get(1 ..).unwrap_or_default()
+impl ResolvedTarget {
+  async fn resolve(target: &str, modifier: &str) -> Result<Self> {
+    let output = Command::new("buck2")
+      .args(["build", "-m", modifier, "--show-simple-output", target])
+      .output()
+      .await
+      .map_err(|e| {
+        anyhow!("Failed to run buck2 build for {target}: {e}")
+      })?;
+
+    if !output.status.success() {
+      let stderr = String::from_utf8_lossy(&output.stderr);
+      return Err(anyhow!("buck2 build failed for {target}: {stderr}"));
+    }
+
+    let stdout = String::from_utf8(output.stdout).map_err(|e| {
+      anyhow!("Invalid utf-8 in buck2 output for target {target}: {e}")
+    })?;
+    let rel_path = stdout.trim();
+    if rel_path.is_empty() {
+      return Err(anyhow!("Empty output path for target {target}"));
+    }
+
+    let executable_path =
+      std::fs::canonicalize(rel_path).map_err(|e| {
+        anyhow!(
+          "Failed to canonicalize '{rel_path}' for target {target}: {e}"
+        )
+      })?;
+
+    let directory = executable_path
+      .parent()
+      .ok_or_else(|| {
+        anyhow!("missing parent for {}", executable_path.display())
+      })?
+      .to_path_buf();
+
+    let file_name = executable_path
+      .file_name()
+      .ok_or_else(|| {
+        anyhow!("missing file name for {}", executable_path.display())
+      })?
+      .to_os_string();
+
+    Ok(Self {
+      executable_path,
+      directory,
+      file_name,
+    })
   }
 }
 
@@ -54,10 +121,10 @@ impl Cli {
   Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, clap::ValueEnum,
 )]
 enum Mode {
-  Executable,
   Gleam,
   Haskell,
   Rust,
+  #[value(alias = "javascript")]
   JavaScript,
 }
 
@@ -66,10 +133,25 @@ enum Mode {
 pub async fn main() -> Result<ExitCode> {
   match Cli::try_parse() {
     Ok(cli) => {
+      let resolved_target = if let Some(target) = &cli.target {
+        Some(ResolvedTarget::resolve(target, &cli.modifier).await?)
+      } else {
+        if cli.command.is_empty() {
+          return Err(anyhow!(
+            "command is required when --mode is specified"
+          ));
+        }
+        None
+      };
+
       let files_changed = Arc::new(Semaphore::new(0));
       let mut join_set = JoinSet::new();
-      join_set.spawn(watch_files(cli.clone(), files_changed.clone()));
-      join_set.spawn(run_command(cli.clone(), files_changed.clone()));
+      join_set.spawn(watch_files(
+        cli.clone(),
+        resolved_target.clone(),
+        files_changed.clone(),
+      ));
+      join_set.spawn(run_command(cli, resolved_target, files_changed));
       let err = join_set
         .join_next()
         .await
@@ -90,6 +172,7 @@ pub async fn main() -> Result<ExitCode> {
 #[allow(clippy::print_stdout)]
 async fn watch_files(
   cli: Cli,
+  resolved_target: Option<ResolvedTarget>,
   files_changed: Arc<Semaphore>,
 ) -> Result<!> {
   let connector = Connector::new()
@@ -105,13 +188,9 @@ async fn watch_files(
     )
     .await?;
   println!("[watch] Connected to Watchman server");
-  let root_path = if cli.mode == Mode::Executable {
-    let program_path = Path::new(cli.program()?);
-    let program_dir = program_path
-      .parent()
-      .ok_or(anyhow!("missing program parent"))?;
-    write_executable_config(program_dir).await?;
-    program_dir
+  let root_path = if let Some(resolved) = &resolved_target {
+    write_executable_config(&resolved.directory).await?;
+    resolved.directory.as_path()
   } else {
     Path::new(".")
   };
@@ -129,7 +208,7 @@ async fn watch_files(
       SubscribeRequest {
         since: None,
         relative_root: Some(".".into()),
-        expression: Some(build_expr(&cli)?),
+        expression: Some(build_expr(&cli, resolved_target.as_ref())?),
         fields: vec!["name", "type"],
         empty_on_fresh_instance: false,
         case_sensitive: true,
@@ -168,85 +247,84 @@ async fn write_executable_config(program_dir: &Path) -> Result<()> {
   Ok(())
 }
 
-fn build_expr(cli: &Cli) -> Result<Expr> {
-  let file_expr = match cli.mode {
-    Mode::Executable => {
-      vec![Expr::Name(NameTerm {
-        paths: vec![
-          Path::new(cli.program()?)
-            .file_name()
-            .ok_or(anyhow!("empty program"))?
-            .into(),
-        ],
-        wholename: true,
-      })]
+fn build_expr(
+  cli: &Cli,
+  resolved_target: Option<&ResolvedTarget>,
+) -> Result<Expr> {
+  let file_expr = if let Some(resolved) = resolved_target {
+    vec![Expr::Name(NameTerm {
+      paths: vec![Path::new(&resolved.file_name).into()],
+      wholename: true,
+    })]
+  } else {
+    match cli.mode.expect("mode or target required") {
+      Mode::Haskell => vec![
+        Expr::Suffix(vec!["hs".into()]),
+        Expr::Name(NameTerm {
+          paths: vec!["BUCK".into()],
+          wholename: false,
+        }),
+        Expr::Name(NameTerm {
+          paths: vec![
+            "dev-hlint/base.yaml".into(),
+            "dev-task/haskell.yml".into(),
+          ],
+          wholename: true,
+        }),
+      ],
+      Mode::Rust => vec![
+        Expr::Suffix(vec!["rs".into(), "sql".into()]),
+        Expr::Name(NameTerm {
+          paths: vec!["BUCK".into(), "workspace.bzl".into()],
+          wholename: false,
+        }),
+        Expr::Name(NameTerm {
+          paths: vec!["dev-task/rust.yml".into()],
+          wholename: true,
+        }),
+      ],
+      Mode::Gleam => vec![
+        Expr::Suffix(vec!["gleam".into()]),
+        Expr::Name(NameTerm {
+          paths: vec!["gleam.toml".into(), "manifest.toml".into()],
+          wholename: false,
+        }),
+        Expr::Name(NameTerm {
+          paths: vec!["Taskfile.yml".into()],
+          wholename: false,
+        }),
+      ],
+      Mode::JavaScript => vec![
+        Expr::Suffix(vec![
+          "cjs".into(),
+          "css".into(),
+          "gleam".into(),
+          "html".into(),
+          "js".into(),
+          "mjs".into(),
+          "sql".into(),
+          "toml".into(),
+          "txt".into(),
+        ]),
+        Expr::Name(NameTerm {
+          paths: vec![
+            ".eslintrc.json".into(),
+            "BUCK".into(),
+            "vendor/README.md".into(),
+          ],
+          wholename: false,
+        }),
+        Expr::Name(NameTerm {
+          paths: vec![
+            "dev-buck/esbuild.bzl".into(),
+            "dev-buck/gleam.bzl".into(),
+            "dev-eslint/index.json".into(),
+            "dev-task/node.yml".into(),
+          ],
+          wholename: true,
+        }),
+      ],
     }
-    Mode::Haskell => vec![
-      Expr::Suffix(vec!["hs".into()]),
-      Expr::Name(NameTerm {
-        paths: vec!["BUCK".into()],
-        wholename: false,
-      }),
-      Expr::Name(NameTerm {
-        paths: vec![
-          "dev-hlint/base.yaml".into(),
-          "dev-task/haskell.yml".into(),
-        ],
-        wholename: true,
-      }),
-    ],
-    Mode::Rust => vec![
-      Expr::Suffix(vec!["rs".into(), "sql".into()]),
-      Expr::Name(NameTerm {
-        paths: vec!["BUCK".into(), "workspace.bzl".into()],
-        wholename: false,
-      }),
-      Expr::Name(NameTerm {
-        paths: vec!["dev-task/rust.yml".into()],
-        wholename: true,
-      }),
-    ],
-    Mode::Gleam => vec![
-      Expr::Suffix(vec!["gleam".into()]),
-      Expr::Name(NameTerm {
-        paths: vec!["gleam.toml".into(), "manifest.toml".into()],
-        wholename: false,
-      }),
-      Expr::Name(NameTerm {
-        paths: vec!["Taskfile.yml".into()],
-        wholename: false,
-      }),
-    ],
-    Mode::JavaScript => vec![
-      Expr::Suffix(vec![
-        "cjs".into(),
-        "css".into(),
-        "gleam".into(),
-        "html".into(),
-        "js".into(),
-        "mjs".into(),
-        "sql".into(),
-        "toml".into(),
-        "txt".into(),
-      ]),
-      Expr::Name(NameTerm {
-        paths: vec![
-          ".eslintrc.json".into(),
-          "BUCK".into(),
-          "vendor/README.md".into(),
-        ],
-        wholename: false,
-      }),
-      Expr::Name(NameTerm {
-        paths: vec![
-          "dev-buck/esbuild.bzl".into(),
-          "dev-buck/gleam.bzl".into(),
-          "dev-eslint/index.json".into(),
-          "dev-task/node.yml".into(),
-        ],
-        wholename: true,
-      }),
-    ],
   };
   Ok(Expr::All(vec![
     Expr::FileType(FileType::Regular),
@@ -256,6 +334,7 @@ fn build_expr(cli: &Cli) -> Result<Expr> {
 
 async fn run_command(
   cli: Cli,
+  resolved_target: Option<ResolvedTarget>,
   files_changed: Arc<Semaphore>,
 ) -> Result<!> {
   let mut child: Option<Child> = None;
@@ -264,13 +343,13 @@ async fn run_command(
       permit = files_changed.acquire(),
       if cli.restart || child.is_none() => {
         permit?.forget();
-        child = Some(handle_files_changed(&cli, child).await?);
+        child = Some(handle_files_changed(&cli, resolved_target.as_ref(), child).await?);
       }
       status = async {
         child.as_mut().map(Child::wait).expect("some child").await
       }, if child.is_some() => {
         child = handle_child_done(
-          &cli, status?
+          &cli, resolved_target.as_ref(), status?
         ).await?;
       }
     }
@@ -279,6 +358,7 @@ async fn run_command(
 
 async fn handle_files_changed(
   cli: &Cli,
+  resolved_target: Option<&ResolvedTarget>,
   child: Option<Child>,
 ) -> Result<Child> {
   match child {
@@ -286,13 +366,14 @@ async fn handle_files_changed(
       restart_child(&child)?;
       Ok(child)
     }
-    None => Ok(start_child(cli).await?),
+    None => Ok(start_child(cli, resolved_target).await?),
   }
 }
 
 #[allow(clippy::print_stdout)]
 async fn handle_child_done(
   cli: &Cli,
+  resolved_target: Option<&ResolvedTarget>,
   status: ExitStatus,
 ) -> Result<Option<Child>> {
   if let Some(code) = status.code() {
@@ -301,27 +382,39 @@ async fn handle_child_done(
     println!("[watch] Unknown exit code");
   }
   if cli.restart {
-    Ok(Some(start_child(cli).await?))
+    Ok(Some(start_child(cli, resolved_target).await?))
   } else {
     Ok(None)
   }
 }
 
 #[allow(clippy::print_stdout)]
-async fn start_child(cli: &Cli) -> Result<Child> {
-  let program = cli.program()?;
-  let args = cli.args();
-  let child = { || ready(Command::new(program).args(args).spawn()) }
+async fn start_child(
+  cli: &Cli,
+  resolved_target: Option<&ResolvedTarget>,
+) -> Result<Child> {
+  let (program, args): (PathBuf, &[String]) =
+    if let Some(resolved) = resolved_target {
+      (resolved.executable_path.clone(), &cli.command)
+    } else {
+      let prog = cli
+        .command
+        .first()
+        .ok_or_else(|| anyhow!("empty command"))?;
+      (PathBuf::from(prog), &cli.command[1 ..])
+    };
+  let program_display = program.display().to_string();
+  let child = { || ready(Command::new(&program).args(args).spawn()) }
     .retry(
       // Retry in case an executable is still being written
       backon::ExponentialBuilder::default()
         .with_jitter()
         .with_min_delay(Duration::from_millis(10))
-        .with_min_delay(Duration::from_millis(200))
+        .with_max_delay(Duration::from_millis(200))
         .with_max_times(10),
     )
     .await?;
-  println!("[watch] Started {program}");
+  println!("[watch] Started {program_display}");
   Ok(child)
 }
 

@@ -16,13 +16,7 @@ tasks:
     aliases:
       - build:watch
       - bw
-    cmd:
-      task: :watchman:client
-      vars:
-        WATCH: true
-        RESTART: false
-        MODE: haskell
-        COMMAND: buck2 build -m debug //dev-gen:symbolize-dev-gen-exe //dev-gen:symbolize-dev-gen-test
+    cmd: buck2 run -m {{.TASK_WATCHMAN_CLIENT_MODE}} //dev-watchman-client -- --mode haskell -- buck2 build -m debug //dev-gen:symbolize-dev-gen-exe //dev-gen:symbolize-dev-gen-test
 
   build:release:
     aliases:
@@ -31,66 +25,6 @@ tasks:
 
   clean:
     cmd: "true"
-
-  execute-target:
-    internal: true
-    requires:
-      vars:
-        - WATCH
-        - MODE
-        - NAME
-        - TARGET
-        - ARGS
-    cmds:
-      - cmd: 'true # /{{.WATCH}}/{{.MODE}}/{{.NAME}}/{{.TARGET}}/{{.ARGS}}/'
-        silent: true
-      - task: :watchman:client
-        vars:
-          WATCH: '{{.WATCH}}'
-          RESTART: false
-          MODE: executable
-          COMMAND: 'buck2 run -m {{.MODE}} //{{.NAME}}:symbolize-{{.NAME}}-exe -- {{.ARGS}} {{.CLI_ARGS}}'
-
-  execute-target:run:debug:
-    internal: true
-    requires:
-      vars:
-        - NAME
-    cmd: buck2 run -m debug //{{.NAME}}:symbolize-{{.NAME}}-exe -- {{.ARGS}} {{.CLI_ARGS}}
-
-  execute-target:run:release:
-    internal: true
-    requires:
-      vars:
-        - NAME
-    cmd: buck2 run -m release //{{.NAME}}:symbolize-{{.NAME}}-exe -- {{.ARGS}} {{.CLI_ARGS}}
-
-  execute-target:test:debug:
-    internal: true
-    requires:
-      vars:
-        - NAME
-    cmd: buck2 test -m debug //{{.NAME}}:test
-
-  execute-target:test:debug:watch:
-    internal: true
-    requires:
-      vars:
-        - NAME
-    cmd:
-      task: :watchman:client
-      vars:
-        WATCH: true
-        RESTART: false
-        MODE: haskell
-        COMMAND: buck2 test -m debug //{{.NAME}}:test
-
-  execute-target:test:release:
-    internal: true
-    requires:
-      vars:
-        - NAME
-    cmd: buck2 test -m release //{{.NAME}}:test
 
   check:
     aliases:
@@ -111,41 +45,20 @@ tasks:
   lint:
     aliases:
       - l
-    cmd:
-      task: lint:exec
-      vars:
-        WATCH: false
-
-  lint:exec:
-    internal: true
-    requires:
-      vars:
-        - WATCH
-    cmd:
-      task: :watchman:client
-      vars:
-        WATCH: '{{.WATCH}}'
-        RESTART: false
-        MODE: haskell
-        COMMAND: buck2 build //dev-gen:lint
+    cmd: buck2 build //dev-gen:lint
 
   lint:watch:
     aliases:
       - lw
-    cmd:
-      task: lint:exec
-      vars:
-        WATCH: true
+    cmd: buck2 run -m {{.TASK_WATCHMAN_CLIENT_MODE}} //dev-watchman-client -- --mode haskell -- buck2 build //dev-gen:lint
 
   test:debug:
     aliases:
       - test
       - t
-    deps:
-      - :dev-gen:test:debug
+    cmd: buck2 test -m debug //dev-gen:test
 
   test:release:
     aliases:
       - tr
-    deps:
-      - :dev-gen:test:release
+    cmd: buck2 test -m release //dev-gen:test

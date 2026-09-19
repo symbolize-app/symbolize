@@ -169,7 +169,7 @@ genRustPackageTaskfile rustPackageName =
         vars = Just [("NAME", rustPackageName)],
         tasks =
           fromList . toList $
-            uncurry genRustTask
+            uncurry (genRustTask rustPackageName)
               <$> Vector.catMaybes
                 [ whenService ("run:debug", ["run", "r"]),
                   whenService ("run:debug:watch", ["run:watch", "rw"]),
@@ -183,22 +183,24 @@ genRustPackageTaskfile rustPackageName =
   where
     whenService = whenTrue $ Package.isRustService rustPackageName
 
-genRustTask :: Text -> Vector Text -> (Text, FileFormat.TaskfileTask)
-genRustTask name aliases =
-  ( name,
+genRustTask :: Text -> Text -> Vector Text -> (Text, FileFormat.TaskfileTask)
+genRustTask pkgName taskName aliases =
+  ( taskName,
     FileFormat.TaskfileTask
       { aliases = Just aliases,
         deps = Nothing,
-        cmd =
-          Just
-            ( FileFormat.TaskfileCommand
-                { task = ":rust:execute-package:" <> name,
-                  vars = Just [("NAME", "{{.NAME}}")]
-                }
-            ),
-        cmds = Nothing
+        cmd = Nothing,
+        cmds = Just (Vector.singleton (commandFor taskName))
       }
   )
+  where
+    commandFor "run:debug" = "buck2 run -m debug //" <> pkgName <> " -- {{.CLI_ARGS}}"
+    commandFor "run:debug:watch" = "buck2 run -m {{.TASK_WATCHMAN_CLIENT_MODE}} //dev-watchman-client -- --target //" <> pkgName <> " --restart -- {{.CLI_ARGS}}"
+    commandFor "run:release" = "buck2 run -m release //" <> pkgName <> " -- {{.CLI_ARGS}}"
+    commandFor "test:debug" = "buck2 test -m debug //" <> pkgName <> ":test"
+    commandFor "test:debug:watch" = "buck2 run -m {{.TASK_WATCHMAN_CLIENT_MODE}} //dev-watchman-client -- --target //" <> pkgName <> ":test"
+    commandFor "test:release" = "buck2 test -m release //" <> pkgName <> ":test"
+    commandFor _ = "true"
 
 genProcfile ::
   FileFormat.Workspace ->
@@ -210,10 +212,16 @@ genProcfile workspace procfileInput =
       ( \member ->
           Vector.catMaybes
             [ Just $
-                member <> "__test: task " <> member <> ":test:watch",
+                member
+                  <> "__test: buck2 run -m $TASK_WATCHMAN_CLIENT_MODE //dev-watchman-client -- --target //"
+                  <> member
+                  <> ":test",
               whenTrue
                 (Package.isRustService member)
-                $ member <> "__run: task " <> member <> ":run:watch"
+                $ member
+                  <> "__run: buck2 run -m $TASK_WATCHMAN_CLIENT_MODE //dev-watchman-client -- --target //"
+                  <> member
+                  <> " --restart"
             ]
       )
       workspace.rustMembers
@@ -240,23 +248,17 @@ genRootTaskfile workspace rootTaskfileInput =
         [ ( "rust:test:debug",
             FileFormat.TaskfileTask
               { aliases = Just ["rust:test", "rust:t"],
-                deps =
-                  Just
-                    ( (<> ":test:debug") <$> rustPackageNames
-                    ),
+                deps = Nothing,
                 cmd = Nothing,
-                cmds = Nothing
+                cmds = Just (Vector.singleton "buck2 test -m debug $(buck2 uquery \"kind('rust_test', //...)\")")
               }
           ),
           ( "rust:test:release",
             FileFormat.TaskfileTask
               { aliases = Just ["rust:tr"],
-                deps =
-                  Just
-                    ( (<> ":test:release") <$> rustPackageNames
-                    ),
+                deps = Nothing,
                 cmd = Nothing,
-                cmds = Nothing
+                cmds = Just (Vector.singleton "buck2 test -m release $(buck2 uquery \"kind('rust_test', //...)\")")
               }
           )
         ]

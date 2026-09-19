@@ -4,25 +4,20 @@ tasks:
     aliases:
       - test
       - t
-    cmd:
-      task: :rust:execute-package:test:debug
-      vars:
-        NAME: "{{.NAME}}"
+    cmds:
+      - buck2 test -m debug //dev-watchman-client:test
   test:debug:watch:
     aliases:
       - test:watch
       - tw
-    cmd:
-      task: :rust:execute-package:test:debug:watch
-      vars:
-        NAME: "{{.NAME}}"
+    cmds:
+      - buck2 run -m {{.TASK_WATCHMAN_CLIENT_MODE}} //dev-watchman-client -- --target
+        //dev-watchman-client:test
   test:release:
     aliases:
       - tr
-    cmd:
-      task: :rust:execute-package:test:release
-      vars:
-        NAME: "{{.NAME}}"
+    cmds:
+      - buck2 test -m release //dev-watchman-client:test
 vars:
   NAME: dev-watchman-client
 version: "3"

@@ -1,15 +1,19 @@
-watchman__server: task watchman:server
-rust__build__clippy: task rust:build:clippy:watch
-node__esbuild__build: task node:esbuild:build:watch
-node__test: task node:test:watch
-node__eslint__lint__check: task node:eslint:lint:check:watch
-haskell__build: task haskell:build:watch
-haskell__lint: task haskell:lint:watch
-dev-gen__test: task dev-gen:test:watch
-dev-sim__test: task dev-sim:test:watch
-dev-watchman-client__test: task dev-watchman-client:test:watch
-lib-hex-rs__test: task lib-hex-rs:test:watch
-svc-gateway-host-run__test: task svc-gateway-host-run:test:watch
-svc-gateway-host-run__run: task svc-gateway-host-run:run:watch
-svc-search-host-read__test: task svc-search-host-read:test:watch
-svc-search-host-read__run: task svc-search-host-read:run:watch
+watchman__server: watchman --unix-listener-path="$(realpath build/watchman-unix-listener)" --pidfile="$(realpath build/watchman-pid)" --statefile="$(realpath build/watchman-state)" --foreground
+rust__build__clippy: buck2 run -m $TASK_WATCHMAN_CLIENT_MODE //dev-watchman-client -- --mode rust -- bash -c 'buck2 build -m debug //dev-sim //dev-watchman-client //svc-gateway-host-run //svc-search-host-read //dev-sim:test //dev-watchman-client:test //lib-hex-rs:test //svc-gateway-host-run:test //svc-search-host-read:test && buck2 bxl -m debug dev_buck//clippy.bxl:check'
+node__esbuild__build: buck2 run -m $TASK_WATCHMAN_CLIENT_MODE //dev-watchman-client -- --mode javascript -- bash -c 'out=$(buck2 build --show-output //svc-gateway-guest-run:manifest | awk "{print \$2}") && ln -sf $(realpath "$out") svc-gateway-host-store/build/manifest.sqlite3'
+node__test: buck2 run -m $TASK_WATCHMAN_CLIENT_MODE //dev-watchman-client -- --mode gleam -- bash -c 'buck2 test -m debug $(buck2 uquery "kind(\"gleam_test\", //...)")'
+node__eslint__lint__check: buck2 run -m $TASK_WATCHMAN_CLIENT_MODE //dev-watchman-client -- --mode javascript -- eslint --config dev-eslint/index.json --cache --cache-location build/eslint-cache --ignore-path .gitignore --max-warnings 0 --ext js,cjs,mjs
+haskell__build: buck2 run -m $TASK_WATCHMAN_CLIENT_MODE //dev-watchman-client -- --mode haskell -- buck2 build -m debug //dev-gen:symbolize-dev-gen-exe //dev-gen:symbolize-dev-gen-test
+haskell__lint: buck2 run -m $TASK_WATCHMAN_CLIENT_MODE //dev-watchman-client -- --mode haskell -- buck2 build //dev-gen:lint
+dev-gen__test: buck2 run -m $TASK_WATCHMAN_CLIENT_MODE //dev-watchman-client -- --target //dev-gen:test
+
+
+
+
+dev-sim__test: buck2 run -m $TASK_WATCHMAN_CLIENT_MODE //dev-watchman-client -- --target //dev-sim:test
+dev-watchman-client__test: buck2 run -m $TASK_WATCHMAN_CLIENT_MODE //dev-watchman-client -- --target //dev-watchman-client:test
+lib-hex-rs__test: buck2 run -m $TASK_WATCHMAN_CLIENT_MODE //dev-watchman-client -- --target //lib-hex-rs:test
+svc-gateway-host-run__test: buck2 run -m $TASK_WATCHMAN_CLIENT_MODE //dev-watchman-client -- --target //svc-gateway-host-run:test
+svc-gateway-host-run__run: buck2 run -m $TASK_WATCHMAN_CLIENT_MODE //dev-watchman-client -- --target //svc-gateway-host-run --restart
+svc-search-host-read__test: buck2 run -m $TASK_WATCHMAN_CLIENT_MODE //dev-watchman-client -- --target //svc-search-host-read:test
+svc-search-host-read__run: buck2 run -m $TASK_WATCHMAN_CLIENT_MODE //dev-watchman-client -- --target //svc-search-host-read --restart
