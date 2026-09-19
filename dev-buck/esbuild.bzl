@@ -63,8 +63,15 @@ def _esbuild_manifest_impl(ctx: AnalysisContext) -> list[Provider]:
     cmd.add(cmd_args(hidden = [dep[DefaultInfo].default_outputs[0] for dep in ctx.attrs.migration_deps]))
     cmd.add(cmd_args(hidden = [dep[DefaultInfo].default_outputs[0] for dep in ctx.attrs.query_deps]))
 
+    env = {
+        "BETTER_SQLITE3_BINDING": ctx.attrs.better_sqlite3[DefaultInfo].default_outputs[0],
+        "ESBUILD_BINARY_PATH": ctx.attrs.esbuild_bin[DefaultInfo].default_outputs[0],
+        "ESBUILD_MAIN_PATH": ctx.attrs.esbuild_main[DefaultInfo].default_outputs[0],
+    }
+
     ctx.actions.run(
         cmd,
+        env = env,
         category = "dev_esbuild",
         identifier = ctx.attrs.mode,
     )
@@ -81,6 +88,7 @@ _esbuild_manifest = rule(
         "copy_entries": attrs.list(attrs.source(), default = []),
         "dev_esbuild": attrs.dep(default = "//dev-esbuild:dev-esbuild"),
         "esbuild_bin": attrs.dep(default = "vendor//esbuild-0.19.5:esbuild"),
+        "esbuild_main": attrs.dep(default = "vendor//esbuild-0.19.5:main.js"),
         "guest": attrs.dep(default = "//svc-gateway-guest-run:svc-gateway-guest-run"),
         "guest_dir": attrs.string(default = "svc-gateway-guest-run"),
         "migration_deps": attrs.list(attrs.dep(), default = []),

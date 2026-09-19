@@ -7,11 +7,6 @@ const require = createRequire(import.meta.url)
 
 const currentDir = dirname(fileURLToPath(import.meta.url))
 const repoRoot = process.env.DEVENV_ROOT ?? pathResolve(currentDir, '..')
-process.env.ESBUILD_BINARY_PATH ??= pathResolve(
-  repoRoot,
-  'build/vendor/esbuild/esbuild',
-)
-
 let mappings = null
 
 function loadMappings() {
@@ -29,15 +24,10 @@ let transformSync = null
 
 function getTransformSync() {
   if (!transformSync) {
-    const esbuildBin = pathResolve(
-      repoRoot,
-      'build/vendor/esbuild/esbuild',
-    )
-    process.env.ESBUILD_BINARY_PATH ??= esbuildBin
-    const esbuildMain = pathResolve(
-      repoRoot,
-      'build/vendor/esbuild/main.js',
-    )
+    const esbuildMain = process.env.ESBUILD_MAIN_PATH
+    if (!esbuildMain) {
+      throw new Error('ESBUILD_MAIN_PATH environment variable is not set')
+    }
     const esbuildMod = require(esbuildMain)
     transformSync = esbuildMod.transformSync
   }
@@ -45,6 +35,16 @@ function getTransformSync() {
 }
 
 export async function resolve(specifier, context, nextResolve) {
+  if (specifier === 'esbuild') {
+    const esbuildMain = process.env.ESBUILD_MAIN_PATH
+    if (esbuildMain) {
+      return {
+        url: pathToFileURL(esbuildMain).href,
+        shortCircuit: true,
+      }
+    }
+  }
+
   const map = loadMappings()
 
   if (map.has(specifier)) {
@@ -97,13 +97,12 @@ export async function resolve(specifier, context, nextResolve) {
 
   // Handle generated/injected.js for puppeteer
   if (specifier.includes('generated/injected.js')) {
-    const injectedPath = pathResolve(
-      repoRoot,
-      'build/vendor/puppeteer/injected.js',
-    )
-    return {
-      url: pathToFileURL(injectedPath).href,
-      shortCircuit: true,
+    const injectedPath = process.env.PUPPETEER_INJECTED_PATH
+    if (injectedPath) {
+      return {
+        url: pathToFileURL(injectedPath).href,
+        shortCircuit: true,
+      }
     }
   }
 

@@ -2,7 +2,6 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "version": 1,
   "imports": {
-    "esbuild": "build/vendor/esbuild/main.js",
     "better-sqlite3": "vendor/better-sqlite3-11.1.2/lib/index.js",
     "puppeteer": "vendor/puppeteer-25.9.0/packages/puppeteer/src/puppeteer.ts",
     "puppeteer-core": "vendor/puppeteer-25.9.0/packages/puppeteer-core/src/puppeteer-core.ts",
