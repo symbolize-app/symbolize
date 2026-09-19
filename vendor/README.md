@@ -184,8 +184,7 @@ specifier remapping across the repository:
     "rxjs": "vendor/rxjs-7.8.2/src/index.ts",
     "urlpattern-polyfill": "vendor/urlpattern-polyfill-10.0.0/src/url-pattern.ts",
     "parsel-js": "vendor/parsel-js-1.2.3/parsel.ts",
-    "better-sqlite3": "vendor/better-sqlite3-11.1.2/lib/index.js",
-    "esbuild": "build/vendor/esbuild/main.js"
+    "better-sqlite3": "vendor/better-sqlite3-11.1.2/lib/index.js"
   }
 }
 ```
@@ -202,9 +201,8 @@ Execution and bundling consume this table directly:
   are consumed directly from their source entrypoints or legitimate build
   artifacts.
 - **Native build artifacts**: Platform-specific native outputs (such as
-  `better_sqlite3.node`, `puppeteer`'s injected script, or the `esbuild` binary and JS bundle, compiled via Buck2)
-  belong strictly in `build/vendor/` and are built by tasks in
-  `dev-task/node.yml`.
+  `better_sqlite3.node`, `puppeteer`'s injected script, or the `esbuild` binary and JS bundle)
+  are compiled hermetically by Buck2 and resolved directly from Buck2 outputs via `dev-node-loader`.
 
 ## Haskell and Buck2 snapshots
 
@@ -467,8 +465,7 @@ with an empty ledger.
   be justified in `dup.toml`.
 - Do not put package-manager installations or Devenv state in this directory.
 - No generated artifacts, ad-hoc wrappers, or monolithic runtime bundles are
-  permitted in `vendor/`. All snapshots must be pure upstream Git checkouts. Build
-  output for native or platform-specific tools belongs strictly in `build/vendor/`.
+  permitted in `vendor/`. All snapshots must be pure upstream Git checkouts.
   First-party glue adapter packages and owned `index.js` shim files are strictly
   prohibited.
 - Revendor any third-party dependencies bundled inside an upstream snapshot as

@@ -12,14 +12,12 @@ tasks:
       - build
       - b
     deps:
-      - vendor:build
       - esbuild:build:debug
 
   build:release:
     aliases:
       - br
     deps:
-      - vendor:build
       - esbuild:build:release
 
   clean:
@@ -31,44 +29,11 @@ tasks:
     deps:
       - esbuild:clean:debug
       - eslint:clean
-      - vendor:clean
 
   clean:release:
     deps:
       - esbuild:clean:release
       - eslint:clean
-      - vendor:clean
-
-  vendor:clean:
-    cmd: rm -rf build/vendor
-
-  vendor:build:
-    sources:
-      - vendor/esbuild-0.19.5/**
-      - vendor/better-sqlite3-11.1.2/**
-      - vendor/sqlite3-3.46.0/**
-      - vendor/puppeteer-25.9.0/packages/puppeteer-core/src/injected/**
-      - vendor/puppeteer-25.9.0/packages/puppeteer-core/src/templates/**
-    generates:
-      - build/vendor/esbuild/esbuild
-      - build/vendor/esbuild/main.js
-      - build/vendor/better-sqlite3/better_sqlite3.node
-      - build/vendor/puppeteer/injected.js
-    cmds:
-      - mkdir -p build/vendor/esbuild build/vendor/better-sqlite3 build/vendor/puppeteer
-      - >-
-        while read -r target path; do
-          case "$target" in
-            *better-sqlite3*) cp "$path" build/vendor/better-sqlite3/better_sqlite3.node ;;
-            *esbuild-0.19.5:esbuild*) cp "$path" build/vendor/esbuild/esbuild ;;
-            *esbuild-0.19.5:main.js*) cp "$path" build/vendor/esbuild/main.js ;;
-            *puppeteer*) cp "$path" build/vendor/puppeteer/injected.js ;;
-          esac
-        done < <(buck2 build --show-output -m release \
-          vendor//better-sqlite3-11.1.2:better-sqlite3 \
-          vendor//esbuild-0.19.5:esbuild \
-          vendor//esbuild-0.19.5:main.js \
-          vendor//puppeteer-25.9.0:injected)
 
   esbuild:build:debug:
     aliases:

@@ -27,7 +27,6 @@ tasks:
     - gleam run --module dev_esbuild_development_graph_browser_driver_main
   build:
     deps:
-    - :node:vendor:build
     - :svc-gateway-guest-run:build
     dir: '{{.TASKFILE_DIR}}'
     cmd: gleam build

@@ -253,6 +253,11 @@ def _gleam_test_impl(ctx: AnalysisContext) -> list[Provider]:
     test_env["register.mjs"] = ctx.attrs.loader_register[DefaultInfo].default_outputs[0]
     test_env["hooks.mjs"] = ctx.attrs.loader_hooks[DefaultInfo].default_outputs[0]
 
+    test_env["better_sqlite3.node"] = ctx.attrs.better_sqlite3[DefaultInfo].default_outputs[0]
+    test_env["esbuild"] = ctx.attrs.esbuild_bin[DefaultInfo].default_outputs[0]
+    test_env["esbuild_main.js"] = ctx.attrs.esbuild_main[DefaultInfo].default_outputs[0]
+    test_env["puppeteer_injected.js"] = ctx.attrs.puppeteer_injected[DefaultInfo].default_outputs[0]
+
     runner_content = 'import { main } from "./' + pkg_info.package_name + "/" + ctx.attrs.module + '.mjs";\nmain();\n'
     runner_mjs = ctx.actions.write("run_test.mjs", runner_content)
     test_env["run_test.mjs"] = runner_mjs
@@ -275,6 +280,10 @@ def _gleam_test_impl(ctx: AnalysisContext) -> list[Provider]:
         '    export DEVENV_ROOT="$p"',
         '  fi',
         'fi',
+        'export BETTER_SQLITE3_BINDING="$PWD/better_sqlite3.node"',
+        'export ESBUILD_BINARY_PATH="$PWD/esbuild"',
+        'export ESBUILD_MAIN_PATH="$PWD/esbuild_main.js"',
+        'export PUPPETEER_INJECTED_PATH="$PWD/puppeteer_injected.js"',
         'exec node --preserve-symlinks --preserve-symlinks-main --import ./register.mjs run_test.mjs "$@"',
     ]
     ctx.actions.write(script, "\n".join(script_lines) + "\n", is_executable = True)
@@ -293,11 +302,15 @@ def _gleam_test_impl(ctx: AnalysisContext) -> list[Provider]:
 _gleam_test = rule(
     impl = _gleam_test_impl,
     attrs = {
+        "better_sqlite3": attrs.dep(default = "vendor//better-sqlite3-11.1.2:better-sqlite3"),
+        "esbuild_bin": attrs.dep(default = "vendor//esbuild-0.19.5:esbuild"),
+        "esbuild_main": attrs.dep(default = "vendor//esbuild-0.19.5:main.js"),
         "loader_hooks": attrs.dep(default = "@root//dev-node-loader:hooks.mjs"),
         "loader_register": attrs.dep(default = "@root//dev-node-loader:register.mjs"),
         "module": attrs.string(),
         "package": attrs.dep(),
         "prelude": attrs.dep(default = "dev_buck//:prelude"),
+        "puppeteer_injected": attrs.dep(default = "vendor//puppeteer-25.9.0:injected"),
     },
 )
 
