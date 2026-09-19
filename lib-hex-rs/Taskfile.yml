@@ -4,25 +4,20 @@ tasks:
     aliases:
       - test
       - t
-    cmd:
-      task: :rust:execute-package:test:debug
-      vars:
-        NAME: "{{.NAME}}"
+    cmds:
+      - buck2 test -m debug //lib-hex-rs:test
   test:debug:watch:
     aliases:
       - test:watch
       - tw
-    cmd:
-      task: :rust:execute-package:test:debug:watch
-      vars:
-        NAME: "{{.NAME}}"
+    cmds:
+      - buck2 run -m {{.TASK_WATCHMAN_CLIENT_MODE}} //dev-watchman-client -- --target
+        //lib-hex-rs:test
   test:release:
     aliases:
       - tr
-    cmd:
-      task: :rust:execute-package:test:release
-      vars:
-        NAME: "{{.NAME}}"
+    cmds:
+      - buck2 test -m release //lib-hex-rs:test
 vars:
   NAME: lib-hex-rs
 version: "3"

@@ -142,8 +142,6 @@ tasks:
   dev:
     aliases:
       - d
-    deps:
-      - watchman:client:prep
     cmd:
       task: overmind:start
 
@@ -165,91 +163,20 @@ tasks:
       - node:format:fix
 
   gleam:check:
-    deps:
-      - dev-browser-test:check
-      - dev-esbuild:check
-      - dev-node-test:check
-      - lib-concurrency:check
-      - lib-collection:check
-      - lib-dataflow:check
-      - lib-error:check
-      - lib-hex:check
-      - lib-markup:check
-      - lib-payload:check
-      - lib-random:check
-      - lib-styling:check
-      - lib-stream:check
-      - lib-test:check
-      - lib-test-runner:check
-      - lib-time:check
-      - svc-auth-guest-read:check
-      - svc-gateway-guest-run:check
-      - svc-auth-guest-view:check
+    cmds:
+      - buck2 build -m debug $(buck2 uquery 'kind("gleam_package", //...)' | sed 's/:[^:]*$/:check/')
 
   gleam:format:check:
-    deps:
-      - dev-browser-test:format:check
-      - dev-esbuild:format:check
-      - dev-node-test:format:check
-      - lib-concurrency:format:check
-      - lib-collection:format:check
-      - lib-dataflow:format:check
-      - lib-error:format:check
-      - lib-hex:format:check
-      - lib-markup:format:check
-      - lib-payload:format:check
-      - lib-random:format:check
-      - lib-styling:format:check
-      - lib-stream:format:check
-      - lib-test:format:check
-      - lib-test-runner:format:check
-      - lib-time:format:check
-      - svc-auth-guest-read:format:check
-      - svc-gateway-guest-run:format:check
-      - svc-auth-guest-view:format:check
+    cmds:
+      - buck2 build $(buck2 uquery 'kind("gleam_package", //...)' | sed 's/:[^:]*$/:format-check/')
 
   gleam:lint:check:
-    deps:
-      - dev-browser-test:lint
-      - dev-esbuild:lint
-      - dev-node-test:lint
-      - lib-concurrency:lint
-      - lib-collection:lint
-      - lib-dataflow:lint
-      - lib-error:lint
-      - lib-hex:lint
-      - lib-markup:lint
-      - lib-payload:lint
-      - lib-random:lint
-      - lib-styling:lint
-      - lib-stream:lint
-      - lib-test:lint
-      - lib-test-runner:lint
-      - lib-time:lint
-      - svc-auth-guest-read:lint
-      - svc-gateway-guest-run:lint
-      - svc-auth-guest-view:lint
+    cmds:
+      - buck2 build $(buck2 uquery 'kind("gleam_package", //...)' | sed 's/:[^:]*$/:lint/')
 
   gleam:test:
-    deps:
-      - dev-esbuild:test
-      - dev-node-test:test
-      - lib-concurrency:test
-      - lib-collection:test
-      - lib-dataflow:test
-      - lib-error:test
-      - lib-hex:test
-      - lib-markup:test
-      - lib-payload:test
-      - lib-random:test
-      - lib-styling:test
-      - lib-stream:test
-      - lib-test:test
-      - lib-test-runner:test
-      - lib-stream:test:http
-      - lib-stream:test:custom
-      - lib-time:test
-      - svc-gateway-guest-run:test
+    cmds:
+      - buck2 test -m debug $(buck2 uquery "kind('gleam_test', //...)")
 
   gleam:test:browser:
     cmds:
@@ -295,21 +222,21 @@ tasks:
     aliases:
       - g
     cmds:
-      - buck2 run //dev-gen:symbolize-dev-gen-exe
+      - buck2 run -m {{.TASK_GEN_MODE}} //dev-gen:symbolize-dev-gen-exe
 
   gen:check:
     cmds:
-      - buck2 run //dev-gen:symbolize-dev-gen-exe -- --check
+      - buck2 run -m {{.TASK_GEN_MODE}} //dev-gen:symbolize-dev-gen-exe -- --check
 
   vendor:check:
     cmds:
-      - buck2 run //dev-gen:symbolize-dev-gen-exe -- --check-vendor
+      - buck2 run -m {{.TASK_GEN_MODE}} //dev-gen:symbolize-dev-gen-exe -- --check-vendor
 
   license:check:
     aliases:
       - vendor:license:check
     cmds:
-      - buck2 run //dev-gen:symbolize-dev-gen-exe -- --check-licenses
+      - buck2 run -m {{.TASK_GEN_MODE}} //dev-gen:symbolize-dev-gen-exe -- --check-licenses
 
   lint:check:
     aliases:
@@ -338,10 +265,15 @@ tasks:
     deps:
       - rust:security
 
+  test:debug:
+    aliases:
+      - test
+      - t
+    cmds:
+      - buck2 test -m debug //...
+
   test:release:
     aliases:
       - tr
-    deps:
-      - haskell:test:release
-      - rust:test:release
-      - node:test
+    cmds:
+      - buck2 test -m release //...

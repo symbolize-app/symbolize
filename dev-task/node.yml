@@ -86,13 +86,7 @@ tasks:
       - esbuild:bw
     deps:
       - :svc-gateway-host-store:link-build-dir
-    cmd:
-      task: :watchman:client
-      vars:
-        WATCH: true
-        RESTART: false
-        MODE: javascript
-        COMMAND: task node:esbuild:build:debug
+    cmd: buck2 run -m {{.TASK_WATCHMAN_CLIENT_MODE}} //dev-watchman-client -- --mode javascript -- bash -c 'out=$(buck2 build --show-output //svc-gateway-guest-run:manifest | awk "{print \$2}") && ln -sf $(realpath "$out") svc-gateway-host-store/build/manifest.sqlite3'
 
   esbuild:build:release:
     deps:
@@ -120,13 +114,7 @@ tasks:
     cmd: eslint --config dev-eslint/index.json {{.ESLINT_ARGS}}
 
   eslint:lint:check:watch:
-    cmd:
-      task: :watchman:client
-      vars:
-        WATCH: true
-        RESTART: false
-        MODE: javascript
-        COMMAND: eslint --config dev-eslint/index.json {{.ESLINT_ARGS}}
+    cmd: buck2 run -m {{.TASK_WATCHMAN_CLIENT_MODE}} //dev-watchman-client -- --mode javascript -- eslint --config dev-eslint/index.json {{.ESLINT_ARGS}}
 
   eslint:lint:fix:
     cmd: eslint --config dev-eslint/index.json {{.ESLINT_ARGS}} --fix
@@ -158,15 +146,9 @@ tasks:
   test:
     aliases:
       - t
-    cmd: task gleam:test
+    cmd: buck2 test -m debug $(buck2 uquery "kind('gleam_test', //...)")
 
   test:watch:
     aliases:
       - tw
-    cmd:
-      task: :watchman:client
-      vars:
-        WATCH: true
-        RESTART: false
-        MODE: gleam
-        COMMAND: task gleam:test
+    cmd: buck2 run -m {{.TASK_WATCHMAN_CLIENT_MODE}} //dev-watchman-client -- --mode gleam -- bash -c 'buck2 test -m debug $(buck2 uquery "kind(\"gleam_test\", //...)")'

@@ -16,13 +16,7 @@ tasks:
     aliases:
       - test:watch
       - tw
-    cmd:
-      task: :watchman:client
-      vars:
-        WATCH: true
-        RESTART: false
-        MODE: haskell
-        COMMAND: buck2 test -m debug //dev-gen:test
+    cmd: buck2 run -m {{.TASK_WATCHMAN_CLIENT_MODE}} //dev-watchman-client -- --target //dev-gen:test
 
   test:release:
     aliases:

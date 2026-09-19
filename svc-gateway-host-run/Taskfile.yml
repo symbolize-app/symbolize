@@ -4,48 +4,38 @@ tasks:
     aliases:
       - run
       - r
-    cmd:
-      task: :rust:execute-package:run:debug
-      vars:
-        NAME: "{{.NAME}}"
+    cmds:
+      - buck2 run -m debug //svc-gateway-host-run -- {{.CLI_ARGS}}
   run:debug:watch:
     aliases:
       - run:watch
       - rw
-    cmd:
-      task: :rust:execute-package:run:debug:watch
-      vars:
-        NAME: "{{.NAME}}"
+    cmds:
+      - buck2 run -m {{.TASK_WATCHMAN_CLIENT_MODE}} //dev-watchman-client -- --target
+        //svc-gateway-host-run --restart -- {{.CLI_ARGS}}
   run:release:
     aliases:
       - rr
-    cmd:
-      task: :rust:execute-package:run:release
-      vars:
-        NAME: "{{.NAME}}"
+    cmds:
+      - buck2 run -m release //svc-gateway-host-run -- {{.CLI_ARGS}}
   test:debug:
     aliases:
       - test
       - t
-    cmd:
-      task: :rust:execute-package:test:debug
-      vars:
-        NAME: "{{.NAME}}"
+    cmds:
+      - buck2 test -m debug //svc-gateway-host-run:test
   test:debug:watch:
     aliases:
       - test:watch
       - tw
-    cmd:
-      task: :rust:execute-package:test:debug:watch
-      vars:
-        NAME: "{{.NAME}}"
+    cmds:
+      - buck2 run -m {{.TASK_WATCHMAN_CLIENT_MODE}} //dev-watchman-client -- --target
+        //svc-gateway-host-run:test
   test:release:
     aliases:
       - tr
-    cmd:
-      task: :rust:execute-package:test:release
-      vars:
-        NAME: "{{.NAME}}"
+    cmds:
+      - buck2 test -m release //svc-gateway-host-run:test
 vars:
   NAME: svc-gateway-host-run
 version: "3"

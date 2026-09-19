@@ -101,17 +101,17 @@ spec = context "Gen" $ do
                     [ ( "rust:test:debug",
                         FileFormat.TaskfileTask
                           { aliases = Just ["rust:test", "rust:t"],
-                            deps = Just [],
+                            deps = Nothing,
                             cmd = Nothing,
-                            cmds = Nothing
+                            cmds = Just ["buck2 test -m debug $(buck2 uquery \"kind('rust_test', //...)\")"]
                           }
                       ),
                       ( "rust:test:release",
                         FileFormat.TaskfileTask
                           { aliases = Just ["rust:tr"],
-                            deps = Just [],
+                            deps = Nothing,
                             cmd = Nothing,
-                            cmds = Nothing
+                            cmds = Just ["buck2 test -m release $(buck2 uquery \"kind('rust_test', //...)\")"]
                           }
                       ),
                       ( "y",
