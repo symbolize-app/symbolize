@@ -39,11 +39,6 @@ tasks:
       for (const [expression,expectedValue] of expressions) { const code=context.rule_code(atom.compile(context.styling(),atom.atom("x",expression))[1].head);
       if (code!==`.a0{x:${expectedValue}}`) throw new Error(`numeric expression mismatch:
       ${code}`); } } console.log("lib-styling generated JS numeric parity passed")'''
-  link-build-dir:
-    cmd:
-      task: :build-dir:link-package-build-dir
-      vars:
-        NAME: '{{.NAME}}'
   lint:
     aliases:
     - l
@@ -57,5 +52,3 @@ tasks:
     aliases:
     - tr
     cmd: buck2 test -m release //lib-styling:test
-vars:
-  NAME: lib-styling

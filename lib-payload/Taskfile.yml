@@ -6,11 +6,6 @@ tasks:
     aliases:
     - fc
     cmd: buck2 build //lib-payload:format-check
-  link-build-dir:
-    cmd:
-      task: :build-dir:link-package-build-dir
-      vars:
-        NAME: '{{.NAME}}'
   lint:
     aliases:
     - l
@@ -24,6 +19,4 @@ tasks:
     aliases:
     - tr
     cmd: buck2 test -m release //lib-payload:test
-vars:
-  NAME: lib-payload
 version: '3'

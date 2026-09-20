@@ -9,12 +9,10 @@
     NODE_OPTIONS = "--experimental-json-modules --unhandled-rejections strict --import ${config.devenv.root}/dev-node-loader/register.mjs";
     SYMBOLIZE_CHROMIUM_EXECUTABLE = "${pkgs.chromium}/bin/chromium";
 
-    DATABASE_URL = "sqlite:svc-gateway-host-store/build/manifest.sqlite3";
     DBMATE_MIGRATIONS_DIR = "svc-gateway-host-store/migrate";
     DBMATE_SCHEMA_FILE = "svc-gateway-host-store/schema.sql";
     DBMATE_MIGRATIONS_TABLE = "migration";
 
-    CARGO_HOME = "${config.devenv.root}/.cargo";
     RUST_BACKTRACE = "1";
 
     LC_ALL = "C.UTF-8";

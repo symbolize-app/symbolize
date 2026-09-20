@@ -2,8 +2,6 @@ version: '3'
 
 run: when_changed
 
-vars:
-  NAME: dev-gen
 
 tasks:
   test:debug:
@@ -42,8 +40,3 @@ tasks:
       - l
     cmd: buck2 build //dev-gen:lint
 
-  link-build-dir:
-    cmd:
-      task: :build-dir:link-package-build-dir
-      vars:
-        NAME: '{{.NAME}}'

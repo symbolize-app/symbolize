@@ -1,13 +1,12 @@
 import dev_browser_test as browser
 import dev_esbuild_db as db
+import dev_esbuild_node as node
 import gleam/bit_array
 import gleam/io
 import gleam/result
 import gleam/string
 import lib_dataflow as dataflow
 import lib_hex
-
-const database_path = "../svc-gateway-host-store/build/manifest.sqlite3"
 
 const content_for_path_query = "test/query/content_for_path.sql"
 
@@ -26,7 +25,7 @@ type State {
 }
 
 pub fn main() {
-  let database = db.open_readonly(database_path)
+  let database = db.open_readonly(node.manifest_path())
   let assert Ok(shell) =
     db.query_blob_by_text(
       database,

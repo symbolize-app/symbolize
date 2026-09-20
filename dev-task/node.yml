@@ -27,50 +27,31 @@ tasks:
 
   clean:debug:
     deps:
-      - esbuild:clean:debug
       - eslint:clean
 
   clean:release:
     deps:
-      - esbuild:clean:release
       - eslint:clean
 
   esbuild:build:debug:
     aliases:
       - esbuild:build
       - esbuild:b
-    deps:
-      - :svc-gateway-host-store:link-build-dir
-    cmd: >-
-      out=$(buck2 build --show-output //svc-gateway-guest-run:manifest | awk '{print $2}') &&
-      ln -sf $(realpath "$out") svc-gateway-host-store/build/manifest.sqlite3
+    cmd: buck2 build -m debug //svc-gateway-guest-run:manifest
 
   esbuild:build:debug:watch:
     aliases:
       - esbuild:build:watch
       - esbuild:bw
-    deps:
-      - :svc-gateway-host-store:link-build-dir
-    cmd: buck2 run -m {{.TASK_WATCHMAN_CLIENT_MODE}} //dev-watchman-client -- --mode javascript -- bash -c 'out=$(buck2 build --show-output //svc-gateway-guest-run:manifest | awk "{print \$2}") && ln -sf $(realpath "$out") svc-gateway-host-store/build/manifest.sqlite3'
+    cmd: buck2 run -m {{.TASK_WATCHMAN_CLIENT_MODE}} //dev-watchman-client -- --mode javascript -- buck2 build -m debug //svc-gateway-host-run
 
   esbuild:build:release:
-    deps:
-      - :svc-gateway-host-store:link-build-dir
-    cmd: >-
-      out=$(buck2 build --show-output //svc-gateway-guest-run:manifest-release | awk '{print $2}') &&
-      ln -sf $(realpath "$out") svc-gateway-host-store/build/manifest.sqlite3
+    cmd: buck2 build -m release //svc-gateway-guest-run:manifest-release
 
   esbuild:test:browser:built:
     cmds:
-      - task: :build-dir:link-build-dirs
       - task: esbuild:build:debug
       - task: :dev-esbuild:test:browser:built
-
-  esbuild:clean:debug:
-    cmd: rm -f svc-gateway-host-store/build/manifest.sqlite3
-
-  esbuild:clean:release:
-    cmd: rm -f svc-gateway-host-store/build/manifest.sqlite3
 
   eslint:clean:
     cmd: rm build/eslint-cache

@@ -25,11 +25,6 @@ tasks:
     - build
     dir: '{{.TASKFILE_DIR}}'
     cmd: gleam run --module lib_stream_browser_driver_main
-  link-build-dir:
-    cmd:
-      task: :build-dir:link-package-build-dir
-      vars:
-        NAME: '{{.NAME}}'
   lint:
     aliases:
     - l
@@ -43,5 +38,3 @@ tasks:
     aliases:
     - tr
     cmd: buck2 test -m release //lib-stream:test
-vars:
-  NAME: lib-stream

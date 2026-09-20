@@ -1,18 +1,12 @@
 includes:
-  build-dir:
-    taskfile: dev-task/build-dir.yml
   dev-browser-test:
     taskfile: dev-browser-test
   dev-esbuild:
     taskfile: dev-esbuild
-  dev-eslint:
-    taskfile: dev-eslint
   dev-gen:
     taskfile: dev-gen
   dev-node-test:
     taskfile: dev-node-test
-  dev-prettier:
-    taskfile: dev-prettier
   dev-sim:
     taskfile: dev-sim
   dev-watchman-client:
@@ -67,8 +61,6 @@ includes:
     taskfile: svc-gateway-guest-run
   svc-gateway-host-run:
     taskfile: svc-gateway-host-run
-  svc-gateway-host-store:
-    taskfile: svc-gateway-host-store
   svc-search-host-read:
     taskfile: svc-search-host-read
   watchman:
@@ -185,30 +177,6 @@ tasks:
       - rust:lint:fix
       - node:lint:fix
       - sqlite:lint:fix
-  node:link-build-dirs:
-    deps:
-      - dev-browser-test:link-build-dir
-      - dev-esbuild:link-build-dir
-      - dev-eslint:link-build-dir
-      - dev-gen:link-build-dir
-      - dev-node-test:link-build-dir
-      - dev-prettier:link-build-dir
-      - lib-collection:link-build-dir
-      - lib-concurrency:link-build-dir
-      - lib-dataflow:link-build-dir
-      - lib-error:link-build-dir
-      - lib-hex:link-build-dir
-      - lib-markup:link-build-dir
-      - lib-payload:link-build-dir
-      - lib-random:link-build-dir
-      - lib-stream:link-build-dir
-      - lib-styling:link-build-dir
-      - lib-test:link-build-dir
-      - lib-test-runner:link-build-dir
-      - lib-time:link-build-dir
-      - svc-auth-guest-read:link-build-dir
-      - svc-auth-guest-view:link-build-dir
-      - svc-gateway-guest-run:link-build-dir
   rust:test:debug:
     aliases:
       - rust:test

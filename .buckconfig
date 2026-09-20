@@ -35,7 +35,6 @@
 [project]
   ignore = \
     .git, \
-    .cargo, \
     .devenv, \
     .env, \
     .font, \
@@ -45,11 +44,9 @@
     art/favicon.png, \
     build, \
     */build, \
-    node_modules, \
     .task, \
     relude-hlint.yaml, \
     result, \
     tmp, \
     buck-out, \
-    .buckd, \
-    dist-newstyle
+    .buckd
