@@ -166,7 +166,7 @@ genRustPackageTaskfile rustPackageName =
       { version = FileFormat.taskfileVersion,
         run = FileFormat.taskfileRun,
         includes = Nothing,
-        vars = Just [("NAME", rustPackageName)],
+        vars = Nothing,
         tasks =
           fromList . toList $
             uncurry (genRustTask rustPackageName)

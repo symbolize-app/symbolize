@@ -36,6 +36,4 @@ tasks:
       - tr
     cmds:
       - buck2 test -m release //svc-search-host-read:test
-vars:
-  NAME: svc-search-host-read
 version: "3"
