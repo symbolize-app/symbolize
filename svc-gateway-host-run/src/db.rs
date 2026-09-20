@@ -14,7 +14,6 @@ use std::sync::Arc;
 use std::thread;
 use std::thread::ThreadId;
 use std::time::Duration;
-use tokio::process::Command;
 use tokio::runtime::Handle as TokioHandle;
 use tokio::select;
 use tokio::sync::oneshot;
@@ -81,7 +80,6 @@ struct QueryRequest(Box<dyn QueryFunction + Send>);
 
 impl DbImpl {
   pub async fn init() -> Result<Self> {
-    Self::run_migrations().await?;
     Ok(DbImpl {
       connection_task_tracker: TaskTracker::new(),
       idle_connections: Arc::new(ArrayQueue::new(MAX_IDLE_CONNECTIONS)),
@@ -95,22 +93,13 @@ impl DbImpl {
     self.connection_task_tracker.wait().await;
   }
 
-  async fn run_migrations() -> Result<()> {
-    let success = Command::new("dbmate")
-      .args(["--no-dump-schema", "up"])
-      .status()
-      .await?
-      .success();
-    success.then_some(()).ok_or(anyhow!("dbmate failed"))
-  }
-
   fn open_db_connection() -> Result<rusqlite::Connection> {
     let path = std::env::var("MANIFEST_PATH")
       .ok()
       .or_else(|| option_env!("MANIFEST_PATH").map(String::from))
-      .unwrap_or_else(|| {
-        "svc-gateway-host-store/build/manifest.sqlite3".to_string()
-      });
+      .ok_or_else(|| {
+        anyhow!("MANIFEST_PATH environment variable is not set")
+      })?;
     Ok(rusqlite::Connection::open_with_flags(
       path,
       rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY

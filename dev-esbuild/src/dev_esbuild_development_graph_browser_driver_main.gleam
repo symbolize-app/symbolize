@@ -1,16 +1,15 @@
 import dev_browser_test as browser
 import dev_esbuild_db as db
+import dev_esbuild_node as node
 import gleam/io
 import gleam/string
-
-const database_path = "../svc-gateway-host-store/build/manifest.sqlite3"
 
 const content_for_path_query = "test/query/content_for_path.sql"
 
 const entry_path = "/.code/svc-gateway-guest-run/main.development.mjs"
 
 pub fn main() {
-  let database = db.open_readonly(database_path)
+  let database = db.open_readonly(node.manifest_path())
   let root = browser.resolve_path("build/dev/javascript")
   browser.run(
     fn(path, _search, _request, response) {

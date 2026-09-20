@@ -1,5 +1,10 @@
-import { execFile as runFile } from 'node:child_process'
-import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
+import { execFile as runFile, execFileSync } from 'node:child_process'
+import {
+  existsSync,
+  mkdtempSync,
+  readFileSync,
+  writeFileSync,
+} from 'node:fs'
 import { mkdir as makeDirectory, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import {
@@ -7,6 +12,18 @@ import {
   relative as relativePath,
 } from 'node:path'
 import { Result$Error, Result$Ok, List } from './gleam.mjs'
+
+export function manifest_path() {
+  if (process.env.MANIFEST_PATH && existsSync(process.env.MANIFEST_PATH)) {
+    return process.env.MANIFEST_PATH
+  }
+  const out = execFileSync(
+    'buck2',
+    ['build', '--show-simple-output', '//svc-gateway-guest-run:manifest'],
+    { encoding: 'utf8' },
+  ).trim()
+  return resolvePath(out)
+}
 
 export function argv() {
   return List.fromArray(process.argv.slice(2))

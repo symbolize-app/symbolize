@@ -286,7 +286,7 @@ checkGleamDependencies repoRoot = do
     findFilesRecursive dir targetName = do
       entries <- Dir.listDirectory dir `catchAny` const (pure [])
       let ignored :: [FilePath]
-          ignored = [".git", ".tmp", "build", "node_modules", "dist-newstyle", "buck-out"]
+          ignored = [".git", ".tmp", "build", "buck-out"]
       validEntries <- flip filterM entries $ \e -> do
         let full = dir </> e
         isDir <- Dir.doesDirectoryExist full `catchAny` const (pure False)

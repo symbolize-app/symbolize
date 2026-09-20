@@ -30,11 +30,6 @@ tasks:
     - :svc-gateway-guest-run:build
     dir: '{{.TASKFILE_DIR}}'
     cmd: gleam build
-  link-build-dir:
-    cmd:
-      task: :build-dir:link-package-build-dir
-      vars:
-        NAME: '{{.NAME}}'
   lint:
     aliases:
     - l
@@ -48,6 +43,4 @@ tasks:
     aliases:
     - tr
     cmd: buck2 test -m release //dev-esbuild:test
-vars:
-  NAME: dev-esbuild
 version: '3'

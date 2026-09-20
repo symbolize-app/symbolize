@@ -14,15 +14,8 @@ tasks:
     - build
     dir: '{{.TASKFILE_DIR}}'
     cmd: gleam run --module svc_auth_guest_view_browser_driver_main
-  link-build-dir:
-    cmd:
-      task: :build-dir:link-package-build-dir
-      vars:
-        NAME: '{{.NAME}}'
   lint:
     aliases:
     - l
     cmd: buck2 build //svc-auth-guest-view:lint
-vars:
-  NAME: svc-auth-guest-view
 version: '3'

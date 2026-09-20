@@ -3,6 +3,9 @@ import lib_error
 @external(javascript, "./node_ffi.mjs", "argv")
 pub fn argv() -> List(String)
 
+@external(javascript, "./node_ffi.mjs", "manifest_path")
+pub fn manifest_path() -> String
+
 @external(javascript, "./node_ffi.mjs", "resolve")
 pub fn resolve(path: String) -> String
 

@@ -256,7 +256,7 @@ _readVendorTargets = liftIO $ do
     findBuckFiles dir = do
       entries <- Dir.listDirectory dir `catchAny` const (pure [])
       let ignored :: [FilePath.FilePath]
-          ignored = [".git", ".tmp", "build", "node_modules", "dist-newstyle", "buck-out"]
+          ignored = [".git", ".tmp", "build", "buck-out"]
       fpaths <- forM entries $ \e -> do
         let full = dir </> e
         isDir <- Dir.doesDirectoryExist full `catchAny` const (pure False)

@@ -18,14 +18,8 @@ includes:
   dev-esbuild:
     taskfile: dev-esbuild
 
-  dev-eslint:
-    taskfile: dev-eslint
-
   dev-node-test:
     taskfile: dev-node-test
-
-  dev-prettier:
-    taskfile: dev-prettier
 
   dev-watchman-client:
     taskfile: dev-watchman-client
@@ -44,9 +38,6 @@ includes:
 
   sqlite:
     taskfile: dev-task/sqlite.yml
-
-  svc-gateway-host-store:
-    taskfile: svc-gateway-host-store
 
   lib-collection:
     taskfile: lib-collection
@@ -95,9 +86,6 @@ includes:
 
   svc-gateway-guest-run:
     taskfile: svc-gateway-guest-run
-
-  build-dir:
-    taskfile: dev-task/build-dir.yml
 
   watchman:
     taskfile: dev-task/watchman.yml
@@ -192,31 +180,6 @@ tasks:
       - task svc-gateway-guest-run:test:browser:service-worker
       - task svc-auth-guest-read:test:browser
       - task svc-auth-guest-view:test:browser
-
-  node:link-build-dirs:
-    deps:
-      - dev-browser-test:link-build-dir
-      - dev-esbuild:link-build-dir
-      - dev-eslint:link-build-dir
-      - dev-gen:link-build-dir
-      - dev-node-test:link-build-dir
-      - dev-prettier:link-build-dir
-      - lib-collection:link-build-dir
-      - lib-concurrency:link-build-dir
-      - lib-dataflow:link-build-dir
-      - lib-error:link-build-dir
-      - lib-hex:link-build-dir
-      - lib-markup:link-build-dir
-      - lib-payload:link-build-dir
-      - lib-random:link-build-dir
-      - lib-stream:link-build-dir
-      - lib-styling:link-build-dir
-      - lib-test:link-build-dir
-      - lib-test-runner:link-build-dir
-      - lib-time:link-build-dir
-      - svc-auth-guest-read:link-build-dir
-      - svc-auth-guest-view:link-build-dir
-      - svc-gateway-guest-run:link-build-dir
 
   gen:
     aliases:
