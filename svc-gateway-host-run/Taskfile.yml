@@ -36,6 +36,4 @@ tasks:
       - tr
     cmds:
       - buck2 test -m release //svc-gateway-host-run:test
-vars:
-  NAME: svc-gateway-host-run
 version: "3"

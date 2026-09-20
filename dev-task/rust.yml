@@ -2,13 +2,6 @@ version: '3'
 
 run: when_changed
 
-vars:
-  # Note: some options still needed as args (https://github.com/rust-lang/rust-clippy/issues/7290)
-  CLIPPY_ARGS: >-
-    --
-    -A clippy::single_component_path_imports
-    -D warnings
-
 tasks:
   build:debug:
     aliases:

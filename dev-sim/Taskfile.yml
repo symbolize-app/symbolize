@@ -18,6 +18,4 @@ tasks:
       - tr
     cmds:
       - buck2 test -m release //dev-sim:test
-vars:
-  NAME: dev-sim
 version: "3"

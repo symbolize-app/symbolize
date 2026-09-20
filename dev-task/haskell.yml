@@ -2,9 +2,6 @@ version: '3'
 
 run: when_changed
 
-vars:
-  NAME: dev-gen
-
 tasks:
   build:debug:
     aliases:

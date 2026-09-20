@@ -18,6 +18,4 @@ tasks:
       - tr
     cmds:
       - buck2 test -m release //dev-watchman-client:test
-vars:
-  NAME: dev-watchman-client
 version: "3"
